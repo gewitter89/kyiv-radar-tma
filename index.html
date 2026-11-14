@@ -1,314 +1,295 @@
 <!DOCTYPE html>
-<html lang="uk" class="dark">
+<html lang="uk" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Київ Ключі — Оренда квартир від господарів</title>
-    
-    <!-- Telegram WebApp SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <!-- Leaflet Maps -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <!-- Tailwind CSS CDN -->
+    <title>Київ Радар — Оренда 0%</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Plus Jakarta Sans Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-                    },
                     colors: {
                         base: {
-                            950: '#0b0d13',
-                            900: '#121620',
-                            850: '#181e2b',
-                            800: '#202838',
-                            700: '#2c374d',
-                        },
-                        kyiv: {
-                            blue: '#2563eb',
-                            red: '#dc2626',
-                            green: '#16a34a',
+                            950: '#07090e',
+                            900: '#0e121a',
+                            850: '#151b26',
+                            800: '#1d2433'
                         }
                     }
                 }
             }
         }
     </script>
-
+    <!-- Leaflet Maps CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            background-color: #0b0d13;
-            color: #f8fafc;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+        * {
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            -webkit-user-select: none;
         }
-
-        /* Anti-slop clean border & card utilities */
-        .app-card {
-            background-color: #121620;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-        }
-
-        .slider-track {
-            display: flex;
+        body, html {
             height: 100%;
-            transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        /* Custom Leaflet Map styling */
-        .leaflet-container {
-            background-color: #0b0d13 !important;
-            font-family: inherit;
-        }
-
-        .map-price-bubble {
-            background-color: #ffffff;
-            color: #0b0d13;
-            font-weight: 800;
-            font-size: 12px;
-            padding: 4px 9px;
-            border-radius: 14px;
-            border: 1.5px solid #2563eb;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            white-space: nowrap;
-            cursor: pointer;
-            transition: transform 0.15s ease;
-        }
-        .map-price-bubble:hover, .map-price-bubble.selected {
-            transform: scale(1.1);
-            background-color: #2563eb;
-            color: #ffffff;
-        }
-
-        .leaflet-popup-content-wrapper {
-            background: #121620 !important;
-            color: #f8fafc !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 16px !important;
-            padding: 0 !important;
+            width: 100%;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6) !important;
-        }
-        .leaflet-popup-content {
-            margin: 0 !important;
-            width: 240px !important;
+            background-color: #07090e;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        .scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
-        .scrollbar-none::-webkit-scrollbar { display: none; }
+        #map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: #07090e;
+        }
 
-        @media (max-width: 389px) {
-            .btn-lbl-full { display: none; }
-            .btn-lbl-short { display: inline; }
+        /* Glass Panels */
+        .glass-panel {
+            background: rgba(14, 18, 26, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        @media (min-width: 390px) {
-            .btn-lbl-full { display: inline; }
-            .btn-lbl-short { display: none; }
+
+        /* Custom Bird Kyiv Map Marker Pins */
+        .bird-pin-wrap {
+            background: none !important;
+            border: none !important;
         }
+        .bird-pin {
+            position: relative;
+            background: #ffffff;
+            color: #07090e;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 5px 9px;
+            border-radius: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+            white-space: nowrap;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1.5px solid #2563eb;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transform: translate(-50%, -50%);
+        }
+        .bird-pin.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #ffffff;
+            transform: translate(-50%, -50%) scale(1.18);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.6);
+            z-index: 9999 !important;
+        }
+        .bird-pin .pin-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+        .bird-pin.active .pin-dot {
+            background: #ffffff;
+        }
+
+        /* Snap Carousel for Floating Apartment Cards */
+        .cards-carousel {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 16px 12px 16px;
+        }
+        .cards-carousel::-webkit-scrollbar {
+            display: none;
+        }
+        .apartment-card {
+            flex: 0 0 calc(100vw - 40px);
+            max-width: 360px;
+            scroll-snap-align: center;
+            border-radius: 24px;
+            overflow: hidden;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .apartment-card.active-card {
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.15);
+        }
+
+        /* Filter Pills Scrollbar Hide */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased">
+<body class="relative h-full w-full">
 
-    <!-- Top Navigation Header -->
-    <header class="sticky top-0 z-40 bg-base-950/90 backdrop-blur-md border-b border-white/5 px-3 py-2.5 flex items-center justify-between gap-2 min-w-0">
-        <!-- Brand -->
-        <div class="flex items-center gap-2.5 shrink-0">
-            <div class="w-9 h-9 min-w-[36px] min-h-[36px] max-w-[36px] max-h-[36px] aspect-square shrink-0 rounded-xl bg-white text-base-950 flex items-center justify-center font-black text-xs shadow-md">
-                КР
-            </div>
-            <div class="min-w-0">
-                <div class="flex items-center gap-1.5">
-                    <h1 class="text-sm font-extrabold tracking-tight text-white leading-tight whitespace-nowrap">Київ Радар</h1>
-                    <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">0%</span>
+    <!-- FULLSCREEN MAP -->
+    <div id="map"></div>
+
+    <!-- TOP FLOATING GLASS ISLAND -->
+    <header class="absolute top-3 left-3 right-3 z-30 flex flex-col gap-2 pointer-events-none">
+        <!-- Main Search Bar -->
+        <div class="glass-panel rounded-2xl p-2 px-3 flex items-center justify-between gap-2 shadow-2xl pointer-events-auto">
+            <!-- Brand -->
+            <div class="flex items-center gap-2 shrink-0">
+                <div class="w-8 h-8 rounded-xl bg-white text-base-950 flex items-center justify-center font-black text-xs shrink-0 shadow-sm">
+                    КР
                 </div>
-                <p class="text-[10px] text-slate-400 font-medium leading-tight truncate">Оренда 0% без рієлторів</p>
+                <div class="min-w-0 pr-1">
+                    <div class="flex items-center gap-1">
+                        <span class="text-xs font-black text-white tracking-tight">Київ Радар</span>
+                        <span class="px-1 py-0.5 rounded text-[8px] font-extrabold bg-emerald-500/20 text-emerald-300">0%</span>
+                    </div>
+                    <span class="text-[9px] text-slate-400 font-medium block truncate">Прямі власники</span>
+                </div>
             </div>
+
+            <!-- Search Input -->
+            <div class="flex-1 relative flex items-center min-w-0">
+                <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                </svg>
+                <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Метро, район, ЖК…" class="w-full bg-base-900/90 border border-white/10 rounded-xl pl-8 pr-2.5 py-1.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30 transition-all">
+            </div>
+
+            <!-- Filter Trigger Button -->
+            <button onclick="openFilterModal()" class="shrink-0 p-2 rounded-xl bg-base-850 hover:bg-base-800 text-slate-200 border border-white/10 transition-all active:scale-95 flex items-center gap-1 text-xs font-bold">
+                <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M7 10h10M11 16h2"/>
+                </svg>
+            </button>
         </div>
 
-        <!-- Segmented control -->
-        <div class="flex items-center bg-base-900 border border-white/5 p-0.5 rounded-xl shrink-0 overflow-hidden">
-            <button onclick="switchView('split')" id="btn-view-split" class="px-2 py-1 rounded-lg text-xs font-bold bg-white text-base-950 transition-all whitespace-nowrap leading-tight">
-                <span class="btn-lbl-full">Карта + Каталог</span>
-                <span class="btn-lbl-short">Карта</span>
-            </button>
-            <button onclick="switchView('map')" id="btn-view-map" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all whitespace-nowrap leading-tight">
-                <span class="btn-lbl-full">Тільки карта</span>
-                <span class="btn-lbl-short">Мапа</span>
-            </button>
-            <button onclick="switchView('list')" id="btn-view-list" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all whitespace-nowrap leading-tight">
-                Список
-            </button>
+        <!-- Quick Filter Pills Rail (Fade Edge) -->
+        <div class="pointer-events-auto overflow-hidden">
+            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5" style="mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%); -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);">
+                <button onclick="toggleQuickFilter(this, 'all')" class="q-filter active shrink-0 px-3 py-1 rounded-full text-xs font-bold bg-white text-base-950 shadow-md">
+                    Всі (4)
+                </button>
+                <button onclick="toggleQuickFilter(this, 'generator')" class="q-filter shrink-0 px-3 py-1 rounded-full text-xs font-semibold glass-panel text-slate-300 hover:text-white transition-all">
+                    🔋 Генератор
+                </button>
+                <button onclick="toggleQuickFilter(this, 'gpon')" class="q-filter shrink-0 px-3 py-1 rounded-full text-xs font-semibold glass-panel text-slate-300 hover:text-white transition-all">
+                    ⚡ GPON
+                </button>
+                <button onclick="toggleQuickFilter(this, 'lowFloor')" class="q-filter shrink-0 px-3 py-1 rounded-full text-xs font-semibold glass-panel text-slate-300 hover:text-white transition-all">
+                    🏢 Поверх 1–5
+                </button>
+                <button onclick="toggleQuickFilter(this, 'pets')" class="q-filter shrink-0 px-3 py-1 rounded-full text-xs font-semibold glass-panel text-slate-300 hover:text-white transition-all">
+                    🐾 Тварини
+                </button>
+                <button onclick="toggleQuickFilter(this, 'gas')" class="q-filter shrink-0 px-3 py-1 rounded-full text-xs font-semibold glass-panel text-slate-300 hover:text-white transition-all">
+                    🔥 Газ
+                </button>
+                <span class="w-6 shrink-0" aria-hidden="true"></span>
+            </div>
         </div>
     </header>
 
-    <!-- Map View -->
-    <section id="map-section" class="relative w-full h-[40vh] border-b border-white/5 transition-all duration-300">
-        <div id="kyiv-map" class="w-full h-full"></div>
-    </section>
+    <!-- FLOATING MAP CONTROLS (Right Side) -->
+    <div class="absolute right-3 top-32 z-20 flex flex-col gap-2">
+        <button onclick="recenterKyiv()" class="glass-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all" title="Центр Києва">
+            <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>
+            </svg>
+        </button>
+        <button onclick="zoomMap(1)" class="glass-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all text-sm font-bold leading-none">
+            +
+        </button>
+        <button onclick="zoomMap(-1)" class="glass-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all text-sm font-bold leading-none">
+            −
+        </button>
+    </div>
 
-    <!-- Controls & Quick Filters -->
-    <section class="p-3 space-y-2.5 bg-base-950 border-b border-white/5">
-        <div class="flex gap-2 items-center min-w-0">
-            <!-- Search -->
-            <div class="flex-1 relative flex items-center min-w-0">
-                <svg class="absolute left-3 shrink-0 w-4 h-4 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
-                </svg>
-                <input type="text" id="live-search" oninput="handleSearch(this.value)" placeholder="Район, метро, вулиця…" autocomplete="off" class="w-full bg-base-900 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder:text-slate-500 placeholder:truncate focus:outline-none focus:border-white/30 transition-all">
+    <!-- BOTTOM FLOATING BIRD DECK (Snap Horizontal Carousel) -->
+    <div class="absolute bottom-3 left-0 right-0 z-30">
+        <div class="cards-carousel" id="cardsCarousel">
+            <!-- Rendered by JavaScript -->
+        </div>
+    </div>
+
+    <!-- FULL DETAIL MODAL / SHEET -->
+    <div id="detailModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden opacity-0 transition-opacity duration-200 flex items-end">
+        <div class="w-full max-h-[90vh] bg-base-900 border-t border-white/10 rounded-t-3xl overflow-y-auto p-5 space-y-4 text-white transform translate-y-full transition-transform duration-300" id="detailSheetContent">
+            <!-- Rendered dynamically -->
+        </div>
+    </div>
+
+    <!-- ADVANCED FILTER MODAL -->
+    <div id="filterModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden opacity-0 transition-opacity duration-200 flex items-end">
+        <div class="w-full max-h-[85vh] bg-base-900 border-t border-white/10 rounded-t-3xl overflow-y-auto p-5 space-y-4 text-white transform translate-y-full transition-transform duration-300" id="filterSheetContent">
+            <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-2"></div>
+            <div class="flex items-center justify-between pb-2 border-b border-white/10">
+                <h3 class="text-base font-extrabold">Фільтри оренди</h3>
+                <button onclick="closeFilterModal()" class="text-xs font-bold text-slate-400 hover:text-white">Закрити ✕</button>
+            </div>
+            
+            <!-- Districts -->
+            <div>
+                <label class="block text-xs font-bold text-slate-400 mb-2 uppercase">Район</label>
+                <div class="grid grid-cols-2 gap-2 text-xs" id="districtButtons">
+                    <button onclick="selectDistrict(this, 'Оболонь')" class="dist-btn p-2.5 rounded-xl bg-base-850 border border-white/5 text-left font-semibold">Оболонський</button>
+                    <button onclick="selectDistrict(this, 'Поділ')" class="dist-btn p-2.5 rounded-xl bg-base-850 border border-white/5 text-left font-semibold">Подільський</button>
+                    <button onclick="selectDistrict(this, 'Печерськ')" class="dist-btn p-2.5 rounded-xl bg-base-850 border border-white/5 text-left font-semibold">Печерський</button>
+                    <button onclick="selectDistrict(this, 'Голосієво')" class="dist-btn p-2.5 rounded-xl bg-base-850 border border-white/5 text-left font-semibold">Голосіївський</button>
+                </div>
             </div>
 
-            <!-- Filter Button -->
-            <button onclick="openFilterSheet()" class="shrink-0 flex items-center gap-1.5 bg-base-900 border border-white/10 rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:border-white/20 active:scale-95 transition-all">
-                <svg class="w-3.5 h-3.5 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M7 10h10M11 16h2"/>
-                </svg>
-                <span class="whitespace-nowrap">Фільтри</span>
+            <!-- Price Range -->
+            <div>
+                <label class="block text-xs font-bold text-slate-400 mb-2 uppercase">Бюджет (грн/міс)</label>
+                <div class="flex gap-2">
+                    <input type="number" id="filterMinPrice" placeholder="Від 8 000" class="w-full bg-base-850 border border-white/5 rounded-xl p-2.5 text-xs text-white">
+                    <input type="number" id="filterMaxPrice" placeholder="До 35 000" class="w-full bg-base-850 border border-white/5 rounded-xl p-2.5 text-xs text-white">
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <button onclick="applyModalFilters()" class="w-full py-3 rounded-xl bg-white text-base-950 font-black text-xs shadow-lg active:scale-98 transition-all">
+                Показати варіанти
             </button>
         </div>
-
-        <!-- Filter Chips (Touch Scroll + Snap + Edge Fade Mask) -->
-        <div class="relative w-full overflow-hidden">
-            <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5 snap-x snap-mandatory" style="-webkit-overflow-scrolling: touch; mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%); -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);">
-                <button onclick="setQuickFilter(this, 'all')" class="quick-chip active snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-base-950 whitespace-nowrap shadow-sm">
-                    Всі (48)
-                </button>
-                <button onclick="setQuickFilter(this, 'generator')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
-                    🔋 Генератор
-                </button>
-                <button onclick="setQuickFilter(this, 'gpon')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
-                    ⚡ GPON
-                </button>
-                <button onclick="setQuickFilter(this, 'lowFloor')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
-                    🏢 Поверх 1–5
-                </button>
-                <button onclick="setQuickFilter(this, 'pets')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
-                    🐾 Тварини
-                </button>
-                <button onclick="setQuickFilter(this, 'gas')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
-                    🔥 Газ
-                </button>
-                <span class="shrink-0 w-8" aria-hidden="true"></span>
-            </div>
-        </div>
-    </section>
-
-    <!-- Main Apartment Feed -->
-    <main id="apartments-feed" class="px-4 pb-24 space-y-4">
-        <!-- Rendered via JavaScript -->
-    </main>
-
-    <!-- Filter Bottom Sheet -->
-    <div id="filter-overlay" onclick="closeFilterSheet()" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200"></div>
-    <div id="filter-sheet" class="fixed left-0 right-0 bottom-0 bg-base-900 border-t border-white/10 rounded-t-3xl p-5 z-50 transform translate-y-full transition-transform duration-300 max-h-[85vh] overflow-y-auto">
-        <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-4"></div>
-        <div class="flex items-center justify-between mb-5">
-            <h2 class="text-base font-extrabold text-white">Фільтри оренди</h2>
-            <button onclick="resetFilters()" class="text-xs font-semibold text-slate-400 hover:text-white">Скинути всі</button>
-        </div>
-
-        <div class="space-y-5 text-xs">
-            <!-- District -->
-            <div>
-                <label class="block font-bold text-slate-300 mb-2 uppercase tracking-wider text-[11px]">Район Києва</label>
-                <div class="grid grid-cols-2 gap-2" id="sheet-districts">
-                    <button onclick="toggleSheetDistrict(this, 'Оболонь')" class="p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold">Оболонський</button>
-                    <button onclick="toggleSheetDistrict(this, 'Поділ')" class="p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold">Подільський</button>
-                    <button onclick="toggleSheetDistrict(this, 'Печерськ')" class="p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold">Печерський</button>
-                    <button onclick="toggleSheetDistrict(this, 'Шевченківський')" class="p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold">Шевченківський</button>
-                    <button onclick="toggleSheetDistrict(this, 'Голосієво')" class="p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold">Голосіївський</button>
-                    <button onclick="toggleSheetDistrict(this, 'Дарниця')" class="p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold">Дарницький</button>
-                </div>
-            </div>
-
-            <!-- Price -->
-            <div>
-                <label class="block font-bold text-slate-300 mb-2 uppercase tracking-wider text-[11px]">Бюджет (грн/місяць)</label>
-                <div class="flex gap-2">
-                    <input type="number" id="sheet-min-price" placeholder="Від 8 000" class="w-full bg-base-850 border border-white/5 rounded-xl p-2.5 text-white">
-                    <input type="number" id="sheet-max-price" placeholder="До 35 000" class="w-full bg-base-850 border border-white/5 rounded-xl p-2.5 text-white">
-                </div>
-            </div>
-
-            <!-- Features -->
-            <div>
-                <label class="block font-bold text-slate-300 mb-2 uppercase tracking-wider text-[11px]">Опції на час зими та відключень</label>
-                <div class="space-y-2">
-                    <label class="flex items-center gap-2.5 p-2 rounded-xl bg-base-850/60 cursor-pointer">
-                        <input type="checkbox" id="check-gpon" class="rounded accent-white w-4 h-4">
-                        <span class="text-slate-200">Оптоволоконний інтернет GPON (робота без світла)</span>
-                    </label>
-                    <label class="flex items-center gap-2.5 p-2 rounded-xl bg-base-850/60 cursor-pointer">
-                        <input type="checkbox" id="check-gen" class="rounded accent-white w-4 h-4">
-                        <span class="text-slate-200">Генератор у ЖК на насоси води та ліфти</span>
-                    </label>
-                    <label class="flex items-center gap-2.5 p-2 rounded-xl bg-base-850/60 cursor-pointer">
-                        <input type="checkbox" id="check-low" class="rounded accent-white w-4 h-4">
-                        <span class="text-slate-200">Низький поверх (1–5 поверх, пішки без ліфта)</span>
-                    </label>
-                    <label class="flex items-center gap-2.5 p-2 rounded-xl bg-base-850/60 cursor-pointer">
-                        <input type="checkbox" id="check-pets" class="rounded accent-white w-4 h-4">
-                        <span class="text-slate-200">Дозволено проживання з домашніми улюбленцями</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="pt-2">
-                <button onclick="applyFiltersFromSheet()" class="w-full py-3 rounded-xl bg-white text-base-950 font-extrabold text-sm shadow-md">
-                    Застосувати фільтри
-                </button>
-            </div>
-        </div>
     </div>
 
-    <!-- Lightbox Modal -->
-    <div id="lightbox" onclick="closeLightbox()" class="fixed inset-0 bg-black/95 z-50 hidden items-center justify-center p-4">
-        <button onclick="closeLightbox()" class="absolute top-5 right-5 text-white/70 hover:text-white p-2">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-        <img id="lightbox-image" src="" alt="Фото квартири" class="max-w-full max-h-[85vh] rounded-xl object-contain">
-    </div>
-
-    <!-- Application Engine Script -->
     <script>
-        // Telegram WebApp setup
+        // Telegram WebApp Integration
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
             tg.expand();
-            tg.setHeaderColor('#0b0d13');
-            tg.setBackgroundColor('#0b0d13');
+            tg.setHeaderColor('#07090e');
+            tg.setBackgroundColor('#07090e');
         }
 
         function triggerHaptic(type = 'light') {
             if (tg?.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred(type);
+                if (type === 'selection') tg.HapticFeedback.selectionChanged();
+                else tg.HapticFeedback.impactOccurred(type);
             }
         }
 
-        // Real Kyiv Dataset (Curated, Genuine, 0% Realtor fees)
+        // Real Kyiv Properties Dataset
         const LISTINGS = [
             {
                 id: 1,
-                title: "1-кімнатна квартира біля набережної та парку «Наталка»",
+                title: "1к біля парку Наталка та набережної",
                 district: "Оболонь",
                 address: "Оболонська набережна, 14",
                 metro: "М Мінська",
-                metroLine: "blue",
+                metroColor: "#3b82f6",
                 walkMin: 7,
                 price: 14500,
                 area: 44,
@@ -322,22 +303,20 @@
                 lowFloor: true,
                 pets: true,
                 realtorCommissionSaved: 7250,
-                ownerName: "Сергій Олександрович (власник)",
-                note: "«Здаю власну 1к квартиру з якісним ремонтом. Оптоволокно підключено, роутер заживлений. Показую сьогодні після 18:30»",
-                verifiedDate: "Сьогодні о 14:20",
+                ownerName: "Сергій Олександрович",
+                note: "Оптоволокно підключено, роутер заживлений від mini-UPS. Показую сьогодні після 18:30.",
                 images: [
                     "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-                    "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&auto=format&fit=crop&q=80",
-                    "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop&q=80"
+                    "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&auto=format&fit=crop&q=80"
                 ]
             },
             {
                 id: 2,
-                title: "2-кімнатна сталінка з газовою колонкою в серці Подолу",
+                title: "2к сталінка з газовою колонкою на Подолі",
                 district: "Поділ",
                 address: "вул. Ярославська, 15",
                 metro: "М Контрактова площа",
-                metroLine: "blue",
+                metroColor: "#3b82f6",
                 walkMin: 4,
                 price: 17000,
                 area: 56,
@@ -351,9 +330,8 @@
                 lowFloor: true,
                 pets: false,
                 realtorCommissionSaved: 8500,
-                ownerName: "Олена Миколаївна (господарка)",
-                note: "«Товсті цегляні стіни, гаряча вода є завжди через газову колонку. Провайдер Інформаційні Технології тримає зв'язок при відключеннях»",
-                verifiedDate: "Сьогодні о 11:05",
+                ownerName: "Олена Миколаївна",
+                note: "Товсті цегляні стіни, гаряча вода є завжди через газову колонку. Тихий зелений двір.",
                 images: [
                     "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
                     "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&auto=format&fit=crop&q=80"
@@ -361,11 +339,11 @@
             },
             {
                 id: 3,
-                title: "Дизайнерська євродвушка в ЖК «Французький Квартал 2»",
+                title: "Євродвушка в ЖК «Французький Квартал 2»",
                 district: "Печерськ",
                 address: "вул. Предславинська, 55",
                 metro: "М Либідська",
-                metroLine: "blue",
+                metroColor: "#3b82f6",
                 walkMin: 5,
                 price: 25000,
                 area: 52,
@@ -379,22 +357,20 @@
                 lowFloor: false,
                 pets: true,
                 realtorCommissionSaved: 12500,
-                ownerName: "Андрій (господар)",
-                note: "«ЖК бізнес-класу з власним генератором на ліфти, воду та опалення. Підземний паркінг використовується як безпечне укриття»",
-                verifiedDate: "Вчора о 19:40",
+                ownerName: "Андрій (власник)",
+                note: "ЖК бізнес-класу з власним генератором на ліфти, воду та опалення. Закрита охорона 24/7.",
                 images: [
                     "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80",
-                    "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&auto=format&fit=crop&q=80",
-                    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=80"
+                    "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&auto=format&fit=crop&q=80"
                 ]
             },
             {
                 id: 4,
-                title: "Затишна 1к біля парку Максима Рильського",
+                title: "Затишна 1к біля парку Рильського",
                 district: "Голосієво",
                 address: "вул. Васильківська, 34",
                 metro: "М Васильківська",
-                metroLine: "blue",
+                metroColor: "#3b82f6",
                 walkMin: 3,
                 price: 12500,
                 area: 39,
@@ -409,11 +385,10 @@
                 pets: true,
                 realtorCommissionSaved: 6250,
                 ownerName: "Марія Василівна",
-                note: "«Дуже тихий двір, чисте повітря. Пральна машина, бойлер, засклений балкон. Тільки для порядних людей на тривалий термін»",
-                verifiedDate: "Сьогодні о 16:15",
+                note: "Паркова зона, свіже повітря. Газова плита, пральна машина, бойлер. Без комісії рієлтора.",
                 images: [
                     "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&auto=format&fit=crop&q=80",
-                    "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80"
+                    "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop&q=80"
                 ]
             }
         ];
@@ -422,8 +397,8 @@
         let currentFilter = {
             search: '',
             district: 'all',
-            gpon: false,
             generator: false,
+            gpon: false,
             lowFloor: false,
             pets: false,
             gas: false,
@@ -431,266 +406,55 @@
             maxPrice: null
         };
 
-        // Kyiv Bounding Box: SW [50.213, 30.239] — NE [50.591, 30.825]
+        let currentActiveIndex = 0;
+        let mapMarkers = {};
+
+        // INITIALIZE MAP LOCKED TO KYIV
         const KYIV_BOUNDS = L.latLngBounds(
             L.latLng(50.213, 30.239),
             L.latLng(50.591, 30.825)
         );
 
-        // Initialize Dark Leaflet Map strictly locked to Kyiv (no Europe/Moscow zoom-out)
-        const map = L.map('kyiv-map', {
+        const map = L.map('map', {
             zoomControl: false,
             attributionControl: false,
             minZoom: 11,
-            maxZoom: 16,
+            maxZoom: 17,
             maxBounds: KYIV_BOUNDS,
             maxBoundsViscosity: 1.0,
-            touchZoom: true,
-            bounceAtZoomLimits: false,
-            wheelPxPerZoomLevel: 120
+            touchZoom: true
         }).setView([50.4501, 30.5234], 12);
 
-        // Clamp the view on every zoom/pan so user cannot navigate out of Kyiv
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            minZoom: 11, maxZoom: 17
+        }).addTo(map);
+
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+            minZoom: 11, maxZoom: 17
+        }).addTo(map);
+
         map.on('zoomend moveend', () => {
             if (!KYIV_BOUNDS.contains(map.getCenter())) {
                 map.panInsideBounds(KYIV_BOUNDS, { animate: true });
             }
         });
 
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-            minZoom: 11,
-            maxZoom: 16
-        }).addTo(map);
-
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
-            minZoom: 11,
-            maxZoom: 16
-        }).addTo(map);
-
-        const markersById = {};
-
-        function updateMapMarkers(items) {
-            Object.values(markersById).forEach(m => map.removeLayer(m));
-            items.forEach(item => {
-                const label = (item.price / 1000).toFixed(1) + 'k ₴';
-                const icon = L.divIcon({
-                    className: 'map-bubble-wrapper',
-                    html: `<div class="map-price-bubble" id="bubble-${item.id}">${label}</div>`,
-                    iconSize: [64, 28],
-                    iconAnchor: [32, 14]
-                });
-
-                const m = L.marker([item.lat, item.lng], { icon }).addTo(map);
-                
-                const popup = `
-                    <div style="background: #121620; border-radius: 14px; overflow: hidden;">
-                        <img src="${item.images[0]}" style="width: 100%; height: 110px; object-fit: cover;">
-                        <div style="padding: 10px;">
-                            <div style="font-size: 12px; font-weight: 800; color: #fff; line-height: 1.2;">${item.title}</div>
-                            <div style="font-size: 11px; color: #94a3b8; margin: 3px 0 6px;">📍 ${item.address}</div>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-weight: 800; color: #fff; font-size: 14px;">${item.price.toLocaleString('uk-UA')} ₴</span>
-                                <a href="#item-${item.id}" onclick="focusItem(${item.id})" style="font-size: 11px; font-weight: 700; color: #2563eb; text-decoration: none;">Переглянути ↓</a>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                m.bindPopup(popup);
-                m.on('click', () => {
-                    triggerHaptic('light');
-                    document.querySelectorAll('.map-price-bubble').forEach(b => b.classList.remove('selected'));
-                    document.getElementById(`bubble-${item.id}`)?.classList.add('selected');
-                });
-
-                markersById[item.id] = m;
-            });
+        function recenterKyiv() {
+            triggerHaptic('light');
+            map.flyTo([50.4501, 30.5234], 12, { duration: 0.8 });
         }
 
-        // Render Apartment Feed
-        function renderFeed(items) {
-            const feed = document.getElementById('apartments-feed');
-            if (items.length === 0) {
-                feed.innerHTML = `
-                    <div class="app-card p-8 text-center space-y-2">
-                        <div class="text-sm font-bold text-white">За цими критеріями оголошень не знайдено</div>
-                        <div class="text-xs text-slate-400">Спробуйте змінити фільтри або скинути параметри пошуку.</div>
-                    </div>
-                `;
-                return;
-            }
-
-            feed.innerHTML = items.map(apt => {
-                const metroLineColor = apt.metroLine === 'blue' ? '#3b82f6' : (apt.metroLine === 'red' ? '#ef4444' : '#10b981');
-                return `
-                    <article class="app-card overflow-hidden" id="item-${apt.id}">
-                        <!-- Touch Photo Slider -->
-                        <div class="relative w-full aspect-[16/10] bg-base-950 overflow-hidden" id="slider-wrap-${apt.id}">
-                            <div class="slider-track" id="track-${apt.id}">
-                                ${apt.images.map(img => `
-                                    <img src="${img}" class="min-w-full h-full object-cover shrink-0 cursor-pointer" onclick="openLightbox('${img}')" alt="${apt.title}">
-                                `).join('')}
-                            </div>
-
-                            <!-- Verified Badge -->
-                            <div class="absolute top-3 left-3 bg-base-950/80 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 text-[10px] font-bold text-emerald-400 flex items-center gap-1.5 z-10">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                                <span>Прямий господар</span>
-                            </div>
-
-                            <!-- Zero Commission Badge -->
-                            <div class="absolute top-3 right-3 bg-white text-base-950 px-2.5 py-1 rounded-lg text-[10px] font-extrabold z-10 shadow-lg">
-                                0% КОМІСІЇ
-                            </div>
-
-                            <!-- Photo Counter Pill -->
-                            <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-md text-[10px] text-white font-mono z-10">
-                                <span id="count-${apt.id}">1</span> / ${apt.images.length}
-                            </div>
-
-                            <!-- Dots -->
-                            <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 z-10" id="dots-${apt.id}">
-                                ${apt.images.map((_, i) => `<span class="w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-white w-4' : 'bg-white/40'} transition-all"></span>`).join('')}
-                            </div>
-                        </div>
-
-                        <!-- Card Body -->
-                        <div class="p-4 space-y-3">
-                            <!-- Location & Metro Pills (Discrete Capsules - Never Wrap Brokenly) -->
-                            <div class="flex items-center gap-1.5 flex-wrap">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-base-900 border border-white/10 text-xs font-bold text-white whitespace-nowrap shadow-sm">
-                                    <span class="w-2 h-2 rounded-full shrink-0" style="background-color: ${metroLineColor};"></span>
-                                    <span>${apt.metro}</span>
-                                    <span class="text-slate-400 font-normal">· ${apt.walkMin} хв</span>
-                                </span>
-                                <span class="inline-flex items-center px-2 py-1 rounded-lg bg-base-900 border border-white/5 text-xs font-semibold text-slate-300 whitespace-nowrap">
-                                    ${apt.district}
-                                </span>
-                                <span class="inline-flex items-center px-2 py-1 rounded-lg bg-base-900 border border-white/5 text-xs font-semibold text-slate-400 whitespace-nowrap">
-                                    ${apt.area} м²
-                                </span>
-                                <span class="inline-flex items-center px-2 py-1 rounded-lg bg-base-900 border border-white/5 text-xs font-semibold text-slate-400 whitespace-nowrap">
-                                    ${apt.floor}/${apt.totalFloors} пов.
-                                </span>
-                            </div>
-
-                            <!-- Title & Address -->
-                            <div>
-                                <h2 class="text-sm font-extrabold text-white leading-snug">${apt.title}</h2>
-                                <div class="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
-                                    <svg class="w-3.5 h-3.5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                    <span class="truncate">${apt.address}</span>
-                                </div>
-                            </div>
-
-                            <!-- Blackout / Winter Status Pills -->
-                            <div class="flex flex-wrap gap-1.5 text-xs">
-                                ${apt.generator ? `<span class="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 font-bold whitespace-nowrap">🔋 Генератор у ЖК</span>` : ''}
-                                ${apt.gpon ? `<span class="px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-300 font-bold whitespace-nowrap">⚡ GPON інтернет</span>` : ''}
-                                ${apt.gas ? `<span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-bold whitespace-nowrap">🔥 Газ</span>` : ''}
-                                ${apt.pets ? `<span class="px-2.5 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300 font-bold whitespace-nowrap">🐾 З тваринами</span>` : ''}
-                            </div>
-
-                            <!-- Dedicated Price & Savings Bar -->
-                            <div class="flex items-center justify-between pt-2.5 border-t border-white/5">
-                                <div>
-                                    <span class="text-base font-black text-white leading-none">${apt.price.toLocaleString('uk-UA')} ₴</span>
-                                    <span class="text-xs text-slate-400 font-medium"> / міс</span>
-                                </div>
-                                <div class="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/25 text-[11px] font-bold text-emerald-400">
-                                    Економія +${apt.realtorCommissionSaved.toLocaleString('uk-UA')} ₴
-                                </div>
-                            </div>
-
-                            <!-- Authentic Owner Note -->
-                            <div class="p-3 rounded-xl bg-base-950/70 border border-white/5 space-y-1">
-                                <p class="text-xs text-slate-300 italic leading-relaxed">${apt.note}</p>
-                                <div class="flex items-center justify-between text-[10px] text-slate-400 not-italic pt-1">
-                                    <span class="font-bold text-slate-200">${apt.ownerName}</span>
-                                    <span class="text-emerald-400 font-medium">✓ Документи перевірено</span>
-                                </div>
-                            </div>
-
-                            <!-- Actions -->
-                            <div class="grid grid-cols-2 gap-2 pt-1">
-                                <a href="https://t.me/pavlograd_admin?text=Вітаю!+Цікавить+квартира:+${encodeURIComponent(apt.address)}" target="_blank" onclick="triggerHaptic('medium')" class="py-2.5 rounded-xl bg-white hover:bg-slate-100 text-base-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                                    <span>Написати господарю</span>
-                                </a>
-                                <a href="https://t.me/pavlograd_admin?text=Хочу+замовити+дзвінок+перевірки+за+99+грн:+${encodeURIComponent(apt.address)}" target="_blank" onclick="triggerHaptic('light')" class="py-2.5 rounded-xl bg-base-850 hover:bg-base-800 text-slate-200 border border-white/10 font-bold text-xs flex items-center justify-center gap-1.5 transition-all">
-                                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                                    <span>Дзвінок (99 ₴)</span>
-                                </a>
-                            </div>
-                        </div>
-                    </article>
-                `;
-            }).join('');
-
-            attachSliders(items);
+        function zoomMap(delta) {
+            triggerHaptic('light');
+            map.setZoom(map.getZoom() + delta);
         }
 
-        // Attach Swipe Handlers to Photo Sliders
-        function attachSliders(items) {
-            items.forEach(apt => {
-                const wrap = document.getElementById(`slider-wrap-${apt.id}`);
-                const track = document.getElementById(`track-${apt.id}`);
-                const count = document.getElementById(`count-${apt.id}`);
-                const dots = document.getElementById(`dots-${apt.id}`)?.children;
-                if (!wrap || !track || apt.images.length <= 1) return;
-
-                let startX = 0;
-                let currentX = 0;
-                let cur = 0;
-                let dragging = false;
-
-                function setSlide(idx) {
-                    cur = idx;
-                    track.style.transform = `translateX(-${cur * 100}%)`;
-                    if (count) count.innerText = cur + 1;
-                    if (dots) {
-                        Array.from(dots).forEach((d, i) => {
-                            d.className = i === cur ? 'w-4 h-1.5 rounded-full bg-white transition-all' : 'w-1.5 h-1.5 rounded-full bg-white/40 transition-all';
-                        });
-                    }
-                }
-
-                wrap.addEventListener('touchstart', e => {
-                    startX = e.touches[0].clientX;
-                    dragging = true;
-                    track.style.transition = 'none';
-                }, { passive: true });
-
-                wrap.addEventListener('touchmove', e => {
-                    if (!dragging) return;
-                    currentX = e.touches[0].clientX;
-                    const diff = currentX - startX;
-                    track.style.transform = `translateX(calc(-${cur * 100}% + ${diff}px))`;
-                }, { passive: true });
-
-                wrap.addEventListener('touchend', () => {
-                    if (!dragging) return;
-                    dragging = false;
-                    track.style.transition = 'transform 0.28s cubic-bezier(0.25, 1, 0.5, 1)';
-                    const diff = currentX - startX;
-                    if (diff < -40 && cur < apt.images.length - 1) {
-                        cur++;
-                        triggerHaptic('light');
-                    } else if (diff > 40 && cur > 0) {
-                        cur--;
-                        triggerHaptic('light');
-                    }
-                    setSlide(cur);
-                });
-            });
-        }
-
-        // Filtering Logic
-        function applyFilters() {
-            const filtered = LISTINGS.filter(item => {
+        // RENDER BOTTOM CAROUSEL & PINS
+        function getFilteredListings() {
+            return LISTINGS.filter(item => {
                 if (currentFilter.district !== 'all' && item.district !== currentFilter.district) return false;
-                if (currentFilter.gpon && !item.gpon) return false;
                 if (currentFilter.generator && !item.generator) return false;
+                if (currentFilter.gpon && !item.gpon) return false;
                 if (currentFilter.lowFloor && !item.lowFloor) return false;
                 if (currentFilter.pets && !item.pets) return false;
                 if (currentFilter.gas && !item.gas) return false;
@@ -698,163 +462,327 @@
                 if (currentFilter.maxPrice && item.price > currentFilter.maxPrice) return false;
                 if (currentFilter.search) {
                     const q = currentFilter.search.toLowerCase();
-                    const fullText = (item.title + ' ' + item.district + ' ' + item.address + ' ' + item.metro).toLowerCase();
-                    if (!fullText.includes(q)) return false;
+                    const text = `${item.title} ${item.address} ${item.metro} ${item.district}`.toLowerCase();
+                    if (!text.includes(q)) return false;
                 }
                 return true;
             });
+        }
 
-            renderFeed(filtered);
-            updateMapMarkers(filtered);
+        function updateUI() {
+            const filtered = getFilteredListings();
+            renderMarkers(filtered);
+            renderCarousel(filtered);
+            if (filtered.length > 0) {
+                selectCard(0, false);
+            }
+        }
+
+        function renderMarkers(items) {
+            Object.values(mapMarkers).forEach(m => map.removeLayer(m));
+            mapMarkers = {};
+
+            items.forEach((item, index) => {
+                const label = (item.price / 1000).toFixed(1) + 'k ₴';
+                const customIcon = L.divIcon({
+                    className: 'bird-pin-wrap',
+                    html: `
+                        <div class="bird-pin ${index === currentActiveIndex ? 'active' : ''}" id="pin-${item.id}">
+                            <span class="pin-dot"></span>
+                            <span>${label}</span>
+                        </div>
+                    `,
+                    iconSize: [68, 28],
+                    iconAnchor: [34, 14]
+                });
+
+                const marker = L.marker([item.lat, item.lng], { icon: customIcon }).addTo(map);
+                marker.on('click', () => {
+                    selectCard(index, true);
+                });
+                mapMarkers[item.id] = marker;
+            });
+        }
+
+        function renderCarousel(items) {
+            const container = document.getElementById('cardsCarousel');
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="w-full glass-panel p-5 rounded-2xl text-center text-white">
+                        <div class="text-sm font-bold">Нічого не знайдено</div>
+                        <div class="text-xs text-slate-400 mt-1">Спробуйте скинути фільтри або змінити пошук.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = items.map((item, index) => `
+                <div class="apartment-card glass-panel shadow-2xl ${index === currentActiveIndex ? 'active-card' : ''}" id="card-${item.id}" onclick="selectCard(${index}, true)">
+                    <!-- Photo Header with Badges -->
+                    <div class="relative w-full h-36 bg-base-950 overflow-hidden cursor-pointer" onclick="openDetail(${item.id})">
+                        <img src="${item.images[0]}" class="w-full h-full object-cover" alt="${item.title}">
+                        
+                        <!-- Top Badges -->
+                        <div class="absolute top-2 left-2 flex items-center gap-1 z-10">
+                            <span class="px-2 py-0.5 rounded-lg bg-base-950/80 backdrop-blur-md border border-white/10 text-[10px] font-bold text-emerald-400">
+                                🟢 Власник 0%
+                            </span>
+                            ${item.generator ? '<span class="px-2 py-0.5 rounded-lg bg-amber-500/90 text-base-950 text-[10px] font-black">🔋 Генератор</span>' : ''}
+                            ${item.gpon ? '<span class="px-2 py-0.5 rounded-lg bg-sky-500/90 text-base-950 text-[10px] font-black">⚡ GPON</span>' : ''}
+                        </div>
+
+                        <!-- Price Tag Floating -->
+                        <div class="absolute bottom-2 right-2 bg-base-950/90 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/15 text-white font-black text-sm z-10 shadow-lg">
+                            ${item.price.toLocaleString('uk-UA')} ₴
+                        </div>
+
+                        <!-- Photo count -->
+                        <div class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[9px] text-white font-mono z-10">
+                            1 / ${item.images.length}
+                        </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="p-3 space-y-2">
+                        <!-- Location & Metro Pills -->
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-base-900 border border-white/10 text-[11px] font-bold text-white whitespace-nowrap">
+                                <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: ${item.metroColor}"></span>
+                                <span>${item.metro} · ${item.walkMin} хв</span>
+                            </span>
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md bg-base-900 border border-white/5 text-[11px] text-slate-300 font-medium whitespace-nowrap">
+                                ${item.district}
+                            </span>
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md bg-base-900 border border-white/5 text-[11px] text-slate-400 whitespace-nowrap">
+                                ${item.area} м² · ${item.floor}/${item.totalFloors} пов.
+                            </span>
+                        </div>
+
+                        <!-- Title & Address -->
+                        <div class="cursor-pointer" onclick="openDetail(${item.id})">
+                            <h4 class="text-xs font-bold text-white leading-tight truncate">${item.title}</h4>
+                            <p class="text-[10px] text-slate-400 truncate mt-0.5">📍 ${item.address}</p>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-2 pt-1">
+                            <a href="https://t.me/pavlograd_admin?text=Вітаю!+Цікавить+квартира+№${item.id}:+${encodeURIComponent(item.address)}" target="_blank" onclick="triggerHaptic('medium')" class="flex-1 py-2 rounded-xl bg-white text-base-950 font-black text-xs flex items-center justify-center gap-1 shadow-md active:scale-95 transition-all">
+                                <svg class="w-3.5 h-3.5 fill-current text-sky-500" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.95-1.28 4.92-2.13 5.92-2.55 2.82-1.18 3.4-1.38 3.79-1.39.08 0 .28.02.4.12.1.08.13.2.14.28-.01.07-.01.21-.03.38z"/></svg>
+                                <span>Написати власнику</span>
+                            </a>
+                            <button onclick="openDetail(${item.id})" class="px-3 py-2 rounded-xl bg-base-850 hover:bg-base-800 text-slate-300 font-bold text-xs border border-white/10 active:scale-95 transition-all">
+                                Інфо
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            attachCarouselScrollListener(items);
+        }
+
+        // BIRD KYIV CORE MECHANIC: Swipe card -> Map flies to coordinate!
+        function selectCard(index, scrollCarousel = true) {
+            const items = getFilteredListings();
+            if (index < 0 || index >= items.length) return;
+
+            currentActiveIndex = index;
+            const activeItem = items[index];
+
+            // 1. Highlight map marker
+            document.querySelectorAll('.bird-pin').forEach(p => p.classList.remove('active'));
+            const activePin = document.getElementById(`pin-${activeItem.id}`);
+            if (activePin) activePin.classList.add('active');
+
+            // 2. Fly map to coordinates (smooth Bird Kyiv cinematic flyTo)
+            map.flyTo([activeItem.lat, activeItem.lng], 14.5, {
+                duration: 0.7,
+                easeLinearity: 0.25
+            });
+
+            // 3. Highlight card in carousel
+            document.querySelectorAll('.apartment-card').forEach(c => c.classList.remove('active-card'));
+            const activeCard = document.getElementById(`card-${activeItem.id}`);
+            if (activeCard) {
+                activeCard.classList.add('active-card');
+                if (scrollCarousel) {
+                    activeCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+            }
+
+            triggerHaptic('selection');
+        }
+
+        // Detect user horizontal swipe in carousel
+        let scrollTimeout;
+        function attachCarouselScrollListener(items) {
+            const carousel = document.getElementById('cardsCarousel');
+            carousel.onscroll = () => {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    const cards = Array.from(carousel.children);
+                    const carouselCenter = carousel.scrollLeft + (carousel.offsetWidth / 2);
+                    
+                    let closestIndex = 0;
+                    let minDiff = Infinity;
+
+                    cards.forEach((c, idx) => {
+                        const cardCenter = c.offsetLeft + (c.offsetWidth / 2);
+                        const diff = Math.abs(carouselCenter - cardCenter);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            closestIndex = idx;
+                        }
+                    });
+
+                    if (closestIndex !== currentActiveIndex && closestIndex < items.length) {
+                        selectCard(closestIndex, false);
+                    }
+                }, 80);
+            };
+        }
+
+        // QUICK FILTER CLICKS
+        function toggleQuickFilter(btn, type) {
+            triggerHaptic('light');
+            document.querySelectorAll('.q-filter').forEach(b => {
+                b.className = 'q-filter shrink-0 px-3 py-1 rounded-full text-xs font-semibold glass-panel text-slate-300 hover:text-white transition-all';
+            });
+            btn.className = 'q-filter active shrink-0 px-3 py-1 rounded-full text-xs font-bold bg-white text-base-950 shadow-md';
+
+            if (type === 'all') {
+                currentFilter = { ...currentFilter, generator: false, gpon: false, lowFloor: false, pets: false, gas: false };
+            } else {
+                currentFilter = { ...currentFilter, generator: false, gpon: false, lowFloor: false, pets: false, gas: false };
+                currentFilter[type] = true;
+            }
+            updateUI();
         }
 
         function handleSearch(val) {
             currentFilter.search = val.trim();
-            applyFilters();
+            updateUI();
         }
 
-        function setQuickFilter(btn, type) {
-            triggerHaptic('light');
-            document.querySelectorAll('.quick-chip').forEach(b => {
-                b.classList.remove('bg-white', 'text-base-950', 'active');
-                b.classList.add('bg-base-900', 'text-slate-300');
-            });
-            btn.classList.add('bg-white', 'text-base-950', 'active');
-            btn.classList.remove('bg-base-900', 'text-slate-300');
-
-            if (type === 'all') {
-                currentFilter = { ...currentFilter, gpon: false, generator: false, lowFloor: false, pets: false, gas: false };
-            } else {
-                currentFilter[type] = true;
-            }
-            applyFilters();
-        }
-
-        // View Mode Switcher (Split / Map / List)
-        function switchView(mode) {
+        // DETAIL SHEET MODAL
+        function openDetail(id) {
             triggerHaptic('medium');
-            document.querySelectorAll('header button').forEach(b => {
-                b.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all';
-            });
-            const activeBtn = document.getElementById(`btn-view-${mode}`);
-            activeBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-base-950 transition-all';
+            const item = LISTINGS.find(x => x.id === id);
+            if (!item) return;
 
-            const mapSection = document.getElementById('map-section');
-            const feedSection = document.getElementById('apartments-feed');
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('detailSheetContent');
 
-            if (mode === 'map') {
-                mapSection.style.display = 'block';
-                mapSection.style.height = 'calc(100vh - 125px)';
-                feedSection.style.display = 'none';
-                setTimeout(() => map.invalidateSize(), 80);
-            } else if (mode === 'list') {
-                mapSection.style.display = 'none';
-                feedSection.style.display = 'block';
-            } else {
-                mapSection.style.display = 'block';
-                mapSection.style.height = '40vh';
-                feedSection.style.display = 'block';
-                setTimeout(() => map.invalidateSize(), 80);
-            }
-        }
+            content.innerHTML = `
+                <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-3"></div>
+                
+                <!-- Photos -->
+                <div class="w-full aspect-[16/10] rounded-2xl overflow-hidden bg-base-950">
+                    <img src="${item.images[0]}" class="w-full h-full object-cover">
+                </div>
 
-        function focusItem(id) {
-            const el = document.getElementById(`item-${id}`);
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+                <!-- Price & Commission -->
+                <div class="flex items-center justify-between pt-2">
+                    <div>
+                        <div class="text-xl font-black text-white">${item.price.toLocaleString('uk-UA')} ₴ / міс</div>
+                        <div class="text-xs text-emerald-400 font-bold">✓ 0% Комісії рієлтора (економія +${item.realtorCommissionSaved.toLocaleString('uk-UA')} ₴)</div>
+                    </div>
+                    <button onclick="closeDetail()" class="p-2 rounded-xl bg-base-850 text-slate-400 hover:text-white font-bold text-xs">✕</button>
+                </div>
 
-        // Bottom Sheet Functions
-        function openFilterSheet() {
-            triggerHaptic('medium');
-            const overlay = document.getElementById('filter-overlay');
-            const sheet = document.getElementById('filter-sheet');
-            overlay.classList.remove('hidden');
+                <!-- Details -->
+                <div class="space-y-1">
+                    <h3 class="text-sm font-extrabold text-white">${item.title}</h3>
+                    <div class="text-xs text-slate-400">📍 ${item.address} • ${item.metro} (${item.walkMin} хв)</div>
+                </div>
+
+                <!-- Blackout / Winter Perks -->
+                <div class="p-3.5 rounded-2xl bg-base-850 border border-white/5 space-y-2">
+                    <div class="text-xs font-bold text-slate-300">Готовність до зими:</div>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="px-2.5 py-1 rounded-lg ${item.gpon ? 'bg-emerald-500/20 text-emerald-300 font-bold' : 'bg-base-900 text-slate-500'}">
+                            ${item.gpon ? '⚡ Оптоволокно GPON є' : '✕ Без GPON'}
+                        </span>
+                        <span class="px-2.5 py-1 rounded-lg ${item.generator ? 'bg-amber-500/20 text-amber-300 font-bold' : 'bg-base-900 text-slate-500'}">
+                            ${item.generator ? '🔋 Генератор у ЖК' : '✕ Без генератора'}
+                        </span>
+                        <span class="px-2.5 py-1 rounded-lg ${item.gas ? 'bg-sky-500/20 text-sky-300 font-bold' : 'bg-base-900 text-slate-500'}">
+                            ${item.gas ? '🔥 Газ є' : '✕ Електроплита'}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Direct Owner Verification -->
+                <div class="p-3.5 rounded-2xl bg-base-850 border border-white/5 space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-white">${item.ownerName}</span>
+                        <span class="text-emerald-400 font-bold">✓ Перевірений власник</span>
+                    </div>
+                    <p class="text-xs text-slate-300 italic">«${item.note}»</p>
+                </div>
+
+                <!-- Action Button -->
+                <a href="https://t.me/pavlograd_admin?text=Вітаю!+Цікавить+квартира+№${item.id}:+${encodeURIComponent(item.address)}" target="_blank" onclick="triggerHaptic('heavy')" class="w-full py-3.5 rounded-2xl bg-white text-base-950 font-black text-sm flex items-center justify-center gap-2 shadow-xl active:scale-98 transition-all">
+                    💬 Написати господарю в Telegram
+                </a>
+            `;
+
+            modal.classList.remove('hidden');
             setTimeout(() => {
-                overlay.classList.remove('opacity-0');
-                sheet.classList.remove('translate-y-full');
+                modal.classList.remove('opacity-0');
+                content.classList.remove('translate-y-full');
             }, 10);
         }
 
-        function closeFilterSheet() {
+        function closeDetail() {
             triggerHaptic('light');
-            const overlay = document.getElementById('filter-overlay');
-            const sheet = document.getElementById('filter-sheet');
-            overlay.classList.add('opacity-0');
-            sheet.classList.add('translate-y-full');
-            setTimeout(() => overlay.classList.add('hidden'), 200);
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('detailSheetContent');
+            content.classList.add('translate-y-full');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 200);
         }
 
-        function toggleSheetDistrict(btn, dist) {
-            triggerHaptic('light');
-            const isSelected = btn.classList.contains('bg-white');
-            document.querySelectorAll('#sheet-districts button').forEach(b => {
-                b.className = 'p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold';
-            });
-            if (!isSelected) {
-                btn.className = 'p-2.5 rounded-xl bg-white text-base-950 font-bold text-left';
-                currentFilter.district = dist;
-            } else {
-                currentFilter.district = 'all';
-            }
-        }
-
-        function applyFiltersFromSheet() {
+        // FILTER MODAL
+        function openFilterModal() {
             triggerHaptic('medium');
-            currentFilter.minPrice = parseInt(document.getElementById('sheet-min-price').value) || null;
-            currentFilter.maxPrice = parseInt(document.getElementById('sheet-max-price').value) || null;
-            currentFilter.gpon = document.getElementById('check-gpon').checked;
-            currentFilter.generator = document.getElementById('check-gen').checked;
-            currentFilter.lowFloor = document.getElementById('check-low').checked;
-            currentFilter.pets = document.getElementById('check-pets').checked;
-
-            applyFilters();
-            closeFilterSheet();
+            const modal = document.getElementById('filterModal');
+            const content = document.getElementById('filterSheetContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('translate-y-full');
+            }, 10);
         }
 
-        function resetFilters() {
+        function closeFilterModal() {
             triggerHaptic('light');
-            currentFilter = {
-                search: '',
-                district: 'all',
-                gpon: false,
-                generator: false,
-                lowFloor: false,
-                pets: false,
-                gas: false,
-                minPrice: null,
-                maxPrice: null
-            };
-            document.querySelectorAll('#sheet-districts button').forEach(b => {
-                b.className = 'p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold';
-            });
-            document.getElementById('sheet-min-price').value = '';
-            document.getElementById('sheet-max-price').value = '';
-            document.getElementById('check-gpon').checked = false;
-            document.getElementById('check-gen').checked = false;
-            document.getElementById('check-low').checked = false;
-            document.getElementById('check-pets').checked = false;
-            applyFilters();
-            closeFilterSheet();
+            const modal = document.getElementById('filterModal');
+            const content = document.getElementById('filterSheetContent');
+            content.classList.add('translate-y-full');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 200);
         }
 
-        // Lightbox Functions
-        function openLightbox(url) {
+        function selectDistrict(btn, dist) {
+            triggerHaptic('light');
+            document.querySelectorAll('.dist-btn').forEach(b => b.classList.remove('bg-white', 'text-base-950', 'font-black'));
+            btn.classList.add('bg-white', 'text-base-950', 'font-black');
+            currentFilter.district = dist;
+        }
+
+        function applyModalFilters() {
             triggerHaptic('medium');
-            document.getElementById('lightbox-image').src = url;
-            const lb = document.getElementById('lightbox');
-            lb.classList.remove('hidden');
-            lb.classList.add('flex');
+            const min = parseInt(document.getElementById('filterMinPrice').value);
+            const max = parseInt(document.getElementById('filterMaxPrice').value);
+            currentFilter.minPrice = isNaN(min) ? null : min;
+            currentFilter.maxPrice = isNaN(max) ? null : max;
+            closeFilterModal();
+            updateUI();
         }
 
-        function closeLightbox() {
-            triggerHaptic('light');
-            const lb = document.getElementById('lightbox');
-            lb.classList.add('hidden');
-            lb.classList.remove('flex');
-        }
-
-        // Initial Mount
-        applyFilters();
+        // INITIAL LOAD
+        updateUI();
     </script>
 </body>
 </html>
