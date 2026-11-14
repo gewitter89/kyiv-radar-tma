@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="uk" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Київ Радар — Оренда 0% та Швидкий Викуп</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['Syne', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: {
+                            950: '#07090e',
+                            900: '#0c0f17',
+                            850: '#111520',
+                            800: '#171c2b',
+                            700: '#232a3f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #07090e;
+            color: #f1f5f9;
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 90px;
+        }
+        .glass-card {
+            background: rgba(17, 21, 32, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .glow-accent {
+            box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.35);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-emerald-500 selection:text-black">
+
+    <!-- Top App Header -->
+    <header class="sticky top-0 z-40 bg-dark-950/90 backdrop-blur-md border-b border-white/5 px-4 py-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-dark-950 shadow-md font-black">
+                    <i data-lucide="radar" class="w-4 h-4"></i>
+                </span>
+                <div>
+                    <h1 class="font-display font-extrabold text-white text-base leading-none">КИЇВ РАДАР</h1>
+                    <span class="text-[10px] text-emerald-400 font-semibold tracking-wider uppercase">ШІ-Снайпер 0% Комісії</span>
+                </div>
+            </div>
+
+            <!-- Live Status Pill -->
+            <a href="https://t.me/kyiv_bez_komisii" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Канал 0%</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- MAIN TAB 1: RENT DEALS -->
+    <main id="tab-rent" class="tab-content px-4 py-4 space-y-4">
+        
+        <!-- Search & Metric Banner -->
+        <div class="glass-card p-4 rounded-2xl border-emerald-500/20 bg-gradient-to-r from-emerald-950/20 via-dark-850 to-dark-850">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-xs text-slate-400">Прямі власники у базі</span>
+                    <div class="text-2xl font-display font-extrabold text-white">52 квартири</div>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-400">Збережено клієнтам</span>
+                    <div class="text-2xl font-display font-extrabold text-emerald-400">540 000+ ₴</div>
+                </div>
+            </div>
+            <p class="text-xs text-slate-300 mt-2.5 leading-relaxed">
+                🛡 Алгоритм відсікає 100% рієлторів за базою 14 000+ номерів агентств.
+            </p>
+        </div>
+
+        <!-- District Filter Horizontal Scroll -->
+        <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar py-1 text-xs font-semibold">
+            <button onclick="filterDistrict('all')" class="district-btn active px-3.5 py-2 rounded-xl bg-emerald-500 text-dark-950 whitespace-nowrap transition-all">Всі райони</button>
+            <button onclick="filterDistrict('Оболонь')" class="district-btn px-3.5 py-2 rounded-xl bg-dark-850 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Оболонь</button>
+            <button onclick="filterDistrict('Печерськ')" class="district-btn px-3.5 py-2 rounded-xl bg-dark-850 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Печерськ</button>
+            <button onclick="filterDistrict('Поділ')" class="district-btn px-3.5 py-2 rounded-xl bg-dark-850 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Поділ</button>
+            <button onclick="filterDistrict('Дарниця')" class="district-btn px-3.5 py-2 rounded-xl bg-dark-850 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Дарниця</button>
+            <button onclick="filterDistrict('Голосієво')" class="district-btn px-3.5 py-2 rounded-xl bg-dark-850 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Голосієво</button>
+        </div>
+
+        <!-- Deals List Container -->
+        <div id="deals-list" class="space-y-3.5">
+            <!-- Deal Item 1 -->
+            <div class="deal-card glass-card rounded-2xl p-4 border border-white/5 hover:border-emerald-500/40 transition-all" data-district="Оболонь" data-price="14000">
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <span class="inline-block px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-1">
+                            Прямий Власник
+                        </span>
+                        <h3 class="font-bold text-white text-base leading-snug">
+                            1-к квартира, просп. Володимира Івасюка
+                        </h3>
+                        <div class="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-500"></i>
+                            <span>Оболонь, біля набережної • 42 м²</span>
+                        </div>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <div class="text-lg font-display font-black text-white">14 000 ₴</div>
+                        <span class="text-[10px] text-slate-400">/ місяць</span>
+                    </div>
+                </div>
+
+                <div class="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
+                    <div class="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        <span>Економія: +7 000 ₴</span>
+                    </div>
+                    <a href="https://olx.ua" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center gap-1">
+                        <span>Контакти</span>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Deal Item 2 -->
+            <div class="deal-card glass-card rounded-2xl p-4 border border-white/5 hover:border-emerald-500/40 transition-all" data-district="Печерськ" data-price="22000">
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <span class="inline-block px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-1">
+                            Прямий Власник
+                        </span>
+                        <h3 class="font-bold text-white text-base leading-snug">
+                            2-к студія, вул. Шота Руставелі
+                        </h3>
+                        <div class="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-500"></i>
+                            <span>Печерськ, Палац Спорту • 60 м²</span>
+                        </div>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <div class="text-lg font-display font-black text-white">22 000 ₴</div>
+                        <span class="text-[10px] text-slate-400">/ місяць</span>
+                    </div>
+                </div>
+
+                <div class="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
+                    <div class="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        <span>Економія: +11 000 ₴</span>
+                    </div>
+                    <a href="https://olx.ua" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center gap-1">
+                        <span>Контакти</span>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Deal Item 3 -->
+            <div class="deal-card glass-card rounded-2xl p-4 border border-white/5 hover:border-emerald-500/40 transition-all" data-district="Поділ" data-price="16500">
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <span class="inline-block px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-1">
+                            Прямий Власник
+                        </span>
+                        <h3 class="font-bold text-white text-base leading-snug">
+                            1-к квартира, вул. Сагайдачного
+                        </h3>
+                        <div class="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-500"></i>
+                            <span>Поділ, Контрактова площа • 38 м²</span>
+                        </div>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <div class="text-lg font-display font-black text-white">16 500 ₴</div>
+                        <span class="text-[10px] text-slate-400">/ місяць</span>
+                    </div>
+                </div>
+
+                <div class="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
+                    <div class="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        <span>Економія: +8 250 ₴</span>
+                    </div>
+                    <a href="https://olx.ua" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center gap-1">
+                        <span>Контакти</span>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Deal Item 4 -->
+            <div class="deal-card glass-card rounded-2xl p-4 border border-white/5 hover:border-emerald-500/40 transition-all" data-district="Дарниця" data-price="13000">
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <span class="inline-block px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-1">
+                            Прямий Власник
+                        </span>
+                        <h3 class="font-bold text-white text-base leading-snug">
+                            2-к комфорт, вул. Анни Ахматової
+                        </h3>
+                        <div class="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-500"></i>
+                            <span>Дарниця, Позняки • 54 м²</span>
+                        </div>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <div class="text-lg font-display font-black text-white">13 000 ₴</div>
+                        <span class="text-[10px] text-slate-400">/ місяць</span>
+                    </div>
+                </div>
+
+                <div class="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
+                    <div class="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        <span>Економія: +6 500 ₴</span>
+                    </div>
+                    <a href="https://olx.ua" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center gap-1">
+                        <span>Контакти</span>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MAIN TAB 2: PERSONAL RADAR -->
+    <main id="tab-radar" class="tab-content hidden px-4 py-4 space-y-4">
+        <div class="glass-card p-5 rounded-2xl border-blue-500/30 bg-gradient-to-b from-blue-950/20 to-dark-850 space-y-4">
+            <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                    <i data-lucide="crosshair" class="w-5 h-5"></i>
+                </span>
+                <div>
+                    <h2 class="text-lg font-display font-extrabold text-white">Персональний ШІ-Радар</h2>
+                    <p class="text-xs text-slate-400">Миттєве сповіщення за 1 секунду</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 pt-2 text-sm">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Бажаний район у Києві</label>
+                    <select id="radar-district-select" class="w-full bg-dark-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-white text-sm focus:border-blue-500 focus:outline-none">
+                        <option value="Оболонський">Оболонський</option>
+                        <option value="Печерський">Печерський</option>
+                        <option value="Подільський">Подільський</option>
+                        <option value="Шевченківський">Шевченківський</option>
+                        <option value="Дарницький">Дарницький</option>
+                        <option value="Голосіївський">Голосіївський</option>
+                        <option value="Всі райони Києва">Всі райони Києва</option>
+                    </select>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between text-xs font-semibold text-slate-300 mb-1.5">
+                        <span>Максимальний бюджет</span>
+                        <span id="budget-val" class="text-emerald-400 font-bold">15 000 ₴/міс</span>
+                    </div>
+                    <input type="range" id="budget-range" min="8000" max="35000" step="1000" value="15000" class="w-full accent-emerald-500 cursor-pointer" oninput="updateBudget(this.value)">
+                </div>
+            </div>
+
+            <button onclick="saveRadarSettings()" class="glow-accent w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-sm flex items-center justify-center gap-2 transition-all">
+                <i data-lucide="bell-ring" class="w-4 h-4"></i>
+                <span>Активувати мій Радар</span>
+            </button>
+        </div>
+
+        <!-- How Radar Works -->
+        <div class="glass-card p-4 rounded-2xl space-y-3 text-xs text-slate-300">
+            <h4 class="font-bold text-white text-sm">Чому Персональний Радар — це киллер-фіча?</h4>
+            <div class="flex items-start gap-2.5">
+                <i data-lucide="zap" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i>
+                <p>Квартири від власників у Києві розбирають за <strong>15–20 хвилин</strong>. Радар знаходить їх швидше за рієлторів.</p>
+            </div>
+            <div class="flex items-start gap-2.5">
+                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                <p>Жодного спаму: ви отримуєте сповіщення <strong>тільки</strong> під свій район і свій бюджет.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- MAIN TAB 3: INSTANT GADGET BUYOUT -->
+    <main id="tab-buyout" class="tab-content hidden px-4 py-4 space-y-4">
+        <div class="glass-card p-5 rounded-2xl border-amber-500/30 bg-gradient-to-b from-amber-950/20 to-dark-850 space-y-4">
+            <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                    <i data-lucide="coins" class="w-5 h-5"></i>
+                </span>
+                <div>
+                    <h2 class="text-lg font-display font-extrabold text-white">Швидкий Викуп Гаджетів</h2>
+                    <p class="text-xs text-slate-400">Готівка у Києві за 1 годину</p>
+                </div>
+            </div>
+
+            <!-- Device Selector -->
+            <div class="space-y-3 text-sm">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Оберіть пристрій</label>
+                    <select id="gadget-select" class="w-full bg-dark-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-white text-sm focus:border-amber-500 focus:outline-none" onchange="calculateBuyout()">
+                        <option value="iphone15pm">Apple iPhone 15 Pro Max</option>
+                        <option value="iphone15p">Apple iPhone 15 Pro</option>
+                        <option value="iphone14p">Apple iPhone 14 Pro</option>
+                        <option value="iphone13">Apple iPhone 13</option>
+                        <option value="macbook_m1">Apple MacBook Air M1</option>
+                        <option value="ecoflow_river">EcoFlow River 2 Max</option>
+                        <option value="ecoflow_delta">EcoFlow Delta 2</option>
+                        <option value="ps5">Sony PlayStation 5</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Стан гаджета</label>
+                    <div class="grid grid-cols-3 gap-2 text-xs font-semibold">
+                        <button onclick="setCondition('perfect')" id="cond-perfect" class="cond-btn py-2 rounded-xl bg-amber-500 text-dark-950 font-bold border border-amber-500">Ідеальний</button>
+                        <button onclick="setCondition('good')" id="cond-good" class="cond-btn py-2 rounded-xl bg-dark-900 text-slate-300 border border-white/10">Добре</button>
+                        <button onclick="setCondition('fair')" id="cond-fair" class="cond-btn py-2 rounded-xl bg-dark-900 text-slate-300 border border-white/10">Сліди</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Appraisal Box -->
+            <div class="p-4 rounded-xl bg-dark-900/90 border border-white/10 space-y-2">
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                    <span>Ринкова ціна на OLX:</span>
+                    <span id="market-price-val" class="font-bold text-white">42 000 ₴</span>
+                </div>
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                    <span>Швидка самостійна продаж:</span>
+                    <span id="fast-price-val" class="font-bold text-slate-300">37 800 ₴</span>
+                </div>
+                <div class="pt-2 border-t border-white/10 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs text-amber-400 font-semibold block">Терміновий викуп готівкою:</span>
+                        <span id="buyout-cash-val" class="text-2xl font-display font-black text-amber-400">29 400 ₴</span>
+                    </div>
+                    <span class="text-[10px] px-2 py-1 rounded bg-amber-500/10 text-amber-300 font-bold">Сьогодні</span>
+                </div>
+            </div>
+
+            <!-- CTA Order -->
+            <a id="buyout-cta-btn" href="https://t.me/pavlograd_admin?text=Вітаю!+Хочу+продати+iPhone+15+Pro+Max+на+викуп" target="_blank" class="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-dark-950 font-bold text-sm flex items-center justify-center gap-2 transition-all">
+                <i data-lucide="handshake" class="w-4 h-4"></i>
+                <span>Отримати гроші сьогодні у Києві</span>
+            </a>
+        </div>
+    </main>
+
+    <!-- MAIN TAB 4: VIP PASS -->
+    <main id="tab-vip" class="tab-content hidden px-4 py-4 space-y-4">
+        <div class="glass-card p-5 rounded-2xl border-indigo-500/30 bg-gradient-to-b from-indigo-950/20 to-dark-850 space-y-4">
+            <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
+                    <i data-lucide="crown" class="w-5 h-5"></i>
+                </span>
+                <div>
+                    <h2 class="text-lg font-display font-extrabold text-white">VIP Інсайдер Клуб</h2>
+                    <p class="text-xs text-slate-400">Фора 15 хвилин перед всім ринком</p>
+                </div>
+            </div>
+
+            <ul class="space-y-2.5 text-xs text-slate-300">
+                <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-indigo-400"></i> Прямі контакти господарів на 15 хв раніше каналу</li>
+                <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-indigo-400"></i> Закритий чат інвестиційних фліпів техніки</li>
+                <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-indigo-400"></i> Юридична перевірка документів власності</li>
+            </ul>
+
+            <div class="pt-2 border-t border-white/10 space-y-2.5">
+                <a href="https://t.me/prostov_shrink_bot?start=vip" target="_blank" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-between px-4 transition-all">
+                    <span>Пробний VIP (7 днів)</span>
+                    <span>350 Stars (~$7)</span>
+                </a>
+                <a href="https://t.me/prostov_shrink_bot?start=vip" target="_blank" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-between px-4 shadow-lg shadow-indigo-500/20">
+                    <span>Повний VIP (30 днів) [ХІТ]</span>
+                    <span>1 500 Stars (~$30)</span>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Mobile App Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-dark-950/95 backdrop-blur-xl border-t border-white/10 px-2 py-2">
+        <div class="max-w-md mx-auto grid grid-cols-4 gap-1">
+            <button onclick="switchTab('rent')" id="nav-rent" class="nav-item active flex flex-col items-center justify-center py-1.5 px-2 rounded-xl text-emerald-400 transition-colors">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span class="text-[10px] font-bold mt-1">Оренда</span>
+            </button>
+            <button onclick="switchTab('radar')" id="nav-radar" class="nav-item flex flex-col items-center justify-center py-1.5 px-2 rounded-xl text-slate-400 hover:text-white transition-colors">
+                <i data-lucide="crosshair" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold mt-1">Радар</span>
+            </button>
+            <button onclick="switchTab('buyout')" id="nav-buyout" class="nav-item flex flex-col items-center justify-center py-1.5 px-2 rounded-xl text-slate-400 hover:text-white transition-colors">
+                <i data-lucide="badge-dollar-sign" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold mt-1">Викуп</span>
+            </button>
+            <button onclick="switchTab('vip')" id="nav-vip" class="nav-item flex flex-col items-center justify-center py-1.5 px-2 rounded-xl text-slate-400 hover:text-white transition-colors">
+                <i data-lucide="crown" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold mt-1">VIP</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- App Logic Scripts -->
+    <script>
+        // Init Lucide
+        lucide.createIcons();
+
+        // Init Telegram WebApp
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+            window.Telegram.WebApp.setHeaderColor('#07090e');
+            window.Telegram.WebApp.setBackgroundColor('#07090e');
+        }
+
+        function triggerHaptic() {
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+            }
+        }
+
+        // Tab Navigation
+        function switchTab(tabId) {
+            triggerHaptic();
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.remove('text-emerald-400', 'font-bold');
+                btn.classList.add('text-slate-400');
+            });
+            const activeBtn = document.getElementById('nav-' + tabId);
+            activeBtn.classList.remove('text-slate-400');
+            activeBtn.classList.add('text-emerald-400', 'font-bold');
+        }
+
+        // District Filter
+        function filterDistrict(district) {
+            triggerHaptic();
+            document.querySelectorAll('.district-btn').forEach(b => {
+                b.classList.remove('bg-emerald-500', 'text-dark-950');
+                b.classList.add('bg-dark-850', 'text-slate-300');
+            });
+            event.target.classList.add('bg-emerald-500', 'text-dark-950');
+            event.target.classList.remove('bg-dark-850', 'text-slate-300');
+
+            document.querySelectorAll('.deal-card').forEach(card => {
+                if (district === 'all' || card.dataset.district.includes(district)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Radar Budget Range
+        function updateBudget(val) {
+            document.getElementById('budget-val').innerText = Number(val).toLocaleString('uk-UA') + ' ₴/міс';
+        }
+
+        function saveRadarSettings() {
+            triggerHaptic();
+            const district = document.getElementById('radar-district-select').value;
+            const budget = document.getElementById('budget-range').value;
+            if (window.Telegram?.WebApp) {
+                window.Telegram.WebApp.showPopup({
+                    title: '🎉 Радар Активовано!',
+                    message: `Локація: ${district}\nБюджет: до ${Number(budget).toLocaleString()} ₴\n\nБот надішле пуш у чат, як тільки з'явиться квартира від власника!`,
+                    buttons: [{type: 'ok', text: 'Чудово'}]
+                });
+            } else {
+                alert(`Радар збережено: ${district}, до ${budget} ₴!`);
+            }
+        }
+
+        // Gadget Buyout Calculator
+        const GADGET_DATABASE = {
+            iphone15pm: { name: 'iPhone 15 Pro Max', market: 42000 },
+            iphone15p: { name: 'iPhone 15 Pro', market: 36000 },
+            iphone14p: { name: 'iPhone 14 Pro', market: 29000 },
+            iphone13: { name: 'iPhone 13', market: 18500 },
+            macbook_m1: { name: 'MacBook Air M1', market: 25000 },
+            ecoflow_river: { name: 'EcoFlow River 2 Max', market: 12500 },
+            ecoflow_delta: { name: 'EcoFlow Delta 2', market: 34000 },
+            ps5: { name: 'Sony PlayStation 5', market: 19000 }
+        };
+
+        let currentConditionCoeff = 1.0;
+
+        function setCondition(cond) {
+            triggerHaptic();
+            document.querySelectorAll('.cond-btn').forEach(b => {
+                b.classList.remove('bg-amber-500', 'text-dark-950', 'border-amber-500');
+                b.classList.add('bg-dark-900', 'text-slate-300', 'border-white/10');
+            });
+            const activeBtn = document.getElementById('cond-' + cond);
+            activeBtn.classList.add('bg-amber-500', 'text-dark-950', 'border-amber-500');
+            activeBtn.classList.remove('bg-dark-900', 'text-slate-300', 'border-white/10');
+
+            if (cond === 'perfect') currentConditionCoeff = 1.0;
+            else if (cond === 'good') currentConditionCoeff = 0.90;
+            else if (cond === 'fair') currentConditionCoeff = 0.75;
+
+            calculateBuyout();
+        }
+
+        function calculateBuyout() {
+            const key = document.getElementById('gadget-select').value;
+            const item = GADGET_DATABASE[key];
+            const market = Math.round(item.market * currentConditionCoeff);
+            const fast = Math.round(market * 0.90);
+            const cash = Math.round(market * 0.70 / 100) * 100;
+
+            document.getElementById('market-price-val').innerText = market.toLocaleString('uk-UA') + ' ₴';
+            document.getElementById('fast-price-val').innerText = fast.toLocaleString('uk-UA') + ' ₴';
+            document.getElementById('buyout-cash-val').innerText = cash.toLocaleString('uk-UA') + ' ₴';
+
+            const ctaBtn = document.getElementById('buyout-cta-btn');
+            ctaBtn.href = `https://t.me/pavlograd_admin?text=Вітаю!+Хочу+продати+${encodeURIComponent(item.name)}+на+викуп+за+${cash}+грн`;
+        }
+
+        // Init initial calculation
+        calculateBuyout();
+    </script>
+</body>
+</html>
