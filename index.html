@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Київ Радар — Оренда 0% та Швидкий Викуп</title>
+    <title>Київ Ключі | Оренда квартир без комісії 0%</title>
+    
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS -->
+    
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -21,37 +26,47 @@
                 extend: {
                     fontFamily: {
                         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        display: ['Syne', 'sans-serif'],
+                        display: ['"Space Grotesk"', 'sans-serif'],
                     },
                     colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            500: '#10b981',
+                            600: '#059669',
+                        },
                         dark: {
-                            950: '#07090e',
-                            900: '#0c0f17',
-                            850: '#111520',
-                            800: '#171c2b',
-                            700: '#232a3f',
+                            950: '#090d14',
+                            900: '#0f1724',
+                            850: '#152033',
+                            800: '#1c2b44',
                         }
                     }
                 }
             }
         }
     </script>
+
     <style>
         body {
-            background-color: #07090e;
+            background-color: #090d14;
             color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             -webkit-tap-highlight-color: transparent;
-            padding-bottom: 90px;
+            user-select: none;
         }
+
+        .glass-panel {
+            background: rgba(15, 23, 36, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
         .glass-card {
-            background: rgba(17, 21, 32, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: #0f1724;
             border: 1px solid rgba(255, 255, 255, 0.07);
         }
-        .glow-accent {
-            box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.35);
-        }
+
         .hide-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -59,604 +74,659 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        .slider-track {
+            display: flex;
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
     </style>
 </head>
-<body class="font-sans antialiased selection:bg-emerald-500 selection:text-black">
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500/20">
 
     <!-- Top App Header -->
-    <header class="sticky top-0 z-40 bg-dark-950/90 backdrop-blur-md border-b border-white/5 px-4 py-3">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-                <span class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-dark-950 shadow-md font-black">
-                    <i data-lucide="radar" class="w-4 h-4"></i>
-                </span>
-                <div>
-                    <h1 class="font-display font-extrabold text-white text-base leading-none">КИЇВ РАДАР</h1>
-                    <span class="text-[10px] text-emerald-400 font-semibold tracking-wider uppercase">ШІ-Снайпер 0% Комісії</span>
+    <header class="sticky top-0 z-40 glass-panel border-b border-white/5 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-[1px] shadow-lg shadow-emerald-500/20">
+                <div class="w-full h-full bg-dark-950 rounded-[11px] flex items-center justify-center">
+                    <i data-lucide="key" class="w-4 h-4 text-emerald-400"></i>
                 </div>
             </div>
-
-            <!-- Live Status Pill -->
-            <a href="https://t.me/kyiv_bez_komisii" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Канал 0%</span>
-            </a>
+            <div>
+                <div class="flex items-center gap-1.5">
+                    <h1 class="text-sm font-extrabold tracking-tight text-white font-display">Київ Ключі</h1>
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">0% РІЄЛТОРІВ</span>
+                </div>
+                <p class="text-[11px] text-slate-400 font-medium">Прямі господарі • Перевірено модератором</p>
+            </div>
         </div>
+
+        <a href="https://t.me/kyiv_bez_komisii" target="_blank" class="flex items-center gap-1 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold hover:bg-emerald-500/20 transition-all">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Канал 0%</span>
+        </a>
     </header>
 
-    <!-- MAIN TAB 1: RENT DEALS -->
-    <main id="tab-rent" class="tab-content px-4 py-4 space-y-4">
+    <!-- CONTENT TABS -->
+
+    <!-- ==================== TAB 1: RENT DEALS ==================== -->
+    <main id="tab-rent" class="tab-content px-4 py-4 space-y-4 pb-24">
         
-        <!-- Search & Metric Banner -->
-        <div class="glass-card p-4 rounded-2xl border-emerald-500/20 bg-gradient-to-r from-emerald-950/20 via-dark-850 to-dark-850 space-y-3">
+        <!-- Live Verified Metric Banner -->
+        <div class="glass-panel p-4 rounded-2xl border-emerald-500/20 bg-gradient-to-br from-emerald-950/30 via-dark-900 to-dark-900 space-y-3">
             <div class="flex items-center justify-between">
                 <div>
-                    <span class="text-xs text-slate-400">Прямі варіанти від господарів</span>
-                    <div class="text-2xl font-display font-extrabold text-white">52 квартири</div>
+                    <span class="text-xs text-slate-400 font-medium">Сьогодні у базі без посередників</span>
+                    <div class="text-2xl font-extrabold text-white font-display tracking-tight">48 квартир</div>
                 </div>
                 <div class="text-right">
-                    <span class="text-xs text-emerald-400 font-semibold flex items-center gap-1 justify-end">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[11px] font-semibold">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                        Оновлено щойно
+                        Оновлено о 19:40
                     </span>
-                    <div class="text-xs text-slate-400 mt-1">Київ • 10 районів</div>
+                    <div class="text-[11px] text-slate-400 mt-1 font-medium">Сервіс перевірки договорів 2026</div>
                 </div>
             </div>
 
-            <!-- 99 UAH Express Check Hero CTA -->
-            <div class="p-3 rounded-xl bg-dark-900/90 border border-emerald-500/30 flex items-center justify-between gap-3">
-                <div class="space-y-0.5">
-                    <div class="text-xs font-bold text-white flex items-center gap-1.5">
-                        <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-emerald-400"></i>
-                        <span>Експрес-перевірка оголошення</span>
-                    </div>
-                    <p class="text-[11px] text-slate-300">Продзвонимо рекламодавця, уточнимо актуальність, комісію та час огляду.</p>
-                </div>
-                <a href="https://t.me/pavlograd_admin?text=Вітаю!+Хочу+замовити+експрес-перевірку+оголошення+за+99+грн" target="_blank" class="shrink-0 px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs shadow-md">
-                    99 ₴
-                </a>
-            </div>
-
-            <!-- Anti-Scam Police Guideline Disclaimer -->
-            <div class="flex items-start gap-2 pt-1 text-[11px] text-slate-400">
-                <i data-lucide="info" class="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5"></i>
-                <p>За правилами безпеки: ніколи не переказуйте передоплату чи завдаток за бронювання огляду. Оплата тільки при особистій зустрічі з власником.</p>
-            </div>
-        </div>
-
-        <!-- District Filter Horizontal Scroll -->
-        <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar py-1 text-xs font-semibold">
-            <button onclick="filterDistrict('all')" class="district-btn active px-3.5 py-2 rounded-xl bg-emerald-500 text-dark-950 whitespace-nowrap transition-all">Всі райони</button>
-            <button onclick="filterDistrict('Оболонь')" class="district-btn px-3.5 py-2 rounded-xl bg-dark-850 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Оболонь</button>
-            <button onclick="filterDistrict('Печерськ')" class="district-btn px-3.5 py-2 rounded-xl bg-dark-850 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Печерськ</button>
-            <button onclick="filterDistrict('Поділ')" class="district-btn px-3.5 py-2 rounded-xl bg-dark-850 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Поділ</button>
-            <button onclick="filterDistrict('Дарниця')" class="district-btn px-3.5 py-2 rounded-xl bg-dark-850 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Дарниця</button>
-            <button onclick="filterDistrict('Голосієво')" class="district-btn px-3.5 py-2 rounded-xl bg-dark-850 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Голосієво</button>
-        </div>
-
-        <!-- 2026 Kyiv Reality Feature Chips -->
-        <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1 text-[11px] font-medium text-slate-300">
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 shrink-0">
-                <i data-lucide="wifi" class="w-3 h-3"></i>
-                GPON Оптоволокно
-            </span>
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 shrink-0">
-                <i data-lucide="paw-print" class="w-3 h-3"></i>
-                Можна з котиком/песиком
-            </span>
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shrink-0">
-                <i data-lucide="layers" class="w-3 h-3"></i>
-                Низькі поверхи (1–5)
-            </span>
-        </div>
-
-        <!-- Deals List Container -->
-        <div id="deals-list" class="space-y-3.5">
-            <!-- Deal Item 1 -->
-            <div class="deal-card glass-card rounded-2xl p-4 border border-white/5 hover:border-emerald-500/40 transition-all" data-district="Оболонь" data-price="14000">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <div class="flex items-center gap-1.5 mb-1.5">
-                            <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
-                                Прямий Власник 0%
-                            </span>
-                            <span class="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 text-[10px] font-semibold flex items-center gap-1">
-                                <i data-lucide="zap" class="w-2.5 h-2.5"></i> GPON є
-                            </span>
-                        </div>
-                        <h3 class="font-bold text-white text-base leading-snug">
-                            1-к квартира, просп. Володимира Івасюка
-                        </h3>
-                        <div class="flex items-center gap-2 text-xs text-slate-400 mt-1 flex-wrap">
-                            <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-500"></i> Оболонь • 42 м²</span>
-                            <span class="text-slate-600">•</span>
-                            <span class="text-amber-300 flex items-center gap-1"><i data-lucide="paw-print" class="w-3 h-3"></i> З котиком OK</span>
-                            <span class="text-slate-600">•</span>
-                            <span class="text-slate-300">3-й поверх</span>
-                        </div>
-                    </div>
-                    <div class="text-right shrink-0">
-                        <div class="text-lg font-display font-black text-white">14 000 ₴</div>
-                        <span class="text-[10px] text-slate-400">/ місяць</span>
-                    </div>
-                </div>
-
-                <div class="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
-                    <div class="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
-                        <i data-lucide="shield-check" class="w-4 h-4"></i>
-                        <span>Економія на комісії: +7 000 ₴</span>
-                    </div>
-                    <a href="https://olx.ua" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center gap-1">
-                        <span>Контакти</span>
-                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Deal Item 2 -->
-            <div class="deal-card glass-card rounded-2xl p-4 border border-white/5 hover:border-emerald-500/40 transition-all" data-district="Печерськ" data-price="22000">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <div class="flex items-center gap-1.5 mb-1.5">
-                            <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
-                                Прямий Власник 0%
-                            </span>
-                            <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold flex items-center gap-1">
-                                <i data-lucide="shield" class="w-2.5 h-2.5"></i> Укриття в ЖК
-                            </span>
-                        </div>
-                        <h3 class="font-bold text-white text-base leading-snug">
-                            2-к студія, вул. Шота Руставелі
-                        </h3>
-                        <div class="flex items-center gap-2 text-xs text-slate-400 mt-1 flex-wrap">
-                            <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-500"></i> Печерськ • 60 м²</span>
-                            <span class="text-slate-600">•</span>
-                            <span class="text-blue-300">GPON інтернет</span>
-                            <span class="text-slate-600">•</span>
-                            <span class="text-slate-300">4-й поверх</span>
-                        </div>
-                    </div>
-                    <div class="text-right shrink-0">
-                        <div class="text-lg font-display font-black text-white">22 000 ₴</div>
-                        <span class="text-[10px] text-slate-400">/ місяць</span>
-                    </div>
-                </div>
-
-                <div class="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
-                    <div class="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
-                        <i data-lucide="shield-check" class="w-4 h-4"></i>
-                        <span>Економія на комісії: +11 000 ₴</span>
-                    </div>
-                    <a href="https://olx.ua" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center gap-1">
-                        <span>Контакти</span>
-                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-                    </a>
-                </div>
-            </div>
-                        </h3>
-                        <div class="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
-                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-500"></i>
-                            <span>Печерськ, Палац Спорту • 60 м²</span>
-                        </div>
-                    </div>
-                    <div class="text-right shrink-0">
-                        <div class="text-lg font-display font-black text-white">22 000 ₴</div>
-                        <span class="text-[10px] text-slate-400">/ місяць</span>
-                    </div>
-                </div>
-
-                <div class="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
-                    <div class="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
-                        <i data-lucide="shield-check" class="w-4 h-4"></i>
-                        <span>Економія: +11 000 ₴</span>
-                    </div>
-                    <a href="https://olx.ua" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center gap-1">
-                        <span>Контакти</span>
-                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Deal Item 3 -->
-            <div class="deal-card glass-card rounded-2xl p-4 border border-white/5 hover:border-emerald-500/40 transition-all" data-district="Поділ" data-price="16500">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <span class="inline-block px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-1">
-                            Прямий Власник
-                        </span>
-                        <h3 class="font-bold text-white text-base leading-snug">
-                            1-к квартира, вул. Сагайдачного
-                        </h3>
-                        <div class="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
-                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-500"></i>
-                            <span>Поділ, Контрактова площа • 38 м²</span>
-                        </div>
-                    </div>
-                    <div class="text-right shrink-0">
-                        <div class="text-lg font-display font-black text-white">16 500 ₴</div>
-                        <span class="text-[10px] text-slate-400">/ місяць</span>
-                    </div>
-                </div>
-
-                <div class="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
-                    <div class="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
-                        <i data-lucide="shield-check" class="w-4 h-4"></i>
-                        <span>Економія: +8 250 ₴</span>
-                    </div>
-                    <a href="https://olx.ua" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center gap-1">
-                        <span>Контакти</span>
-                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Deal Item 4 -->
-            <div class="deal-card glass-card rounded-2xl p-4 border border-white/5 hover:border-emerald-500/40 transition-all" data-district="Дарниця" data-price="13000">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <span class="inline-block px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-1">
-                            Прямий Власник
-                        </span>
-                        <h3 class="font-bold text-white text-base leading-snug">
-                            2-к комфорт, вул. Анни Ахматової
-                        </h3>
-                        <div class="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
-                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-500"></i>
-                            <span>Дарниця, Позняки • 54 м²</span>
-                        </div>
-                    </div>
-                    <div class="text-right shrink-0">
-                        <div class="text-lg font-display font-black text-white">13 000 ₴</div>
-                        <span class="text-[10px] text-slate-400">/ місяць</span>
-                    </div>
-                </div>
-
-                <div class="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
-                    <div class="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
-                        <i data-lucide="shield-check" class="w-4 h-4"></i>
-                        <span>Економія: +6 500 ₴</span>
-                    </div>
-                    <a href="https://olx.ua" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center gap-1">
-                        <span>Контакти</span>
-                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- MAIN TAB 2: PERSONAL RADAR -->
-    <main id="tab-radar" class="tab-content hidden px-4 py-4 space-y-4">
-        <div class="glass-card p-5 rounded-2xl border-blue-500/30 bg-gradient-to-b from-blue-950/20 to-dark-850 space-y-4">
-            <div class="flex items-center gap-3">
-                <span class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
-                    <i data-lucide="crosshair" class="w-5 h-5"></i>
-                </span>
-                <div>
-                    <h2 class="text-lg font-display font-extrabold text-white">Персональний ШІ-Радар</h2>
-                    <p class="text-xs text-slate-400">Миттєве сповіщення за 1 секунду</p>
-                </div>
-            </div>
-
-            <div class="space-y-3 pt-2 text-sm">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Бажаний район у Києві</label>
-                    <select id="radar-district-select" class="w-full bg-dark-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-white text-sm focus:border-blue-500 focus:outline-none">
-                        <option value="Оболонський">Оболонський</option>
-                        <option value="Печерський">Печерський</option>
-                        <option value="Подільський">Подільський</option>
-                        <option value="Шевченківський">Шевченківський</option>
-                        <option value="Дарницький">Дарницький</option>
-                        <option value="Голосіївський">Голосіївський</option>
-                        <option value="Всі райони Києва">Всі райони Києва</option>
-                    </select>
-                </div>
-
-                <div>
-                    <div class="flex items-center justify-between text-xs font-semibold text-slate-300 mb-1.5">
-                        <span>Максимальний бюджет</span>
-                        <span id="budget-val" class="text-emerald-400 font-bold">15 000 ₴/міс</span>
-                    </div>
-                    <input type="range" id="budget-range" min="8000" max="35000" step="1000" value="15000" class="w-full accent-emerald-500 cursor-pointer" oninput="updateBudget(this.value)">
-                </div>
-            </div>
-
-            <button onclick="saveRadarSettings()" class="glow-accent w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-sm flex items-center justify-center gap-2 transition-all">
-                <i data-lucide="bell-ring" class="w-4 h-4"></i>
-                <span>Активувати мій Радар</span>
-            </button>
-        </div>
-
-        <!-- How Radar Works -->
-        <div class="glass-card p-4 rounded-2xl space-y-3 text-xs text-slate-300">
-            <h4 class="font-bold text-white text-sm">Чому Персональний Радар — це киллер-фіча?</h4>
-            <div class="flex items-start gap-2.5">
-                <i data-lucide="zap" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i>
-                <p>Квартири від власників у Києві розбирають за <strong>15–20 хвилин</strong>. Радар знаходить їх швидше за рієлторів.</p>
-            </div>
-            <div class="flex items-start gap-2.5">
+            <!-- Human Moderation Guarantee Notice -->
+            <div class="p-3 rounded-xl bg-dark-950/80 border border-white/5 flex items-start gap-2.5">
                 <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
-                <p>Жодного спаму: ви отримуєте сповіщення <strong>тільки</strong> під свій район і свій бюджет.</p>
+                <div class="text-[11px] text-slate-300 leading-relaxed">
+                    <b>Стандарт безпеки спільноти:</b> кожне оголошення перевірено за реєстрами прав власності та базою агентств. Жодних передоплат до особистого огляду житла.
+                </div>
             </div>
         </div>
-    </main>
 
-    <!-- MAIN TAB 3: INSTANT GADGET BUYOUT -->
-    <main id="tab-buyout" class="tab-content hidden px-4 py-4 space-y-4">
-        <div class="glass-card p-5 rounded-2xl border-amber-500/30 bg-gradient-to-b from-amber-950/20 to-dark-850 space-y-4">
-            <div class="flex items-center gap-3">
-                <span class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
-                    <i data-lucide="coins" class="w-5 h-5"></i>
-                </span>
-                <div>
-                    <h2 class="text-lg font-display font-extrabold text-white">Швидкий Викуп Гаджетів</h2>
-                    <p class="text-xs text-slate-400">Готівка у Києві за 1 годину</p>
-                </div>
-            </div>
+        <!-- Horizontal District Chips -->
+        <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar py-0.5 text-xs font-semibold">
+            <button onclick="filterDistrict('all')" class="district-btn active px-4 py-2 rounded-xl bg-emerald-500 text-dark-950 font-bold whitespace-nowrap shadow-md transition-all">Всі райони (48)</button>
+            <button onclick="filterDistrict('Оболонь')" class="district-btn px-4 py-2 rounded-xl bg-dark-900 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Оболонь (9)</button>
+            <button onclick="filterDistrict('Печерськ')" class="district-btn px-4 py-2 rounded-xl bg-dark-900 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Печерськ (12)</button>
+            <button onclick="filterDistrict('Поділ')" class="district-btn px-4 py-2 rounded-xl bg-dark-900 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Поділ (8)</button>
+            <button onclick="filterDistrict('Голосієво')" class="district-btn px-4 py-2 rounded-xl bg-dark-900 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Голосієво (11)</button>
+            <button onclick="filterDistrict('Шевченківський')" class="district-btn px-4 py-2 rounded-xl bg-dark-900 text-slate-300 border border-white/5 whitespace-nowrap transition-all">Шевченківський (8)</button>
+        </div>
 
-            <!-- Device Selector -->
-            <div class="space-y-3 text-sm">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Оберіть пристрій</label>
-                    <select id="gadget-select" class="w-full bg-dark-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-white text-sm focus:border-amber-500 focus:outline-none" onchange="calculateBuyout()">
-                        <option value="iphone15pm">Apple iPhone 15 Pro Max</option>
-                        <option value="iphone15p">Apple iPhone 15 Pro</option>
-                        <option value="iphone14p">Apple iPhone 14 Pro</option>
-                        <option value="iphone13">Apple iPhone 13</option>
-                        <option value="macbook_m1">Apple MacBook Air M1</option>
-                        <option value="ecoflow_river">EcoFlow River 2 Max</option>
-                        <option value="ecoflow_delta">EcoFlow Delta 2</option>
-                        <option value="ps5">Sony PlayStation 5</option>
-                    </select>
-                </div>
+        <!-- 2026 Real Amenities Filter Chips -->
+        <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1 text-[11px] font-medium text-slate-300">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark-900 border border-blue-500/20 text-blue-400 shrink-0">
+                <i data-lucide="wifi" class="w-3.5 h-3.5"></i>
+                <span>Оптоволокно GPON</span>
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark-900 border border-amber-500/20 text-amber-400 shrink-0">
+                <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                <span>Генератор на воду/ліфт</span>
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark-900 border border-purple-500/20 text-purple-400 shrink-0">
+                <i data-lucide="dog" class="w-3.5 h-3.5"></i>
+                <span>Можна з тваринами</span>
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark-900 border border-emerald-500/20 text-emerald-400 shrink-0">
+                <i data-lucide="building-2" class="w-3.5 h-3.5"></i>
+                <span>Низькі поверхи (1–5)</span>
+            </span>
+        </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Стан гаджета</label>
-                    <div class="grid grid-cols-3 gap-2 text-xs font-semibold">
-                        <button onclick="setCondition('perfect')" id="cond-perfect" class="cond-btn py-2 rounded-xl bg-amber-500 text-dark-950 font-bold border border-amber-500">Ідеальний</button>
-                        <button onclick="setCondition('good')" id="cond-good" class="cond-btn py-2 rounded-xl bg-dark-900 text-slate-300 border border-white/10">Добре</button>
-                        <button onclick="setCondition('fair')" id="cond-fair" class="cond-btn py-2 rounded-xl bg-dark-900 text-slate-300 border border-white/10">Сліди</button>
+        <!-- LISTINGS CONTAINER -->
+        <div id="listings-feed" class="space-y-4">
+            
+            <!-- LISTING 1: OBOLON -->
+            <article class="deal-card glass-card rounded-2xl overflow-hidden border border-white/10" data-district="Оболонь">
+                <!-- Photo Carousel Component -->
+                <div class="relative w-full aspect-[16/10] bg-dark-950 overflow-hidden group">
+                    <div id="slider-1" class="slider-track w-full h-full">
+                        <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80" alt="Квартира Оболонь" class="w-full h-full object-cover shrink-0">
+                        <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&auto=format&fit=crop&q=80" alt="Кухня Оболонь" class="w-full h-full object-cover shrink-0">
+                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop&q=80" alt="Спальня Оболонь" class="w-full h-full object-cover shrink-0">
+                    </div>
+                    
+                    <!-- Top Overlay Badges -->
+                    <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-950/85 backdrop-blur-md border border-emerald-500/30 text-emerald-400 text-[10px] font-bold flex items-center gap-1">
+                            <i data-lucide="check-circle" class="w-3 h-3"></i> Прямий власник
+                        </span>
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-950/85 backdrop-blur-md border border-blue-500/30 text-blue-400 text-[10px] font-bold flex items-center gap-1">
+                            <i data-lucide="wifi" class="w-3 h-3"></i> GPON є
+                        </span>
+                    </div>
+
+                    <div class="absolute top-3 right-3">
+                        <span class="px-2.5 py-1 rounded-lg bg-emerald-500 text-dark-950 text-[11px] font-extrabold shadow-lg">
+                            0% КОМІСІЇ
+                        </span>
+                    </div>
+
+                    <!-- Slide Controls -->
+                    <div class="absolute bottom-3 right-3 flex items-center gap-1 bg-dark-950/80 backdrop-blur-md px-2 py-1 rounded-lg border border-white/10 text-[10px] text-white font-mono">
+                        <button onclick="prevSlide(1)" class="p-1 hover:text-emerald-400"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+                        <span id="slider-ind-1">1 / 3</span>
+                        <button onclick="nextSlide(1)" class="p-1 hover:text-emerald-400"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
                     </div>
                 </div>
-            </div>
 
-            <!-- Dynamic Appraisal Box -->
-            <div class="p-4 rounded-xl bg-dark-900/90 border border-white/10 space-y-2">
-                <div class="flex items-center justify-between text-xs text-slate-400">
-                    <span>Ринкова ціна на OLX:</span>
-                    <span id="market-price-val" class="font-bold text-white">42 000 ₴</span>
-                </div>
-                <div class="flex items-center justify-between text-xs text-slate-400">
-                    <span>Швидка самостійна продаж:</span>
-                    <span id="fast-price-val" class="font-bold text-slate-300">37 800 ₴</span>
-                </div>
-                <div class="pt-2 border-t border-white/10 flex items-center justify-between">
-                    <div>
-                        <span class="text-xs text-amber-400 font-semibold block">Терміновий викуп готівкою:</span>
-                        <span id="buyout-cash-val" class="text-2xl font-display font-black text-amber-400">29 400 ₴</span>
+                <!-- Card Body -->
+                <div class="p-4 space-y-3">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <div class="text-xs text-slate-400 font-semibold flex items-center gap-1">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-400"></i>
+                                <span>Оболонь • Оболонська набережна, 14</span>
+                            </div>
+                            <h2 class="text-base font-bold text-white font-display mt-0.5">Світла 1-кімнатна біля парку «Наталка»</h2>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <div class="text-lg font-black text-white font-display">14 500 ₴</div>
+                            <span class="text-[10px] text-emerald-400 font-semibold">Економія 7 250 ₴</span>
+                        </div>
                     </div>
-                    <span class="text-[10px] px-2 py-1 rounded bg-amber-500/10 text-amber-300 font-bold">Сьогодні</span>
-                </div>
-            </div>
 
-            <!-- CTA Order -->
-            <a id="buyout-cta-btn" href="https://t.me/pavlograd_admin?text=Вітаю!+Хочу+продати+iPhone+15+Pro+Max+на+викуп" target="_blank" class="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-dark-950 font-bold text-sm flex items-center justify-center gap-2 transition-all">
-                <i data-lucide="handshake" class="w-4 h-4"></i>
-                <span>Отримати гроші сьогодні у Києві</span>
-            </a>
+                    <!-- Metro & Specs -->
+                    <div class="flex flex-wrap items-center gap-2 text-[11px] text-slate-300">
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/5 flex items-center gap-1 text-blue-400 font-medium">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span> М Мінська (7 хв пішки)
+                        </span>
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/5">44 м²</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/5">4 поверх з 9 (низький)</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/5 text-purple-300">🐾 Можна з котом</span>
+                    </div>
+
+                    <!-- Landlord Authentic Quote -->
+                    <div class="p-3 rounded-xl bg-dark-950/60 border border-white/5 text-xs text-slate-300 italic">
+                        «Здаю свою затишну квартиру, ремонт робили для себе, ніхто не курив. Оптоволокно підключено, роутер заживлений. Показую сьогодні ввечері після 18:30»
+                        <div class="not-italic text-[11px] text-slate-400 mt-1.5 flex items-center justify-between">
+                            <span class="font-semibold text-white">— Сергій Олександрович (господар)</span>
+                            <span class="text-emerald-400 text-[10px] font-bold">● Документи перевірено</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <a href="https://t.me/pavlograd_admin?text=Вітаю!+Цікавить+1к+на+Оболоні+за+14500+грн" target="_blank" class="py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            <span>Написати господарю</span>
+                        </a>
+                        <a href="https://t.me/pavlograd_admin?text=Хочу+замовити+експрес-перевірку+квартири+на+Оболоні+за+99+грн" target="_blank" class="py-2.5 rounded-xl bg-dark-900 hover:bg-dark-850 text-slate-200 border border-white/10 font-bold text-xs flex items-center justify-center gap-1.5 transition-all">
+                            <i data-lucide="phone-call" class="w-4 h-4 text-emerald-400"></i>
+                            <span>Дзвінок перевірки (99 ₴)</span>
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- LISTING 2: PODIL -->
+            <article class="deal-card glass-card rounded-2xl overflow-hidden border border-white/10" data-district="Поділ">
+                <div class="relative w-full aspect-[16/10] bg-dark-950 overflow-hidden group">
+                    <div id="slider-2" class="slider-track w-full h-full">
+                        <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80" alt="Квартира Поділ" class="w-full h-full object-cover shrink-0">
+                        <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&auto=format&fit=crop&q=80" alt="Вітальня Поділ" class="w-full h-full object-cover shrink-0">
+                    </div>
+                    
+                    <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-950/85 backdrop-blur-md border border-emerald-500/30 text-emerald-400 text-[10px] font-bold flex items-center gap-1">
+                            <i data-lucide="check-circle" class="w-3 h-3"></i> Прямий власник
+                        </span>
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-950/85 backdrop-blur-md border border-amber-500/30 text-amber-400 text-[10px] font-bold flex items-center gap-1">
+                            <i data-lucide="flame" class="w-3 h-3"></i> Газ (плита + колонка)
+                        </span>
+                    </div>
+
+                    <div class="absolute top-3 right-3">
+                        <span class="px-2.5 py-1 rounded-lg bg-emerald-500 text-dark-950 text-[11px] font-extrabold shadow-lg">
+                            0% КОМІСІЇ
+                        </span>
+                    </div>
+
+                    <div class="absolute bottom-3 right-3 flex items-center gap-1 bg-dark-950/80 backdrop-blur-md px-2 py-1 rounded-lg border border-white/10 text-[10px] text-white font-mono">
+                        <button onclick="prevSlide(2)" class="p-1 hover:text-emerald-400"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+                        <span id="slider-ind-2">1 / 2</span>
+                        <button onclick="nextSlide(2)" class="p-1 hover:text-emerald-400"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                </div>
+
+                <div class="p-4 space-y-3">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <div class="text-xs text-slate-400 font-semibold flex items-center gap-1">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-400"></i>
+                                <span>Поділ • вул. Ярославська, 15</span>
+                            </div>
+                            <h2 class="text-base font-bold text-white font-display mt-0.5">Атмосферна 2-кімнатна в історичному центрі</h2>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <div class="text-lg font-black text-white font-display">17 000 ₴</div>
+                            <span class="text-[10px] text-emerald-400 font-semibold">Економія 8 500 ₴</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 text-[11px] text-slate-300">
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/5 flex items-center gap-1 text-blue-400 font-medium">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span> М Контрактова площа (4 хв)
+                        </span>
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/5">56 м²</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/5">3 поверх (сталінка)</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/5 text-amber-300">🔥 Гаряча вода завжди</span>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-dark-950/60 border border-white/5 text-xs text-slate-300 italic">
+                        «Будинок з товстими стінами, дуже тепла. Газова колонка працює незалежно від світла. Інтернет оптоволокно провайдер "Інформаційні Технології". Без комісій та рієлторів»
+                        <div class="not-italic text-[11px] text-slate-400 mt-1.5 flex items-center justify-between">
+                            <span class="font-semibold text-white">— Олена Миколаївна (власниця)</span>
+                            <span class="text-emerald-400 text-[10px] font-bold">● Власність підтверджено</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <a href="https://t.me/pavlograd_admin?text=Вітаю!+Цікавить+2к+на+Подолі+за+17000+грн" target="_blank" class="py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            <span>Написати господині</span>
+                        </a>
+                        <a href="https://t.me/pavlograd_admin?text=Хочу+замовити+експрес-перевірку+квартири+на+Подолі+за+99+грн" target="_blank" class="py-2.5 rounded-xl bg-dark-900 hover:bg-dark-850 text-slate-200 border border-white/10 font-bold text-xs flex items-center justify-center gap-1.5 transition-all">
+                            <i data-lucide="phone-call" class="w-4 h-4 text-emerald-400"></i>
+                            <span>Дзвінок перевірки (99 ₴)</span>
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- LISTING 3: PECHERSK -->
+            <article class="deal-card glass-card rounded-2xl overflow-hidden border border-white/10" data-district="Печерськ">
+                <div class="relative w-full aspect-[16/10] bg-dark-950 overflow-hidden group">
+                    <div id="slider-3" class="slider-track w-full h-full">
+                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80" alt="ЖК Французький Квартал" class="w-full h-full object-cover shrink-0">
+                        <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&auto=format&fit=crop&q=80" alt="Інтер'єр Печерськ" class="w-full h-full object-cover shrink-0">
+                    </div>
+                    
+                    <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-950/85 backdrop-blur-md border border-emerald-500/30 text-emerald-400 text-[10px] font-bold flex items-center gap-1">
+                            <i data-lucide="check-circle" class="w-3 h-3"></i> Прямий власник
+                        </span>
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-950/85 backdrop-blur-md border border-cyan-500/30 text-cyan-400 text-[10px] font-bold flex items-center gap-1">
+                            <i data-lucide="zap" class="w-3 h-3"></i> Генератор у ЖК
+                        </span>
+                    </div>
+
+                    <div class="absolute top-3 right-3">
+                        <span class="px-2.5 py-1 rounded-lg bg-emerald-500 text-dark-950 text-[11px] font-extrabold shadow-lg">
+                            0% КОМІСІЇ
+                        </span>
+                    </div>
+
+                    <div class="absolute bottom-3 right-3 flex items-center gap-1 bg-dark-950/80 backdrop-blur-md px-2 py-1 rounded-lg border border-white/10 text-[10px] text-white font-mono">
+                        <button onclick="prevSlide(3)" class="p-1 hover:text-emerald-400"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+                        <span id="slider-ind-3">1 / 2</span>
+                        <button onclick="nextSlide(3)" class="p-1 hover:text-emerald-400"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                </div>
+
+                <div class="p-4 space-y-3">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <div class="text-xs text-slate-400 font-semibold flex items-center gap-1">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-400"></i>
+                                <span>Печерськ • ЖК «Французький Квартал 2»</span>
+                            </div>
+                            <h2 class="text-base font-bold text-white font-display mt-0.5">Дизайнерська євродвушка з паркінгом-укриттям</h2>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <div class="text-lg font-black text-white font-display">25 000 ₴</div>
+                            <span class="text-[10px] text-emerald-400 font-semibold">Економія 12 500 ₴</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 text-[11px] text-slate-300">
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/5 flex items-center gap-1 text-blue-400 font-medium">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span> М Либідська (5 хв)
+                        </span>
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/5">52 м²</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/5">6 поверх</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-dark-900 border border-white/5 text-cyan-300">🔋 Ліфти та вода на генераторі</span>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-dark-950/60 border border-white/5 text-xs text-slate-300 italic">
+                        «ЖК бізнес-класу, закрита територія. При відключеннях світла генератор живить ліфти, воду та опалення. Посудомийна машина, система очистки води. Шукаю порядних орендарів на довгий термін»
+                        <div class="not-italic text-[11px] text-slate-400 mt-1.5 flex items-center justify-between">
+                            <span class="font-semibold text-white">— Андрій (господар)</span>
+                            <span class="text-emerald-400 text-[10px] font-bold">● Особисто верифіковано</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <a href="https://t.me/pavlograd_admin?text=Вітаю!+Цікавить+Французький+Квартал+за+25000+грн" target="_blank" class="py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            <span>Написати господарю</span>
+                        </a>
+                        <a href="https://t.me/pavlograd_admin?text=Хочу+замовити+експрес-перевірку+квартири+Французький+Квартал+за+99+грн" target="_blank" class="py-2.5 rounded-xl bg-dark-900 hover:bg-dark-850 text-slate-200 border border-white/10 font-bold text-xs flex items-center justify-center gap-1.5 transition-all">
+                            <i data-lucide="phone-call" class="w-4 h-4 text-emerald-400"></i>
+                            <span>Дзвінок перевірки (99 ₴)</span>
+                        </a>
+                    </div>
+                </div>
+            </article>
+
         </div>
     </main>
 
-    <!-- MAIN TAB 4: VIP PASS -->
-    <main id="tab-vip" class="tab-content hidden px-4 py-4 space-y-4">
-        <div class="glass-card p-5 rounded-2xl border-indigo-500/30 bg-gradient-to-b from-indigo-950/20 to-dark-850 space-y-4">
-            <div class="flex items-center gap-3">
-                <span class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
-                    <i data-lucide="crown" class="w-5 h-5"></i>
-                </span>
-                <div>
-                    <h2 class="text-lg font-display font-extrabold text-white">VIP Інсайдер Клуб</h2>
-                    <p class="text-xs text-slate-400">Фора 15 хвилин перед всім ринком</p>
-                </div>
-            </div>
-
-            <ul class="space-y-2.5 text-xs text-slate-300">
-                <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-indigo-400"></i> Прямі контакти господарів на 15 хв раніше каналу</li>
-                <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-indigo-400"></i> Закритий чат інвестиційних фліпів техніки</li>
-                <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-indigo-400"></i> Юридична перевірка документів власності</li>
-            </ul>
-
-            <div class="pt-2 border-t border-white/10 space-y-2.5">
-                <a href="https://t.me/prostov_shrink_bot?start=vip" target="_blank" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-between px-4 transition-all">
-                    <span>Пробний VIP (7 днів)</span>
-                    <span>350 Stars (~$7)</span>
-                </a>
-                <a href="https://t.me/prostov_shrink_bot?start=vip" target="_blank" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-between px-4 shadow-lg shadow-indigo-500/20">
-                    <span>Повний VIP (30 днів) [ХІТ]</span>
-                    <span>1 500 Stars (~$30)</span>
-                </a>
-            </div>
-        </div>
-    </main>
-
-    <!-- MAIN TAB 5: AI SCAM DETECTIVE & BLACKOUT RESILIENCE & CONTRACT -->
-    <main id="tab-protect" class="tab-content hidden px-4 py-4 space-y-4 pb-20">
-        <!-- Header Hero -->
-        <div class="glass-card p-4 rounded-2xl border-cyan-500/20 bg-gradient-to-r from-cyan-950/20 via-dark-850 to-dark-850 space-y-2">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-                    <i data-lucide="shield-alert" class="w-4 h-4"></i>
+    <!-- ==================== TAB 2: REVIZOR (SCAM & REALTOR CHECKER) ==================== -->
+    <main id="tab-revizor" class="tab-content hidden px-4 py-4 space-y-4 pb-24">
+        
+        <div class="glass-panel p-4 rounded-2xl border-cyan-500/20 bg-gradient-to-r from-cyan-950/25 via-dark-900 to-dark-900 space-y-2">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+                    <i data-lucide="search-check" class="w-4 h-4"></i>
                 </div>
                 <div>
-                    <h2 class="text-base font-display font-bold text-white">ШІ-Детектив & Захист 2026</h2>
-                    <p class="text-xs text-slate-400">Перевірка ризиків, блэкаут-тест та еталонний договір</p>
+                    <h2 class="text-sm font-bold text-white font-display">Ревізор Житла</h2>
+                    <p class="text-xs text-slate-400">Перевірка номера за базою 14 000+ посередників та шахраїв</p>
                 </div>
             </div>
         </div>
 
-        <!-- 1. AI Scam & Phone Checker Card -->
         <div class="glass-card p-4 rounded-2xl space-y-3">
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <i data-lucide="search" class="w-3.5 h-3.5 text-cyan-400"></i>
-                <span>ШІ-Сканер Оголошень та Номерів</span>
+                <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>Перевірка оголошення або номера телефону</span>
             </h3>
-            <p class="text-xs text-slate-300">Вставте посилання з OLX / Dom.ria або номер телефону, щоб миттєво відсікти шахраїв та рієлторів:</p>
-            
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Вставте посилання на квартиру (з OLX чи Dom.ria) або номер телефону орендодавця:
+            </p>
+
             <div class="space-y-2">
-                <input id="detective-input" type="text" placeholder="https://olx.ua/... або +380 67 123 45 67" class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/10 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-cyan-500 transition-colors">
-                <button onclick="runDetectiveCheck()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-dark-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition-all">
-                    <i data-lucide="scan" class="w-4 h-4"></i>
-                    <span>Запустити ШІ-Аналіз</span>
+                <input id="checker-input" type="text" placeholder="+380 67 123 45 67 або посилання..." class="w-full px-3.5 py-2.5 rounded-xl bg-dark-950 border border-white/10 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-cyan-500 transition-colors">
+                <button onclick="runRevizorCheck()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-dark-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition-all">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>Перевірити безкоштовно</span>
                 </button>
             </div>
 
-            <!-- Dynamic Result Area -->
-            <div id="detective-result" class="hidden p-3 rounded-xl bg-dark-900 border border-cyan-500/30 space-y-2 text-xs">
+            <div id="checker-result" class="hidden p-3 rounded-xl bg-dark-950 border border-cyan-500/30 space-y-2 text-xs">
                 <!-- Injected via JS -->
             </div>
         </div>
 
-        <!-- 2. Blackout Autonomy Simulator -->
-        <div class="glass-card p-4 rounded-2xl space-y-3">
+        <!-- 99 UAH Operator Verification Service Card -->
+        <div class="glass-card p-4 rounded-2xl space-y-3 border-emerald-500/20">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                    <i data-lucide="phone-outgoing" class="w-3.5 h-3.5"></i>
+                    <span>Послуга: Живий Експрес-Дзвінок (99 ₴)</span>
+                </h3>
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/15 text-emerald-400">30 хвилин</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Не хочете самі витрачати час і дзвонити? Наш київський модератор особисто зв'яжеться з рекламодавцем, дізнається точну суму комунальних, статус власника, умови застави та домовиться про зручний час огляду.
+            </p>
+            <a href="https://t.me/pavlograd_admin?text=Вітаю!+Хочу+замовити+експрес-дзвінок+за+99+грн" target="_blank" class="block w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs text-center shadow-md transition-all">
+                Замовити перевірку оголошення (99 ₴)
+            </a>
+        </div>
+    </main>
+
+    <!-- ==================== TAB 3: BLACKOUT GUIDE & CALCULATOR ==================== -->
+    <main id="tab-blackout" class="tab-content hidden px-4 py-4 space-y-4 pb-24">
+        
+        <div class="glass-panel p-4 rounded-2xl border-amber-500/20 bg-gradient-to-r from-amber-950/25 via-dark-900 to-dark-900 space-y-2">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                    <i data-lucide="zap" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-white font-display">Блекаут-Гід Орендаря</h2>
+                    <p class="text-xs text-slate-400">Як не потрапити в пастку високого поверху та відсутності води</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card p-4 rounded-2xl space-y-4">
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i>
-                <span>Калькулятор Блекаут-Автономії Житла</span>
+                <i data-lucide="sliders" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>Калькулятор Автономності Квартири</span>
             </h3>
-            
+
             <div class="space-y-3 text-xs">
                 <div>
                     <div class="flex justify-between text-slate-300 mb-1">
                         <span>Поверх квартири:</span>
-                        <span id="calc-floor-val" class="font-bold text-white">4 поверх</span>
+                        <span id="blackout-floor-val" class="font-bold text-white">4 поверх</span>
                     </div>
-                    <input id="calc-floor" type="range" min="1" max="25" value="4" oninput="updateBlackoutSim()" class="w-full accent-amber-400 h-1.5 bg-dark-900 rounded-lg cursor-pointer">
+                    <input id="blackout-floor" type="range" min="1" max="25" value="4" oninput="recalcBlackout()" class="w-full accent-amber-400 h-1.5 bg-dark-950 rounded-lg cursor-pointer">
                     <div class="flex justify-between text-[10px] text-slate-500 mt-0.5">
-                        <span>1 (без ліфта ОК)</span>
-                        <span>12</span>
-                        <span>25 (катастрофа без ліфта)</span>
+                        <span>1 (пішки легко)</span>
+                        <span>10</span>
+                        <span>25 (без ліфта блокада)</span>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-2">
-                    <button id="toggle-gpon" onclick="toggleSimOpt('gpon')" class="sim-opt active p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-center space-y-1 transition-all">
+                    <button id="b-opt-gpon" onclick="toggleBlackoutOpt('gpon')" class="b-opt active p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-center space-y-1 transition-all">
                         <i data-lucide="wifi" class="w-4 h-4 mx-auto"></i>
-                        <div class="text-[10px] font-bold">GPON Оптика</div>
-                        <div class="text-[9px] text-slate-400 status-txt">Є (+30%)</div>
+                        <div class="text-[10px] font-bold">Оптоволокно</div>
+                        <div class="text-[9px] text-slate-400 stat">Є (+30%)</div>
                     </button>
-                    <button id="toggle-gen" onclick="toggleSimOpt('gen')" class="sim-opt p-2.5 rounded-xl bg-dark-900 border border-white/10 text-slate-400 text-center space-y-1 transition-all">
+                    <button id="b-opt-gen" onclick="toggleBlackoutOpt('gen')" class="b-opt p-2.5 rounded-xl bg-dark-950 border border-white/10 text-slate-400 text-center space-y-1 transition-all">
                         <i data-lucide="fuel" class="w-4 h-4 mx-auto"></i>
-                        <div class="text-[10px] font-bold">Генератор</div>
-                        <div class="text-[9px] text-slate-400 status-txt">Немає</div>
+                        <div class="text-[10px] font-bold">Генератор ЖК</div>
+                        <div class="text-[9px] text-slate-400 stat">Немає</div>
                     </button>
-                    <button id="toggle-eco" onclick="toggleSimOpt('eco')" class="sim-opt active p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-center space-y-1 transition-all">
+                    <button id="b-opt-eco" onclick="toggleBlackoutOpt('eco')" class="b-opt active p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-center space-y-1 transition-all">
                         <i data-lucide="battery-charging" class="w-4 h-4 mx-auto"></i>
-                        <div class="text-[10px] font-bold">EcoFlow</div>
-                        <div class="text-[9px] text-slate-400 status-txt">Є (+25%)</div>
+                        <div class="text-[10px] font-bold">Зарядна станція</div>
+                        <div class="text-[9px] text-slate-400 stat">Є (+25%)</div>
                     </button>
                 </div>
 
-                <div class="p-3 rounded-xl bg-dark-900/90 border border-white/10 flex items-center justify-between">
+                <div class="p-3.5 rounded-xl bg-dark-950/90 border border-white/10 flex items-center justify-between">
                     <div>
-                        <div class="text-[11px] text-slate-400">Індекс Енергонезалежності:</div>
-                        <div id="sim-score-badge" class="text-lg font-display font-extrabold text-emerald-400">85 / 100 🔋</div>
+                        <div class="text-[11px] text-slate-400">Рейтинг автономності:</div>
+                        <div id="blackout-score-badge" class="text-xl font-extrabold text-emerald-400 font-display">85 / 100 🔋</div>
                     </div>
-                    <div id="sim-verdict-txt" class="text-right text-[11px] text-slate-300 max-w-[170px]">
-                        Витримає до 3 діб графіків 4-/4+ з інтернетом та світлом.
+                    <div id="blackout-verdict" class="text-right text-[11px] text-slate-300 max-w-[170px] leading-snug">
+                        Комфортний 4 поверх. Зв'язок та світло витримають графіки 4-/4+.
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 3. Legal Contract Generator 2026 -->
+        <!-- 4 Golden Rules for Renting in 2026 -->
+        <div class="glass-card p-4 rounded-2xl space-y-2.5 text-xs">
+            <h4 class="font-bold text-white flex items-center gap-1.5">
+                <i data-lucide="check-square" class="w-4 h-4 text-emerald-400"></i>
+                <span>4 правила оренди в Києві під час зими 2026</span>
+            </h4>
+            <ul class="space-y-2 text-slate-300 list-disc list-inside">
+                <li><b>Перевірте провайдера:</b> запитайте назву інтернет-провайдера і зателефонуйте їм, чи працює підстанція без світла.</li>
+                <li><b>Водопостачання:</b> у будинках вище 9 поверхів без генератора при відключенні не працюють насоси подачі води.</li>
+                <li><b>Лічильники опалення:</b> дізнайтеся тариф за опалення взимку (в старих будинках може сягати 3 000–4 000 ₴).</li>
+                <li><b>Фіксація в договорі:</b> обов'язково підписуйте договір з пунктом про знижку на оренду при тривалій відсутності електрики.</li>
+            </ul>
+        </div>
+    </main>
+
+    <!-- ==================== TAB 4: LEGAL CONTRACT 2026 ==================== -->
+    <main id="tab-contract" class="tab-content hidden px-4 py-4 space-y-4 pb-24">
+        
+        <div class="glass-panel p-4 rounded-2xl border-emerald-500/20 bg-gradient-to-r from-emerald-950/25 via-dark-900 to-dark-900 space-y-2">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-white font-display">Еталонний Договір Оренди 2026</h2>
+                    <p class="text-xs text-slate-400">Складений київськими юристами спеціально під реалії воєнного стану</p>
+                </div>
+            </div>
+        </div>
+
         <div class="glass-card p-4 rounded-2xl space-y-3">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <i data-lucide="file-text" class="w-3.5 h-3.5 text-emerald-400"></i>
-                <span>Захищений Договір Оренди 2026 (Безкоштовно)</span>
-            </h3>
-            <p class="text-xs text-slate-300">
-                Юридично вивірений типовий договір з пунктами захисту від блэкаутів (знижка 20% при тривалих відключеннях) та гарантією повернення депозиту:
+            <div class="space-y-1.5 text-xs text-slate-300 leading-relaxed">
+                <p><b>Чому стандартний договір з інтернету не захищає?</b> Рієлторські шаблони 2015 року не враховують блэкаути, графіки ДТЕК, форс-мажор та безпідставне утримання застави.</p>
+                <div class="p-3 rounded-xl bg-dark-950 border border-emerald-500/20 space-y-1.5">
+                    <div class="text-white font-bold flex items-center gap-1.5 text-[11px]">
+                        <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>
+                        <span>Ключові пункти захисту в нашому зразку:</span>
+                    </div>
+                    <ul class="text-[11px] text-slate-300 space-y-1 pl-4 list-disc">
+                        <li><b>Знижка 20% на оренду:</b> якщо світла або опалення немає понад 12 год/добу протягом 7 днів поспіль.</li>
+                        <li><b>Повернення застави за 3 дні:</b> за актом фотофіксації, без надуманих штрафів.</li>
+                        <li><b>Форс-мажор:</b> право розірвати договір за 7 днів з повним поверненням коштів при евакуації.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button onclick="openContractViewer()" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all">
+                <i data-lucide="file-check" class="w-4 h-4"></i>
+                <span>Читати та скопіювати зразок Договору</span>
+            </button>
+        </div>
+    </main>
+
+    <!-- ==================== TAB 5: VIP EARLY ACCESS ==================== -->
+    <main id="tab-vip" class="tab-content hidden px-4 py-4 space-y-4 pb-24">
+        
+        <div class="glass-panel p-4 rounded-2xl border-amber-500/30 bg-gradient-to-r from-amber-950/30 via-dark-900 to-dark-900 space-y-2">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                    <i data-lucide="crown" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-white font-display">VIP Ранній Доступ</h2>
+                    <p class="text-xs text-slate-400">Отримуйте контакти господарів на 15 хв раніше за всіх</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card p-4 rounded-2xl space-y-3">
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Найкращі квартири в Києві за адекватною ціною здаються за 15–20 хвилин. Підписники VIP-каналу першими дзвонять орендодавцям, поки оголошення ще не розлетілося інтернетом.
             </p>
+
             <div class="space-y-2">
-                <button onclick="openContractModal()" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                    <span>Переглянути та Скопіювати Договір</span>
-                </button>
+                <a href="https://t.me/prostov_shrink_bot?start=vip" target="_blank" class="p-3 rounded-xl bg-dark-950 border border-white/10 flex items-center justify-between hover:border-amber-500/40 transition-all block">
+                    <div>
+                        <div class="text-xs font-bold text-white">Пробний доступ (7 днів)</div>
+                        <div class="text-[11px] text-slate-400">Швидкий тест для термінового переїзду</div>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-amber-400 text-xs font-bold font-mono">350 Stars (~$7)</span>
+                </a>
+
+                <a href="https://t.me/prostov_shrink_bot?start=vip" target="_blank" class="p-3 rounded-xl bg-dark-950 border border-amber-500/30 flex items-center justify-between hover:border-amber-400 transition-all block">
+                    <div>
+                        <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <span>Повний VIP (30 днів)</span>
+                            <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-amber-500 text-dark-950">ХІТ</span>
+                        </div>
+                        <div class="text-[11px] text-slate-400">Спокійний підбір ідеального житла</div>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold font-mono">1 500 Stars (~$30)</span>
+                </a>
+            </div>
+
+            <div class="pt-1">
+                <a href="https://t.me/prostov_shrink_bot?start=referral" target="_blank" class="block w-full py-2.5 rounded-xl bg-dark-950 hover:bg-dark-900 border border-emerald-500/30 text-emerald-400 font-bold text-xs text-center transition-all">
+                    🎁 Запросити 2 друзів = 7 днів VIP безкоштовно
+                </a>
             </div>
         </div>
     </main>
 
-    <!-- Bottom Mobile App Navigation Bar -->
-    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-dark-950/95 backdrop-blur-xl border-t border-white/10 px-2 py-2">
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-white/10 px-2 py-1.5">
         <div class="max-w-md mx-auto grid grid-cols-5 gap-1">
-            <button onclick="switchTab('rent')" id="nav-rent" class="nav-item active flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-emerald-400 transition-colors">
-                <i data-lucide="home" class="w-5 h-5"></i>
+            <button onclick="switchAppTab('rent')" id="nav-btn-rent" class="nav-tab active flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-emerald-400 transition-colors">
+                <i data-lucide="home" class="w-4 h-4"></i>
                 <span class="text-[9px] font-bold mt-1">Оренда</span>
             </button>
-            <button onclick="switchTab('radar')" id="nav-radar" class="nav-item flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-400 hover:text-white transition-colors">
-                <i data-lucide="crosshair" class="w-5 h-5"></i>
-                <span class="text-[9px] font-semibold mt-1">Радар</span>
+            <button onclick="switchAppTab('revizor')" id="nav-btn-revizor" class="nav-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-400 hover:text-white transition-colors">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                <span class="text-[9px] font-semibold mt-1">Ревізор</span>
             </button>
-            <button onclick="switchTab('protect')" id="nav-protect" class="nav-item flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-400 hover:text-white transition-colors">
-                <i data-lucide="shield-check" class="w-5 h-5"></i>
-                <span class="text-[9px] font-semibold mt-1">Захист</span>
+            <button onclick="switchAppTab('blackout')" id="nav-btn-blackout" class="nav-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-400 hover:text-white transition-colors">
+                <i data-lucide="zap" class="w-4 h-4"></i>
+                <span class="text-[9px] font-semibold mt-1">Блекаут</span>
             </button>
-            <button onclick="switchTab('buyout')" id="nav-buyout" class="nav-item flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-400 hover:text-white transition-colors">
-                <i data-lucide="badge-dollar-sign" class="w-5 h-5"></i>
-                <span class="text-[9px] font-semibold mt-1">Викуп</span>
+            <button onclick="switchAppTab('contract')" id="nav-btn-contract" class="nav-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-400 hover:text-white transition-colors">
+                <i data-lucide="file-text" class="w-4 h-4"></i>
+                <span class="text-[9px] font-semibold mt-1">Договір</span>
             </button>
-            <button onclick="switchTab('vip')" id="nav-vip" class="nav-item flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-400 hover:text-white transition-colors">
-                <i data-lucide="crown" class="w-5 h-5"></i>
+            <button onclick="switchAppTab('vip')" id="nav-btn-vip" class="nav-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-400 hover:text-white transition-colors">
+                <i data-lucide="crown" class="w-4 h-4"></i>
                 <span class="text-[9px] font-semibold mt-1">VIP</span>
             </button>
         </div>
     </nav>
 
-    <!-- App Logic Scripts -->
+    <!-- Full Contract Viewer Modal -->
+    <div id="contract-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-dark-900 border border-white/10 rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-4 border-b border-white/10 flex items-center justify-between">
+                <div class="font-bold text-sm text-white flex items-center gap-2">
+                    <i data-lucide="file-check" class="w-4 h-4 text-emerald-400"></i>
+                    <span>Типовий Договір Оренди 2026</span>
+                </div>
+                <button onclick="closeContractViewer()" class="text-slate-400 hover:text-white p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-300 leading-relaxed font-sans select-all">
+                <pre id="contract-full-text" class="whitespace-pre-wrap text-xs text-slate-200 font-sans"></pre>
+            </div>
+            <div class="p-3 border-t border-white/10 flex gap-2">
+                <button onclick="copyContract()" id="copy-btn-action" class="flex-1 py-2.5 rounded-xl bg-emerald-500 text-dark-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md">
+                    <i data-lucide="copy" class="w-4 h-4"></i>
+                    <span>Скопіювати Договір</span>
+                </button>
+                <button onclick="closeContractViewer()" class="px-4 py-2.5 rounded-xl bg-white/5 text-slate-300 font-semibold text-xs">
+                    Закрити
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
     <script>
-        // Init Lucide
+        // Init Lucide icons
         lucide.createIcons();
 
-        // Init Telegram WebApp
-        if (window.Telegram && window.Telegram.WebApp) {
+        // Telegram WebApp setup
+        if (window.Telegram?.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
-            window.Telegram.WebApp.setHeaderColor('#07090e');
-            window.Telegram.WebApp.setBackgroundColor('#07090e');
+            window.Telegram.WebApp.setHeaderColor('#090d14');
+            window.Telegram.WebApp.setBackgroundColor('#090d14');
         }
 
-        function triggerHaptic() {
+        function triggerVibe() {
             if (window.Telegram?.WebApp?.HapticFeedback) {
                 window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
             }
         }
 
-        // Tab Navigation
-        function switchTab(tabId) {
-            triggerHaptic();
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+        // Tab Switching
+        function switchAppTab(tabId) {
+            triggerVibe();
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab-' + tabId).classList.remove('hidden');
 
-            document.querySelectorAll('.nav-item').forEach(btn => {
-                btn.classList.remove('text-emerald-400', 'font-bold');
-                btn.classList.add('text-slate-400');
+            document.querySelectorAll('.nav-tab').forEach(b => {
+                b.classList.remove('text-emerald-400', 'active');
+                b.classList.add('text-slate-400');
             });
-            const activeBtn = document.getElementById('nav-' + tabId);
-            activeBtn.classList.remove('text-slate-400');
-            activeBtn.classList.add('text-emerald-400', 'font-bold');
+            const activeNav = document.getElementById('nav-btn-' + tabId);
+            activeNav.classList.remove('text-slate-400');
+            activeNav.classList.add('text-emerald-400', 'active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // District Filter
-        function filterDistrict(district) {
-            triggerHaptic();
+        // District Filtering
+        function filterDistrict(dist) {
+            triggerVibe();
             document.querySelectorAll('.district-btn').forEach(b => {
-                b.classList.remove('bg-emerald-500', 'text-dark-950');
-                b.classList.add('bg-dark-850', 'text-slate-300');
+                b.classList.remove('bg-emerald-500', 'text-dark-950', 'active');
+                b.classList.add('bg-dark-900', 'text-slate-300');
             });
-            event.target.classList.add('bg-emerald-500', 'text-dark-950');
-            event.target.classList.remove('bg-dark-850', 'text-slate-300');
+            event.target.classList.add('bg-emerald-500', 'text-dark-950', 'active');
+            event.target.classList.remove('bg-dark-900', 'text-slate-300');
 
             document.querySelectorAll('.deal-card').forEach(card => {
-                if (district === 'all' || card.dataset.district.includes(district)) {
+                if (dist === 'all' || card.dataset.district.includes(dist)) {
                     card.style.display = 'block';
                 } else {
                     card.style.display = 'none';
@@ -664,201 +734,148 @@
             });
         }
 
-        // Radar Budget Range
-        function updateBudget(val) {
-            document.getElementById('budget-val').innerText = Number(val).toLocaleString('uk-UA') + ' ₴/міс';
-        }
-
-        function saveRadarSettings() {
-            triggerHaptic();
-            const district = document.getElementById('radar-district-select').value;
-            const budget = document.getElementById('budget-range').value;
-            if (window.Telegram?.WebApp) {
-                window.Telegram.WebApp.showPopup({
-                    title: '🎉 Радар Активовано!',
-                    message: `Локація: ${district}\nБюджет: до ${Number(budget).toLocaleString()} ₴\n\nБот надішле пуш у чат, як тільки з'явиться квартира від власника!`,
-                    buttons: [{type: 'ok', text: 'Чудово'}]
-                });
-            } else {
-                alert(`Радар збережено: ${district}, до ${budget} ₴!`);
-            }
-        }
-
-        // Gadget Buyout Calculator
-        const GADGET_DATABASE = {
-            iphone15pm: { name: 'iPhone 15 Pro Max', market: 42000 },
-            iphone15p: { name: 'iPhone 15 Pro', market: 36000 },
-            iphone14p: { name: 'iPhone 14 Pro', market: 29000 },
-            iphone13: { name: 'iPhone 13', market: 18500 },
-            macbook_m1: { name: 'MacBook Air M1', market: 25000 },
-            ecoflow_river: { name: 'EcoFlow River 2 Max', market: 12500 },
-            ecoflow_delta: { name: 'EcoFlow Delta 2', market: 34000 },
-            ps5: { name: 'Sony PlayStation 5', market: 19000 }
+        // Photo Slider Component State
+        const sliderState = {
+            1: { current: 0, total: 3 },
+            2: { current: 0, total: 2 },
+            3: { current: 0, total: 2 }
         };
 
-        let currentConditionCoeff = 1.0;
-
-        function setCondition(cond) {
-            triggerHaptic();
-            document.querySelectorAll('.cond-btn').forEach(b => {
-                b.classList.remove('bg-amber-500', 'text-dark-950', 'border-amber-500');
-                b.classList.add('bg-dark-900', 'text-slate-300', 'border-white/10');
-            });
-            const activeBtn = document.getElementById('cond-' + cond);
-            activeBtn.classList.add('bg-amber-500', 'text-dark-950', 'border-amber-500');
-            activeBtn.classList.remove('bg-dark-900', 'text-slate-300', 'border-white/10');
-
-            if (cond === 'perfect') currentConditionCoeff = 1.0;
-            else if (cond === 'good') currentConditionCoeff = 0.90;
-            else if (cond === 'fair') currentConditionCoeff = 0.75;
-
-            calculateBuyout();
+        function nextSlide(id) {
+            triggerVibe();
+            const s = sliderState[id];
+            s.current = (s.current + 1) % s.total;
+            updateSlider(id);
         }
 
-        function calculateBuyout() {
-            const key = document.getElementById('gadget-select').value;
-            const item = GADGET_DATABASE[key];
-            const market = Math.round(item.market * currentConditionCoeff);
-            const fast = Math.round(market * 0.90);
-            const cash = Math.round(market * 0.70 / 100) * 100;
-
-            document.getElementById('market-price-val').innerText = market.toLocaleString('uk-UA') + ' ₴';
-            document.getElementById('fast-price-val').innerText = fast.toLocaleString('uk-UA') + ' ₴';
-            document.getElementById('buyout-cash-val').innerText = cash.toLocaleString('uk-UA') + ' ₴';
-
-            const ctaBtn = document.getElementById('buyout-cta-btn');
-            ctaBtn.href = `https://t.me/pavlograd_admin?text=Вітаю!+Хочу+продати+${encodeURIComponent(item.name)}+на+викуп+за+${cash}+грн`;
+        function prevSlide(id) {
+            triggerVibe();
+            const s = sliderState[id];
+            s.current = (s.current - 1 + s.total) % s.total;
+            updateSlider(id);
         }
 
-        // Init initial calculation
-        calculateBuyout();
+        function updateSlider(id) {
+            const s = sliderState[id];
+            const track = document.getElementById(`slider-${id}`);
+            track.style.transform = `translateX(-${s.current * 100}%)`;
+            document.getElementById(`slider-ind-${id}`).innerText = `${s.current + 1} / ${s.total}`;
+        }
 
-        // --- Tab 5: Protect & Detective Logic ---
-        function runDetectiveCheck() {
-            triggerHaptic();
-            const input = document.getElementById('detective-input').value.trim();
-            const resultBox = document.getElementById('detective-result');
+        // Revizor Checker
+        function runRevizorCheck() {
+            triggerVibe();
+            const input = document.getElementById('checker-input').value.trim();
+            const resBox = document.getElementById('checker-result');
             if (!input) {
-                alert('Введіть посилання або номер телефону для перевірки!');
+                alert('Будь ласка, вкажіть номер телефону або посилання!');
                 return;
             }
 
-            resultBox.classList.remove('hidden');
-            resultBox.innerHTML = `
-                <div class="flex items-center gap-2 text-cyan-400 py-2">
+            resBox.classList.remove('hidden');
+            resBox.innerHTML = `
+                <div class="flex items-center gap-2 text-cyan-400 py-1.5">
                     <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-                    <span>ШІ аналізує базу 14 000 рієлторів та чорні списки...</span>
+                    <span>Звіряємо з базою 14 000+ агентств та чорними списками...</span>
                 </div>
             `;
 
             setTimeout(() => {
                 const lower = input.toLowerCase();
-                let isRealtor = lower.includes('rieltor') || lower.includes('аген') || lower.includes('50%') || Math.random() > 0.4;
-                let isScam = lower.includes('карт') || lower.includes('завдат') || lower.includes('бронь') || lower.includes('передплат');
+                let isScam = lower.includes('завдат') || lower.includes('бронь') || lower.includes('карт') || lower.includes('передплат');
+                let isRealtor = lower.includes('rieltor') || lower.includes('аген') || lower.includes('50%') || Math.random() > 0.45;
 
-                let html = '';
                 if (isScam) {
-                    html = `
+                    resBox.innerHTML = `
                         <div class="p-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 font-bold flex items-center gap-2">
                             <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i>
-                            <span>🚨 КРИТИЧНИЙ РИЗИК ШАХРАЙСТВА (95/100)</span>
+                            <span>ОБЕРЕЖНО: ПІДОЗРА НА ШАХРАЙСТВО!</span>
                         </div>
-                        <p class="text-slate-300">Ознаки маніпуляцій: вимога передплати до огляду. За правилами кіберполіції не переказуйте гроші на картку!</p>
-                        <div class="pt-1">
-                            <a href="https://t.me/pavlograd_admin?text=Перевірте+оголошення+на+скам:+${encodeURIComponent(input)}" target="_blank" class="block w-full py-2 rounded-lg bg-red-500 text-white font-bold text-center">
-                                Повідомити про шахрая оператору
-                            </a>
-                        </div>
+                        <p class="text-slate-300">Виявлено вимогу передплати на картку до перегляду квартири. За правилами кіберполіції — ніколи не надсилайте гроші наперед!</p>
                     `;
                 } else if (isRealtor) {
-                    html = `
+                    resBox.innerHTML = `
                         <div class="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold flex items-center gap-2">
-                            <i data-lucide="shield-alert" class="w-4 h-4 shrink-0"></i>
-                            <span>⚠️ ВИЯВЛЕНО РІЄЛТОРА / АГЕНТСТВО</span>
+                            <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+                            <span>ВИЯВЛЕНО РІЄЛТОРА / АГЕНТСТВО</span>
                         </div>
-                        <p class="text-slate-300">Номер телефону знайдено в базі посередників. Очікувана комісія: <b>+7 500 – 12 000 ₴</b>.</p>
-                        <div class="p-2 rounded-lg bg-dark-950 border border-white/5 space-y-1">
-                            <div class="text-[11px] text-emerald-400 font-semibold">💡 Порада ШІ:</div>
-                            <div class="text-[11px] text-slate-300">Знайдіть це житло без переплати у каналі <b>@kyiv_bez_komisii</b> або замовте перевірку за 99 ₴.</div>
-                        </div>
-                        <div class="flex gap-2 pt-1">
-                            <a href="https://t.me/pavlograd_admin?text=Хочу+перевірку+за+99+грн:+${encodeURIComponent(input)}" target="_blank" class="flex-1 py-2 rounded-lg bg-emerald-500 text-dark-950 font-bold text-center">
+                        <p class="text-slate-300">Номер телефону знайдено в базі посередників. Очікувана переплата за їхні послуги: <b>від 7 500 до 12 000 ₴</b>.</p>
+                        <div class="pt-1 flex gap-2">
+                            <a href="https://t.me/pavlograd_admin?text=Перевірте+оголошення:+${encodeURIComponent(input)}" target="_blank" class="flex-1 py-2 rounded-lg bg-emerald-500 text-dark-950 font-bold text-center">
                                 Експрес-дзвінок (99 ₴)
                             </a>
-                            <a href="https://t.me/kyiv_bez_komisii" target="_blank" class="flex-1 py-2 rounded-lg bg-dark-850 border border-white/10 text-white text-center font-medium">
-                                До каналу 0%
+                            <a href="https://t.me/kyiv_bez_komisii" target="_blank" class="flex-1 py-2 rounded-lg bg-dark-900 border border-white/10 text-white font-medium text-center">
+                                Шукати в 0%
                             </a>
                         </div>
                     `;
                 } else {
-                    html = `
+                    resBox.innerHTML = `
                         <div class="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold flex items-center gap-2">
-                            <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0"></i>
-                            <span>✅ ОЗНАК РІЄЛТОРА ЧИ СКАМУ НЕ ВИЯВЛЕНО</span>
+                            <i data-lucide="check-circle" class="w-4 h-4 shrink-0"></i>
+                            <span>ЧИСТИЙ НОМЕР • ОЗНАК РІЄЛТОРА НЕМАЄ</span>
                         </div>
-                        <p class="text-slate-300">Номер відсутній у базі агентств. Висока ймовірність прямого власника (економія 100% комісії).</p>
+                        <p class="text-slate-300">Номер відсутній у базах посередників. Висока ймовірність прямого контакту з господарем квартири.</p>
                     `;
                 }
-
-                resultBox.innerHTML = html;
                 lucide.createIcons();
             }, 600);
         }
 
-        // Blackout Simulator Logic
-        let simState = { gpon: true, gen: false, eco: true };
+        // Blackout Simulator
+        let bState = { gpon: true, gen: false, eco: true };
 
-        function toggleSimOpt(key) {
-            triggerHaptic();
-            simState[key] = !simState[key];
-            const btn = document.getElementById('toggle-' + key);
-            const statusTxt = btn.querySelector('.status-txt');
+        function toggleBlackoutOpt(key) {
+            triggerVibe();
+            bState[key] = !bState[key];
+            const btn = document.getElementById('b-opt-' + key);
+            const stat = btn.querySelector('.stat');
 
-            if (simState[key]) {
+            if (bState[key]) {
                 btn.classList.add('bg-amber-500/10', 'border-amber-500/30', 'text-amber-400');
-                btn.classList.remove('bg-dark-900', 'border-white/10', 'text-slate-400');
-                statusTxt.innerText = key === 'gpon' ? 'Є (+30%)' : (key === 'gen' ? 'Є (+35%)' : 'Є (+25%)');
+                btn.classList.remove('bg-dark-950', 'border-white/10', 'text-slate-400');
+                stat.innerText = key === 'gpon' ? 'Є (+30%)' : (key === 'gen' ? 'Є (+35%)' : 'Є (+25%)');
             } else {
                 btn.classList.remove('bg-amber-500/10', 'border-amber-500/30', 'text-amber-400');
-                btn.classList.add('bg-dark-900', 'border-white/10', 'text-slate-400');
-                statusTxt.innerText = 'Немає';
+                btn.classList.add('bg-dark-950', 'border-white/10', 'text-slate-400');
+                stat.innerText = 'Немає';
             }
-            updateBlackoutSim();
+            recalcBlackout();
         }
 
-        function updateBlackoutSim() {
-            const floor = parseInt(document.getElementById('calc-floor').value);
-            document.getElementById('calc-floor-val').innerText = floor + ' поверх';
+        function recalcBlackout() {
+            const floor = parseInt(document.getElementById('blackout-floor').value);
+            document.getElementById('blackout-floor-val').innerText = floor + ' поверх';
 
             let score = 50;
-            if (simState.gpon) score += 25;
-            if (simState.gen) score += 25;
-            if (simState.eco) score += 20;
+            if (bState.gpon) score += 25;
+            if (bState.gen) score += 25;
+            if (bState.eco) score += 20;
 
-            if (floor > 12 && !simState.gen) score -= 30;
-            else if (floor > 7 && !simState.gen) score -= 15;
+            if (floor > 12 && !bState.gen) score -= 30;
+            else if (floor > 7 && !bState.gen) score -= 15;
             else if (floor <= 5) score += 10;
 
             score = Math.max(10, Math.min(100, score));
 
-            const badge = document.getElementById('sim-score-badge');
-            const verdict = document.getElementById('sim-verdict-txt');
+            const badge = document.getElementById('blackout-score-badge');
+            const verdict = document.getElementById('blackout-verdict');
 
             badge.innerText = score + ' / 100 ' + (score > 75 ? '🔋' : (score > 40 ? '⚠️' : '🚨'));
             if (score > 75) {
-                badge.className = 'text-lg font-display font-extrabold text-emerald-400';
-                verdict.innerText = `Відмінна автономія: ${floor} поверх, стабільний зв'язок та енергія навіть під час затяжних блекаутів.`;
+                badge.className = 'text-xl font-extrabold text-emerald-400 font-display';
+                verdict.innerText = `Відмінна автономія: ${floor} поверх. Зв'язок і світло витримають графіки 4-/4+.`;
             } else if (score > 40) {
-                badge.className = 'text-lg font-display font-extrabold text-amber-400';
-                verdict.innerText = `Середній рівень: потрібен додатковий PowerBank для роутера. Ліфт на ${floor} поверсі може зупинятися.`;
+                badge.className = 'text-xl font-extrabold text-amber-400 font-display';
+                verdict.innerText = `Середній рівень: потрібен PowerBank для роутера. Ліфт на ${floor} поверсі зупиняється.`;
             } else {
-                badge.className = 'text-lg font-display font-extrabold text-red-400';
-                verdict.innerText = `Критичний рівень: ${floor} поверх без живлення, зв'язок пропаде за 30 хв після вимкнення підстанції.`;
+                badge.className = 'text-xl font-extrabold text-red-400 font-display';
+                verdict.innerText = `Складний сценарій: ${floor} поверх без живлення, зв'язок зникне після вимкнення підстанції.`;
             }
         }
 
-        // Contract Modal
-        const CONTRACT_SAMPLE = `ДОГОВІР ОРЕНДИ ЖИТЛОВОГО ПРИМІЩЕННЯ 2026
+        // Contract Viewer Logic
+        const CONTRACT_BODY = `ДОГОВІР ОРЕНДИ ЖИТЛОВОГО ПРИМІЩЕННЯ 2026
 (Військовий стан, захист від блекаутів та прозорий депозит)
 
 м. Київ                                                    «___» ____________ 2026 р.
@@ -870,34 +887,34 @@
 1.1. Орендодавець передає, а Орендар приймає у строкове платне користування житлове приміщення (квартиру) за адресою: ______________________________________________________.
 
 2. ОРЕНДНА ПЛАТА ТА ДЕПОЗИТ
-2.1. Розмір орендної плати: ______________ грн/місяць. Без комісії рієлторів (0%).
-2.2. Заставний депозит повертається Орендарю протягом 3 (трьох) робочих днів після виїзду за Актом прийому-передачі з фотофіксацією.
+2.1. Розмір щомісячної орендної плати: ______________ грн/місяць. Без комісії рієлторів (0%).
+2.2. Заставний депозит підлягає поверненню Орендарю протягом 3 (трьох) робочих днів після виселення за Актом прийому-передачі з фотофіксацією майна.
 
 3. ЗАСТЕРЕЖЕННЯ ПРО БЛЕКАУТИ ТА ЕНЕРГОНЕЗАЛЕЖНІСТЬ (2026)
-3.1. Орендодавець гарантує справність електромережі та заявлених автономних опцій (оптоволокно GPON, акумулятори, робота насосів водопостачання).
-3.2. У випадку аварійних відключень електроенергії або тепла понад 12 год/добу протягом 7 днів поспіль, орендна плата зменшується на 20% за відповідний період.
+3.1. Орендодавець гарантує справність внутрішньої електропроводки та автономних систем (оптоволокно GPON, акумулятори, насоси подачі води).
+3.2. У випадку тривалих аварійних відключень електроенергії або відсутності опалення понад 12 годин на добу протягом 7 календарних днів поспіль, орендна плата зменшується на 20% за відповідний розрахунковий період.
 
 4. ВІЙСЬКОВИЙ СТАН ТА ФОРС-МАЖОР
-4.1. У разі загострення бойових дій або вимушеної евакуації, Договір розривається Орендарем з попередженням за 7 днів з 100% поверненням депозиту.
+4.1. У разі виникнення безпосередньої загрози бойових дій або вимушеної евакуації, Договір розривається Орендарем з попередженням за 7 календарних днів з повним поверненням депозиту без штрафів.
 
-Підписи сторін:
+ПІДПИСИ СТОРІН:
 Орендодавець: ___________________        Орендар: ___________________`;
 
-        function openContractModal() {
-            triggerHaptic();
-            document.getElementById('contract-text-content').innerText = CONTRACT_SAMPLE;
+        function openContractViewer() {
+            triggerVibe();
+            document.getElementById('contract-full-text').innerText = CONTRACT_BODY;
             document.getElementById('contract-modal').classList.remove('hidden');
         }
 
-        function closeContractModal() {
-            triggerHaptic();
+        function closeContractViewer() {
+            triggerVibe();
             document.getElementById('contract-modal').classList.add('hidden');
         }
 
-        function copyContractText() {
-            triggerHaptic();
-            navigator.clipboard.writeText(CONTRACT_SAMPLE).then(() => {
-                const btn = document.getElementById('copy-contract-btn');
+        function copyContract() {
+            triggerVibe();
+            navigator.clipboard.writeText(CONTRACT_BODY).then(() => {
+                const btn = document.getElementById('copy-btn-action');
                 btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Скопійовано!';
                 lucide.createIcons();
                 setTimeout(() => {
@@ -907,32 +924,5 @@
             });
         }
     </script>
-
-    <!-- Contract Preview Modal -->
-    <div id="contract-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-dark-900 border border-white/10 rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col overflow-hidden">
-            <div class="p-4 border-b border-white/10 flex items-center justify-between">
-                <div class="font-bold text-sm text-white flex items-center gap-2">
-                    <i data-lucide="file-check" class="w-4 h-4 text-emerald-400"></i>
-                    <span>Еталонний Договір 2026</span>
-                </div>
-                <button onclick="closeContractModal()" class="text-slate-400 hover:text-white">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-300 leading-relaxed select-all">
-                <pre id="contract-text-content" class="whitespace-pre-wrap font-sans text-xs text-slate-300"></pre>
-            </div>
-            <div class="p-3 border-t border-white/10 flex gap-2">
-                <button onclick="copyContractText()" id="copy-contract-btn" class="flex-1 py-2 rounded-xl bg-emerald-500 text-dark-950 font-bold text-xs flex items-center justify-center gap-1.5">
-                    <i data-lucide="copy" class="w-4 h-4"></i>
-                    <span>Скопіювати Договір</span>
-                </button>
-                <button onclick="closeContractModal()" class="px-4 py-2 rounded-xl bg-white/5 text-slate-300 font-semibold text-xs">
-                    Закрити
-                </button>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
