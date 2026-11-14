@@ -140,54 +140,54 @@
             background: #007aff;
             border: 2.5px solid #ffffff;
             border-radius: 50%;
-            box-shadow: 0 0 12px rgba(0, 122, 255, 0.9), 0 2px 5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 14px rgba(0, 122, 255, 0.95), 0 2px 6px rgba(0, 0, 0, 0.5);
             z-index: 2;
         }
         .user-loc-pulse {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 44px;
-            height: 44px;
-            margin-left: -22px;
-            margin-top: -22px;
+            width: 46px;
+            height: 46px;
+            margin-left: -23px;
+            margin-top: -23px;
             border-radius: 50%;
-            background: rgba(0, 122, 255, 0.3);
+            background: rgba(0, 122, 255, 0.35);
             animation: locPulse 2.2s infinite cubic-bezier(0.2, 0.6, 0.35, 1);
             z-index: 1;
             pointer-events: none;
         }
         @keyframes locPulse {
-            0% { transform: scale(0.3); opacity: 0.9; }
+            0% { transform: scale(0.35); opacity: 0.9; }
             70% { transform: scale(1.3); opacity: 0; }
             100% { transform: scale(1.4); opacity: 0; }
         }
 
-        /* Snap Carousel for Floating Apartment Cards */
+        /* Modern Compact Bird Kyiv 2.0 Carousel (77% Map Visibility) */
         .cards-carousel {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             scrollbar-width: none;
             -ms-overflow-style: none;
             -webkit-overflow-scrolling: touch;
-            padding: 0 16px 12px 16px;
+            padding: 0 16px 8px 16px;
         }
         .cards-carousel::-webkit-scrollbar {
             display: none;
         }
         .apartment-card {
-            flex: 0 0 calc(100vw - 36px);
-            max-width: 370px;
+            flex: 0 0 calc(100vw - 32px);
+            max-width: 375px;
             scroll-snap-align: center;
-            border-radius: 20px;
+            border-radius: 18px;
             overflow: hidden;
             transition: transform 0.2s ease, border-color 0.2s ease;
         }
         .apartment-card.active-card {
-            border-color: rgba(255, 255, 255, 0.35);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.9);
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -196,7 +196,7 @@
 </head>
 <body class="relative h-full w-full">
 
-    <!-- FULLSCREEN MAP -->
+    <!-- FULLSCREEN MAP (77% Visible Area) -->
     <div id="map"></div>
 
     <!-- TOP FLOATING CONTROL BAR -->
@@ -239,7 +239,7 @@
         <div class="pointer-events-auto w-full">
             <div class="grid grid-cols-4 gap-1.5 w-full">
                 <button onclick="toggleQuickFilter(this, 'all')" id="btnFilterAll" class="q-filter active py-1.5 px-1 rounded-xl text-[11px] font-bold bg-white text-dark-950 text-center shadow-md whitespace-nowrap transition-all">
-                    Всі (40)
+                    Всі (70)
                 </button>
                 <button onclick="activateNearbyMode(this)" id="btnFilterNearby" class="q-filter py-1.5 px-1 rounded-xl text-[11px] font-semibold surface-panel text-slate-300 hover:text-white text-center whitespace-nowrap transition-all">
                     Поруч
@@ -253,13 +253,13 @@
             </div>
         </div>
 
-        <!-- Proximity Active Banner (Appears when Nearby / District is active) -->
+        <!-- Proximity Active Banner -->
         <div id="nearbyBanner" class="hidden pointer-events-auto surface-panel rounded-xl px-3 py-1.5 flex items-center justify-between shadow-xl text-xs">
-            <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-brand-blue animate-pulse"></span>
-                <span id="nearbyBannerText" class="font-medium text-slate-200">Поруч з вами</span>
+            <div class="flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-brand-blue animate-pulse shrink-0"></span>
+                <span id="nearbyBannerText" class="font-medium text-slate-200 truncate">Поруч з вами</span>
             </div>
-            <button onclick="resetNearbyMode()" class="text-slate-400 hover:text-white font-bold text-[11px] pl-2">
+            <button onclick="resetNearbyMode()" class="text-slate-400 hover:text-white font-bold text-[11px] pl-2 shrink-0">
                 Скинути ✕
             </button>
         </div>
@@ -267,7 +267,7 @@
 
     <!-- RIGHT FLOATING MAP CONTROLS -->
     <div class="absolute right-3 top-36 z-20 flex flex-col gap-2">
-        <button id="btnLocate" onclick="handleLocateClick()" class="surface-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all group" title="Поруч зі мною">
+        <button id="btnLocate" onclick="handleLocateClick()" class="surface-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all group" title="Поруч зі мною (GPS)">
             <svg class="w-4 h-4 text-brand-blue group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                 <circle cx="12" cy="12" r="3"/>
                 <path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>
@@ -286,7 +286,7 @@
         </button>
     </div>
 
-    <!-- BOTTOM FLOATING BIRD DECK (Snap Horizontal Carousel) -->
+    <!-- BOTTOM FLOATING BIRD DECK (Compact Horizontal Cards - 77% Map Visibility) -->
     <div class="absolute bottom-3 left-0 right-0 z-30">
         <div class="cards-carousel" id="cardsCarousel">
             <!-- Rendered dynamically -->
@@ -300,7 +300,7 @@
         </div>
     </div>
 
-    <!-- DISTRICT / NEIGHBORHOOD DRAWER (Solves Remote / Outside Kyiv Testing) -->
+    <!-- DISTRICT / NEIGHBORHOOD DRAWER -->
     <div id="districtDrawer" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden opacity-0 transition-opacity duration-200 flex items-end">
         <div class="w-full max-h-[85vh] bg-dark-900 border-t border-white/10 rounded-t-3xl overflow-y-auto p-5 space-y-4 text-white transform translate-y-full transition-transform duration-300" id="districtDrawerContent">
             <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-2"></div>
@@ -314,15 +314,15 @@
 
             <!-- 10 Official Kyiv Districts Grid -->
             <div class="grid grid-cols-2 gap-2 text-xs" id="districtGrid">
-                <button onclick="selectKyivDistrict('Оболонь', 50.5050, 30.5000)" class="dist-choice p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
+                <button onclick="selectKyivDistrict('Оболонь', 50.5050, 30.5080)" class="dist-choice p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
                     <div class="font-bold text-white">Оболонський</div>
                     <div class="text-[10px] text-slate-400">Оболонь, Мінська, Героїв Дніпра</div>
                 </button>
-                <button onclick="selectKyivDistrict('Поділ', 50.4680, 50.4680 ? 30.5120 : 30.5120)" class="dist-choice p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
+                <button onclick="selectKyivDistrict('Поділ', 50.4680, 30.5120)" class="dist-choice p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
                     <div class="font-bold text-white">Подільський</div>
                     <div class="text-[10px] text-slate-400">Поділ, Контрактова, Виноградар</div>
                 </button>
-                <button onclick="selectKyivDistrict('Печерськ', 50.4280, 30.5380)" class="dist-choice p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
+                <button onclick="selectKyivDistrict('Печерськ', 50.4250, 30.5350)" class="dist-choice p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
                     <div class="font-bold text-white">Печерський</div>
                     <div class="text-[10px] text-slate-400">Печерськ, Либідська, Дружби Народів</div>
                 </button>
@@ -330,25 +330,25 @@
                     <div class="font-bold text-white">Шевченківський</div>
                     <div class="text-[10px] text-slate-400">Лук'янівка, Центр, КПІ, Сирець</div>
                 </button>
-                <button onclick="selectKyivDistrict('Голосієво', 50.3950, 30.4950)" class="dist-choice p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
+                <button onclick="selectKyivDistrict('Голосієво', 50.3950, 30.4980)" class="dist-choice p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
                     <div class="font-bold text-white">Голосіївський</div>
                     <div class="text-[10px] text-slate-400">Голосіївська, Васильківська, ВДНГ</div>
                 </button>
-                <button onclick="selectKyivDistrict('Дарниця', 50.4050, 30.6250)" class="dist-choice p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
+                <button onclick="selectKyivDistrict('Дарниця', 50.3980, 30.6350)" class="dist-choice p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
                     <div class="font-bold text-white">Дарницький / Позняки</div>
                     <div class="text-[10px] text-slate-400">Позняки, Осокорки, Харківська</div>
                 </button>
-                <button onclick="selectKyivDistrict('Солом\'янка', 50.4350, 30.4650)" class="dist-choice p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
+                <button onclick="selectKyivDistrict('Солом\'янка', 50.4350, 30.4550)" class="dist-choice p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
                     <div class="font-bold text-white">Солом'янський</div>
                     <div class="text-[10px] text-slate-400">Вокзальна, Шулявка, Солом'янка</div>
                 </button>
-                <button onclick="selectKyivDistrict('Дніпров', 50.4500, 30.5950)" class="dist-choice p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
+                <button onclick="selectKyivDistrict('Дніпров', 50.4520, 30.5980)" class="dist-choice p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
                     <div class="font-bold text-white">Дніпровський</div>
                     <div class="text-[10px] text-slate-400">Лівобережна, Русанівка, Дарниця</div>
                 </button>
             </div>
 
-            <!-- Real Center Simulation for Testing -->
+            <!-- Test Center Button -->
             <button onclick="selectKyivDistrict('Центр', 50.4501, 30.5234)" class="w-full py-3 rounded-xl bg-white text-dark-950 font-bold text-xs flex items-center justify-center gap-2 active:scale-98 transition-all">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
                 <span>Моя точка: Центр (Майдан / Хрещатик)</span>
@@ -389,36 +389,23 @@
         let userMarker = null;
         let userRadiusCircle = null;
 
-        // INITIALIZE MAP (Locked to Greater Kyiv)
-        const KYIV_BOUNDS = L.latLngBounds(
-            L.latLng(50.213, 30.239),
-            L.latLng(50.591, 30.825)
-        );
-
+        // INITIALIZE MAP
         const map = L.map('map', {
             zoomControl: false,
             attributionControl: false,
-            minZoom: 11,
-            maxZoom: 17,
-            maxBounds: KYIV_BOUNDS,
-            maxBoundsViscosity: 1.0,
+            minZoom: 4,
+            maxZoom: 18,
             touchZoom: true
         }).setView([50.4501, 30.5234], 12);
 
-        // Apple Maps Dark Theme Tiles (Clean Monochrome)
+        // Apple Maps Dark Theme Tiles
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-            minZoom: 11, maxZoom: 17
+            minZoom: 4, maxZoom: 18
         }).addTo(map);
 
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
-            minZoom: 11, maxZoom: 17
+            minZoom: 4, maxZoom: 18
         }).addTo(map);
-
-        map.on('zoomend moveend', () => {
-            if (!KYIV_BOUNDS.contains(map.getCenter())) {
-                map.panInsideBounds(KYIV_BOUNDS, { animate: true });
-            }
-        });
 
         // HAVERSINE DISTANCE FORMULA
         function getHaversineDistance(lat1, lon1, lat2, lon2) {
@@ -440,12 +427,35 @@
             return `${distKm.toFixed(1)} км`;
         }
 
-        // GEOLOCATION & PROXIMITY HANDLERS
+        // GEOLOCATION ENGINE
         function handleLocateClick() {
             triggerHaptic('medium');
             const locateBtn = document.getElementById('btnLocate');
             if (locateBtn) locateBtn.classList.add('animate-pulse');
 
+            // 1. Telegram WebApp Location Manager
+            if (window.Telegram?.WebApp?.LocationManager) {
+                try {
+                    window.Telegram.WebApp.LocationManager.init(() => {
+                        window.Telegram.WebApp.LocationManager.getLocation((data) => {
+                            if (locateBtn) locateBtn.classList.remove('animate-pulse');
+                            if (data && data.latitude && data.longitude) {
+                                onGotExactLocation(data.latitude, data.longitude, data.accuracy || 20);
+                                return;
+                            }
+                            fallbackBrowserGeolocation(locateBtn);
+                        });
+                    });
+                    return;
+                } catch (e) {
+                    console.log('TG LocationManager fallback:', e);
+                }
+            }
+
+            fallbackBrowserGeolocation(locateBtn);
+        }
+
+        function fallbackBrowserGeolocation(locateBtn) {
             if (!navigator.geolocation) {
                 if (locateBtn) locateBtn.classList.remove('animate-pulse');
                 openDistrictDrawer();
@@ -455,44 +465,28 @@
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
                     if (locateBtn) locateBtn.classList.remove('animate-pulse');
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-                    
-                    // Check if user is actually inside or near Kyiv (within 50 km)
-                    const dToKyivCenter = getHaversineDistance(lat, lng, 50.4501, 30.5234);
-                    if (dToKyivCenter > 50) {
-                        // User is testing remotely (e.g. from Pavlograd or abroad)
-                        openDistrictDrawer();
-                        return;
-                    }
-
-                    setUserLocationAndRadius(lat, lng, 'Поруч з вами');
+                    onGotExactLocation(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
                 },
                 (err) => {
                     if (locateBtn) locateBtn.classList.remove('animate-pulse');
-                    console.warn('GPS denied or error:', err);
+                    console.warn('Geolocation error:', err);
                     openDistrictDrawer();
                 },
-                { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
             );
         }
 
-        function activateNearbyMode(btn) {
-            triggerHaptic('light');
-            handleLocateClick();
-        }
+        function onGotExactLocation(lat, lng, accuracy = 20) {
+            userLocation = { lat, lng, accuracy };
 
-        function setUserLocationAndRadius(lat, lng, label = 'Поруч з вами') {
-            userLocation = { lat, lng, label };
-
-            // Calculate distance for all listings
+            // Calculate distance to all items
             LISTINGS.forEach(item => {
                 if (item.lat && item.lng) {
                     item.distanceKm = getHaversineDistance(lat, lng, item.lat, item.lng);
                 }
             });
 
-            // 1. Add/Update Blue User Dot
+            // 1. Add / update blue pulsing marker at EXACT USER GPS COORDINATES!
             const userIcon = L.divIcon({
                 className: 'user-loc-wrap',
                 html: `
@@ -514,7 +508,88 @@
                 }).addTo(map);
             }
 
-            // 2. Draw Translucent Radar Circle (3.5 km radius)
+            // Distance to Kyiv center
+            const distToKyiv = getHaversineDistance(lat, lng, 50.4501, 30.5234);
+
+            if (distToKyiv <= 45) {
+                // Inside Greater Kyiv!
+                if (userRadiusCircle) map.removeLayer(userRadiusCircle);
+                userRadiusCircle = L.circle([lat, lng], {
+                    radius: 3500,
+                    color: '#007aff',
+                    fillColor: '#007aff',
+                    fillOpacity: 0.08,
+                    weight: 1.5,
+                    dashArray: '4, 6'
+                }).addTo(map);
+
+                currentFilter.nearbyOnly = true;
+
+                const banner = document.getElementById('nearbyBanner');
+                const bannerText = document.getElementById('nearbyBannerText');
+                if (banner && bannerText) {
+                    const count = getFilteredListings().length;
+                    bannerText.innerHTML = `Поруч з вами (радіус 3.5 км: ${count} вар.)`;
+                    banner.classList.remove('hidden');
+                }
+
+                map.flyTo([lat, lng], 14, { duration: 0.8 });
+            } else {
+                // Outside Kyiv (e.g. testing in Pavlograd or VPN) - SHOW EXACT PIN!
+                map.flyTo([lat, lng], 12, { duration: 0.9 });
+
+                const banner = document.getElementById('nearbyBanner');
+                const bannerText = document.getElementById('nearbyBannerText');
+                if (banner && bannerText) {
+                    bannerText.innerHTML = `📍 Ваша точка: <b>${formatDistance(distToKyiv)}</b> від Києва <button onclick="recenterKyiv()" class="ml-2 underline font-bold text-white">До Києва ›</button>`;
+                    banner.classList.remove('hidden');
+                }
+            }
+
+            updateUI();
+        }
+
+        function activateNearbyMode(btn) {
+            triggerHaptic('light');
+            handleLocateClick();
+        }
+
+        function selectKyivDistrict(districtName, lat, lng) {
+            triggerHaptic('medium');
+            closeDistrictDrawer();
+            setUserLocationAndRadius(lat, lng, `Район ${districtName}`);
+        }
+
+        function setUserLocationAndRadius(lat, lng, label = 'Поруч з вами') {
+            userLocation = { lat, lng, label };
+
+            LISTINGS.forEach(item => {
+                if (item.lat && item.lng) {
+                    item.distanceKm = getHaversineDistance(lat, lng, item.lat, item.lng);
+                }
+            });
+
+            const userIcon = L.divIcon({
+                className: 'user-loc-wrap',
+                html: `
+                    <div class="user-loc-container">
+                        <div class="user-loc-pulse"></div>
+                        <div class="user-loc-dot"></div>
+                    </div>
+                `,
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+
+            if (userMarker) {
+                userMarker.setLatLng([lat, lng]);
+            } else {
+                userMarker = L.marker([lat, lng], {
+                    icon: userIcon,
+                    zIndexOffset: 10000
+                }).addTo(map);
+            }
+
             if (userRadiusCircle) {
                 map.removeLayer(userRadiusCircle);
             }
@@ -527,17 +602,8 @@
                 dashArray: '4, 6'
             }).addTo(map);
 
-            // 3. Enable Nearby Filter Mode
             currentFilter.nearbyOnly = true;
 
-            // Highlight Nearby button
-            document.querySelectorAll('.q-filter').forEach(b => {
-                b.className = 'q-filter py-1.5 px-1 rounded-xl text-[11px] font-semibold surface-panel text-slate-300 hover:text-white text-center whitespace-nowrap transition-all';
-            });
-            const nearbyBtn = document.getElementById('btnFilterNearby');
-            if (nearbyBtn) nearbyBtn.className = 'q-filter active py-1.5 px-1 rounded-xl text-[11px] font-bold bg-white text-dark-950 text-center shadow-md whitespace-nowrap transition-all';
-
-            // Show Nearby Banner
             const banner = document.getElementById('nearbyBanner');
             const bannerText = document.getElementById('nearbyBannerText');
             if (banner && bannerText) {
@@ -546,9 +612,7 @@
                 banner.classList.remove('hidden');
             }
 
-            // Fly camera to user position
             map.flyTo([lat, lng], 13.8, { duration: 0.8 });
-
             updateUI();
         }
 
@@ -575,12 +639,6 @@
             updateUI();
         }
 
-        function selectKyivDistrict(districtName, lat, lng) {
-            triggerHaptic('medium');
-            closeDistrictDrawer();
-            setUserLocationAndRadius(lat, lng, `Район ${districtName}`);
-        }
-
         function recenterKyiv() {
             triggerHaptic('light');
             map.flyTo([50.4501, 30.5234], 12, { duration: 0.8 });
@@ -602,7 +660,6 @@
                     }
                 }
                 if (currentFilter.nearbyOnly && userLocation) {
-                    // Show apartments within 5.5 km or closest
                     if (item.distanceKm === undefined || item.distanceKm > 5.5) return false;
                 }
                 if (currentFilter.search) {
@@ -613,7 +670,6 @@
                 return true;
             });
 
-            // If nearby mode is active, sort strictly by distance
             if (currentFilter.nearbyOnly && userLocation) {
                 res.sort((a, b) => (a.distanceKm || 999) - (b.distanceKm || 999));
             }
@@ -673,18 +729,18 @@
             const imgEl = document.getElementById(`photo-img-${id}`);
             const countEl = document.getElementById(`photo-count-${id}`);
             if (imgEl) imgEl.src = apt.images[cur];
-            if (countEl) countEl.innerText = `${cur + 1} / ${apt.images.length}`;
+            if (countEl) countEl.innerText = `${cur + 1}/${apt.images.length}`;
         }
 
+        // COMPACT HORIZONTAL CARD (77% MAP VISIBILITY)
         function renderCarousel(items) {
             const container = document.getElementById('cardsCarousel');
             if (items.length === 0) {
                 container.innerHTML = `
-                    <div class="w-full surface-panel p-5 rounded-2xl text-center text-white">
-                        <div class="text-sm font-bold">У цьому районі немає вільних квартир</div>
-                        <div class="text-xs text-slate-400 mt-1">Спробуйте скинути радіус або розширити пошук.</div>
-                        <button onclick="resetNearbyMode()" class="mt-3 px-4 py-2 rounded-xl bg-white text-dark-950 font-bold text-xs">
-                            Показати всі 40 квартир
+                    <div class="w-full surface-panel p-4 rounded-2xl text-center text-white">
+                        <div class="text-xs font-bold">У цьому радіусі немає вільних квартир</div>
+                        <button onclick="resetNearbyMode()" class="mt-2 px-3 py-1.5 rounded-xl bg-white text-dark-950 font-bold text-[11px]">
+                            Показати всі квартири Києва
                         </button>
                     </div>
                 `;
@@ -693,83 +749,59 @@
 
             container.innerHTML = items.map((item, index) => {
                 const curPhoto = photoIndexById[item.id] || 0;
-                const metroName = (item.metro || '').replace(/^М\s+/, '');
+                const metroName = (item.metro || '').replace(/^Метро\s+|^М\s+/, '');
                 return `
                 <div class="apartment-card surface-panel shadow-2xl ${index === currentActiveIndex ? 'active-card' : ''}" id="card-${item.id}" onclick="selectCard(${index}, true)">
-                    <!-- Photo Header -->
-                    <div class="relative w-full h-40 bg-dark-950 overflow-hidden">
-                        <img id="photo-img-${item.id}" src="${item.images[curPhoto]}" class="w-full h-full object-cover select-none pointer-events-none" alt="${item.title}">
-                        
-                        <!-- Left & Right Photo Switch Arrows -->
-                        <button onclick="changePhoto(event, ${item.id}, -1)" class="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center font-bold text-xs border border-white/15 active:scale-90 transition-all z-20">‹</button>
-                        <button onclick="changePhoto(event, ${item.id}, 1)" class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center font-bold text-xs border border-white/15 active:scale-90 transition-all z-20">›</button>
+                    <!-- Horizontal Compact Card -->
+                    <div class="flex p-2.5 gap-3 items-center">
+                        <!-- Left Thumbnail (105px x 105px) -->
+                        <div class="relative w-[105px] h-[105px] rounded-xl overflow-hidden bg-dark-950 shrink-0">
+                            <img id="photo-img-${item.id}" src="${item.images[curPhoto]}" class="w-full h-full object-cover select-none pointer-events-none" alt="${item.title}">
+                            
+                            <!-- Left / Right Photo Arrows -->
+                            <button onclick="changePhoto(event, ${item.id}, -1)" class="absolute left-1 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center text-[10px] font-bold z-20">‹</button>
+                            <button onclick="changePhoto(event, ${item.id}, 1)" class="absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center text-[10px] font-bold z-20">›</button>
 
-                        <!-- Verified Direct Owner Badge -->
-                        <div class="absolute top-2.5 left-2.5 flex items-center gap-1 z-10">
-                            <span class="px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-md border border-white/10 text-[10px] font-bold text-white flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                                <span>Прямий власник · 0%</span>
-                            </span>
-                        </div>
-
-                        <!-- Photo count -->
-                        <div class="absolute top-2.5 right-2.5 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[10px] text-white font-mono z-10">
-                            <span id="photo-count-${item.id}">${curPhoto + 1} / ${item.images.length}</span>
-                        </div>
-                    </div>
-
-                    <!-- Card Body -->
-                    <div class="p-3.5 space-y-2">
-                        <!-- Line 1: Price and Real Savings -->
-                        <div class="flex items-baseline justify-between">
-                            <div>
-                                <span class="text-base font-black text-white">${item.price.toLocaleString('uk-UA')} ₴</span>
-                                <span class="text-xs text-slate-400 font-normal"> / міс</span>
-                            </div>
-                            <div class="text-[11px] font-semibold text-emerald-400">
-                                Економія +${item.realtorCommissionSaved.toLocaleString('uk-UA')} ₴
+                            <!-- Photo count -->
+                            <div class="absolute bottom-1 right-1 bg-black/70 px-1 py-0.2 rounded text-[9px] text-white font-mono z-10">
+                                <span id="photo-count-${item.id}">${curPhoto + 1}/${item.images.length}</span>
                             </div>
                         </div>
 
-                        <!-- Line 2: Metro and Specs in ONE Unbroken Row -->
-                        <div class="text-xs text-slate-300 font-medium truncate flex items-center gap-1.5">
-                            <span class="text-white font-bold whitespace-nowrap">Метро ${metroName}</span>
-                            <span class="text-slate-500">·</span>
-                            <span class="whitespace-nowrap">${item.walkMin} хв</span>
-                            <span class="text-slate-500">·</span>
-                            <span class="whitespace-nowrap">${item.district}</span>
-                            <span class="text-slate-500">·</span>
-                            <span class="whitespace-nowrap">${item.area} м²</span>
-                            <span class="text-slate-500">·</span>
-                            <span class="whitespace-nowrap">${item.floor}/${item.totalFloors} пов.</span>
-                        </div>
+                        <!-- Right Info Body -->
+                        <div class="flex-1 min-w-0 flex flex-col justify-between py-0.5 space-y-1">
+                            <!-- Line 1: Price and Savings -->
+                            <div class="flex items-baseline justify-between">
+                                <div class="text-base font-black text-white whitespace-nowrap">
+                                    ${item.price.toLocaleString('uk-UA')} ₴<span class="text-[10px] text-slate-400 font-normal">/міс</span>
+                                </div>
+                                <div class="text-[10px] font-semibold text-emerald-400 whitespace-nowrap">
+                                    0% комісії
+                                </div>
+                            </div>
 
-                        <!-- Line 3: Address & Exact Proximity Distance -->
-                        <div class="text-[11px] text-slate-400 truncate flex items-center justify-between gap-1.5">
-                            <span class="truncate">${item.address}</span>
-                            ${item.distanceKm !== undefined ? `
-                                <span class="shrink-0 px-2 py-0.5 rounded-md bg-brand-blue/15 border border-brand-blue/30 text-brand-blue text-[10px] font-bold flex items-center gap-1">
-                                    <span>📍 ${formatDistance(item.distanceKm)}</span>
+                            <!-- Line 2: Metro and Specs -->
+                            <div class="text-[11px] text-slate-300 font-medium truncate">
+                                <span class="text-white font-bold">Метро ${metroName}</span> · ${item.walkMin} хв · ${item.area} м²
+                            </div>
+
+                            <!-- Line 3: Tags -->
+                            <div class="flex items-center gap-1 overflow-hidden">
+                                ${item.generator ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-white text-[9px] font-medium whitespace-nowrap">Генератор</span>' : ''}
+                                ${item.gpon ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-white text-[9px] font-medium whitespace-nowrap">GPON</span>' : ''}
+                                ${item.gas ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300 text-[9px] font-medium whitespace-nowrap">Газ</span>' : ''}
+                                ${item.pets ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300 text-[9px] font-medium whitespace-nowrap">Тварини</span>' : ''}
+                            </div>
+
+                            <!-- Line 4: Distance & CTA Button -->
+                            <div class="flex items-center justify-between pt-0.5">
+                                <span class="text-[10px] text-brand-blue font-bold truncate">
+                                    ${item.distanceKm !== undefined ? `📍 ${formatDistance(item.distanceKm)}` : `📍 ${item.district}`}
                                 </span>
-                            ` : ''}
-                        </div>
-
-                        <!-- Line 4: Clean Monochrome Neutral Tags (Zero AI Rainbow Clutter) -->
-                        <div class="flex items-center gap-1.5 overflow-hidden text-xs pt-0.5">
-                            ${item.generator ? '<span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300 text-[10px] font-medium whitespace-nowrap">Генератор</span>' : ''}
-                            ${item.gpon ? '<span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300 text-[10px] font-medium whitespace-nowrap">GPON інтернет</span>' : ''}
-                            ${item.gas ? '<span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300 text-[10px] font-medium whitespace-nowrap">Газ</span>' : ''}
-                            ${item.pets ? '<span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300 text-[10px] font-medium whitespace-nowrap">З тваринами</span>' : ''}
-                        </div>
-
-                        <!-- Line 5: Solid CTA Buttons -->
-                        <div class="flex gap-2 pt-1">
-                            <button onclick="openDetail(${item.id})" class="flex-1 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-dark-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-98 transition-all">
-                                <span>Переглянути контакти</span>
-                            </button>
-                            <button onclick="openDetail(${item.id})" class="px-3.5 py-2.5 rounded-xl bg-dark-850 hover:bg-dark-800 text-slate-300 font-bold text-xs border border-white/10 active:scale-95 transition-all">
-                                Деталі
-                            </button>
+                                <button onclick="openDetail(${item.id})" class="px-3 py-1 rounded-lg bg-white hover:bg-slate-100 text-dark-950 font-black text-[11px] shrink-0 shadow-sm active:scale-95 transition-all">
+                                    Деталі ›
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -787,19 +819,17 @@
             currentActiveIndex = index;
             const activeItem = items[index];
 
-            // 1. Highlight map marker
             document.querySelectorAll('.bird-pin').forEach(p => p.classList.remove('active'));
             const activePin = document.getElementById(`pin-${activeItem.id}`);
             if (activePin) activePin.classList.add('active');
 
-            // 2. Camera offset: pin is positioned in UPPER 45% of the screen, NEVER under the card
-            const cameraLat = activeItem.lat - 0.008;
+            // Camera offset keeps pin in upper 40% of screen above the compact card
+            const cameraLat = activeItem.lat - 0.006;
             map.flyTo([cameraLat, activeItem.lng], 14.5, {
-                duration: 0.7,
+                duration: 0.6,
                 easeLinearity: 0.25
             });
 
-            // 3. Highlight card in carousel
             document.querySelectorAll('.apartment-card').forEach(c => c.classList.remove('active-card'));
             const activeCard = document.getElementById(`card-${activeItem.id}`);
             if (activeCard) {
@@ -812,7 +842,6 @@
             triggerHaptic('selection');
         }
 
-        // Detect user horizontal swipe in carousel
         let scrollTimeout;
         function attachCarouselScrollListener(items) {
             const carousel = document.getElementById('cardsCarousel');
@@ -879,7 +908,7 @@
 
             const modal = document.getElementById('detailModal');
             const content = document.getElementById('detailSheetContent');
-            const metroName = (item.metro || '').replace(/^М\s+/, '');
+            const metroName = (item.metro || '').replace(/^Метро\s+|^М\s+/, '');
 
             content.innerHTML = `
                 <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-3"></div>
@@ -931,7 +960,7 @@
                     </div>
                 </div>
 
-                <!-- Direct Owner Phone Unlock (Single Solid Monobank Funnel) -->
+                <!-- Direct Owner Phone Unlock (Single High-Converting Monobank Funnel) -->
                 <div class="p-4 rounded-2xl bg-dark-850 border border-white/10 space-y-3 shadow-lg">
                     <div class="flex items-center justify-between">
                         <div>
