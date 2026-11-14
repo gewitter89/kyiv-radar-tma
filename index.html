@@ -126,14 +126,14 @@
     <!-- Top Navigation Header -->
     <header class="sticky top-0 z-40 bg-base-950/90 backdrop-blur-md border-b border-white/5 px-3 py-2.5 flex items-center justify-between gap-2 min-w-0">
         <!-- Brand -->
-        <div class="flex items-center gap-2 shrink-0">
-            <div class="w-8 h-8 rounded-xl bg-white text-base-950 flex items-center justify-center font-black text-xs leading-none">
+        <div class="flex items-center gap-2.5 shrink-0">
+            <div class="w-9 h-9 min-w-[36px] min-h-[36px] max-w-[36px] max-h-[36px] aspect-square shrink-0 rounded-xl bg-white text-base-950 flex items-center justify-center font-black text-xs shadow-md">
                 КР
             </div>
             <div class="min-w-0">
-                <div class="flex items-center gap-1.5 flex-wrap">
-                    <h1 class="text-sm font-extrabold tracking-tight text-white leading-tight">Київ Радар</h1>
-                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-white/10 text-slate-300 shrink-0">0%</span>
+                <div class="flex items-center gap-1.5">
+                    <h1 class="text-sm font-extrabold tracking-tight text-white leading-tight whitespace-nowrap">Київ Радар</h1>
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">0%</span>
                 </div>
                 <p class="text-[10px] text-slate-400 font-medium leading-tight truncate">Оренда 0% без рієлторів</p>
             </div>
@@ -180,27 +180,29 @@
             </button>
         </div>
 
-        <!-- Filter Chips (Touch Scroll + Snap) -->
-        <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5 snap-x snap-mandatory" style="-webkit-overflow-scrolling: touch;">
-            <button onclick="setQuickFilter(this, 'all')" class="quick-chip active snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-base-950 whitespace-nowrap shadow-sm">
-                Всі (48)
-            </button>
-            <button onclick="setQuickFilter(this, 'gpon')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
-                ⚡ GPON
-            </button>
-            <button onclick="setQuickFilter(this, 'generator')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
-                🔋 Генератор
-            </button>
-            <button onclick="setQuickFilter(this, 'lowFloor')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
-                🏢 Поверх 1–5
-            </button>
-            <button onclick="setQuickFilter(this, 'pets')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
-                🐾 Тварини
-            </button>
-            <button onclick="setQuickFilter(this, 'gas')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
-                🔥 Газ
-            </button>
-            <span class="shrink-0 w-2" aria-hidden="true"></span>
+        <!-- Filter Chips (Touch Scroll + Snap + Edge Fade Mask) -->
+        <div class="relative w-full overflow-hidden">
+            <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5 snap-x snap-mandatory" style="-webkit-overflow-scrolling: touch; mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%); -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);">
+                <button onclick="setQuickFilter(this, 'all')" class="quick-chip active snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-base-950 whitespace-nowrap shadow-sm">
+                    Всі (48)
+                </button>
+                <button onclick="setQuickFilter(this, 'generator')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
+                    🔋 Генератор
+                </button>
+                <button onclick="setQuickFilter(this, 'gpon')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
+                    ⚡ GPON
+                </button>
+                <button onclick="setQuickFilter(this, 'lowFloor')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
+                    🏢 Поверх 1–5
+                </button>
+                <button onclick="setQuickFilter(this, 'pets')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
+                    🐾 Тварини
+                </button>
+                <button onclick="setQuickFilter(this, 'gas')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
+                    🔥 Газ
+                </button>
+                <span class="shrink-0 w-8" aria-hidden="true"></span>
+            </div>
         </div>
     </section>
 
@@ -554,31 +556,50 @@
 
                         <!-- Card Body -->
                         <div class="p-4 space-y-3">
-                            <div class="flex items-start justify-between gap-3">
-                                <div>
-                                    <div class="flex items-center gap-1.5 text-xs text-slate-400 font-medium mb-0.5">
-                                        <span class="w-2 h-2 rounded-full" style="background-color: ${metroLineColor};"></span>
-                                        <span>${apt.metro} (${apt.walkMin} хв пішки)</span>
-                                        <span>•</span>
-                                        <span>${apt.district}</span>
-                                    </div>
-                                    <h2 class="text-sm font-bold text-white leading-snug">${apt.title}</h2>
-                                    <div class="text-[11px] text-slate-400 mt-0.5">${apt.address}</div>
-                                </div>
-                                <div class="text-right shrink-0">
-                                    <div class="text-base font-extrabold text-white">${apt.price.toLocaleString('uk-UA')} ₴</div>
-                                    <div class="text-[10px] font-bold text-emerald-400">Економія +${apt.realtorCommissionSaved.toLocaleString('uk-UA')} ₴</div>
+                            <!-- Location & Metro Pills (Discrete Capsules - Never Wrap Brokenly) -->
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-base-900 border border-white/10 text-xs font-bold text-white whitespace-nowrap shadow-sm">
+                                    <span class="w-2 h-2 rounded-full shrink-0" style="background-color: ${metroLineColor};"></span>
+                                    <span>${apt.metro}</span>
+                                    <span class="text-slate-400 font-normal">· ${apt.walkMin} хв</span>
+                                </span>
+                                <span class="inline-flex items-center px-2 py-1 rounded-lg bg-base-900 border border-white/5 text-xs font-semibold text-slate-300 whitespace-nowrap">
+                                    ${apt.district}
+                                </span>
+                                <span class="inline-flex items-center px-2 py-1 rounded-lg bg-base-900 border border-white/5 text-xs font-semibold text-slate-400 whitespace-nowrap">
+                                    ${apt.area} м²
+                                </span>
+                                <span class="inline-flex items-center px-2 py-1 rounded-lg bg-base-900 border border-white/5 text-xs font-semibold text-slate-400 whitespace-nowrap">
+                                    ${apt.floor}/${apt.totalFloors} пов.
+                                </span>
+                            </div>
+
+                            <!-- Title & Address -->
+                            <div>
+                                <h2 class="text-sm font-extrabold text-white leading-snug">${apt.title}</h2>
+                                <div class="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
+                                    <svg class="w-3.5 h-3.5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    <span class="truncate">${apt.address}</span>
                                 </div>
                             </div>
 
-                            <!-- Specs & Feature Pills -->
-                            <div class="flex flex-wrap gap-1.5 text-[11px]">
-                                <span class="px-2.5 py-1 rounded-lg bg-base-850 text-slate-300 font-medium">${apt.area} м²</span>
-                                <span class="px-2.5 py-1 rounded-lg bg-base-850 text-slate-300 font-medium">${apt.floor}/${apt.totalFloors} поверх</span>
-                                ${apt.gpon ? `<span class="px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 font-semibold">⚡️ GPON є</span>` : ''}
-                                ${apt.generator ? `<span class="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 font-semibold">🔋 Генератор у ЖК</span>` : ''}
-                                ${apt.gas ? `<span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-semibold">🔥 Газ</span>` : ''}
-                                ${apt.pets ? `<span class="px-2.5 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300 font-semibold">🐾 Тварини дозволені</span>` : ''}
+                            <!-- Blackout / Winter Status Pills -->
+                            <div class="flex flex-wrap gap-1.5 text-xs">
+                                ${apt.generator ? `<span class="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 font-bold whitespace-nowrap">🔋 Генератор у ЖК</span>` : ''}
+                                ${apt.gpon ? `<span class="px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-300 font-bold whitespace-nowrap">⚡ GPON інтернет</span>` : ''}
+                                ${apt.gas ? `<span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-bold whitespace-nowrap">🔥 Газ</span>` : ''}
+                                ${apt.pets ? `<span class="px-2.5 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300 font-bold whitespace-nowrap">🐾 З тваринами</span>` : ''}
+                            </div>
+
+                            <!-- Dedicated Price & Savings Bar -->
+                            <div class="flex items-center justify-between pt-2.5 border-t border-white/5">
+                                <div>
+                                    <span class="text-base font-black text-white leading-none">${apt.price.toLocaleString('uk-UA')} ₴</span>
+                                    <span class="text-xs text-slate-400 font-medium"> / міс</span>
+                                </div>
+                                <div class="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/25 text-[11px] font-bold text-emerald-400">
+                                    Економія +${apt.realtorCommissionSaved.toLocaleString('uk-UA')} ₴
+                                </div>
                             </div>
 
                             <!-- Authentic Owner Note -->
