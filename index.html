@@ -716,8 +716,13 @@
 
         const photoIndexById = {};
 
+        function normalizeMetroName(raw) {
+            if (!raw) return 'Київ';
+            return raw.replace(/^(Метро|м\.|м|М)\s+/i, '').trim();
+        }
+
         function changePhoto(e, id, delta) {
-            e.stopPropagation();
+            if (e) e.stopPropagation();
             triggerHaptic('light');
             const apt = LISTINGS.find(x => x.id === id);
             if (!apt || apt.images.length <= 1) return;
@@ -749,21 +754,25 @@
 
             container.innerHTML = items.map((item, index) => {
                 const curPhoto = photoIndexById[item.id] || 0;
-                const metroName = (item.metro || '').replace(/^Метро\s+|^М\s+/, '');
+                const metroName = normalizeMetroName(item.metro);
                 return `
                 <div class="apartment-card surface-panel shadow-2xl ${index === currentActiveIndex ? 'active-card' : ''}" id="card-${item.id}" onclick="selectCard(${index}, true)">
                     <!-- Horizontal Compact Card -->
                     <div class="flex p-2.5 gap-3 items-center">
-                        <!-- Left Thumbnail (105px x 105px) -->
+                        <!-- Left Thumbnail (105px x 105px) with tap zones and swiping -->
                         <div class="relative w-[105px] h-[105px] rounded-xl overflow-hidden bg-dark-950 shrink-0">
                             <img id="photo-img-${item.id}" src="${item.images[curPhoto]}" class="w-full h-full object-cover select-none pointer-events-none" alt="${item.title}">
                             
+                            <!-- Tap zones (left 50% = prev, right 50% = next) -->
+                            <div class="absolute inset-y-0 left-0 w-1/2 z-10 cursor-pointer" onclick="changePhoto(event, ${item.id}, -1)"></div>
+                            <div class="absolute inset-y-0 right-0 w-1/2 z-10 cursor-pointer" onclick="changePhoto(event, ${item.id}, 1)"></div>
+
                             <!-- Left / Right Photo Arrows -->
-                            <button onclick="changePhoto(event, ${item.id}, -1)" class="absolute left-1 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center text-[10px] font-bold z-20">‹</button>
-                            <button onclick="changePhoto(event, ${item.id}, 1)" class="absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center text-[10px] font-bold z-20">›</button>
+                            <button onclick="changePhoto(event, ${item.id}, -1)" class="absolute left-1 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-black/70 hover:bg-black text-white flex items-center justify-center text-[10px] font-bold z-20 pointer-events-auto">‹</button>
+                            <button onclick="changePhoto(event, ${item.id}, 1)" class="absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-black/70 hover:bg-black text-white flex items-center justify-center text-[10px] font-bold z-20 pointer-events-auto">›</button>
 
                             <!-- Photo count -->
-                            <div class="absolute bottom-1 right-1 bg-black/70 px-1 py-0.2 rounded text-[9px] text-white font-mono z-10">
+                            <div class="absolute bottom-1 right-1 bg-black/75 px-1.5 py-0.5 rounded text-[9px] text-white font-mono z-20 pointer-events-none">
                                 <span id="photo-count-${item.id}">${curPhoto + 1}/${item.images.length}</span>
                             </div>
                         </div>
@@ -775,22 +784,23 @@
                                 <div class="text-base font-black text-white whitespace-nowrap">
                                     ${item.price.toLocaleString('uk-UA')} ₴<span class="text-[10px] text-slate-400 font-normal">/міс</span>
                                 </div>
-                                <div class="text-[10px] font-semibold text-emerald-400 whitespace-nowrap">
+                                <div class="text-[10px] font-bold text-emerald-400 whitespace-nowrap">
                                     0% комісії
                                 </div>
                             </div>
 
-                            <!-- Line 2: Metro and Specs -->
-                            <div class="text-[11px] text-slate-300 font-medium truncate">
-                                <span class="text-white font-bold">Метро ${metroName}</span> · ${item.walkMin} хв · ${item.area} м²
+                            <!-- Line 2: Metro and Specs (Balanced in one clean row) -->
+                            <div class="flex items-center justify-between text-[11px] text-slate-300 font-medium">
+                                <span class="truncate pr-1"><span class="text-white font-bold">Ⓜ️ ${metroName}</span> · ${item.walkMin} хв</span>
+                                <span class="shrink-0 text-slate-400 font-bold">${item.area} м²</span>
                             </div>
 
-                            <!-- Line 3: Tags -->
+                            <!-- Line 3: Blackout & Property Badges (Apple Monochrome) -->
                             <div class="flex items-center gap-1 overflow-hidden">
-                                ${item.generator ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-white text-[9px] font-medium whitespace-nowrap">Генератор</span>' : ''}
-                                ${item.gpon ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-white text-[9px] font-medium whitespace-nowrap">GPON</span>' : ''}
-                                ${item.gas ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300 text-[9px] font-medium whitespace-nowrap">Газ</span>' : ''}
-                                ${item.pets ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300 text-[9px] font-medium whitespace-nowrap">Тварини</span>' : ''}
+                                ${item.generator ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-white text-[9px] font-semibold whitespace-nowrap border border-white/5">Генератор</span>' : ''}
+                                ${item.gpon ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-white text-[9px] font-semibold whitespace-nowrap border border-white/5">GPON</span>' : ''}
+                                ${item.gas ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300 text-[9px] font-medium whitespace-nowrap border border-white/5">Газ</span>' : ''}
+                                ${item.pets ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300 text-[9px] font-medium whitespace-nowrap border border-white/5">Тварини</span>' : ''}
                             </div>
 
                             <!-- Line 4: Distance & CTA Button -->
@@ -900,25 +910,68 @@
             updateUI();
         }
 
-        // DETAIL SHEET MODAL
+        // DETAIL SHEET MODAL WITH INTERACTIVE GALLERY
+        let modalPhotoIdx = 0;
+        let activeDetailItem = null;
+
+        function changeModalPhoto(delta) {
+            triggerHaptic('light');
+            if (!activeDetailItem || !activeDetailItem.images || activeDetailItem.images.length <= 1) return;
+            modalPhotoIdx = (modalPhotoIdx + delta + activeDetailItem.images.length) % activeDetailItem.images.length;
+            const imgEl = document.getElementById('modalMainPhoto');
+            const countEl = document.getElementById('modalPhotoCounter');
+            const barsEl = document.getElementById('modalPhotoBars');
+            if (imgEl) imgEl.src = activeDetailItem.images[modalPhotoIdx];
+            if (countEl) countEl.innerText = `${modalPhotoIdx + 1} з ${activeDetailItem.images.length}`;
+            if (barsEl) {
+                barsEl.innerHTML = activeDetailItem.images.map((_, i) => `
+                    <span class="h-1 rounded-full transition-all ${i === modalPhotoIdx ? 'w-5 bg-white' : 'w-1.5 bg-white/40'}"></span>
+                `).join('');
+            }
+        }
+
         function openDetail(id) {
             triggerHaptic('medium');
             const item = LISTINGS.find(x => x.id === id);
             if (!item) return;
 
+            activeDetailItem = item;
+            modalPhotoIdx = 0;
+
             const modal = document.getElementById('detailModal');
             const content = document.getElementById('detailSheetContent');
-            const metroName = (item.metro || '').replace(/^Метро\s+|^М\s+/, '');
+            const metroName = normalizeMetroName(item.metro);
+            const images = item.images && item.images.length > 0 ? item.images : [''];
 
             content.innerHTML = `
                 <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-3"></div>
                 
-                <!-- Photos with Counter -->
+                <!-- Photos with Full Interactive Carousel & Tap Zones -->
                 <div class="relative w-full aspect-[16/10] rounded-2xl overflow-hidden bg-dark-950">
-                    <img src="${item.images[0]}" class="w-full h-full object-cover">
-                    <div class="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-md text-[10px] font-bold text-white flex items-center gap-1">
+                    <img id="modalMainPhoto" src="${images[0]}" class="w-full h-full object-cover select-none pointer-events-none" alt="${item.title}">
+                    
+                    <!-- Tap Zones (left 50% = prev, right 50% = next) -->
+                    <div class="absolute inset-y-0 left-0 w-1/2 z-10 cursor-pointer" onclick="changeModalPhoto(-1)"></div>
+                    <div class="absolute inset-y-0 right-0 w-1/2 z-10 cursor-pointer" onclick="changeModalPhoto(1)"></div>
+
+                    <!-- Direct Owner Tag -->
+                    <div class="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-md text-[10px] font-bold text-white flex items-center gap-1 z-20 pointer-events-none">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                         <span>Прямий власник · 0% комісії</span>
+                    </div>
+
+                    <!-- Nav Arrows (if > 1 photo) -->
+                    ${images.length > 1 ? `
+                        <button onclick="changeModalPhoto(-1)" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/70 hover:bg-black text-white flex items-center justify-center text-sm font-bold z-20 active:scale-95 transition-all">‹</button>
+                        <button onclick="changeModalPhoto(1)" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/70 hover:bg-black text-white flex items-center justify-center text-sm font-bold z-20 active:scale-95 transition-all">›</button>
+                    ` : ''}
+
+                    <!-- Bottom Indicator: Bars + Counter -->
+                    <div class="absolute bottom-2.5 inset-x-3 flex items-center justify-between z-20 pointer-events-none">
+                        <div id="modalPhotoBars" class="flex items-center gap-1">
+                            ${images.map((_, i) => `<span class="h-1 rounded-full transition-all ${i === 0 ? 'w-5 bg-white' : 'w-1.5 bg-white/40'}"></span>`).join('')}
+                        </div>
+                        <span id="modalPhotoCounter" class="px-2 py-0.5 rounded-md bg-black/75 text-[10px] font-mono text-white font-bold">1 з ${images.length}</span>
                     </div>
                 </div>
 
@@ -931,30 +984,36 @@
                     <button onclick="closeDetail()" class="p-2 rounded-xl bg-dark-850 text-slate-400 hover:text-white font-bold text-xs">✕</button>
                 </div>
 
-                <!-- Location & Metro in One Row -->
-                <div class="p-3 rounded-xl bg-dark-850 border border-white/5 space-y-1.5">
+                <!-- Location, Metro & Detailed Specs -->
+                <div class="p-3.5 rounded-xl bg-dark-850 border border-white/5 space-y-2">
                     <div class="text-xs text-white font-bold flex items-center justify-between">
-                        <span>Метро ${metroName} · ${item.walkMin} хв пішки · ${item.district}</span>
+                        <span>Ⓜ️ ${metroName} · ${item.walkMin} хв пішки · ${item.district}</span>
                         ${item.distanceKm !== undefined ? `
                             <span class="px-2 py-0.5 rounded-md bg-brand-blue/15 text-brand-blue text-[10px] font-bold border border-brand-blue/30">
                                 📍 ${formatDistance(item.distanceKm)} від вас
                             </span>
                         ` : ''}
                     </div>
-                    <div class="text-[11px] text-slate-400">${item.address} · ${item.area} м² · ${item.floor}/${item.totalFloors} поверх</div>
+                    <div class="text-[11px] text-slate-300 flex items-center gap-2 flex-wrap pt-0.5">
+                        <span>📍 ${item.address}</span>
+                        <span class="text-slate-600">·</span>
+                        <span>📐 <b>${item.area} м²</b></span>
+                        <span class="text-slate-600">·</span>
+                        <span>🏢 <b>Поверх:</b> ${item.floor} з ${item.totalFloors}</span>
+                    </div>
                 </div>
 
                 <!-- Blackout / Winter Readiness -->
                 <div class="p-3.5 rounded-xl bg-dark-850 border border-white/5 space-y-2">
                     <div class="text-xs font-bold text-slate-300">Автономність житла:</div>
                     <div class="flex flex-wrap gap-2 text-xs">
-                        <span class="px-2.5 py-1 rounded-lg ${item.gpon ? 'bg-white/10 text-white font-medium' : 'bg-dark-900 text-slate-500'}">
+                        <span class="px-2.5 py-1 rounded-lg ${item.gpon ? 'bg-white/10 text-white font-medium border border-white/5' : 'bg-dark-900 text-slate-500'}">
                             ${item.gpon ? 'GPON інтернет працює без світла' : 'Без GPON'}
                         </span>
-                        <span class="px-2.5 py-1 rounded-lg ${item.generator ? 'bg-white/10 text-white font-medium' : 'bg-dark-900 text-slate-500'}">
+                        <span class="px-2.5 py-1 rounded-lg ${item.generator ? 'bg-white/10 text-white font-medium border border-white/5' : 'bg-dark-900 text-slate-500'}">
                             ${item.generator ? 'Генератор у ЖК на ліфти та воду' : 'Без генератора'}
                         </span>
-                        <span class="px-2.5 py-1 rounded-lg ${item.gas ? 'bg-white/10 text-white font-medium' : 'bg-dark-900 text-slate-500'}">
+                        <span class="px-2.5 py-1 rounded-lg ${item.gas ? 'bg-white/10 text-white font-medium border border-white/5' : 'bg-dark-900 text-slate-500'}">
                             ${item.gas ? 'Газ (гаряча вода/плита)' : 'Електроплита'}
                         </span>
                     </div>
@@ -1039,6 +1098,30 @@
                 console.log('Error loading deals:', e);
             }
             updateUI();
+
+            // Handle Deep Link (?deal=X or #deal_X or startapp=deal_X)
+            const hash = window.location.hash || '';
+            const params = new URLSearchParams(window.location.search);
+            const tgStartApp = window.Telegram?.WebApp?.initDataUnsafe?.start_param || '';
+            
+            let targetDealId = null;
+            if (hash.startsWith('#deal_')) {
+                targetDealId = parseInt(hash.replace('#deal_', ''));
+            } else if (params.has('deal')) {
+                targetDealId = parseInt(params.get('deal'));
+            } else if (tgStartApp.startsWith('deal_')) {
+                targetDealId = parseInt(tgStartApp.replace('deal_', ''));
+            }
+
+            if (targetDealId) {
+                const targetIdx = LISTINGS.findIndex(x => x.id === targetDealId);
+                if (targetIdx !== -1) {
+                    setTimeout(() => {
+                        selectCard(targetIdx, true);
+                        openDetail(targetDealId);
+                    }, 400);
+                }
+            }
         }
 
         loadLiveDeals();
