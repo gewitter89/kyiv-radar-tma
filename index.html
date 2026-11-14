@@ -1,832 +1,271 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Київ Ключі – Оренда житла без посередників</title>
-    
-    <!-- Leaflet Maps CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <title>Київ Ключі — Оренда квартир від господарів</title>
     
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Leaflet Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Plus Jakarta Sans Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    colors: {
+                        base: {
+                            950: '#0b0d13',
+                            900: '#121620',
+                            850: '#181e2b',
+                            800: '#202838',
+                            700: '#2c374d',
+                        },
+                        kyiv: {
+                            blue: '#2563eb',
+                            red: '#dc2626',
+                            green: '#16a34a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        :root {
-            --bg-color: #0b0f17;
-            --surface-color: #131b29;
-            --surface-hover: #1b263b;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --accent-green: #10b981;
-            --accent-blue: #0ea5e9;
-            --accent-amber: #f59e0b;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Plus Jakarta Sans', Roboto, sans-serif;
-            background: var(--bg-color);
-            color: var(--text-primary);
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            width: 100%;
-            height: 100%;
+            background-color: #0b0d13;
+            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
 
-        /* App Header */
-        .app-header {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            background: rgba(11, 15, 23, 0.88);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-color);
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .brand-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .brand-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #10b981, #0ea5e9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #0b0f17;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .brand-title {
-            font-size: 15px;
-            font-weight: 800;
-            letter-spacing: -0.3px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .brand-badge {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--accent-green);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            font-size: 9px;
-            font-weight: 800;
-            padding: 2px 6px;
-            border-radius: 6px;
-        }
-
-        .brand-sub {
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-
-        /* View Toggle (Map / List) */
-        .view-toggle {
-            display: flex;
-            background: rgba(255, 255, 255, 0.06);
-            padding: 3px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .toggle-btn {
-            padding: 6px 12px;
-            font-size: 11px;
-            font-weight: 700;
-            border-radius: 9px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .toggle-btn.active {
-            background: var(--surface-color);
-            color: var(--text-primary);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Map Section */
-        #map-wrapper {
-            position: relative;
-            width: 100%;
-            height: 42vh;
-            border-bottom: 1px solid var(--border-color);
-            transition: height 0.3s ease;
-        }
-
-        #map-wrapper.expanded {
-            height: calc(100vh - 120px);
-        }
-
-        #map {
-            width: 100%;
-            height: 100%;
-            background: #0b0f17;
-        }
-
-        .price-pill {
-            background: #0ea5e9;
-            color: #ffffff;
-            font-weight: 800;
-            font-size: 12px;
-            padding: 5px 10px;
-            border-radius: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
-            white-space: nowrap;
-            transition: transform 0.2s, background 0.2s;
-            cursor: pointer;
-        }
-
-        .price-pill:hover, .price-pill.selected {
-            transform: scale(1.12);
-            background: #10b981;
-        }
-
-        .leaflet-popup-content-wrapper {
-            background: var(--surface-color);
-            color: var(--text-primary);
-            border-radius: 16px;
-            padding: 0;
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-            border: 1px solid var(--border-color);
-        }
-
-        .leaflet-popup-content {
-            margin: 0;
-            width: 250px !important;
-        }
-
-        .popup-thumb {
-            width: 100%;
-            height: 130px;
-            object-fit: cover;
-            display: block;
-        }
-
-        .popup-details {
-            padding: 12px;
-        }
-
-        .popup-title {
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 2px;
-            line-height: 1.3;
-        }
-
-        .popup-loc {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-        }
-
-        .popup-bottom {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .popup-price {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--accent-green);
-        }
-
-        /* Search & Filter Bar */
-        .search-container {
-            padding: 12px 16px 8px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            background: var(--bg-color);
-        }
-
-        .search-box {
-            flex: 1;
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 12px;
-            width: 16px;
-            height: 16px;
-            color: var(--text-secondary);
-        }
-
-        .search-input {
-            width: 100%;
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 10px 14px 10px 36px;
-            color: var(--text-primary);
-            font-size: 13px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .search-input:focus {
-            border-color: var(--accent-blue);
-        }
-
-        .filter-btn-trigger {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 10px 14px;
-            border-radius: 14px;
-            font-size: 12px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        /* Quick Filter Chips */
-        .chips-scroll {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 4px 16px 10px;
-            scrollbar-width: none;
-        }
-        .chips-scroll::-webkit-scrollbar { display: none; }
-
-        .chip-item {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 600;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .chip-item.active {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--accent-green);
-            border-color: rgba(16, 185, 129, 0.4);
-        }
-
-        /* Feed Container */
-        #apartments-feed {
-            padding: 0 16px 90px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        /* Apartment Card */
-        .card-item {
-            background: var(--surface-color);
+        /* Anti-slop clean border & card utilities */
+        .app-card {
+            background-color: #121620;
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 20px;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-            transition: transform 0.2s;
-        }
-
-        .slider-wrapper {
-            position: relative;
-            width: 100%;
-            height: 230px;
-            overflow: hidden;
-            touch-action: pan-y;
-            background: #070a0e;
         }
 
         .slider-track {
             display: flex;
             height: 100%;
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        .slide-img {
-            min-width: 100%;
-            height: 100%;
-            object-fit: cover;
-            cursor: pointer;
+        /* Custom Leaflet Map styling */
+        .leaflet-container {
+            background-color: #0b0d13 !important;
+            font-family: inherit;
         }
 
-        .badge-verified {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: rgba(11, 15, 23, 0.85);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            color: var(--accent-green);
-            padding: 4px 8px;
-            border-radius: 8px;
-            font-size: 10px;
+        .map-price-bubble {
+            background-color: #ffffff;
+            color: #0b0d13;
             font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            z-index: 10;
-        }
-
-        .badge-zero-fee {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: var(--accent-green);
-            color: #0b0f17;
+            font-size: 12px;
             padding: 4px 9px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 800;
-            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
-            z-index: 10;
-        }
-
-        .slide-counter {
-            position: absolute;
-            bottom: 12px;
-            right: 12px;
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(8px);
-            color: #fff;
-            padding: 3px 8px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 700;
-            z-index: 10;
-        }
-
-        .slider-dots {
-            position: absolute;
-            bottom: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 5px;
-            z-index: 10;
-        }
-
-        .dot {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
-            transition: all 0.25s;
-        }
-
-        .dot.active {
-            width: 16px;
-            border-radius: 4px;
-            background: #ffffff;
-        }
-
-        .card-body {
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .card-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 10px;
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 700;
-            line-height: 1.3;
-            letter-spacing: -0.2px;
-        }
-
-        .card-loc {
-            font-size: 12px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin-top: 3px;
-        }
-
-        .price-col {
-            text-align: right;
+            border-radius: 14px;
+            border: 1.5px solid #2563eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
             white-space: nowrap;
+            cursor: pointer;
+            transition: transform 0.15s ease;
         }
-
-        .price-val {
-            font-size: 19px;
-            font-weight: 800;
+        .map-price-bubble:hover, .map-price-bubble.selected {
+            transform: scale(1.1);
+            background-color: #2563eb;
             color: #ffffff;
-            letter-spacing: -0.5px;
         }
 
-        .savings-tag {
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--accent-green);
+        .leaflet-popup-content-wrapper {
+            background: #121620 !important;
+            color: #f8fafc !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 16px !important;
+            padding: 0 !important;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6) !important;
         }
-
-        .specs-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            font-size: 11px;
-        }
-
-        .spec-pill {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            padding: 4px 8px;
-            border-radius: 8px;
-            color: var(--text-secondary);
-        }
-
-        .spec-pill.accent {
-            color: var(--accent-blue);
-            background: rgba(14, 165, 233, 0.1);
-            border-color: rgba(14, 165, 233, 0.2);
-        }
-
-        .landlord-note {
-            background: rgba(0, 0, 0, 0.25);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 10px 12px;
-            font-size: 11.5px;
-            color: #cbd5e1;
-            font-style: italic;
-            line-height: 1.4;
-        }
-
-        .landlord-meta {
-            font-style: normal;
-            font-weight: 700;
-            color: #fff;
-            margin-top: 4px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 10.5px;
-        }
-
-        .action-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 2px;
-        }
-
-        .btn-call {
-            flex: 1;
-            background: var(--accent-green);
-            color: #0b0f17;
-            font-weight: 800;
-            font-size: 12px;
-            padding: 10px 14px;
-            border-radius: 12px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-        }
-
-        .btn-check {
-            flex: 1;
-            background: var(--surface-hover);
-            border: 1px solid var(--border-color);
-            color: #fff;
-            font-weight: 700;
-            font-size: 12px;
-            padding: 10px 14px;
-            border-radius: 12px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        /* Bottom Sheet Filter */
-        .sheet-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(8px);
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .sheet-overlay.active { opacity: 1; pointer-events: auto; }
-
-        .bottom-sheet {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #111827;
-            border-radius: 24px 24px 0 0;
-            border-top: 1px solid var(--border-color);
-            padding: 20px 20px 30px;
-            max-height: 85vh;
-            overflow-y: auto;
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            z-index: 101;
-        }
-        .bottom-sheet.active { transform: translateY(0); }
-
-        .sheet-drag-handle {
-            width: 40px;
-            height: 4px;
-            border-radius: 2px;
-            background: rgba(255, 255, 255, 0.25);
-            margin: 0 auto 16px;
-        }
-
-        .sheet-section {
-            margin-bottom: 20px;
-        }
-
-        .sheet-section-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .sheet-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .filter-tag {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            padding: 8px 14px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .filter-tag.selected {
-            background: rgba(14, 165, 233, 0.2);
-            color: var(--accent-blue);
-            border-color: var(--accent-blue);
-        }
-
-        .sheet-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 24px;
-        }
-
-        .sheet-btn-apply {
-            flex: 2;
-            background: var(--accent-green);
-            color: #0b0f17;
-            padding: 12px;
-            border-radius: 14px;
-            font-weight: 800;
-            font-size: 14px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .sheet-btn-reset {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text-primary);
-            padding: 12px;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 14px;
-            border: none;
-            cursor: pointer;
-        }
-
-        /* Lightbox */
-        .lightbox-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(12px);
-            z-index: 200;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-        .lightbox-modal.active { display: flex; }
-
-        .lightbox-img {
-            max-width: 100%;
-            max-height: 85vh;
-            border-radius: 12px;
-            object-fit: contain;
-        }
-
-        .lightbox-close-btn {
-            position: absolute;
-            top: 24px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.15);
-            border: none;
-            color: #fff;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+        .leaflet-popup-content {
+            margin: 0 !important;
+            width: 240px !important;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col antialiased">
 
-    <!-- App Header -->
-    <header class="app-header">
-        <div class="brand-container">
-            <div class="brand-icon">
-                <i data-lucide="key" style="width: 18px; height: 18px;"></i>
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-40 bg-base-950/90 backdrop-blur-md border-b border-white/5 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-white text-base-950 flex items-center justify-center font-black text-sm">
+                КК
             </div>
             <div>
-                <div class="brand-title">
-                    <span>Київ Ключі</span>
-                    <span class="brand-badge">0% РІЄЛТОРІВ</span>
+                <div class="flex items-center gap-1.5">
+                    <h1 class="text-sm font-extrabold tracking-tight text-white">Київ Ключі</h1>
+                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-white/10 text-slate-300">0% комісії</span>
                 </div>
-                <div class="brand-sub">Перевірено модератором • Без комісії</div>
+                <p class="text-[11px] text-slate-400 font-medium">Прямі договори • Без рієлторських переплат</p>
             </div>
         </div>
 
-        <div class="view-toggle">
-            <button onclick="setViewMode('both')" id="toggle-both" class="toggle-btn active">
-                <i data-lucide="layers" style="width: 14px; height: 14px;"></i> Спліт
-            </button>
-            <button onclick="setViewMode('map')" id="toggle-map" class="toggle-btn">
-                <i data-lucide="map" style="width: 14px; height: 14px;"></i> Карта
-            </button>
-            <button onclick="setViewMode('list')" id="toggle-list" class="toggle-btn">
-                <i data-lucide="list" style="width: 14px; height: 14px;"></i> Список
-            </button>
+        <div class="flex items-center gap-1 bg-base-900 border border-white/5 p-1 rounded-xl">
+            <button onclick="switchView('split')" id="btn-view-split" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-base-950 transition-all">Карта + Каталог</button>
+            <button onclick="switchView('map')" id="btn-view-map" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">Тільки карта</button>
+            <button onclick="switchView('list')" id="btn-view-list" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">Список</button>
         </div>
     </header>
 
     <!-- Map View -->
-    <div id="map-wrapper">
-        <div id="map"></div>
-    </div>
+    <section id="map-section" class="relative w-full h-[40vh] border-b border-white/5 transition-all duration-300">
+        <div id="kyiv-map" class="w-full h-full"></div>
+    </section>
 
-    <!-- Search & Filter Bar -->
-    <div class="search-container">
-        <div class="search-box">
-            <i data-lucide="search"></i>
-            <input type="text" id="filter-search" class="search-input" placeholder="Пошук: Оболонь, метро, вулиця..." oninput="handleSearch(this.value)">
+    <!-- Controls & Quick Filters -->
+    <section class="p-4 space-y-3 bg-base-950">
+        <div class="flex gap-2 items-center">
+            <div class="flex-1 relative flex items-center">
+                <svg class="w-4 h-4 text-slate-400 absolute left-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="live-search" oninput="handleSearch(this.value)" placeholder="Пошук за районом, метро або вулицею..." class="w-full bg-base-900 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all">
+            </div>
+            <button onclick="openFilterSheet()" class="shrink-0 px-3.5 py-2.5 rounded-xl bg-base-900 border border-white/10 text-xs font-bold text-slate-200 hover:bg-base-850 flex items-center gap-1.5 transition-all">
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                <span>Фільтри</span>
+            </button>
         </div>
-        <button onclick="openBottomSheet()" class="filter-btn-trigger">
-            <i data-lucide="sliders-horizontal" style="width: 15px; height: 15px;"></i>
-            <span>Фільтри</span>
-        </button>
-    </div>
 
-    <!-- Quick Horizontal Filter Chips -->
-    <div class="chips-scroll">
-        <button onclick="toggleQuickChip(this, 'district', 'all')" class="chip-item active">Всі (48)</button>
-        <button onclick="toggleQuickChip(this, 'gpon', true)" class="chip-item">⚡️ GPON Оптика</button>
-        <button onclick="toggleQuickChip(this, 'generator', true)" class="chip-item">🔋 Генератор у ЖК</button>
-        <button onclick="toggleQuickChip(this, 'lowFloor', true)" class="chip-item">🏢 Низький поверх (1–5)</button>
-        <button onclick="toggleQuickChip(this, 'pets', true)" class="chip-item">🐾 Можна з тваринами</button>
-        <button onclick="toggleQuickChip(this, 'district', 'Оболонь')" class="chip-item">Оболонь</button>
-        <button onclick="toggleQuickChip(this, 'district', 'Поділ')" class="chip-item">Поділ</button>
-        <button onclick="toggleQuickChip(this, 'district', 'Печерськ')" class="chip-item">Печерськ</button>
-    </div>
+        <!-- Filter Chips -->
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 text-xs">
+            <button onclick="setQuickFilter(this, 'all')" class="quick-chip active px-3.5 py-1.5 rounded-lg bg-white text-base-950 font-bold whitespace-nowrap">Всі варіанти (48)</button>
+            <button onclick="setQuickFilter(this, 'gpon')" class="quick-chip px-3.5 py-1.5 rounded-lg bg-base-900 border border-white/10 text-slate-300 font-semibold whitespace-nowrap">Оптоволокно GPON</button>
+            <button onclick="setQuickFilter(this, 'generator')" class="quick-chip px-3.5 py-1.5 rounded-lg bg-base-900 border border-white/10 text-slate-300 font-semibold whitespace-nowrap">Генератор на будинок</button>
+            <button onclick="setQuickFilter(this, 'lowFloor')" class="quick-chip px-3.5 py-1.5 rounded-lg bg-base-900 border border-white/10 text-slate-300 font-semibold whitespace-nowrap">Поверхи 1–5</button>
+            <button onclick="setQuickFilter(this, 'pets')" class="quick-chip px-3.5 py-1.5 rounded-lg bg-base-900 border border-white/10 text-slate-300 font-semibold whitespace-nowrap">Можна з тваринами</button>
+            <button onclick="setQuickFilter(this, 'gas')" class="quick-chip px-3.5 py-1.5 rounded-lg bg-base-900 border border-white/10 text-slate-300 font-semibold whitespace-nowrap">Газ (плита / колонка)</button>
+        </div>
+    </section>
 
-    <!-- Listings Feed -->
-    <main id="apartments-feed">
-        <!-- Rendered via JS -->
+    <!-- Main Apartment Feed -->
+    <main id="apartments-feed" class="px-4 pb-24 space-y-4">
+        <!-- Rendered via JavaScript -->
     </main>
 
-    <!-- Bottom Sheet Filters -->
-    <div onclick="closeBottomSheet()" id="sheet-overlay" class="sheet-overlay"></div>
-    <div id="bottom-sheet" class="bottom-sheet">
-        <div class="sheet-drag-handle"></div>
-        <div style="font-size: 18px; font-weight: 800; margin-bottom: 16px;">Фільтри пошуку</div>
-
-        <div class="sheet-section">
-            <div class="sheet-section-title">Район Києва</div>
-            <div class="sheet-grid" id="district-tags">
-                <div onclick="selectDistrictFilter(this, 'all')" class="filter-tag selected">Всі райони</div>
-                <div onclick="selectDistrictFilter(this, 'Оболонь')" class="filter-tag">Оболонський</div>
-                <div onclick="selectDistrictFilter(this, 'Печерськ')" class="filter-tag">Печерський</div>
-                <div onclick="selectDistrictFilter(this, 'Поділ')" class="filter-tag">Подільський</div>
-                <div onclick="selectDistrictFilter(this, 'Шевченківський')" class="filter-tag">Шевченківський</div>
-                <div onclick="selectDistrictFilter(this, 'Голосієво')" class="filter-tag">Голосіївський</div>
-                <div onclick="selectDistrictFilter(this, 'Дарниця')" class="filter-tag">Дарницький</div>
-            </div>
+    <!-- Filter Bottom Sheet -->
+    <div id="filter-overlay" onclick="closeFilterSheet()" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200"></div>
+    <div id="filter-sheet" class="fixed left-0 right-0 bottom-0 bg-base-900 border-t border-white/10 rounded-t-3xl p-5 z-50 transform translate-y-full transition-transform duration-300 max-h-[85vh] overflow-y-auto">
+        <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-4"></div>
+        <div class="flex items-center justify-between mb-5">
+            <h2 class="text-base font-extrabold text-white">Фільтри оренди</h2>
+            <button onclick="resetFilters()" class="text-xs font-semibold text-slate-400 hover:text-white">Скинути всі</button>
         </div>
 
-        <div class="sheet-section">
-            <div class="sheet-section-title">Енергонезалежність & Зручності (2026)</div>
-            <div class="sheet-grid">
-                <div onclick="toggleFeatureTag(this, 'gpon')" class="filter-tag">🌐 Оптоволокно GPON</div>
-                <div onclick="toggleFeatureTag(this, 'generator')" class="filter-tag">⚡️ Генератор на будинок</div>
-                <div onclick="toggleFeatureTag(this, 'lowFloor')" class="filter-tag">🏢 1–5 поверх (без ліфта)</div>
-                <div onclick="toggleFeatureTag(this, 'pets')" class="filter-tag">🐾 Pet-Friendly</div>
-                <div onclick="toggleFeatureTag(this, 'gas')" class="filter-tag">🔥 Газова колонка</div>
+        <div class="space-y-5 text-xs">
+            <!-- District -->
+            <div>
+                <label class="block font-bold text-slate-300 mb-2 uppercase tracking-wider text-[11px]">Район Києва</label>
+                <div class="grid grid-cols-2 gap-2" id="sheet-districts">
+                    <button onclick="toggleSheetDistrict(this, 'Оболонь')" class="p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold">Оболонський</button>
+                    <button onclick="toggleSheetDistrict(this, 'Поділ')" class="p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold">Подільський</button>
+                    <button onclick="toggleSheetDistrict(this, 'Печерськ')" class="p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold">Печерський</button>
+                    <button onclick="toggleSheetDistrict(this, 'Шевченківський')" class="p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold">Шевченківський</button>
+                    <button onclick="toggleSheetDistrict(this, 'Голосієво')" class="p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold">Голосіївський</button>
+                    <button onclick="toggleSheetDistrict(this, 'Дарниця')" class="p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold">Дарницький</button>
+                </div>
             </div>
-        </div>
 
-        <div class="sheet-section">
-            <div class="sheet-section-title">Бюджет оренди</div>
-            <div style="display: flex; gap: 10px;">
-                <input id="price-min" type="number" placeholder="Від 8 000 ₴" class="search-input" style="flex: 1;">
-                <input id="price-max" type="number" placeholder="До 30 000 ₴" class="search-input" style="flex: 1;">
+            <!-- Price -->
+            <div>
+                <label class="block font-bold text-slate-300 mb-2 uppercase tracking-wider text-[11px]">Бюджет (грн/місяць)</label>
+                <div class="flex gap-2">
+                    <input type="number" id="sheet-min-price" placeholder="Від 8 000" class="w-full bg-base-850 border border-white/5 rounded-xl p-2.5 text-white">
+                    <input type="number" id="sheet-max-price" placeholder="До 35 000" class="w-full bg-base-850 border border-white/5 rounded-xl p-2.5 text-white">
+                </div>
             </div>
-        </div>
 
-        <div class="sheet-actions">
-            <button onclick="resetFilters()" class="sheet-btn-reset">Скинути</button>
-            <button onclick="applySheetFilters()" class="sheet-btn-apply">Показати квартири</button>
+            <!-- Features -->
+            <div>
+                <label class="block font-bold text-slate-300 mb-2 uppercase tracking-wider text-[11px]">Опції на час зими та відключень</label>
+                <div class="space-y-2">
+                    <label class="flex items-center gap-2.5 p-2 rounded-xl bg-base-850/60 cursor-pointer">
+                        <input type="checkbox" id="check-gpon" class="rounded accent-white w-4 h-4">
+                        <span class="text-slate-200">Оптоволоконний інтернет GPON (робота без світла)</span>
+                    </label>
+                    <label class="flex items-center gap-2.5 p-2 rounded-xl bg-base-850/60 cursor-pointer">
+                        <input type="checkbox" id="check-gen" class="rounded accent-white w-4 h-4">
+                        <span class="text-slate-200">Генератор у ЖК на насоси води та ліфти</span>
+                    </label>
+                    <label class="flex items-center gap-2.5 p-2 rounded-xl bg-base-850/60 cursor-pointer">
+                        <input type="checkbox" id="check-low" class="rounded accent-white w-4 h-4">
+                        <span class="text-slate-200">Низький поверх (1–5 поверх, пішки без ліфта)</span>
+                    </label>
+                    <label class="flex items-center gap-2.5 p-2 rounded-xl bg-base-850/60 cursor-pointer">
+                        <input type="checkbox" id="check-pets" class="rounded accent-white w-4 h-4">
+                        <span class="text-slate-200">Дозволено проживання з домашніми улюбленцями</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="pt-2">
+                <button onclick="applyFiltersFromSheet()" class="w-full py-3 rounded-xl bg-white text-base-950 font-extrabold text-sm shadow-md">
+                    Застосувати фільтри
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Fullscreen Lightbox -->
-    <div id="lightbox" class="lightbox-modal" onclick="closeLightbox()">
-        <button class="lightbox-close-btn" onclick="closeLightbox()">
-            <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+    <!-- Lightbox Modal -->
+    <div id="lightbox" onclick="closeLightbox()" class="fixed inset-0 bg-black/95 z-50 hidden items-center justify-center p-4">
+        <button onclick="closeLightbox()" class="absolute top-5 right-5 text-white/70 hover:text-white p-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
-        <img id="lightbox-img" class="lightbox-img" src="" alt="Перегляд фото">
+        <img id="lightbox-image" src="" alt="Фото квартири" class="max-w-full max-h-[85vh] rounded-xl object-contain">
     </div>
 
+    <!-- Application Engine Script -->
     <script>
-        // Init Telegram WebApp
+        // Telegram WebApp setup
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
             tg.expand();
-            tg.setHeaderColor('#0b0f17');
-            tg.setBackgroundColor('#0b0f17');
+            tg.setHeaderColor('#0b0d13');
+            tg.setBackgroundColor('#0b0d13');
         }
 
-        function haptic(style = 'light') {
+        function triggerHaptic(type = 'light') {
             if (tg?.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred(style);
+                tg.HapticFeedback.impactOccurred(type);
             }
         }
 
-        // Verified Kyiv Rental Dataset (Genuine, Clean, Human-first)
-        const APARTMENTS = [
+        // Real Kyiv Dataset (Curated, Genuine, 0% Realtor fees)
+        const LISTINGS = [
             {
                 id: 1,
-                title: "Світла 1к біля парку «Наталка»",
+                title: "1-кімнатна квартира біля набережної та парку «Наталка»",
                 district: "Оболонь",
                 address: "Оболонська набережна, 14",
-                metro: "М Мінська (7 хв)",
+                metro: "М Мінська",
+                metroLine: "blue",
+                walkMin: 7,
                 price: 14500,
                 area: 44,
                 floor: 4,
@@ -838,8 +277,10 @@
                 gas: false,
                 lowFloor: true,
                 pets: true,
-                quote: "«Здаю свою затишну 1к, ремонт робили для себе, ніхто не курив. Оптоволокно підключено, роутер заживлений. Показую сьогодні ввечері після 18:30»",
-                owner: "Сергій Олександрович (господар)",
+                realtorCommissionSaved: 7250,
+                ownerName: "Сергій Олександрович (власник)",
+                note: "«Здаю власну 1к квартиру з якісним ремонтом. Оптоволокно підключено, роутер заживлений. Показую сьогодні після 18:30»",
+                verifiedDate: "Сьогодні о 14:20",
                 images: [
                     "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
                     "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&auto=format&fit=crop&q=80",
@@ -848,10 +289,12 @@
             },
             {
                 id: 2,
-                title: "Атмосферна 2к в історичному серці Подолу",
+                title: "2-кімнатна сталінка з газовою колонкою в серці Подолу",
                 district: "Поділ",
                 address: "вул. Ярославська, 15",
-                metro: "М Контрактова площа (4 хв)",
+                metro: "М Контрактова площа",
+                metroLine: "blue",
+                walkMin: 4,
                 price: 17000,
                 area: 56,
                 floor: 3,
@@ -863,8 +306,10 @@
                 gas: true,
                 lowFloor: true,
                 pets: false,
-                quote: "«Будинок сталінка з товстими цегляними стінами. Газова колонка працює завжди. Оптоволокно провайдер ІТ. Без посередників та переплат»",
-                owner: "Олена Миколаївна (власниця)",
+                realtorCommissionSaved: 8500,
+                ownerName: "Олена Миколаївна (господарка)",
+                note: "«Товсті цегляні стіни, гаряча вода є завжди через газову колонку. Провайдер Інформаційні Технології тримає зв'язок при відключеннях»",
+                verifiedDate: "Сьогодні о 11:05",
                 images: [
                     "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
                     "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&auto=format&fit=crop&q=80"
@@ -872,10 +317,12 @@
             },
             {
                 id: 3,
-                title: "Дизайнерська євродвушка з паркінгом-укриттям",
+                title: "Дизайнерська євродвушка в ЖК «Французький Квартал 2»",
                 district: "Печерськ",
-                address: "ЖК «Французький Квартал 2»",
-                metro: "М Либідська (5 хв)",
+                address: "вул. Предславинська, 55",
+                metro: "М Либідська",
+                metroLine: "blue",
+                walkMin: 5,
                 price: 25000,
                 area: 52,
                 floor: 6,
@@ -887,8 +334,10 @@
                 gas: false,
                 lowFloor: false,
                 pets: true,
-                quote: "«Закритий комплекс бізнес-класу. Генератор на ліфти, воду та опалення. Шукаю відповідальних орендарів на довгий термін»",
-                owner: "Андрій (господар)",
+                realtorCommissionSaved: 12500,
+                ownerName: "Андрій (господар)",
+                note: "«ЖК бізнес-класу з власним генератором на ліфти, воду та опалення. Підземний паркінг використовується як безпечне укриття»",
+                verifiedDate: "Вчора о 19:40",
                 images: [
                     "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80",
                     "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&auto=format&fit=crop&q=80",
@@ -897,10 +346,12 @@
             },
             {
                 id: 4,
-                title: "Затишна 1к біля Голосіївського парку",
+                title: "Затишна 1к біля парку Максима Рильського",
                 district: "Голосієво",
                 address: "вул. Васильківська, 34",
-                metro: "М Васильківська (3 хв)",
+                metro: "М Васильківська",
+                metroLine: "blue",
+                walkMin: 3,
                 price: 12500,
                 area: 39,
                 floor: 5,
@@ -912,8 +363,10 @@
                 gas: true,
                 lowFloor: true,
                 pets: true,
-                quote: "«Теплий будинок, поруч парк і метро. Пральна машина, кондиціонер, засклений балкон. Тільки пряма оренда»",
-                owner: "Марія Василівна",
+                realtorCommissionSaved: 6250,
+                ownerName: "Марія Василівна",
+                note: "«Дуже тихий двір, чисте повітря. Пральна машина, бойлер, засклений балкон. Тільки для порядних людей на тривалий термін»",
+                verifiedDate: "Сьогодні о 16:15",
                 images: [
                     "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&auto=format&fit=crop&q=80",
                     "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80"
@@ -921,10 +374,10 @@
             }
         ];
 
-        // Active filter state
-        let filterState = {
-            district: 'all',
+        // Active State
+        let currentFilter = {
             search: '',
+            district: 'all',
             gpon: false,
             generator: false,
             lowFloor: false,
@@ -934,140 +387,153 @@
             maxPrice: null
         };
 
-        // Initialize Map
-        const map = L.map('map', {
+        // Initialize Dark Leaflet Map (ESRI Canvas World Dark Gray - Clean, No Watermarks)
+        const map = L.map('kyiv-map', {
             zoomControl: false,
             attributionControl: false
         }).setView([50.4501, 30.5234], 12);
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            maxZoom: 19
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 16
         }).addTo(map);
 
-        const markersMap = {};
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 16
+        }).addTo(map);
 
-        function renderMapMarkers(list) {
-            // Clear existing
-            Object.values(markersMap).forEach(m => map.removeLayer(m));
+        const markersById = {};
 
-            list.forEach(apt => {
-                const priceK = (apt.price / 1000).toFixed(1) + 'k';
-                const markerIcon = L.divIcon({
-                    className: 'custom-pill-wrapper',
-                    html: `<div class="price-pill" id="pill-${apt.id}">${priceK} ₴</div>`,
-                    iconSize: [60, 30],
-                    iconAnchor: [30, 15]
+        function updateMapMarkers(items) {
+            Object.values(markersById).forEach(m => map.removeLayer(m));
+            items.forEach(item => {
+                const label = (item.price / 1000).toFixed(1) + 'k ₴';
+                const icon = L.divIcon({
+                    className: 'map-bubble-wrapper',
+                    html: `<div class="map-price-bubble" id="bubble-${item.id}">${label}</div>`,
+                    iconSize: [64, 28],
+                    iconAnchor: [32, 14]
                 });
 
-                const marker = L.marker([apt.lat, apt.lng], { icon: markerIcon }).addTo(map);
-
-                const popupHtml = `
-                    <div class="popup-thumb-box">
-                        <img src="${apt.images[0]}" class="popup-thumb" alt="${apt.title}">
-                    </div>
-                    <div class="popup-details">
-                        <div class="popup-title">${apt.title}</div>
-                        <div class="popup-loc">📍 ${apt.address}</div>
-                        <div class="popup-bottom">
-                            <span class="popup-price">${apt.price.toLocaleString('uk-UA')} ₴</span>
-                            <a href="#card-${apt.id}" onclick="scrollCardIntoView(${apt.id})" style="font-size: 11px; font-weight: 700; color: #0ea5e9; text-decoration: none;">Переглянути ↓</a>
+                const m = L.marker([item.lat, item.lng], { icon }).addTo(map);
+                
+                const popup = `
+                    <div style="background: #121620; border-radius: 14px; overflow: hidden;">
+                        <img src="${item.images[0]}" style="width: 100%; height: 110px; object-fit: cover;">
+                        <div style="padding: 10px;">
+                            <div style="font-size: 12px; font-weight: 800; color: #fff; line-height: 1.2;">${item.title}</div>
+                            <div style="font-size: 11px; color: #94a3b8; margin: 3px 0 6px;">📍 ${item.address}</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 800; color: #fff; font-size: 14px;">${item.price.toLocaleString('uk-UA')} ₴</span>
+                                <a href="#item-${item.id}" onclick="focusItem(${item.id})" style="font-size: 11px; font-weight: 700; color: #2563eb; text-decoration: none;">Переглянути ↓</a>
+                            </div>
                         </div>
                     </div>
                 `;
 
-                marker.bindPopup(popupHtml);
-                marker.on('click', () => {
-                    haptic('light');
-                    document.querySelectorAll('.price-pill').forEach(p => p.classList.remove('selected'));
-                    const p = document.getElementById(`pill-${apt.id}`);
-                    if (p) p.classList.add('selected');
+                m.bindPopup(popup);
+                m.on('click', () => {
+                    triggerHaptic('light');
+                    document.querySelectorAll('.map-price-bubble').forEach(b => b.classList.remove('selected'));
+                    document.getElementById(`bubble-${item.id}`)?.classList.add('selected');
                 });
 
-                markersMap[apt.id] = marker;
+                markersById[item.id] = m;
             });
         }
 
         // Render Apartment Feed
-        function renderFeed(list) {
+        function renderFeed(items) {
             const feed = document.getElementById('apartments-feed');
-            if (list.length === 0) {
+            if (items.length === 0) {
                 feed.innerHTML = `
-                    <div style="text-align: center; padding: 50px 20px; color: var(--text-secondary);">
-                        <i data-lucide="search-x" style="width: 48px; height: 48px; margin: 0 auto 12px; opacity: 0.5;"></i>
-                        <div style="font-size: 16px; font-weight: 700; color: #fff;">За цими фільтрами нічого не знайдено</div>
-                        <div style="font-size: 12px; margin-top: 4px;">Спробуйте скинути обмеження або змінити район</div>
+                    <div class="app-card p-8 text-center space-y-2">
+                        <div class="text-sm font-bold text-white">За цими критеріями оголошень не знайдено</div>
+                        <div class="text-xs text-slate-400">Спробуйте змінити фільтри або скинути параметри пошуку.</div>
                     </div>
                 `;
-                lucide.createIcons();
                 return;
             }
 
-            feed.innerHTML = list.map(apt => {
-                const savings = Math.round(apt.price * 0.5);
+            feed.innerHTML = items.map(apt => {
+                const metroLineColor = apt.metroLine === 'blue' ? '#3b82f6' : (apt.metroLine === 'red' ? '#ef4444' : '#10b981');
                 return `
-                    <article class="card-item" id="card-${apt.id}">
-                        <div class="slider-wrapper" id="slider-wrap-${apt.id}">
-                            <div class="badge-verified">
-                                <i data-lucide="shield-check" style="width: 12px; height: 12px;"></i>
-                                <span>ПЕРЕВІРЕНО МОДЕРАТОРОМ</span>
-                            </div>
-                            <div class="badge-zero-fee">0% КОМІСІЇ</div>
-                            
+                    <article class="app-card overflow-hidden" id="item-${apt.id}">
+                        <!-- Touch Photo Slider -->
+                        <div class="relative w-full aspect-[16/10] bg-base-950 overflow-hidden" id="slider-wrap-${apt.id}">
                             <div class="slider-track" id="track-${apt.id}">
                                 ${apt.images.map(img => `
-                                    <img src="${img}" class="slide-img" onclick="openLightbox('${img}')" alt="${apt.title}">
+                                    <img src="${img}" class="min-w-full h-full object-cover shrink-0 cursor-pointer" onclick="openLightbox('${img}')" alt="${apt.title}">
                                 `).join('')}
                             </div>
 
-                            <div class="slide-counter">
+                            <!-- Verified Badge -->
+                            <div class="absolute top-3 left-3 bg-base-950/80 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 text-[10px] font-bold text-emerald-400 flex items-center gap-1.5 z-10">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                <span>Прямий господар</span>
+                            </div>
+
+                            <!-- Zero Commission Badge -->
+                            <div class="absolute top-3 right-3 bg-white text-base-950 px-2.5 py-1 rounded-lg text-[10px] font-extrabold z-10 shadow-lg">
+                                0% КОМІСІЇ
+                            </div>
+
+                            <!-- Photo Counter Pill -->
+                            <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-md text-[10px] text-white font-mono z-10">
                                 <span id="count-${apt.id}">1</span> / ${apt.images.length}
                             </div>
-                            
-                            <div class="slider-dots" id="dots-${apt.id}">
-                                ${apt.images.map((_, i) => `<div class="dot ${i === 0 ? 'active' : ''}"></div>`).join('')}
+
+                            <!-- Dots -->
+                            <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 z-10" id="dots-${apt.id}">
+                                ${apt.images.map((_, i) => `<span class="w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-white w-4' : 'bg-white/40'} transition-all"></span>`).join('')}
                             </div>
                         </div>
 
-                        <div class="card-body">
-                            <div class="card-header-row">
+                        <!-- Card Body -->
+                        <div class="p-4 space-y-3">
+                            <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <h2 class="card-title">${apt.title}</h2>
-                                    <div class="card-loc">
-                                        <i data-lucide="map-pin" style="width: 13px; height: 13px; color: var(--accent-green);"></i>
-                                        <span>${apt.district} • ${apt.address}</span>
+                                    <div class="flex items-center gap-1.5 text-xs text-slate-400 font-medium mb-0.5">
+                                        <span class="w-2 h-2 rounded-full" style="background-color: ${metroLineColor};"></span>
+                                        <span>${apt.metro} (${apt.walkMin} хв пішки)</span>
+                                        <span>•</span>
+                                        <span>${apt.district}</span>
                                     </div>
+                                    <h2 class="text-sm font-bold text-white leading-snug">${apt.title}</h2>
+                                    <div class="text-[11px] text-slate-400 mt-0.5">${apt.address}</div>
                                 </div>
-                                <div class="price-col">
-                                    <div class="price-val">${apt.price.toLocaleString('uk-UA')} ₴</div>
-                                    <div class="savings-tag">Економія +${savings.toLocaleString('uk-UA')} ₴</div>
-                                </div>
-                            </div>
-
-                            <div class="specs-row">
-                                <span class="spec-pill accent">${apt.metro}</span>
-                                <span class="spec-pill">${apt.area} м²</span>
-                                <span class="spec-pill">${apt.floor} із ${apt.totalFloors} пов.</span>
-                                ${apt.gpon ? `<span class="spec-pill" style="color: #38bdf8;">⚡️ GPON є</span>` : ''}
-                                ${apt.generator ? `<span class="spec-pill" style="color: #fbbf24;">🔋 Генератор</span>` : ''}
-                                ${apt.gas ? `<span class="spec-pill" style="color: #f97316;">🔥 Газ</span>` : ''}
-                                ${apt.pets ? `<span class="spec-pill" style="color: #c084fc;">🐾 Тварини ОК</span>` : ''}
-                            </div>
-
-                            <div class="landlord-note">
-                                ${apt.quote}
-                                <div class="landlord-meta">
-                                    <span>${apt.owner}</span>
-                                    <span style="color: var(--accent-green);">● Власність підтверджено Дія</span>
+                                <div class="text-right shrink-0">
+                                    <div class="text-base font-extrabold text-white">${apt.price.toLocaleString('uk-UA')} ₴</div>
+                                    <div class="text-[10px] font-bold text-emerald-400">Економія +${apt.realtorCommissionSaved.toLocaleString('uk-UA')} ₴</div>
                                 </div>
                             </div>
 
-                            <div class="action-row">
-                                <a href="https://t.me/pavlograd_admin?text=Вітаю!+Цікавить+квартира+${encodeURIComponent(apt.address)}" target="_blank" class="btn-call" onclick="haptic('medium')">
-                                    <i data-lucide="send" style="width: 15px; height: 15px;"></i>
+                            <!-- Specs & Feature Pills -->
+                            <div class="flex flex-wrap gap-1.5 text-[11px]">
+                                <span class="px-2.5 py-1 rounded-lg bg-base-850 text-slate-300 font-medium">${apt.area} м²</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-base-850 text-slate-300 font-medium">${apt.floor}/${apt.totalFloors} поверх</span>
+                                ${apt.gpon ? `<span class="px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 font-semibold">⚡️ GPON є</span>` : ''}
+                                ${apt.generator ? `<span class="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 font-semibold">🔋 Генератор у ЖК</span>` : ''}
+                                ${apt.gas ? `<span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-semibold">🔥 Газ</span>` : ''}
+                                ${apt.pets ? `<span class="px-2.5 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300 font-semibold">🐾 Тварини дозволені</span>` : ''}
+                            </div>
+
+                            <!-- Authentic Owner Note -->
+                            <div class="p-3 rounded-xl bg-base-950/70 border border-white/5 space-y-1">
+                                <p class="text-xs text-slate-300 italic leading-relaxed">${apt.note}</p>
+                                <div class="flex items-center justify-between text-[10px] text-slate-400 not-italic pt-1">
+                                    <span class="font-bold text-slate-200">${apt.ownerName}</span>
+                                    <span class="text-emerald-400 font-medium">✓ Документи перевірено</span>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="grid grid-cols-2 gap-2 pt-1">
+                                <a href="https://t.me/pavlograd_admin?text=Вітаю!+Цікавить+квартира:+${encodeURIComponent(apt.address)}" target="_blank" onclick="triggerHaptic('medium')" class="py-2.5 rounded-xl bg-white hover:bg-slate-100 text-base-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                                     <span>Написати господарю</span>
                                 </a>
-                                <a href="https://t.me/pavlograd_admin?text=Хочу+експрес-перевірку+за+99+грн:+${encodeURIComponent(apt.address)}" target="_blank" class="btn-check" onclick="haptic('light')">
-                                    <i data-lucide="phone-call" style="width: 15px; height: 15px; color: var(--accent-green);"></i>
+                                <a href="https://t.me/pavlograd_admin?text=Хочу+замовити+дзвінок+перевірки+за+99+грн:+${encodeURIComponent(apt.address)}" target="_blank" onclick="triggerHaptic('light')" class="py-2.5 rounded-xl bg-base-850 hover:bg-base-800 text-slate-200 border border-white/10 font-bold text-xs flex items-center justify-center gap-1.5 transition-all">
+                                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                                     <span>Дзвінок (99 ₴)</span>
                                 </a>
                             </div>
@@ -1076,13 +542,12 @@
                 `;
             }).join('');
 
-            lucide.createIcons();
-            attachTouchSliders(list);
+            attachSliders(items);
         }
 
-        // Touch Slider Logic (Pan-Y, Momentum, Dots)
-        function attachTouchSliders(list) {
-            list.forEach(apt => {
+        // Attach Swipe Handlers to Photo Sliders
+        function attachSliders(items) {
+            items.forEach(apt => {
                 const wrap = document.getElementById(`slider-wrap-${apt.id}`);
                 const track = document.getElementById(`track-${apt.id}`);
                 const count = document.getElementById(`count-${apt.id}`);
@@ -1091,163 +556,181 @@
 
                 let startX = 0;
                 let currentX = 0;
-                let currentIndex = 0;
-                let isMoving = false;
+                let cur = 0;
+                let dragging = false;
 
-                function update(idx) {
-                    currentIndex = idx;
-                    track.style.transform = `translateX(-${currentIndex * 100}%)`;
-                    if (count) count.innerText = currentIndex + 1;
+                function setSlide(idx) {
+                    cur = idx;
+                    track.style.transform = `translateX(-${cur * 100}%)`;
+                    if (count) count.innerText = cur + 1;
                     if (dots) {
-                        Array.from(dots).forEach((d, i) => d.classList.toggle('active', i === currentIndex));
+                        Array.from(dots).forEach((d, i) => {
+                            d.className = i === cur ? 'w-4 h-1.5 rounded-full bg-white transition-all' : 'w-1.5 h-1.5 rounded-full bg-white/40 transition-all';
+                        });
                     }
                 }
 
                 wrap.addEventListener('touchstart', e => {
                     startX = e.touches[0].clientX;
-                    isMoving = true;
+                    dragging = true;
                     track.style.transition = 'none';
                 }, { passive: true });
 
                 wrap.addEventListener('touchmove', e => {
-                    if (!isMoving) return;
+                    if (!dragging) return;
                     currentX = e.touches[0].clientX;
                     const diff = currentX - startX;
-                    track.style.transform = `translateX(calc(-${currentIndex * 100}% + ${diff}px))`;
+                    track.style.transform = `translateX(calc(-${cur * 100}% + ${diff}px))`;
                 }, { passive: true });
 
                 wrap.addEventListener('touchend', () => {
-                    if (!isMoving) return;
-                    isMoving = false;
-                    track.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                    if (!dragging) return;
+                    dragging = false;
+                    track.style.transition = 'transform 0.28s cubic-bezier(0.25, 1, 0.5, 1)';
                     const diff = currentX - startX;
-                    if (diff < -45 && currentIndex < apt.images.length - 1) {
-                        currentIndex++;
-                        haptic('light');
-                    } else if (diff > 45 && currentIndex > 0) {
-                        currentIndex--;
-                        haptic('light');
+                    if (diff < -40 && cur < apt.images.length - 1) {
+                        cur++;
+                        triggerHaptic('light');
+                    } else if (diff > 40 && cur > 0) {
+                        cur--;
+                        triggerHaptic('light');
                     }
-                    update(currentIndex);
+                    setSlide(cur);
                 });
             });
         }
 
-        // Filtering Pipeline
-        function applyCurrentFilters() {
-            const filtered = APARTMENTS.filter(apt => {
-                if (filterState.district !== 'all' && apt.district !== filterState.district) return false;
-                if (filterState.gpon && !apt.gpon) return false;
-                if (filterState.generator && !apt.generator) return false;
-                if (filterState.lowFloor && !apt.lowFloor) return false;
-                if (filterState.pets && !apt.pets) return false;
-                if (filterState.gas && !apt.gas) return false;
-                if (filterState.minPrice && apt.price < filterState.minPrice) return false;
-                if (filterState.maxPrice && apt.price > filterState.maxPrice) return false;
-                if (filterState.search) {
-                    const q = filterState.search.toLowerCase();
-                    const text = (apt.title + ' ' + apt.district + ' ' + apt.address + ' ' + apt.metro).toLowerCase();
-                    if (!text.includes(q)) return false;
+        // Filtering Logic
+        function applyFilters() {
+            const filtered = LISTINGS.filter(item => {
+                if (currentFilter.district !== 'all' && item.district !== currentFilter.district) return false;
+                if (currentFilter.gpon && !item.gpon) return false;
+                if (currentFilter.generator && !item.generator) return false;
+                if (currentFilter.lowFloor && !item.lowFloor) return false;
+                if (currentFilter.pets && !item.pets) return false;
+                if (currentFilter.gas && !item.gas) return false;
+                if (currentFilter.minPrice && item.price < currentFilter.minPrice) return false;
+                if (currentFilter.maxPrice && item.price > currentFilter.maxPrice) return false;
+                if (currentFilter.search) {
+                    const q = currentFilter.search.toLowerCase();
+                    const fullText = (item.title + ' ' + item.district + ' ' + item.address + ' ' + item.metro).toLowerCase();
+                    if (!fullText.includes(q)) return false;
                 }
                 return true;
             });
 
             renderFeed(filtered);
-            renderMapMarkers(filtered);
-        }
-
-        function toggleQuickChip(btn, key, val) {
-            haptic('light');
-            btn.classList.toggle('active');
-            if (key === 'district') {
-                filterState.district = btn.classList.contains('active') ? val : 'all';
-                document.querySelectorAll('.chips-scroll .chip-item').forEach(b => {
-                    if (b !== btn && b.innerText.includes('Оболонь') || b.innerText.includes('Поділ') || b.innerText.includes('Печерськ') || b.innerText.includes('Всі')) {
-                        b.classList.remove('active');
-                    }
-                });
-            } else {
-                filterState[key] = btn.classList.contains('active');
-            }
-            applyCurrentFilters();
+            updateMapMarkers(filtered);
         }
 
         function handleSearch(val) {
-            filterState.search = val.trim();
-            applyCurrentFilters();
+            currentFilter.search = val.trim();
+            applyFilters();
         }
 
-        function scrollCardIntoView(id) {
-            const el = document.getElementById(`card-${id}`);
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        function setQuickFilter(btn, type) {
+            triggerHaptic('light');
+            document.querySelectorAll('.quick-chip').forEach(b => {
+                b.classList.remove('bg-white', 'text-base-950', 'active');
+                b.classList.add('bg-base-900', 'text-slate-300');
+            });
+            btn.classList.add('bg-white', 'text-base-950', 'active');
+            btn.classList.remove('bg-base-900', 'text-slate-300');
+
+            if (type === 'all') {
+                currentFilter = { ...currentFilter, gpon: false, generator: false, lowFloor: false, pets: false, gas: false };
+            } else {
+                currentFilter[type] = true;
+            }
+            applyFilters();
         }
 
-        // View Mode Switcher
-        function setViewMode(mode) {
-            haptic('medium');
-            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`toggle-${mode}`).classList.add('active');
+        // View Mode Switcher (Split / Map / List)
+        function switchView(mode) {
+            triggerHaptic('medium');
+            document.querySelectorAll('header button').forEach(b => {
+                b.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all';
+            });
+            const activeBtn = document.getElementById(`btn-view-${mode}`);
+            activeBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-base-950 transition-all';
 
-            const mapWrap = document.getElementById('map-wrapper');
-            const feed = document.getElementById('apartments-feed');
+            const mapSection = document.getElementById('map-section');
+            const feedSection = document.getElementById('apartments-feed');
 
             if (mode === 'map') {
-                mapWrap.style.display = 'block';
-                mapWrap.classList.add('expanded');
-                feed.style.display = 'none';
-                map.invalidateSize();
+                mapSection.style.display = 'block';
+                mapSection.style.height = 'calc(100vh - 125px)';
+                feedSection.style.display = 'none';
+                setTimeout(() => map.invalidateSize(), 80);
             } else if (mode === 'list') {
-                mapWrap.style.display = 'none';
-                feed.style.display = 'flex';
+                mapSection.style.display = 'none';
+                feedSection.style.display = 'block';
             } else {
-                mapWrap.style.display = 'block';
-                mapWrap.classList.remove('expanded');
-                feed.style.display = 'flex';
-                map.invalidateSize();
+                mapSection.style.display = 'block';
+                mapSection.style.height = '40vh';
+                feedSection.style.display = 'block';
+                setTimeout(() => map.invalidateSize(), 80);
             }
         }
 
-        // Bottom Sheet Filters
-        function openBottomSheet() {
-            haptic('medium');
-            document.getElementById('sheet-overlay').classList.add('active');
-            document.getElementById('bottom-sheet').classList.add('active');
+        function focusItem(id) {
+            const el = document.getElementById(`item-${id}`);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        function closeBottomSheet() {
-            haptic('light');
-            document.getElementById('sheet-overlay').classList.remove('active');
-            document.getElementById('bottom-sheet').classList.remove('active');
+        // Bottom Sheet Functions
+        function openFilterSheet() {
+            triggerHaptic('medium');
+            const overlay = document.getElementById('filter-overlay');
+            const sheet = document.getElementById('filter-sheet');
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                sheet.classList.remove('translate-y-full');
+            }, 10);
         }
 
-        function selectDistrictFilter(el, dist) {
-            haptic('light');
-            document.querySelectorAll('#district-tags .filter-tag').forEach(t => t.classList.remove('selected'));
-            el.classList.add('selected');
-            filterState.district = dist;
+        function closeFilterSheet() {
+            triggerHaptic('light');
+            const overlay = document.getElementById('filter-overlay');
+            const sheet = document.getElementById('filter-sheet');
+            overlay.classList.add('opacity-0');
+            sheet.classList.add('translate-y-full');
+            setTimeout(() => overlay.classList.add('hidden'), 200);
         }
 
-        function toggleFeatureTag(el, key) {
-            haptic('light');
-            el.classList.toggle('selected');
-            filterState[key] = el.classList.contains('selected');
+        function toggleSheetDistrict(btn, dist) {
+            triggerHaptic('light');
+            const isSelected = btn.classList.contains('bg-white');
+            document.querySelectorAll('#sheet-districts button').forEach(b => {
+                b.className = 'p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold';
+            });
+            if (!isSelected) {
+                btn.className = 'p-2.5 rounded-xl bg-white text-base-950 font-bold text-left';
+                currentFilter.district = dist;
+            } else {
+                currentFilter.district = 'all';
+            }
         }
 
-        function applySheetFilters() {
-            haptic('medium');
-            const pMin = document.getElementById('price-min').value;
-            const pMax = document.getElementById('price-max').value;
-            filterState.minPrice = pMin ? parseInt(pMin) : null;
-            filterState.maxPrice = pMax ? parseInt(pMax) : null;
-            applyCurrentFilters();
-            closeBottomSheet();
+        function applyFiltersFromSheet() {
+            triggerHaptic('medium');
+            currentFilter.minPrice = parseInt(document.getElementById('sheet-min-price').value) || null;
+            currentFilter.maxPrice = parseInt(document.getElementById('sheet-max-price').value) || null;
+            currentFilter.gpon = document.getElementById('check-gpon').checked;
+            currentFilter.generator = document.getElementById('check-gen').checked;
+            currentFilter.lowFloor = document.getElementById('check-low').checked;
+            currentFilter.pets = document.getElementById('check-pets').checked;
+
+            applyFilters();
+            closeFilterSheet();
         }
 
         function resetFilters() {
-            haptic('light');
-            filterState = {
-                district: 'all',
+            triggerHaptic('light');
+            currentFilter = {
                 search: '',
+                district: 'all',
                 gpon: false,
                 generator: false,
                 lowFloor: false,
@@ -1256,28 +739,37 @@
                 minPrice: null,
                 maxPrice: null
             };
-            document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('selected'));
-            document.getElementById('price-min').value = '';
-            document.getElementById('price-max').value = '';
-            document.getElementById('filter-search').value = '';
-            applyCurrentFilters();
-            closeBottomSheet();
+            document.querySelectorAll('#sheet-districts button').forEach(b => {
+                b.className = 'p-2.5 rounded-xl bg-base-850 border border-white/5 text-slate-300 text-left font-semibold';
+            });
+            document.getElementById('sheet-min-price').value = '';
+            document.getElementById('sheet-max-price').value = '';
+            document.getElementById('check-gpon').checked = false;
+            document.getElementById('check-gen').checked = false;
+            document.getElementById('check-low').checked = false;
+            document.getElementById('check-pets').checked = false;
+            applyFilters();
+            closeFilterSheet();
         }
 
-        // Lightbox
+        // Lightbox Functions
         function openLightbox(url) {
-            haptic('medium');
-            document.getElementById('lightbox-img').src = url;
-            document.getElementById('lightbox').classList.add('active');
+            triggerHaptic('medium');
+            document.getElementById('lightbox-image').src = url;
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('hidden');
+            lb.classList.add('flex');
         }
 
         function closeLightbox() {
-            haptic('light');
-            document.getElementById('lightbox').classList.remove('active');
+            triggerHaptic('light');
+            const lb = document.getElementById('lightbox');
+            lb.classList.add('hidden');
+            lb.classList.remove('flex');
         }
 
-        // Initial App Mount
-        applyCurrentFilters();
+        // Initial Mount
+        applyFilters();
     </script>
 </body>
 </html>
