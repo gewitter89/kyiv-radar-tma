@@ -505,6 +505,24 @@
             });
         }
 
+        const photoIndexById = {};
+
+        function changePhoto(e, id, delta) {
+            e.stopPropagation();
+            triggerHaptic('light');
+            const apt = LISTINGS.find(x => x.id === id);
+            if (!apt || apt.images.length <= 1) return;
+            photoIndexById[id] = (photoIndexById[id] || 0) + delta;
+            if (photoIndexById[id] < 0) photoIndexById[id] = apt.images.length - 1;
+            if (photoIndexById[id] >= apt.images.length) photoIndexById[id] = 0;
+            
+            const cur = photoIndexById[id];
+            const imgEl = document.getElementById(`photo-img-${id}`);
+            const countEl = document.getElementById(`photo-count-${id}`);
+            if (imgEl) imgEl.src = apt.images[cur];
+            if (countEl) countEl.innerText = `${cur + 1} / ${apt.images.length}`;
+        }
+
         function renderCarousel(items) {
             const container = document.getElementById('cardsCarousel');
             if (items.length === 0) {
@@ -517,67 +535,85 @@
                 return;
             }
 
-            container.innerHTML = items.map((item, index) => `
+            container.innerHTML = items.map((item, index) => {
+                const curPhoto = photoIndexById[item.id] || 0;
+                const metroName = item.metro.replace(/^М\s+/, '');
+                return `
                 <div class="apartment-card glass-panel shadow-2xl ${index === currentActiveIndex ? 'active-card' : ''}" id="card-${item.id}" onclick="selectCard(${index}, true)">
-                    <!-- Photo Header with Badges -->
-                    <div class="relative w-full h-36 bg-base-950 overflow-hidden cursor-pointer" onclick="openDetail(${item.id})">
-                        <img src="${item.images[0]}" class="w-full h-full object-cover" alt="${item.title}">
+                    <!-- Photo Header with Easy Arrow Flipping -->
+                    <div class="relative w-full h-40 bg-base-950 overflow-hidden">
+                        <img id="photo-img-${item.id}" src="${item.images[curPhoto]}" class="w-full h-full object-cover select-none pointer-events-none" alt="${item.title}">
                         
-                        <!-- Top Badges -->
-                        <div class="absolute top-2 left-2 flex items-center gap-1 z-10">
-                            <span class="px-2 py-0.5 rounded-lg bg-base-950/80 backdrop-blur-md border border-white/10 text-[10px] font-bold text-emerald-400">
-                                🟢 Власник 0%
-                            </span>
-                            ${item.generator ? '<span class="px-2 py-0.5 rounded-lg bg-amber-500/90 text-base-950 text-[10px] font-black">🔋 Генератор</span>' : ''}
-                            ${item.gpon ? '<span class="px-2 py-0.5 rounded-lg bg-sky-500/90 text-base-950 text-[10px] font-black">⚡ GPON</span>' : ''}
-                        </div>
+                        <!-- Left & Right Photo Switch Arrows -->
+                        <button onclick="changePhoto(event, ${item.id}, -1)" class="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center font-bold text-xs border border-white/15 active:scale-90 transition-all z-20">‹</button>
+                        <button onclick="changePhoto(event, ${item.id}, 1)" class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center font-bold text-xs border border-white/15 active:scale-90 transition-all z-20">›</button>
 
-                        <!-- Price Tag Floating -->
-                        <div class="absolute bottom-2 right-2 bg-base-950/90 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/15 text-white font-black text-sm z-10 shadow-lg">
-                            ${item.price.toLocaleString('uk-UA')} ₴
+                        <!-- Top Verified Badge -->
+                        <div class="absolute top-2.5 left-2.5 flex items-center gap-1 z-10">
+                            <span class="px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-md border border-white/10 text-[10px] font-bold text-emerald-400">
+                                🟢 Прямий власник · 0%
+                            </span>
                         </div>
 
                         <!-- Photo count -->
-                        <div class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[9px] text-white font-mono z-10">
-                            1 / ${item.images.length}
+                        <div class="absolute top-2.5 right-2.5 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[10px] text-white font-mono z-10">
+                            <span id="photo-count-${item.id}">${curPhoto + 1} / ${item.images.length}</span>
                         </div>
                     </div>
 
                     <!-- Card Body -->
-                    <div class="p-3 space-y-2">
-                        <!-- Location & Metro Pills -->
-                        <div class="flex items-center gap-1.5 flex-wrap">
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-base-900 border border-white/10 text-[11px] font-bold text-white whitespace-nowrap">
-                                <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: ${item.metroColor}"></span>
-                                <span>${item.metro} · ${item.walkMin} хв</span>
-                            </span>
-                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md bg-base-900 border border-white/5 text-[11px] text-slate-300 font-medium whitespace-nowrap">
-                                ${item.district}
-                            </span>
-                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md bg-base-900 border border-white/5 text-[11px] text-slate-400 whitespace-nowrap">
-                                ${item.area} м² · ${item.floor}/${item.totalFloors} пов.
-                            </span>
+                    <div class="p-3.5 space-y-2.5">
+                        <!-- Line 1: Price and Savings in One Row -->
+                        <div class="flex items-baseline justify-between">
+                            <div>
+                                <span class="text-base font-black text-white">${item.price.toLocaleString('uk-UA')} ₴</span>
+                                <span class="text-xs text-slate-400 font-normal"> / міс</span>
+                            </div>
+                            <div class="text-xs font-bold text-emerald-400">
+                                Економія +${item.realtorCommissionSaved.toLocaleString('uk-UA')} ₴
+                            </div>
                         </div>
 
-                        <!-- Title & Address -->
-                        <div class="cursor-pointer" onclick="openDetail(${item.id})">
-                            <h4 class="text-xs font-bold text-white leading-tight truncate">${item.title}</h4>
-                            <p class="text-[10px] text-slate-400 truncate mt-0.5">📍 ${item.address}</p>
+                        <!-- Line 2: Metro (Full Clear Word) and specs in ONE Row -->
+                        <div class="text-xs text-slate-300 font-medium truncate flex items-center gap-1.5">
+                            <span class="text-white font-bold whitespace-nowrap">Ⓜ️ Метро ${metroName}</span>
+                            <span class="text-slate-400">·</span>
+                            <span class="whitespace-nowrap">${item.walkMin} хв</span>
+                            <span class="text-slate-400">·</span>
+                            <span class="whitespace-nowrap">${item.district}</span>
+                            <span class="text-slate-400">·</span>
+                            <span class="whitespace-nowrap">${item.area} м²</span>
+                            <span class="text-slate-400">·</span>
+                            <span class="whitespace-nowrap">${item.floor}/${item.totalFloors} пов.</span>
                         </div>
 
-                        <!-- Action Buttons -->
+                        <!-- Line 3: Address & Title -->
+                        <div class="text-[11px] text-slate-400 truncate">
+                            📍 ${item.address} · <span class="text-slate-300">${item.title}</span>
+                        </div>
+
+                        <!-- Line 4: Clean Monochrome Neutral Tags (Zero AI Rainbow Clutter) -->
+                        <div class="flex items-center gap-1.5 overflow-hidden text-xs">
+                            ${item.generator ? '<span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-200 text-[11px] font-medium whitespace-nowrap">🔋 Генератор</span>' : ''}
+                            ${item.gpon ? '<span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-200 text-[11px] font-medium whitespace-nowrap">⚡ GPON</span>' : ''}
+                            ${item.gas ? '<span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-200 text-[11px] font-medium whitespace-nowrap">🔥 Газ</span>' : ''}
+                            ${item.pets ? '<span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-200 text-[11px] font-medium whitespace-nowrap">🐾 Тварини</span>' : ''}
+                        </div>
+
+                        <!-- Line 5: Solid CTA Buttons -->
                         <div class="flex gap-2 pt-1">
-                            <a href="https://t.me/pavlograd_admin?text=Вітаю!+Цікавить+квартира+№${item.id}:+${encodeURIComponent(item.address)}" target="_blank" onclick="triggerHaptic('medium')" class="flex-1 py-2 rounded-xl bg-white text-base-950 font-black text-xs flex items-center justify-center gap-1 shadow-md active:scale-95 transition-all">
+                            <a href="https://t.me/pavlograd_admin?text=Вітаю!+Цікавить+квартира+№${item.id}:+${encodeURIComponent(item.address)}" target="_blank" onclick="triggerHaptic('medium')" class="flex-1 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-base-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-98 transition-all">
                                 <svg class="w-3.5 h-3.5 fill-current text-sky-500" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.95-1.28 4.92-2.13 5.92-2.55 2.82-1.18 3.4-1.38 3.79-1.39.08 0 .28.02.4.12.1.08.13.2.14.28-.01.07-.01.21-.03.38z"/></svg>
-                                <span>Написати власнику</span>
+                                <span>Написати господарю</span>
                             </a>
-                            <button onclick="openDetail(${item.id})" class="px-3 py-2 rounded-xl bg-base-850 hover:bg-base-800 text-slate-300 font-bold text-xs border border-white/10 active:scale-95 transition-all">
-                                Інфо
+                            <button onclick="openDetail(${item.id})" class="px-3.5 py-2.5 rounded-xl bg-base-850 hover:bg-base-800 text-slate-300 font-bold text-xs border border-white/10 active:scale-95 transition-all">
+                                Деталі
                             </button>
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
 
             attachCarouselScrollListener(items);
         }
