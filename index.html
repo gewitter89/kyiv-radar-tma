@@ -107,29 +107,51 @@
             margin: 0 !important;
             width: 240px !important;
         }
+
+        .scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+
+        @media (max-width: 389px) {
+            .btn-lbl-full { display: none; }
+            .btn-lbl-short { display: inline; }
+        }
+        @media (min-width: 390px) {
+            .btn-lbl-full { display: inline; }
+            .btn-lbl-short { display: none; }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
 
     <!-- Top Navigation Header -->
-    <header class="sticky top-0 z-40 bg-base-950/90 backdrop-blur-md border-b border-white/5 px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-white text-base-950 flex items-center justify-center font-black text-sm">
-                КК
+    <header class="sticky top-0 z-40 bg-base-950/90 backdrop-blur-md border-b border-white/5 px-3 py-2.5 flex items-center justify-between gap-2 min-w-0">
+        <!-- Brand -->
+        <div class="flex items-center gap-2 shrink-0">
+            <div class="w-8 h-8 rounded-xl bg-white text-base-950 flex items-center justify-center font-black text-xs leading-none">
+                КР
             </div>
-            <div>
-                <div class="flex items-center gap-1.5">
-                    <h1 class="text-sm font-extrabold tracking-tight text-white">Київ Ключі</h1>
-                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-white/10 text-slate-300">0% комісії</span>
+            <div class="min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                    <h1 class="text-sm font-extrabold tracking-tight text-white leading-tight">Київ Радар</h1>
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-white/10 text-slate-300 shrink-0">0%</span>
                 </div>
-                <p class="text-[11px] text-slate-400 font-medium">Прямі договори • Без рієлторських переплат</p>
+                <p class="text-[10px] text-slate-400 font-medium leading-tight truncate">Оренда 0% без рієлторів</p>
             </div>
         </div>
 
-        <div class="flex items-center gap-1 bg-base-900 border border-white/5 p-1 rounded-xl">
-            <button onclick="switchView('split')" id="btn-view-split" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-base-950 transition-all">Карта + Каталог</button>
-            <button onclick="switchView('map')" id="btn-view-map" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">Тільки карта</button>
-            <button onclick="switchView('list')" id="btn-view-list" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">Список</button>
+        <!-- Segmented control -->
+        <div class="flex items-center bg-base-900 border border-white/5 p-0.5 rounded-xl shrink-0 overflow-hidden">
+            <button onclick="switchView('split')" id="btn-view-split" class="px-2 py-1 rounded-lg text-xs font-bold bg-white text-base-950 transition-all whitespace-nowrap leading-tight">
+                <span class="btn-lbl-full">Карта + Каталог</span>
+                <span class="btn-lbl-short">Карта</span>
+            </button>
+            <button onclick="switchView('map')" id="btn-view-map" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all whitespace-nowrap leading-tight">
+                <span class="btn-lbl-full">Тільки карта</span>
+                <span class="btn-lbl-short">Мапа</span>
+            </button>
+            <button onclick="switchView('list')" id="btn-view-list" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all whitespace-nowrap leading-tight">
+                Список
+            </button>
         </div>
     </header>
 
@@ -139,26 +161,46 @@
     </section>
 
     <!-- Controls & Quick Filters -->
-    <section class="p-4 space-y-3 bg-base-950">
-        <div class="flex gap-2 items-center">
-            <div class="flex-1 relative flex items-center">
-                <svg class="w-4 h-4 text-slate-400 absolute left-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <input type="text" id="live-search" oninput="handleSearch(this.value)" placeholder="Пошук за районом, метро або вулицею..." class="w-full bg-base-900 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all">
+    <section class="p-3 space-y-2.5 bg-base-950 border-b border-white/5">
+        <div class="flex gap-2 items-center min-w-0">
+            <!-- Search -->
+            <div class="flex-1 relative flex items-center min-w-0">
+                <svg class="absolute left-3 shrink-0 w-4 h-4 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                </svg>
+                <input type="text" id="live-search" oninput="handleSearch(this.value)" placeholder="Район, метро, вулиця…" autocomplete="off" class="w-full bg-base-900 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder:text-slate-500 placeholder:truncate focus:outline-none focus:border-white/30 transition-all">
             </div>
-            <button onclick="openFilterSheet()" class="shrink-0 px-3.5 py-2.5 rounded-xl bg-base-900 border border-white/10 text-xs font-bold text-slate-200 hover:bg-base-850 flex items-center gap-1.5 transition-all">
-                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                <span>Фільтри</span>
+
+            <!-- Filter Button -->
+            <button onclick="openFilterSheet()" class="shrink-0 flex items-center gap-1.5 bg-base-900 border border-white/10 rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:border-white/20 active:scale-95 transition-all">
+                <svg class="w-3.5 h-3.5 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M7 10h10M11 16h2"/>
+                </svg>
+                <span class="whitespace-nowrap">Фільтри</span>
             </button>
         </div>
 
-        <!-- Filter Chips -->
-        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 text-xs">
-            <button onclick="setQuickFilter(this, 'all')" class="quick-chip active px-3.5 py-1.5 rounded-lg bg-white text-base-950 font-bold whitespace-nowrap">Всі варіанти (48)</button>
-            <button onclick="setQuickFilter(this, 'gpon')" class="quick-chip px-3.5 py-1.5 rounded-lg bg-base-900 border border-white/10 text-slate-300 font-semibold whitespace-nowrap">Оптоволокно GPON</button>
-            <button onclick="setQuickFilter(this, 'generator')" class="quick-chip px-3.5 py-1.5 rounded-lg bg-base-900 border border-white/10 text-slate-300 font-semibold whitespace-nowrap">Генератор на будинок</button>
-            <button onclick="setQuickFilter(this, 'lowFloor')" class="quick-chip px-3.5 py-1.5 rounded-lg bg-base-900 border border-white/10 text-slate-300 font-semibold whitespace-nowrap">Поверхи 1–5</button>
-            <button onclick="setQuickFilter(this, 'pets')" class="quick-chip px-3.5 py-1.5 rounded-lg bg-base-900 border border-white/10 text-slate-300 font-semibold whitespace-nowrap">Можна з тваринами</button>
-            <button onclick="setQuickFilter(this, 'gas')" class="quick-chip px-3.5 py-1.5 rounded-lg bg-base-900 border border-white/10 text-slate-300 font-semibold whitespace-nowrap">Газ (плита / колонка)</button>
+        <!-- Filter Chips (Touch Scroll + Snap) -->
+        <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5 snap-x snap-mandatory" style="-webkit-overflow-scrolling: touch;">
+            <button onclick="setQuickFilter(this, 'all')" class="quick-chip active snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-base-950 whitespace-nowrap shadow-sm">
+                Всі (48)
+            </button>
+            <button onclick="setQuickFilter(this, 'gpon')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
+                ⚡ GPON
+            </button>
+            <button onclick="setQuickFilter(this, 'generator')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
+                🔋 Генератор
+            </button>
+            <button onclick="setQuickFilter(this, 'lowFloor')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
+                🏢 Поверх 1–5
+            </button>
+            <button onclick="setQuickFilter(this, 'pets')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
+                🐾 Тварини
+            </button>
+            <button onclick="setQuickFilter(this, 'gas')" class="quick-chip snap-start shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-base-900 border border-white/10 text-slate-300 whitespace-nowrap hover:border-white/20 transition-all">
+                🔥 Газ
+            </button>
+            <span class="shrink-0 w-2" aria-hidden="true"></span>
         </div>
     </section>
 
@@ -387,17 +429,39 @@
             maxPrice: null
         };
 
-        // Initialize Dark Leaflet Map (ESRI Canvas World Dark Gray - Clean, No Watermarks)
+        // Kyiv Bounding Box: SW [50.213, 30.239] — NE [50.591, 30.825]
+        const KYIV_BOUNDS = L.latLngBounds(
+            L.latLng(50.213, 30.239),
+            L.latLng(50.591, 30.825)
+        );
+
+        // Initialize Dark Leaflet Map strictly locked to Kyiv (no Europe/Moscow zoom-out)
         const map = L.map('kyiv-map', {
             zoomControl: false,
-            attributionControl: false
+            attributionControl: false,
+            minZoom: 11,
+            maxZoom: 16,
+            maxBounds: KYIV_BOUNDS,
+            maxBoundsViscosity: 1.0,
+            touchZoom: true,
+            bounceAtZoomLimits: false,
+            wheelPxPerZoomLevel: 120
         }).setView([50.4501, 30.5234], 12);
 
+        // Clamp the view on every zoom/pan so user cannot navigate out of Kyiv
+        map.on('zoomend moveend', () => {
+            if (!KYIV_BOUNDS.contains(map.getCenter())) {
+                map.panInsideBounds(KYIV_BOUNDS, { animate: true });
+            }
+        });
+
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            minZoom: 11,
             maxZoom: 16
         }).addTo(map);
 
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+            minZoom: 11,
             maxZoom: 16
         }).addTo(map);
 
