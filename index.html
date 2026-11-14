@@ -101,6 +101,49 @@
             background: #ffffff;
         }
 
+        /* Pulsing Blue User Location Marker (Apple / Uber Style) */
+        .user-loc-wrap {
+            background: transparent !important;
+            border: none !important;
+        }
+        .user-loc-container {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translate(-50%, -50%);
+        }
+        .user-loc-dot {
+            width: 14px;
+            height: 14px;
+            background: #007aff;
+            border: 2.5px solid #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 122, 255, 0.9), 0 2px 5px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+        }
+        .user-loc-pulse {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 38px;
+            height: 38px;
+            margin-left: -19px;
+            margin-top: -19px;
+            border-radius: 50%;
+            background: rgba(0, 122, 255, 0.35);
+            animation: locPulse 2s infinite cubic-bezier(0.2, 0.6, 0.35, 1);
+            z-index: 1;
+            pointer-events: none;
+        }
+        @keyframes locPulse {
+            0% { transform: scale(0.35); opacity: 0.9; }
+            70% { transform: scale(1.3); opacity: 0; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+
         /* Snap Carousel for Floating Apartment Cards */
         .cards-carousel {
             display: flex;
@@ -191,10 +234,16 @@
 
     <!-- FLOATING MAP CONTROLS (Right Side) -->
     <div class="absolute right-3 top-32 z-20 flex flex-col gap-2">
-        <button onclick="recenterKyiv()" class="glass-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all" title="Центр Києва">
-            <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button id="btnLocate" onclick="locateUser(true)" class="glass-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all group" title="Моя геопозиція">
+            <svg class="w-4 h-4 text-sky-400 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                 <circle cx="12" cy="12" r="3"/>
                 <path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>
+            </svg>
+        </button>
+        <button onclick="recenterKyiv()" class="glass-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all group" title="Центр Києва">
+            <svg class="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
         </button>
         <button onclick="zoomMap(1)" class="glass-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all text-sm font-bold leading-none">
@@ -440,6 +489,111 @@
             }
         });
 
+        let userLocation = null;
+        let userMarker = null;
+
+        function getHaversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function formatDistance(distKm) {
+            if (distKm === undefined || distKm === null || isNaN(distKm)) return '';
+            if (distKm < 1) {
+                return `${Math.round(distKm * 1000)} м`;
+            }
+            return `${distKm.toFixed(1)} км`;
+        }
+
+        function locateUser(centerOnUser = true) {
+            triggerHaptic('medium');
+            const locateBtn = document.getElementById('btnLocate');
+            if (locateBtn) locateBtn.classList.add('animate-pulse');
+
+            if (!navigator.geolocation) {
+                if (locateBtn) locateBtn.classList.remove('animate-pulse');
+                console.warn('Geolocation not supported');
+                if (centerOnUser) recenterKyiv();
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    if (locateBtn) locateBtn.classList.remove('animate-pulse');
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    userLocation = { lat, lng, accuracy: pos.coords.accuracy };
+
+                    // Calculate distance to all items
+                    LISTINGS.forEach(item => {
+                        if (item.lat && item.lng) {
+                            item.distanceKm = getHaversineDistance(lat, lng, item.lat, item.lng);
+                        }
+                    });
+
+                    // Add/update pulsing blue location dot on map
+                    const userIcon = L.divIcon({
+                        className: 'user-loc-wrap',
+                        html: `
+                            <div class="user-loc-container">
+                                <div class="user-loc-pulse"></div>
+                                <div class="user-loc-dot"></div>
+                            </div>
+                        `,
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12]
+                    });
+
+                    if (userMarker) {
+                        userMarker.setLatLng([lat, lng]);
+                    } else {
+                        userMarker = L.marker([lat, lng], {
+                            icon: userIcon,
+                            zIndexOffset: 10000
+                        }).addTo(map);
+                    }
+
+                    const inKyiv = KYIV_BOUNDS.contains([lat, lng]);
+
+                    if (centerOnUser) {
+                        if (inKyiv) {
+                            map.flyTo([lat, lng], 14.5, { duration: 0.9 });
+                        } else {
+                            // If testing from outside Kyiv, sort by closest Kyiv deal and fly to it!
+                            const items = getFilteredListings();
+                            if (items.length > 0) {
+                                let closestIdx = 0;
+                                let minD = Infinity;
+                                items.forEach((it, i) => {
+                                    if (it.distanceKm < minD) {
+                                        minD = it.distanceKm;
+                                        closestIdx = i;
+                                    }
+                                });
+                                selectCard(closestIdx, true);
+                            } else {
+                                recenterKyiv();
+                            }
+                        }
+                    }
+
+                    updateUI();
+                },
+                (err) => {
+                    if (locateBtn) locateBtn.classList.remove('animate-pulse');
+                    console.warn('Geolocation error:', err);
+                    if (centerOnUser) recenterKyiv();
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+            );
+        }
+
         function recenterKyiv() {
             triggerHaptic('light');
             map.flyTo([50.4501, 30.5234], 12, { duration: 0.8 });
@@ -587,9 +741,15 @@
                             <span class="whitespace-nowrap">${item.floor}/${item.totalFloors} пов.</span>
                         </div>
 
-                        <!-- Line 3: Address & Title -->
-                        <div class="text-[11px] text-slate-400 truncate">
-                            📍 ${item.address} · <span class="text-slate-300">${item.title}</span>
+                        <!-- Line 3: Address & Title & Geolocation Distance -->
+                        <div class="text-[11px] text-slate-400 truncate flex items-center justify-between gap-1.5">
+                            <span class="truncate">📍 ${item.address} · <span class="text-slate-300">${item.title}</span></span>
+                            ${item.distanceKm !== undefined ? `
+                                <span class="shrink-0 px-2 py-0.5 rounded-md bg-sky-500/15 border border-sky-400/25 text-sky-300 text-[10px] font-extrabold flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+                                    <span>${formatDistance(item.distanceKm)}</span>
+                                </span>
+                            ` : ''}
                         </div>
 
                         <!-- Line 4: Clean Monochrome Neutral Tags (Zero AI Rainbow Clutter) -->
@@ -733,8 +893,16 @@
                 </div>
 
                 <!-- Location & Metro in One Row -->
-                <div class="p-3 rounded-xl bg-base-850 border border-white/5 space-y-1">
-                    <div class="text-xs text-white font-bold">Ⓜ️ Метро ${metroName} · ${item.walkMin} хв пішки · ${item.district}</div>
+                <div class="p-3 rounded-xl bg-base-850 border border-white/5 space-y-1.5">
+                    <div class="text-xs text-white font-bold flex items-center justify-between">
+                        <span>Ⓜ️ Метро ${metroName} · ${item.walkMin} хв пішки · ${item.district}</span>
+                        ${item.distanceKm !== undefined ? `
+                            <span class="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[10px] font-extrabold border border-sky-400/30 flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+                                <span>${formatDistance(item.distanceKm)} від вас</span>
+                            </span>
+                        ` : ''}
+                    </div>
                     <div class="text-[11px] text-slate-400">📍 ${item.address} · ${item.area} м² · ${item.floor}/${item.totalFloors} поверх</div>
                 </div>
 
@@ -861,6 +1029,11 @@
                 console.log('Using local fallback deals:', e);
             }
             updateUI();
+            
+            // Silently request user location on launch
+            setTimeout(() => {
+                locateUser(false);
+            }, 600);
         }
 
         loadLiveDeals();
