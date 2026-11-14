@@ -618,7 +618,7 @@
             attachCarouselScrollListener(items);
         }
 
-        // BIRD KYIV CORE MECHANIC: Swipe card -> Map flies to coordinate!
+        // BIRD KYIV CORE MECHANIC: Swipe card -> Map flies to coordinate with Camera Offset!
         function selectCard(index, scrollCarousel = true) {
             const items = getFilteredListings();
             if (index < 0 || index >= items.length) return;
@@ -631,8 +631,9 @@
             const activePin = document.getElementById(`pin-${activeItem.id}`);
             if (activePin) activePin.classList.add('active');
 
-            // 2. Fly map to coordinates (smooth Bird Kyiv cinematic flyTo)
-            map.flyTo([activeItem.lat, activeItem.lng], 14.5, {
+            // 2. Camera offset: pin is positioned in UPPER 45% of the screen, NEVER under the card!
+            const cameraLat = activeItem.lat - 0.008;
+            map.flyTo([cameraLat, activeItem.lng], 14.5, {
                 duration: 0.7,
                 easeLinearity: 0.25
             });
@@ -709,57 +710,70 @@
 
             const modal = document.getElementById('detailModal');
             const content = document.getElementById('detailSheetContent');
+            const metroName = item.metro.replace(/^М\s+/, '');
 
             content.innerHTML = `
                 <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-3"></div>
                 
-                <!-- Photos -->
-                <div class="w-full aspect-[16/10] rounded-2xl overflow-hidden bg-base-950">
+                <!-- Photos with Counter -->
+                <div class="relative w-full aspect-[16/10] rounded-2xl overflow-hidden bg-base-950">
                     <img src="${item.images[0]}" class="w-full h-full object-cover">
+                    <div class="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-md text-[10px] font-bold text-emerald-400">
+                        🟢 Перевірений власник · 0% комісії
+                    </div>
                 </div>
 
-                <!-- Price & Commission -->
-                <div class="flex items-center justify-between pt-2">
+                <!-- Price & Commission Savings -->
+                <div class="flex items-center justify-between pt-1">
                     <div>
                         <div class="text-xl font-black text-white">${item.price.toLocaleString('uk-UA')} ₴ / міс</div>
-                        <div class="text-xs text-emerald-400 font-bold">✓ 0% Комісії рієлтора (економія +${item.realtorCommissionSaved.toLocaleString('uk-UA')} ₴)</div>
+                        <div class="text-xs text-emerald-400 font-bold">✓ Економія +${item.realtorCommissionSaved.toLocaleString('uk-UA')} ₴ (без рієлторів)</div>
                     </div>
                     <button onclick="closeDetail()" class="p-2 rounded-xl bg-base-850 text-slate-400 hover:text-white font-bold text-xs">✕</button>
                 </div>
 
-                <!-- Details -->
-                <div class="space-y-1">
-                    <h3 class="text-sm font-extrabold text-white">${item.title}</h3>
-                    <div class="text-xs text-slate-400">📍 ${item.address} • ${item.metro} (${item.walkMin} хв)</div>
+                <!-- Location & Metro in One Row -->
+                <div class="p-3 rounded-xl bg-base-850 border border-white/5 space-y-1">
+                    <div class="text-xs text-white font-bold">Ⓜ️ Метро ${metroName} · ${item.walkMin} хв пішки · ${item.district}</div>
+                    <div class="text-[11px] text-slate-400">📍 ${item.address} · ${item.area} м² · ${item.floor}/${item.totalFloors} поверх</div>
                 </div>
 
-                <!-- Blackout / Winter Perks -->
-                <div class="p-3.5 rounded-2xl bg-base-850 border border-white/5 space-y-2">
-                    <div class="text-xs font-bold text-slate-300">Готовність до зими:</div>
+                <!-- Blackout / Winter Readiness (Clean Monochrome) -->
+                <div class="p-3.5 rounded-xl bg-base-850 border border-white/5 space-y-2">
+                    <div class="text-xs font-bold text-slate-300">Готовність до зими та відключень:</div>
                     <div class="flex flex-wrap gap-2 text-xs">
-                        <span class="px-2.5 py-1 rounded-lg ${item.gpon ? 'bg-emerald-500/20 text-emerald-300 font-bold' : 'bg-base-900 text-slate-500'}">
+                        <span class="px-2.5 py-1 rounded-lg ${item.gpon ? 'bg-white/10 text-white font-bold' : 'bg-base-900 text-slate-500'}">
                             ${item.gpon ? '⚡ Оптоволокно GPON є' : '✕ Без GPON'}
                         </span>
-                        <span class="px-2.5 py-1 rounded-lg ${item.generator ? 'bg-amber-500/20 text-amber-300 font-bold' : 'bg-base-900 text-slate-500'}">
+                        <span class="px-2.5 py-1 rounded-lg ${item.generator ? 'bg-white/10 text-white font-bold' : 'bg-base-900 text-slate-500'}">
                             ${item.generator ? '🔋 Генератор у ЖК' : '✕ Без генератора'}
                         </span>
-                        <span class="px-2.5 py-1 rounded-lg ${item.gas ? 'bg-sky-500/20 text-sky-300 font-bold' : 'bg-base-900 text-slate-500'}">
+                        <span class="px-2.5 py-1 rounded-lg ${item.gas ? 'bg-white/10 text-white font-bold' : 'bg-base-900 text-slate-500'}">
                             ${item.gas ? '🔥 Газ є' : '✕ Електроплита'}
                         </span>
                     </div>
                 </div>
 
-                <!-- Direct Owner Verification -->
-                <div class="p-3.5 rounded-2xl bg-base-850 border border-white/5 space-y-1.5">
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="font-bold text-white">${item.ownerName}</span>
-                        <span class="text-emerald-400 font-bold">✓ Перевірений власник</span>
+                <!-- Direct Owner Phone Unlock (99 UAH Micro-Checkout Funnel) -->
+                <div class="p-4 rounded-2xl bg-base-850 border border-white/10 space-y-3 shadow-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-[11px] text-slate-400 font-semibold uppercase">Прямий номер господаря:</div>
+                            <div class="text-base font-black text-white font-mono tracking-wider">${item.phoneMasked || '+380 67 ••• •• 42'}</div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-bold text-emerald-400">Економія ${item.realtorCommissionSaved.toLocaleString('uk-UA')} ₴</span>
+                            <div class="text-[10px] text-slate-400">Замість 50% рієлтору</div>
+                        </div>
                     </div>
-                    <p class="text-xs text-slate-300 italic">«${item.note}»</p>
+                    <a href="https://t.me/prostov_shrink_bot?start=unlock_${item.id}" target="_blank" onclick="triggerHaptic('heavy')" class="w-full py-3.5 rounded-xl bg-white hover:bg-slate-100 text-base-950 font-black text-xs flex items-center justify-center gap-2 shadow-xl active:scale-98 transition-all">
+                        <svg class="w-4 h-4 fill-current text-base-950" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                        <span>Отримати прямий номер за 99 ₴</span>
+                    </a>
                 </div>
 
-                <!-- Action Button -->
-                <a href="https://t.me/pavlograd_admin?text=Вітаю!+Цікавить+квартира+№${item.id}:+${encodeURIComponent(item.address)}" target="_blank" onclick="triggerHaptic('heavy')" class="w-full py-3.5 rounded-2xl bg-white text-base-950 font-black text-sm flex items-center justify-center gap-2 shadow-xl active:scale-98 transition-all">
+                <!-- Direct Telegram Button -->
+                <a href="https://t.me/pavlograd_admin?text=Вітаю!+Цікавить+квартира+№${item.id}:+${encodeURIComponent(item.address)}" target="_blank" onclick="triggerHaptic('medium')" class="w-full py-3 rounded-xl bg-base-800 hover:bg-base-750 text-slate-200 border border-white/10 font-bold text-xs flex items-center justify-center gap-2 transition-all">
                     💬 Написати господарю в Telegram
                 </a>
             `;
@@ -830,8 +844,26 @@
             updateUI();
         }
 
-        // INITIAL LOAD
-        updateUI();
+        // INITIAL LOAD: Fetch live deals from VPS/GitHub Pages data/deals.json
+        async function loadLiveDeals() {
+            try {
+                const res = await fetch('data/deals.json?v=' + Date.now());
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        LISTINGS.splice(0, LISTINGS.length, ...data);
+                        const allBtn = document.querySelector('.q-filter');
+                        if (allBtn) allBtn.innerText = `Всі (${LISTINGS.length})`;
+                        console.log('Successfully loaded live deals:', data.length);
+                    }
+                }
+            } catch (e) {
+                console.log('Using local fallback deals:', e);
+            }
+            updateUI();
+        }
+
+        loadLiveDeals();
     </script>
 </body>
 </html>
