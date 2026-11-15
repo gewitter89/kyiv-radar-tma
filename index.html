@@ -203,17 +203,18 @@
     <header class="absolute top-3 left-3 right-3 z-30 flex flex-col gap-2 pointer-events-none">
         <!-- Search & Filter Row -->
         <div class="surface-panel rounded-2xl p-2 px-3 flex items-center justify-between gap-2 shadow-2xl pointer-events-auto">
-            <!-- Brand Mark -->
-            <div class="flex items-center gap-2 shrink-0">
+            <!-- Brand Mark & Interactive City Selector -->
+            <div class="flex items-center gap-2 shrink-0 cursor-pointer active:scale-95 transition-all" onclick="openCityDrawer()">
                 <div class="w-8 h-8 rounded-xl bg-white text-dark-950 flex items-center justify-center font-black text-xs shrink-0 shadow-sm">
                     КР
                 </div>
                 <div class="min-w-0 pr-1">
                     <div class="flex items-center gap-1">
-                        <span class="text-xs font-bold text-white tracking-tight">Київ Радар</span>
+                        <span class="text-xs font-bold text-white tracking-tight" id="headerCityTitle">Київ</span>
                         <span class="px-1 py-0.2 rounded text-[9px] font-bold bg-white/10 text-emerald-400">0%</span>
+                        <svg class="w-2.5 h-2.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </div>
-                    <span class="text-[10px] text-slate-400 block truncate">Прямі власники</span>
+                    <span class="text-[10px] text-slate-400 block truncate" id="headerCitySub">180 прямих власників</span>
                 </div>
             </div>
 
@@ -240,6 +241,11 @@
             <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 px-0.5">
                 <button onclick="toggleQuickFilter(this, 'all')" id="btnFilterAll" class="q-filter active shrink-0 py-1.5 px-3 rounded-xl text-[11px] font-bold bg-white text-dark-950 text-center shadow-md whitespace-nowrap transition-all">
                     Всі (180)
+                </button>
+                <!-- Landlord Form Fast Trigger -->
+                <button onclick="openLandlordDrawer()" class="shrink-0 py-1.5 px-2.5 rounded-xl text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 text-center whitespace-nowrap transition-all flex items-center gap-1 active:scale-95 shadow-sm">
+                    <span>🏢</span>
+                    <span>Здати 0%</span>
                 </button>
                 <button onclick="toggleQuickFilter(this, 'favs')" id="btnFilterFavs" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-[11px] font-semibold surface-panel text-slate-300 hover:text-white text-center whitespace-nowrap transition-all">
                     🤍 Збережені
@@ -312,6 +318,161 @@
     <div id="detailModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden opacity-0 transition-opacity duration-200 flex items-end">
         <div class="w-full max-h-[90vh] bg-dark-900 border-t border-white/10 rounded-t-3xl overflow-y-auto p-5 space-y-4 text-white transform translate-y-full transition-transform duration-300" id="detailSheetContent">
             <!-- Rendered dynamically -->
+        </div>
+    </div>
+
+    <!-- CITY PICKER DRAWER (Kyiv, Lviv, Odesa) -->
+    <div id="cityDrawer" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden opacity-0 transition-opacity duration-200 flex items-end">
+        <div class="w-full max-h-[70vh] bg-dark-900 border-t border-white/10 rounded-t-3xl overflow-y-auto p-5 space-y-4 text-white transform translate-y-full transition-transform duration-300" id="cityDrawerContent">
+            <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-2"></div>
+            <div class="flex items-center justify-between pb-2 border-b border-white/10">
+                <div>
+                    <h3 class="text-base font-bold text-white">🏙 Оберіть місто пошуку</h3>
+                    <p class="text-[11px] text-slate-400">Моніторинг прямих власників без комісії 50%</p>
+                </div>
+                <button onclick="closeCityDrawer()" class="text-xs font-bold text-slate-400 hover:text-white p-1">✕</button>
+            </div>
+
+            <div class="space-y-2">
+                <!-- Kyiv (Active) -->
+                <button onclick="switchCity('kyiv', 50.4501, 30.5234, 'Київ')" class="w-full p-3.5 rounded-2xl bg-white text-dark-950 font-bold text-left flex items-center justify-between shadow-lg active:scale-98 transition-all">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">🇺🇦</span>
+                        <div>
+                            <div class="text-sm font-extrabold">Київ Радар</div>
+                            <div class="text-[11px] text-slate-600 font-semibold">180 перевірених квартир від власників</div>
+                        </div>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider">Активно</span>
+                </button>
+
+                <!-- Lviv (Expanding) -->
+                <button onclick="switchCity('lviv', 49.8397, 24.0297, 'Львів')" class="w-full p-3.5 rounded-2xl bg-dark-850 border border-white/10 text-left flex items-center justify-between hover:bg-dark-800 active:scale-98 transition-all">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">🦁</span>
+                        <div>
+                            <div class="text-sm font-bold text-white">Львів Радар</div>
+                            <div class="text-[11px] text-slate-400">Запуск 1 грудня · 42 заявки на пошук</div>
+                        </div>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-full bg-brand-blue/20 text-brand-blue text-[10px] font-bold">Скоро</span>
+                </button>
+
+                <!-- Odesa (Expanding) -->
+                <button onclick="switchCity('odesa', 46.4825, 30.7233, 'Одеса')" class="w-full p-3.5 rounded-2xl bg-dark-850 border border-white/10 text-left flex items-center justify-between hover:bg-dark-800 active:scale-98 transition-all">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">⚓</span>
+                        <div>
+                            <div class="text-sm font-bold text-white">Одеса Радар</div>
+                            <div class="text-[11px] text-slate-400">Запуск 1 грудня · 28 заявок на пошук</div>
+                        </div>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-full bg-brand-blue/20 text-brand-blue text-[10px] font-bold">Скоро</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LANDLORD DIRECT LISTING DRAWER -->
+    <div id="landlordDrawer" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden opacity-0 transition-opacity duration-200 flex items-end">
+        <div class="w-full max-h-[90vh] bg-dark-900 border-t border-white/10 rounded-t-3xl overflow-y-auto p-5 space-y-4 text-white transform translate-y-full transition-transform duration-300" id="landlordDrawerContent">
+            <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-2"></div>
+            <div class="flex items-center justify-between pb-2 border-b border-white/10">
+                <div>
+                    <h3 class="text-base font-bold text-white">🏢 Здати квартиру без комісії</h3>
+                    <p class="text-[11px] text-slate-400">Прямі орендарі. 0% рієлторам. Без спаму та холодних дзвінків.</p>
+                </div>
+                <button onclick="closeLandlordDrawer()" class="text-xs font-bold text-slate-400 hover:text-white p-1">✕</button>
+            </div>
+
+            <!-- Landlord Form -->
+            <form id="landlordForm" onsubmit="submitLandlordDeal(event)" class="space-y-3 text-xs">
+                <!-- City & District -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 font-semibold mb-1">Місто</label>
+                        <select id="llCity" class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-brand-blue">
+                            <option value="Київ">Київ</option>
+                            <option value="Львів">Львів</option>
+                            <option value="Одеса">Одеса</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 font-semibold mb-1">Район</label>
+                        <select id="llDistrict" class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-brand-blue">
+                            <option value="Оболонський">Оболонський</option>
+                            <option value="Печерський">Печерський</option>
+                            <option value="Подільський">Подільський</option>
+                            <option value="Шевченківський">Шевченківський</option>
+                            <option value="Голосіївський">Голосіївський</option>
+                            <option value="Дарницький">Дарницький</option>
+                            <option value="Солом'янський">Солом'янський</option>
+                            <option value="Дніпровський">Дніпровський</option>
+                            <option value="Деснянський">Деснянський</option>
+                            <option value="Святошинський">Святошинський</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Street / Complex -->
+                <div>
+                    <label class="block text-[10px] text-slate-400 font-semibold mb-1">Вулиця / Назва ЖК</label>
+                    <input type="text" id="llAddress" required placeholder="наприклад, Оболонська набережна 11, ЖК Паркове Місто" class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:border-brand-blue">
+                </div>
+
+                <!-- Rooms & Price -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 font-semibold mb-1">Кімнат</label>
+                        <select id="llRooms" class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-brand-blue">
+                            <option value="1">1 кімната</option>
+                            <option value="2">2 кімнати</option>
+                            <option value="3">3+ кімнати</option>
+                            <option value="Студія">Студія</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 font-semibold mb-1">Ціна (₴/місяць)</label>
+                        <input type="number" id="llPrice" required placeholder="16000" class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:border-brand-blue">
+                    </div>
+                </div>
+
+                <!-- Blackout Features -->
+                <div>
+                    <label class="block text-[10px] text-slate-400 font-semibold mb-1">Автономність житла (2026)</label>
+                    <div class="grid grid-cols-3 gap-1.5 text-[11px]">
+                        <label class="flex items-center gap-1.5 p-2 rounded-xl bg-dark-850 border border-white/5 cursor-pointer">
+                            <input type="checkbox" id="llGpon" class="rounded accent-emerald-500">
+                            <span>⚡ GPON</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 p-2 rounded-xl bg-dark-850 border border-white/5 cursor-pointer">
+                            <input type="checkbox" id="llGenerator" class="rounded accent-emerald-500">
+                            <span>🔋 Генератор</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 p-2 rounded-xl bg-dark-850 border border-white/5 cursor-pointer">
+                            <input type="checkbox" id="llGas" class="rounded accent-emerald-500">
+                            <span>🔥 Газ</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Contact & Description -->
+                <div>
+                    <label class="block text-[10px] text-slate-400 font-semibold mb-1">Ваш контакт (Телефон або @username в Telegram)</label>
+                    <input type="text" id="llContact" required placeholder="+380 97 123 45 67 або @my_telegram" class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:border-brand-blue">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] text-slate-400 font-semibold mb-1">Короткий опис або посилання на фото (Google Drive / OLX)</label>
+                    <textarea id="llDesc" rows="2" placeholder="Меблі, техніка, чи можна з тваринами, посилання на фотографії..." class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:border-brand-blue"></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="btnSubmitLandlord" class="w-full py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-black text-xs uppercase tracking-wider shadow-lg active:scale-98 transition-all flex items-center justify-center gap-2">
+                    <span>🚀 Опублікувати лот безкоштовно</span>
+                </button>
+                <p class="text-[10px] text-center text-slate-500">Після перевірки на відсутність рієлторських комісій лот з'явиться на карті та в каналі.</p>
+            </form>
         </div>
     </div>
 
@@ -1181,6 +1342,117 @@
             setTimeout(() => drawer.classList.add('hidden'), 200);
         }
 
+        // CITY PICKER
+        function openCityDrawer() {
+            triggerHaptic('medium');
+            const drawer = document.getElementById('cityDrawer');
+            const content = document.getElementById('cityDrawerContent');
+            drawer.classList.remove('hidden');
+            setTimeout(() => {
+                drawer.classList.remove('opacity-0');
+                content.classList.remove('translate-y-full');
+            }, 10);
+        }
+
+        function closeCityDrawer() {
+            triggerHaptic('light');
+            const drawer = document.getElementById('cityDrawer');
+            const content = document.getElementById('cityDrawerContent');
+            content.classList.add('translate-y-full');
+            drawer.classList.add('opacity-0');
+            setTimeout(() => drawer.classList.add('hidden'), 200);
+        }
+
+        function switchCity(cityCode, lat, lng, cityName) {
+            triggerHaptic('medium');
+            closeCityDrawer();
+            const titleEl = document.getElementById('headerCityTitle');
+            const subEl = document.getElementById('headerCitySub');
+            if (titleEl) titleEl.innerText = cityName;
+
+            if (cityCode === 'kyiv') {
+                if (subEl) subEl.innerText = `${LISTINGS.length} прямих власників`;
+                map.flyTo([lat, lng], 12, { duration: 1.2 });
+            } else {
+                if (subEl) subEl.innerText = `Розширення · 1 грудня`;
+                map.flyTo([lat, lng], 13, { duration: 1.5 });
+                if (window.Telegram?.WebApp?.showAlert) {
+                    window.Telegram.WebApp.showAlert(`🚀 Радар у ${cityName} запускається 1 грудня! Прийом заявок від власників відкрито.`);
+                } else {
+                    alert(`🚀 Радар у ${cityName} запускається 1 грудня! Прийом заявок від власників відкрито.`);
+                }
+            }
+        }
+
+        // LANDLORD DRAWER
+        function openLandlordDrawer() {
+            triggerHaptic('medium');
+            const drawer = document.getElementById('landlordDrawer');
+            const content = document.getElementById('landlordDrawerContent');
+            drawer.classList.remove('hidden');
+            setTimeout(() => {
+                drawer.classList.remove('opacity-0');
+                content.classList.remove('translate-y-full');
+            }, 10);
+        }
+
+        function closeLandlordDrawer() {
+            triggerHaptic('light');
+            const drawer = document.getElementById('landlordDrawer');
+            const content = document.getElementById('landlordDrawerContent');
+            content.classList.add('translate-y-full');
+            drawer.classList.add('opacity-0');
+            setTimeout(() => drawer.classList.add('hidden'), 200);
+        }
+
+        async function submitLandlordDeal(e) {
+            e.preventDefault();
+            triggerHaptic('heavy');
+            const btn = document.getElementById('btnSubmitLandlord');
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳ Відправка на модерацію...</span>';
+
+            const city = document.getElementById('llCity').value;
+            const district = document.getElementById('llDistrict').value;
+            const address = document.getElementById('llAddress').value;
+            const rooms = document.getElementById('llRooms').value;
+            const price = document.getElementById('llPrice').value;
+            const gpon = document.getElementById('llGpon').checked ? 'Так' : 'Ні';
+            const gen = document.getElementById('llGenerator').checked ? 'Так' : 'Ні';
+            const gas = document.getElementById('llGas').checked ? 'Так' : 'Ні';
+            const contact = document.getElementById('llContact').value;
+            const desc = document.getElementById('llDesc').value;
+
+            const text = `🏢 <b>НОВИЙ ЛОТ ВІД ВЛАСНИКА (З ФОРМИ TMA)!</b>\n━━━━━━━━━━━━━━━━━━\n🏙 <b>Місто/Район:</b> ${city}, ${district}\n📍 <b>Адреса:</b> ${address}\n📐 <b>Кімнат:</b> ${rooms}\n💰 <b>Ціна:</b> ${price} ₴/міс\n⚡ <b>Автономність:</b> GPON: ${gpon} | Ген: ${gen} | Газ: ${gas}\n📞 <b>Контакт:</b> <code>${contact}</code>\n📝 <b>Опис:</b> ${desc}`;
+
+            try {
+                const botToken = "8976290222:AAF7LnHQ9FTEV3gI4Ap1F8Cz6ATsycbq22U";
+                const adminId = "8531839081";
+                await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: adminId,
+                        text: text,
+                        parse_mode: 'HTML'
+                    })
+                });
+            } catch (err) {
+                console.warn('Notice dispatching landlord lead:', err);
+            }
+
+            closeLandlordDrawer();
+            btn.disabled = false;
+            btn.innerHTML = '<span>🚀 Опублікувати лот безкоштовно</span>';
+            document.getElementById('landlordForm').reset();
+
+            if (window.Telegram?.WebApp?.showAlert) {
+                window.Telegram.WebApp.showAlert('✅ Дякуємо! Вашу квартиру отримано. Модератор перевірить відсутність рієлторської націнки та додасть на карту протягом 15 хвилин.');
+            } else {
+                alert('✅ Дякуємо! Вашу квартиру отримано. Модератор перевірить відсутність рієлторської націнки та додасть на карту протягом 15 хвилин.');
+            }
+        }
+
         // INITIAL LOAD: Live deals from VPS
         async function loadLiveDeals() {
             try {
@@ -1211,6 +1483,10 @@
                 targetDealId = parseInt(params.get('deal'));
             } else if (tgStartApp.startsWith('deal_')) {
                 targetDealId = parseInt(tgStartApp.replace('deal_', ''));
+            }
+
+            if (hash === '#landlord' || hash.includes('landlord') || tgStartApp === 'landlord') {
+                setTimeout(openLandlordDrawer, 500);
             }
 
             if (targetDealId) {
