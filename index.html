@@ -241,14 +241,20 @@
                 <button onclick="toggleQuickFilter(this, 'all')" id="btnFilterAll" class="q-filter active shrink-0 py-1.5 px-3 rounded-xl text-[11px] font-bold bg-white text-dark-950 text-center shadow-md whitespace-nowrap transition-all">
                     Всі (180)
                 </button>
+                <button onclick="toggleQuickFilter(this, 'favs')" id="btnFilterFavs" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-[11px] font-semibold surface-panel text-slate-300 hover:text-white text-center whitespace-nowrap transition-all">
+                    🤍 Збережені
+                </button>
                 <button onclick="toggleQuickFilter(this, 'rooms_1')" id="btnFilterR1" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-[11px] font-semibold surface-panel text-slate-300 hover:text-white text-center whitespace-nowrap transition-all">
                     1-кімн
                 </button>
                 <button onclick="toggleQuickFilter(this, 'rooms_2')" id="btnFilterR2" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-[11px] font-semibold surface-panel text-slate-300 hover:text-white text-center whitespace-nowrap transition-all">
                     2-кімн
                 </button>
-                <button onclick="toggleQuickFilter(this, 'rooms_3')" id="btnFilterR3" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-[11px] font-semibold surface-panel text-slate-300 hover:text-white text-center whitespace-nowrap transition-all">
-                    3-кімн+
+                <button onclick="toggleQuickFilter(this, 'max_15k')" id="btnFilter15k" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-[11px] font-semibold surface-panel text-slate-300 hover:text-white text-center whitespace-nowrap transition-all">
+                    До 15k ₴
+                </button>
+                <button onclick="toggleQuickFilter(this, 'max_20k')" id="btnFilter20k" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-[11px] font-semibold surface-panel text-slate-300 hover:text-white text-center whitespace-nowrap transition-all">
+                    До 20k ₴
                 </button>
                 <button onclick="activateNearbyMode(this)" id="btnFilterNearby" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-[11px] font-semibold surface-panel text-slate-300 hover:text-white text-center whitespace-nowrap transition-all">
                     📍 Поруч
@@ -382,12 +388,68 @@
             }
         }
 
+        // Favorites & Rented Engine (Bird / Monobank style)
+        let FAVORITES = new Set(JSON.parse(localStorage.getItem('kyiv_radar_favs') || '[]'));
+        let RENTED_REPORTS = new Set(JSON.parse(localStorage.getItem('kyiv_radar_rented') || '[]'));
+
+        function toggleFavorite(e, id) {
+            if (e) e.stopPropagation();
+            triggerHaptic('medium');
+            if (FAVORITES.has(id)) {
+                FAVORITES.delete(id);
+            } else {
+                FAVORITES.add(id);
+            }
+            localStorage.setItem('kyiv_radar_favs', JSON.stringify(Array.from(FAVORITES)));
+            updateFavoritesUI();
+        }
+
+        function updateFavoritesUI() {
+            const favCount = FAVORITES.size;
+            const favBtn = document.getElementById('btnFilterFavs');
+            if (favBtn) {
+                favBtn.innerHTML = favCount > 0 ? `❤️ Збережені (${favCount})` : `🤍 Збережені`;
+            }
+            document.querySelectorAll('.fav-heart-btn').forEach(btn => {
+                const id = parseInt(btn.getAttribute('data-id'));
+                if (FAVORITES.has(id)) {
+                    btn.innerHTML = '❤️';
+                    btn.classList.add('scale-110');
+                } else {
+                    btn.innerHTML = '🤍';
+                    btn.classList.remove('scale-110');
+                }
+            });
+            const modalFavText = document.getElementById('modalFavText');
+            if (modalFavText && activeDetailItem) {
+                modalFavText.innerText = FAVORITES.has(activeDetailItem.id) ? '❤️ Збережено' : '🤍 Зберегти';
+            }
+            if (currentFilter.favoritesOnly) {
+                updateUI();
+            }
+        }
+
+        function reportRented(id) {
+            triggerHaptic('heavy');
+            RENTED_REPORTS.add(id);
+            localStorage.setItem('kyiv_radar_rented', JSON.stringify(Array.from(RENTED_REPORTS)));
+            closeDetail();
+            if (tg?.showAlert) {
+                tg.showAlert('Дякуємо! Ми позначили цей лот для швидкої модерації.');
+            } else {
+                alert('Дякуємо! Ми позначили цей лот для швидкої модерації.');
+            }
+            updateUI();
+        }
+
         // Active State
         let LISTINGS = [];
         let currentFilter = {
             search: '',
             district: 'all',
             rooms: 0,
+            maxPrice: 0,
+            favoritesOnly: false,
             generator: false,
             gpon: false,
             nearbyOnly: false
@@ -662,6 +724,8 @@
         // FILTER ENGINE
         function getFilteredListings() {
             let res = LISTINGS.filter(item => {
+                if (currentFilter.favoritesOnly && !FAVORITES.has(item.id)) return false;
+                if (currentFilter.maxPrice > 0 && item.price > currentFilter.maxPrice) return false;
                 if (currentFilter.rooms > 0) {
                     if (currentFilter.rooms === 3 && (item.rooms || 1) >= 3) {
                         // pass
@@ -780,6 +844,18 @@
                         <div class="relative w-[105px] h-[105px] rounded-xl overflow-hidden bg-dark-950 shrink-0">
                             <img id="photo-img-${item.id}" src="${item.images[curPhoto]}" class="w-full h-full object-cover select-none pointer-events-none" alt="${item.title}">
                             
+                            <!-- Heart Favorite Button (1 tap) -->
+                            <button onclick="toggleFavorite(event, ${item.id})" class="fav-heart-btn absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 hover:bg-black text-[12px] flex items-center justify-center z-30 pointer-events-auto transition-transform" data-id="${item.id}">
+                                ${FAVORITES.has(item.id) ? '❤️' : '🤍'}
+                            </button>
+
+                            <!-- Rented Overlay if marked -->
+                            ${RENTED_REPORTS.has(item.id) ? `
+                                <div class="absolute inset-0 bg-black/80 backdrop-blur-[1px] flex items-center justify-center z-25 pointer-events-none">
+                                    <span class="px-2 py-0.5 rounded bg-rose-500/90 text-white text-[9px] font-black uppercase tracking-wider">Здано</span>
+                                </div>
+                            ` : ''}
+
                             <!-- Tap zones (left 50% = prev, right 50% = next) -->
                             <div class="absolute inset-y-0 left-0 w-1/2 z-10 cursor-pointer" onclick="changePhoto(event, ${item.id}, -1)"></div>
                             <div class="absolute inset-y-0 right-0 w-1/2 z-10 cursor-pointer" onclick="changePhoto(event, ${item.id}, 1)"></div>
@@ -915,17 +991,43 @@
                 userRadiusCircle = null;
             }
             currentFilter.nearbyOnly = false;
+            currentFilter.favoritesOnly = false;
+            currentFilter.maxPrice = 0;
+            currentFilter.rooms = 0;
+            currentFilter.generator = false;
+            currentFilter.gpon = false;
 
             if (type === 'all') {
-                currentFilter = { ...currentFilter, rooms: 0, generator: false, gpon: false, district: 'all' };
+                currentFilter.district = 'all';
+            } else if (type === 'favs') {
+                currentFilter.favoritesOnly = true;
+            } else if (type === 'max_15k') {
+                currentFilter.maxPrice = 15000;
+            } else if (type === 'max_20k') {
+                currentFilter.maxPrice = 20000;
             } else if (type.startsWith('rooms_')) {
                 const r = parseInt(type.replace('rooms_', ''));
-                currentFilter = { ...currentFilter, rooms: r, generator: false, gpon: false };
+                currentFilter.rooms = r;
             } else {
-                currentFilter = { ...currentFilter, rooms: 0, generator: false, gpon: false };
                 currentFilter[type] = true;
             }
             updateUI();
+        }
+
+        
+        function shareListing(id) {
+            triggerHaptic('light');
+            const apt = LISTINGS.find(x => x.id === id);
+            if (!apt) return;
+            const title = `${apt.rooms || 1}-к квартира біля м. ${normalizeMetroName(apt.metro)} за ${apt.price.toLocaleString('uk-UA')} ₴ без рієлтора!`;
+            const url = `https://gewitter89.github.io/kyiv-radar-tma/#deal_${id}`;
+            const text = encodeURIComponent(`Знайшов(ла) квартиру без рієлтора на Радарі: ${title}\n`);
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${text}`;
+            if (window.Telegram?.WebApp?.openTelegramLink) {
+                window.Telegram.WebApp.openTelegramLink(shareUrl);
+            } else {
+                window.open(shareUrl, '_blank');
+            }
         }
 
         function handleSearch(val) {
@@ -1008,7 +1110,12 @@
                         <div class="text-xl font-black text-white">${item.price.toLocaleString('uk-UA')} ₴ / міс</div>
                         <div class="text-xs text-emerald-400 font-semibold">Економія +${item.realtorCommissionSaved.toLocaleString('uk-UA')} ₴ без рієлтора</div>
                     </div>
-                    <button onclick="closeDetail()" class="p-2 rounded-xl bg-dark-850 text-slate-400 hover:text-white font-bold text-xs">✕</button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleFavorite(event, ${item.id})" class="px-2.5 py-1.5 rounded-xl bg-dark-850 hover:bg-dark-900 border border-white/10 text-xs font-semibold flex items-center gap-1 active:scale-95 transition-all">
+                            <span id="modalFavText">${FAVORITES.has(item.id) ? '❤️ Збережено' : '🤍 Зберегти'}</span>
+                        </button>
+                        <button onclick="closeDetail()" class="p-2 rounded-xl bg-dark-850 text-slate-400 hover:text-white font-bold text-xs">✕</button>
+                    </div>
                 </div>
 
                 <!-- Location, Metro & Detailed Specs -->
@@ -1064,7 +1171,25 @@
                         <svg class="w-4 h-4 fill-current text-dark-950" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
                         <span>Отримати прямий номер за 99 ₴</span>
                     </a>
+                    <div class="text-[10px] text-slate-400 text-center flex items-center justify-center gap-1.5 pt-0.5">
+                        <span class="text-emerald-400">🛡️</span> <b>100% Гарантія:</b> якщо вже здано — безкоштовна заміна контакту
+                    </div>
                 </div>
+
+                <!-- 1-Tap Viral Share + Free 2026 Contract -->
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="shareListing(${item.id})" class="py-2.5 px-3 rounded-xl surface-panel border border-white/10 hover:border-white/20 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 active:scale-95 transition-all">
+                        <span>✈️ Надіслати другу</span>
+                    </button>
+                    <a href="https://t.me/prostov_shrink_bot?start=contract" target="_blank" class="py-2.5 px-3 rounded-xl surface-panel border border-white/10 hover:border-white/20 text-sky-400 font-bold text-[11px] flex items-center justify-center gap-1.5 active:scale-95 transition-all text-center">
+                        <span>📄 Договір 2026</span>
+                    </a>
+                </div>
+
+                <!-- Report Already Rented -->
+                <button onclick="reportRented(${item.id})" class="w-full py-2 rounded-xl bg-dark-850 hover:bg-dark-900 border border-white/5 text-slate-400 hover:text-rose-400 text-[11px] font-medium transition-colors">
+                    ✕ Повідомити: цю квартиру вже здали
+                </button>
 
                 <div class="text-center pt-1">
                     <a href="https://t.me/pavlograd_admin" target="_blank" class="text-[11px] text-slate-500 hover:text-slate-400 transition-colors">
