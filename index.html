@@ -499,142 +499,78 @@
             return `${distKm.toFixed(1)} км`;
         }
 
-        // GEOLOCATION ENGINE
+        // GEOLOCATION & NEARBY ENGINE
+        function activateNearbyMode(btn) {
+            triggerHaptic('light');
+            document.querySelectorAll('.q-filter').forEach(b => {
+                b.className = 'q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-[11px] font-semibold surface-panel text-slate-300 hover:text-white text-center whitespace-nowrap transition-all';
+            });
+            if (btn) {
+                btn.className = 'q-filter active shrink-0 py-1.5 px-3 rounded-xl text-[11px] font-bold bg-white text-dark-950 text-center shadow-md whitespace-nowrap transition-all';
+            }
+            handleLocateClick();
+        }
+
         function handleLocateClick() {
             triggerHaptic('medium');
             const locateBtn = document.getElementById('btnLocate');
             if (locateBtn) locateBtn.classList.add('animate-pulse');
 
-            // 1. Telegram WebApp Location Manager
-            if (window.Telegram?.WebApp?.LocationManager) {
-                try {
-                    window.Telegram.WebApp.LocationManager.init(() => {
-                        window.Telegram.WebApp.LocationManager.getLocation((data) => {
-                            if (locateBtn) locateBtn.classList.remove('animate-pulse');
-                            if (data && data.latitude && data.longitude) {
-                                onGotExactLocation(data.latitude, data.longitude, data.accuracy || 20);
-                                return;
-                            }
-                            fallbackBrowserGeolocation(locateBtn);
-                        });
-                    });
-                    return;
-                } catch (e) {
-                    console.log('TG LocationManager fallback:', e);
-                }
-            }
-
-            fallbackBrowserGeolocation(locateBtn);
-        }
-
-        function fallbackBrowserGeolocation(locateBtn) {
-            if (!navigator.geolocation) {
-                if (locateBtn) locateBtn.classList.remove('animate-pulse');
-                openDistrictDrawer();
+            // 1. Try browser or TG location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        if (locateBtn) locateBtn.classList.remove('animate-pulse');
+                        onGotExactLocation(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+                    },
+                    (err) => {
+                        if (locateBtn) locateBtn.classList.remove('animate-pulse');
+                        console.warn('Geolocation blocked/error:', err);
+                        // Seamless fallback: open district picker immediately!
+                        openDistrictDrawer();
+                    },
+                    { enableHighAccuracy: true, timeout: 6000, maximumAge: 60000 }
+                );
                 return;
             }
 
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    if (locateBtn) locateBtn.classList.remove('animate-pulse');
-                    onGotExactLocation(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
-                },
-                (err) => {
-                    if (locateBtn) locateBtn.classList.remove('animate-pulse');
-                    console.warn('Geolocation error:', err);
-                    openDistrictDrawer();
-                },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-            );
+            if (locateBtn) locateBtn.classList.remove('animate-pulse');
+            openDistrictDrawer();
         }
 
         function onGotExactLocation(lat, lng, accuracy = 20) {
-            userLocation = { lat, lng, accuracy };
-
-            // Calculate distance to all items
-            LISTINGS.forEach(item => {
-                if (item.lat && item.lng) {
-                    item.distanceKm = getHaversineDistance(lat, lng, item.lat, item.lng);
-                }
-            });
-
-            // 1. Add / update blue pulsing marker at EXACT USER GPS COORDINATES!
-            const userIcon = L.divIcon({
-                className: 'user-loc-wrap',
-                html: `
-                    <div class="user-loc-container">
-                        <div class="user-loc-pulse"></div>
-                        <div class="user-loc-dot"></div>
-                    </div>
-                `,
-                iconSize: [24, 24],
-                iconAnchor: [12, 12]
-            });
-
-            if (userMarker) {
-                userMarker.setLatLng([lat, lng]);
-            } else {
-                userMarker = L.marker([lat, lng], {
-                    icon: userIcon,
-                    zIndexOffset: 10000
-                }).addTo(map);
-            }
-
-            // Distance to Kyiv center
             const distToKyiv = getHaversineDistance(lat, lng, 50.4501, 30.5234);
 
             if (distToKyiv <= 45) {
-                // Inside Greater Kyiv!
-                if (userRadiusCircle) map.removeLayer(userRadiusCircle);
-                userRadiusCircle = L.circle([lat, lng], {
-                    radius: 3500,
-                    color: '#007aff',
-                    fillColor: '#007aff',
-                    fillOpacity: 0.08,
-                    weight: 1.5,
-                    dashArray: '4, 6'
-                }).addTo(map);
-
-                currentFilter.nearbyOnly = true;
-
-                const banner = document.getElementById('nearbyBanner');
-                const bannerText = document.getElementById('nearbyBannerText');
-                if (banner && bannerText) {
-                    const count = getFilteredListings().length;
-                    bannerText.innerHTML = `Поруч з вами (радіус 3.5 км: ${count} вар.)`;
-                    banner.classList.remove('hidden');
-                }
-
-                map.flyTo([lat, lng], 14, { duration: 0.8 });
+                // INSIDE KYIV: Use real GPS location!
+                setUserLocationAndRadius(lat, lng, 'Поруч з вами');
             } else {
-                // Outside Kyiv (e.g. testing in Pavlograd or VPN) - SHOW EXACT PIN!
-                map.flyTo([lat, lng], 12, { duration: 0.9 });
-
-                const banner = document.getElementById('nearbyBanner');
-                const bannerText = document.getElementById('nearbyBannerText');
-                if (banner && bannerText) {
-                    bannerText.innerHTML = `📍 Ваша точка: <b>${formatDistance(distToKyiv)}</b> від Києва <button onclick="recenterKyiv()" class="ml-2 underline font-bold text-white">До Києва ›</button>`;
-                    banner.classList.remove('hidden');
-                }
+                // OUTSIDE KYIV (e.g. user in Pavlograd, desktop, VPN):
+                // Do NOT fly outside Kyiv! Instantly open the District Drawer so user picks their Kyiv district!
+                openDistrictDrawer();
             }
-
-            updateUI();
-        }
-
-        function activateNearbyMode(btn) {
-            triggerHaptic('light');
-            handleLocateClick();
         }
 
         function selectKyivDistrict(districtName, lat, lng) {
             triggerHaptic('medium');
             closeDistrictDrawer();
-            setUserLocationAndRadius(lat, lng, `Район ${districtName}`);
+
+            // Set button to active
+            document.querySelectorAll('.q-filter').forEach(b => {
+                b.className = 'q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-[11px] font-semibold surface-panel text-slate-300 hover:text-white text-center whitespace-nowrap transition-all';
+            });
+            const nearbyBtn = document.getElementById('btnFilterNearby');
+            if (nearbyBtn) {
+                nearbyBtn.className = 'q-filter active shrink-0 py-1.5 px-3 rounded-xl text-[11px] font-bold bg-white text-dark-950 text-center shadow-md whitespace-nowrap transition-all';
+            }
+
+            setUserLocationAndRadius(lat, lng, `${districtName}`);
         }
 
         function setUserLocationAndRadius(lat, lng, label = 'Поруч з вами') {
             userLocation = { lat, lng, label };
 
+            // Calculate distance to all items
             LISTINGS.forEach(item => {
                 if (item.lat && item.lng) {
                     item.distanceKm = getHaversineDistance(lat, lng, item.lat, item.lng);
@@ -680,7 +616,7 @@
             const bannerText = document.getElementById('nearbyBannerText');
             if (banner && bannerText) {
                 const count = getFilteredListings().length;
-                bannerText.innerText = `${label} (в радіусі 3.5 км: ${count} вар.)`;
+                bannerText.innerHTML = `📍 <b>${label}</b> (${count} вар. поруч) <button onclick="openDistrictDrawer()" class="ml-2 underline font-bold text-white text-[10px]">Змінити район ›</button> <button onclick="resetNearbyMode()" class="ml-2 px-1.5 py-0.5 rounded bg-white/20 text-white text-[10px]">✕</button>`;
                 banner.classList.remove('hidden');
             }
 
@@ -702,10 +638,12 @@
             if (banner) banner.classList.add('hidden');
 
             document.querySelectorAll('.q-filter').forEach(b => {
-                b.className = 'q-filter py-1.5 px-1 rounded-xl text-[11px] font-semibold surface-panel text-slate-300 hover:text-white text-center whitespace-nowrap transition-all';
+                b.className = 'q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-[11px] font-semibold surface-panel text-slate-300 hover:text-white text-center whitespace-nowrap transition-all';
             });
             const allBtn = document.getElementById('btnFilterAll');
-            if (allBtn) allBtn.className = 'q-filter active py-1.5 px-1 rounded-xl text-[11px] font-bold bg-white text-dark-950 text-center shadow-md whitespace-nowrap transition-all';
+            if (allBtn) {
+                allBtn.className = 'q-filter active shrink-0 py-1.5 px-3 rounded-xl text-[11px] font-bold bg-white text-dark-950 text-center shadow-md whitespace-nowrap transition-all';
+            }
 
             recenterKyiv();
             updateUI();
