@@ -1617,16 +1617,15 @@
             });
         }
 
-                async function sendContactToBotChat() {
+        async function sendContactToBotChat() {
             if (!currentModalDeal) return;
             const deal = currentModalDeal;
-            const phone = deal.phone || "+380671112233";
+            const realPhone = deal.phone && deal.phone.trim().length > 0 ? deal.phone.trim() : null;
             const initData = window.Telegram?.WebApp?.initData || "";
 
-            showToast("Надсилаємо контакт...");
-
-            // If in Telegram, send via real HTTPS backend to Telegram user chat (server looks up trusted details)
+            // 1. If inside Telegram WebApp, send directly to Telegram chat via backend
             if (initData) {
+                showToast("Надсилаємо контакт у Telegram...");
                 try {
                     const res = await fetch("https://vmi3445944.contaboserver.net/api/send_contact", {
                         method: "POST",
@@ -1636,28 +1635,42 @@
                             initData: initData
                         })
                     });
-                    const data = await res.json();
+                    const data = await res.json().catch(() => ({}));
                     if (res.ok && data.success) {
                         if (window.Telegram?.WebApp?.HapticFeedback) {
                             window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
                         }
                         showToast("✓ Контакт надіслано у ваш Telegram-чат!");
                         return;
+                    } else {
+                        if (window.Telegram?.WebApp?.HapticFeedback) {
+                            window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+                        }
+                        const errReason = data.detail || (res.status === 502 ? "Запустіть бота @prostov_shrink_bot (/start)" : "Помилка сервера");
+                        showToast(`⚠️ Не вдалося надіслати контакт: ${errReason}`);
+                        return;
                     }
                 } catch (e) {
-                    console.error("sendContact error:", e);
+                    console.error("sendContact network error:", e);
+                    if (window.Telegram?.WebApp?.HapticFeedback) {
+                        window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+                    }
+                    showToast("⚠️ Помилка з'єднання з сервером. Спробуйте пізніше.");
+                    return;
                 }
             }
 
-            // Fallback: Copy to clipboard if regular browser or API error
+            // 2. Regular Web Browser (outside Telegram WebApp)
+            if (!realPhone) {
+                showToast("⚠️ Номер не вказано в оголошенні");
+                return;
+            }
+
             try {
-                await navigator.clipboard.writeText(phone);
-                if (window.Telegram?.WebApp?.HapticFeedback) {
-                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-                }
-                showToast(`✓ Номер ${phone} скопійовано`);
+                await navigator.clipboard.writeText(realPhone);
+                showToast(`✓ Номер орендодавця скопійовано: ${realPhone}`);
             } catch (err) {
-                showToast(`✓ Номер власника: ${phone}`);
+                showToast(`Номер орендодавця: ${realPhone}`);
             }
         }
 
