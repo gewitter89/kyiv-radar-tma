@@ -203,7 +203,7 @@ def test_anonymous_media_upload_and_injected_references_are_rejected(privacy_tes
     submit = client.post("/api/landlords/submit", json={
         "address": "вул. Глибочицька, 9, Київ",
         "price": "14000", "rooms": 1, "phone": "+380501234567",
-        "initData": auth, "photos": ["javascript:alert(1)"]
+        "initData": auth, "rightsConfirmed": True, "photos": ["javascript:alert(1)"]
     })
     assert submit.status_code == 400
     assert "фотографій" in submit.json()["detail"].lower()
