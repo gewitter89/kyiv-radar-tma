@@ -1901,14 +1901,14 @@
             if (phoneEl) phoneEl.innerText = phone;
             const ownerEl = document.getElementById('modalOwnerName');
             if (ownerEl) ownerEl.innerText = deal.ownerName || "Орендодавець";
-            const savingsEl = document.getElementById('modalRealtorSavings');
-            if (savingsEl) {
+            const realtorSavingsEl = document.getElementById('modalRealtorSavings');
+            if (realtorSavingsEl) {
                 if (deal.isOwnerVerified && saved > 0) {
-                    savingsEl.innerText = `Економія: ~${saved.toLocaleString()} ₴ (0% комісії)`;
+                    realtorSavingsEl.innerText = `Економія: ~${saved.toLocaleString()} ₴ (0% комісії)`;
                 } else if (deal.contactVerified) {
-                    savingsEl.innerText = `Прямий контакт з орендодавцем`;
+                    realtorSavingsEl.innerText = `Прямий контакт з орендодавцем`;
                 } else {
-                    savingsEl.innerText = `Комісія уточнюється`;
+                    realtorSavingsEl.innerText = `Комісія уточнюється`;
                 }
             }
 
