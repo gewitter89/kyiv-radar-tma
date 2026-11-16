@@ -16,17 +16,25 @@
                 extend: {
                     colors: {
                         dark: {
-                            950: '#090b0e',
-                            900: '#11141a',
-                            850: '#161a22',
-                            800: '#1e232e',
-                            700: '#2b3240'
+                            950: '#000000', // Apple Pure OLED Black
+                            900: '#1c1c1e', // Apple iOS System Background Dark
+                            850: '#2c2c2e', // Apple Secondary System Background
+                            800: '#3a3a3c', // Apple Tertiary System Background
+                            700: '#48484a'  // Apple Quaternary
                         },
-                        accent: {
-                            emerald: '#10b981',
-                            blue: '#3b82f6',
-                            amber: '#f59e0b'
+                        apple: {
+                            blue: '#0a84ff',
+                            green: '#30d158',
+                            orange: '#ff9f0a',
+                            red: '#ff453a',
+                            gray: '#8e8e93',
+                            grayDark: '#636366'
                         }
+                    },
+                    borderRadius: {
+                        'ios-card': '20px',
+                        'ios-sheet': '26px',
+                        'ios-btn': '14px'
                     }
                 }
             }
@@ -59,7 +67,7 @@
             overflow: hidden;
             position: fixed;
             inset: 0;
-            background: #090b0e;
+            background: #000000;
             color: #f3f4f6;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -79,14 +87,14 @@
             border-color: rgba(255, 255, 255, 0.18);
         }
 
-        /* Leaflet Clusters - Clean Matte Theme */
+        /* Leaflet Clusters - Apple Maps Theme */
         .custom-cluster-wrap {
             background: transparent !important;
             border: none !important;
         }
         .cluster-pill {
-            background: #11141a;
-            border: 1.5px solid #3b82f6;
+            background: #1c1c1e;
+            border: 2px solid #0a84ff;
             color: #ffffff;
             font-weight: 700;
             font-size: 13px;
@@ -95,65 +103,62 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
-            transition: transform 0.15s ease, border-color 0.15s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             cursor: pointer;
         }
         .cluster-pill:hover, .cluster-pill:active {
             transform: scale(1.1);
-            border-color: #10b981;
+            background: #0a84ff;
+            border-color: #ffffff;
         }
-        .cluster-pill.sm { width: 34px; height: 34px; border-color: #3b82f6; }
-        .cluster-pill.md { width: 40px; height: 40px; border-color: #6366f1; }
-        .cluster-pill.lg { width: 46px; height: 46px; border-color: #10b981; }
+        .cluster-pill.sm { width: 34px; height: 34px; }
+        .cluster-pill.md { width: 40px; height: 40px; }
+        .cluster-pill.lg { width: 46px; height: 46px; border-color: #30d158; }
 
-        /* Map Price Pins */
+        /* Apple Maps Native Capsule Price Pins */
         .bird-pin-wrap {
             background: transparent !important;
             border: none !important;
         }
         .bird-pin {
-            background: #11141a;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            color: #f3f4f6;
-            font-size: 11px;
+            background: #ffffff;
+            color: #000000;
+            font-size: 11.5px;
             font-weight: 700;
             font-variant-numeric: tabular-nums;
-            padding: 3px 8px;
-            border-radius: 6px;
+            letter-spacing: -0.015em;
+            padding: 3.5px 9px;
+            border-radius: 9999px;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+            gap: 4px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.08);
             white-space: nowrap;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .bird-pin:hover {
-            transform: translateY(-2px) scale(1.05);
-            background: #161a22;
-            border-color: #ffffff;
-            color: #ffffff;
-            z-index: 1000 !important;
+            transform: scale(1.08) translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
         }
         .bird-pin.active {
-            background: #ffffff;
-            color: #090b0e;
-            border-color: #ffffff;
-            transform: translateY(-2px) scale(1.1);
+            background: #0a84ff;
+            color: #ffffff;
+            transform: scale(1.15) translateY(-2px);
             font-weight: 800;
-            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.4);
+            box-shadow: 0 6px 22px rgba(10, 132, 255, 0.6), 0 0 0 2px #ffffff;
             z-index: 1000 !important;
         }
         .pin-dot {
             width: 5px;
             height: 5px;
             border-radius: 9999px;
-            background: #10b981;
+            background: #30d158;
             flex-shrink: 0;
         }
         .bird-pin.active .pin-dot {
-            background: #059669;
+            background: #ffffff;
         }
 
         /* Radar Beacon Live Pulse */
@@ -227,24 +232,26 @@
         .carousel-card {
             scroll-snap-align: start;
             flex-shrink: 0;
-            width: 290px;
-            height: 132px;
-            background: #11141a;
+            width: 295px;
+            height: 136px;
+            background: #1c1c1e;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
+            border-radius: 20px;
             display: flex;
             overflow: hidden;
             cursor: pointer;
-            transition: border-color 0.15s ease, transform 0.15s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .carousel-card:hover {
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.25);
             transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
         }
         .carousel-card.active-deal {
-            border-color: #10b981;
-            background: #161a22;
-            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2);
+            border-color: #0a84ff;
+            background: #242426;
+            box-shadow: 0 8px 28px rgba(10, 132, 255, 0.3), 0 0 0 1px #0a84ff;
         }
 
         /* Desktop Carousel Navigation Arrows */
@@ -280,63 +287,63 @@
          TOP NOTIFICATION TOAST
     ========================================== -->
     <div id="toastNotification" class="fixed top-3 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 -translate-y-2">
-        <div class="px-4 py-2 rounded-xl bg-emerald-500 text-dark-950 font-bold text-xs shadow-2xl flex items-center gap-2 border border-emerald-400">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+        <div class="px-4 py-2 rounded-full bg-[#1c1c1e]/90 text-white font-medium text-xs shadow-2xl flex items-center gap-2 border border-white/10 backdrop-blur-2xl">
+            <svg class="w-4 h-4 text-[#30d158]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
             <span id="toastText">Скопійовано!</span>
         </div>
     </div>
 
     <!-- ==========================================
-         TOP NAVBAR: Sleek, Uncluttered, Modern
+         TOP NAVBAR: Apple Frosted Glass Header
     ========================================== -->
-    <header class="h-12 shrink-0 bg-dark-900 border-b border-white/10 px-2.5 md:px-4 flex items-center justify-between gap-2 z-30">
-        <!-- City Switcher (Compact & Elegant) -->
-        <button onclick="openCityModal()" class="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-dark-950 border border-white/10 hover:border-white/20 text-xs font-semibold text-white transition-colors" title="Змінити місто">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+    <header class="h-12 shrink-0 bg-[#000000]/70 backdrop-blur-2xl border-b border-white/[0.08] px-2.5 md:px-4 flex items-center justify-between gap-2 z-30">
+        <!-- City Switcher (Apple Inset Button) -->
+        <button onclick="openCityModal()" class="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] border border-white/[0.08] text-xs font-semibold text-white transition-colors" title="Змінити місто">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span>
             <span id="cityNameLabel">Київ</span>
-            <svg class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 9l-7 7-7-7"/></svg>
+            <svg class="w-3 h-3 text-[#8e8e93]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 9l-7 7-7-7"/></svg>
         </button>
 
-        <!-- Search Bar (Takes all available width) -->
+        <!-- Search Bar (iOS Search Field) -->
         <div class="flex-1 relative min-w-0">
-            <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Пошук: метро, вулиця, район..." class="w-full bg-dark-950 border border-white/10 rounded-lg px-2.5 py-1.5 pl-7 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500/60 transition-colors">
-            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Пошук: метро, вулиця, район..." class="w-full bg-[#1c1c1e] border border-white/[0.08] rounded-full px-3 py-1.5 pl-8 text-xs text-white placeholder-[#8e8e93] focus:outline-none focus:border-[#0a84ff] transition-all">
+            <svg class="w-3.5 h-3.5 text-[#8e8e93] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         </div>
 
-        <!-- Landlord Post Button (Compact on mobile) -->
-        <button onclick="openLandlordModal()" class="shrink-0 h-8 px-2.5 rounded-lg bg-white/10 hover:bg-emerald-500 hover:text-dark-950 border border-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95" title="Опублікувати квартиру (0% комісії)">
-            <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        <!-- Landlord Post Button -->
+        <button onclick="openLandlordModal()" class="shrink-0 h-8 px-2.5 rounded-full bg-[#1c1c1e] hover:bg-[#30d158] hover:text-black border border-white/[0.08] text-white text-xs font-medium flex items-center gap-1.5 transition-all active:scale-95" title="Опублікувати квартиру (0% комісії)">
+            <svg class="w-3.5 h-3.5 text-[#30d158]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
             <span class="hidden sm:inline">Здати</span>
         </button>
     </header>
 
     <!-- ==========================================
-         FILTER BAR (Sleek Matte Chips + Sort Trigger)
+         FILTER BAR (Apple Segmented Glass Pills)
     ========================================== -->
-    <div class="py-1 px-2.5 border-b border-white/10 bg-dark-950 shrink-0 z-20 overflow-x-auto custom-scroll">
+    <div class="py-1.5 px-2.5 border-b border-white/[0.08] bg-[#000000]/60 backdrop-blur-xl shrink-0 z-20 overflow-x-auto custom-scroll">
         <div class="flex items-center gap-1.5 min-w-max text-[11px]" id="filterContainer">
             <!-- Sort Menu Button -->
-            <button onclick="openSortModal()" id="btnSortFilter" class="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-slate-200 font-bold transition-all flex items-center gap-1 shrink-0">
-                <svg class="w-3 h-3 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+            <button onclick="openSortModal()" id="btnSortFilter" class="px-2.5 py-1 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] border border-white/[0.08] text-white font-medium transition-all flex items-center gap-1 shrink-0">
+                <svg class="w-3 h-3 text-[#0a84ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
                 <span id="sortFilterLabel">Сортування ⌄</span>
             </button>
-            <button onclick="setFilter('all')" id="filterAll" class="px-2.5 py-1 rounded-full bg-white text-dark-950 font-bold transition-all">Всі (150)</button>
-            <button onclick="setFilter('under15k')" id="filter15k" class="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all flex items-center gap-1">
+            <button onclick="setFilter('all')" id="filterAll" class="px-2.5 py-1 rounded-full bg-white text-black font-semibold shadow-sm transition-all">Всі (150)</button>
+            <button onclick="setFilter('under15k')" id="filter15k" class="px-2.5 py-1 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] border border-white/[0.08] font-medium text-[#8e8e93] hover:text-white transition-all flex items-center gap-1">
                 <span>До 15 тис</span>
             </button>
-            <button onclick="setFilter('under20k')" id="filter20k" class="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all flex items-center gap-1">
+            <button onclick="setFilter('under20k')" id="filter20k" class="px-2.5 py-1 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] border border-white/[0.08] font-medium text-[#8e8e93] hover:text-white transition-all flex items-center gap-1">
                 <span>До 20 тис</span>
             </button>
-            <button onclick="setFilter('power')" id="filterPower" class="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all flex items-center gap-1">
-                <svg class="w-3 h-3 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <button onclick="setFilter('power')" id="filterPower" class="px-2.5 py-1 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] border border-white/[0.08] font-medium text-[#8e8e93] hover:text-white transition-all flex items-center gap-1">
+                <svg class="w-3 h-3 text-[#ff9f0a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                 <span>Світло / GPON</span>
             </button>
-            <button onclick="setFilter('pets')" id="filterPets" class="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all flex items-center gap-1">
-                <svg class="w-3 h-3 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16c0 2 1.5 4 4 4s4-2 4-4-1.5-4-4-4-4 2-4 4zM16 16c0 2 1.5 4 4 4s4-2 4-4-1.5-4-4-4-4 2-4 4zM10 6c0 1.5-1 3-2.5 3S5 7.5 5 6s1-3 2.5-3S10 4.5 10 6zM19 6c0 1.5-1 3-2.5 3S14 7.5 14 6s1-3 2.5-3S19 4.5 19 6z"/></svg>
+            <button onclick="setFilter('pets')" id="filterPets" class="px-2.5 py-1 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] border border-white/[0.08] font-medium text-[#8e8e93] hover:text-white transition-all flex items-center gap-1">
+                <svg class="w-3 h-3 text-[#30d158]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16c0 2 1.5 4 4 4s4-2 4-4-1.5-4-4-4-4 2-4 4zM16 16c0 2 1.5 4 4 4s4-2 4-4-1.5-4-4-4-4 2-4 4zM10 6c0 1.5-1 3-2.5 3S5 7.5 5 6s1-3 2.5-3S10 4.5 10 6zM19 6c0 1.5-1 3-2.5 3S14 7.5 14 6s1-3 2.5-3S19 4.5 19 6z"/></svg>
                 <span>З тваринами</span>
             </button>
-            <button onclick="setFilter('favs')" id="filterFavs" class="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all flex items-center gap-1">
-                <svg class="w-3 h-3 text-rose-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            <button onclick="setFilter('favs')" id="filterFavs" class="px-2.5 py-1 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] border border-white/[0.08] font-medium text-[#8e8e93] hover:text-white transition-all flex items-center gap-1">
+                <svg class="w-3 h-3 text-[#ff453a]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                 <span>Обрані (<span id="favCount">0</span>)</span>
             </button>
         </div>
@@ -351,7 +358,7 @@
 
         <!-- Floating Radar Location Status Pill (Interactive Sort Dropdown) -->
         <div id="radarLocationPill" class="absolute top-3 inset-x-3 z-20 hidden flex justify-center pointer-events-none transition-all duration-300">
-            <div class="pointer-events-auto px-3 py-1.5 rounded-full bg-dark-950/95 border border-blue-500/50 text-xs font-semibold text-white shadow-2xl backdrop-blur-md flex items-center gap-2 max-w-full">
+            <div class="pointer-events-auto px-3 py-1.5 rounded-full bg-[#1c1c1e]/90 border border-white/10 text-xs font-semibold text-white shadow-2xl backdrop-blur-2xl flex items-center gap-2 max-w-full">
                 <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse shrink-0"></span>
                 <button onclick="openSortModal()" class="flex items-center gap-1.5 hover:text-blue-300 transition-colors" title="Натисніть для зміни сортування">
                     <span id="radarLocationText" class="truncate">Поруч із вами · За відстанню</span>
@@ -361,52 +368,52 @@
             </div>
         </div>
 
-        <!-- Floating Map Buttons (Top Right) -->
+        <!-- Floating Map Buttons (Top Right: Apple Maps Circle Buttons) -->
         <div class="absolute right-3 top-3 z-20 flex flex-col gap-2">
-            <button onclick="handleLocateClick()" class="w-9 h-9 rounded-xl bg-dark-950/90 border border-white/15 text-slate-200 hover:text-white flex items-center justify-center shadow-xl backdrop-blur-sm transition-transform active:scale-95" title="Поруч зі мною (GPS)">
-                <svg class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
+            <button onclick="handleLocateClick()" class="w-10 h-10 rounded-full bg-[#1c1c1e]/90 border border-white/10 text-white flex items-center justify-center shadow-xl backdrop-blur-2xl transition-transform active:scale-90" title="Поруч зі мною (GPS)">
+                <svg class="w-4 h-4 text-[#0a84ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
             </button>
-            <button onclick="recenterKyiv()" class="w-9 h-9 rounded-xl bg-dark-950/90 border border-white/15 text-slate-200 hover:text-white flex items-center justify-center shadow-xl backdrop-blur-sm transition-transform active:scale-95" title="Київ Центр">
-                <svg class="w-4 h-4 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <button onclick="recenterKyiv()" class="w-10 h-10 rounded-full bg-[#1c1c1e]/90 border border-white/10 text-[#8e8e93] hover:text-white flex items-center justify-center shadow-xl backdrop-blur-2xl transition-transform active:scale-90" title="Київ Центр">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
             </button>
         </div>
 
-        <!-- Floating Counter Badge (Top Left) -->
+        <!-- Floating Counter Badge (Top Left: Apple Capsule) -->
         <div id="activeListingsBadge" class="absolute left-3 top-3 z-20 pointer-events-none transition-opacity duration-200">
-            <div class="px-2.5 py-1 rounded-lg bg-dark-950/90 border border-white/10 text-[11px] font-medium text-slate-200 backdrop-blur-sm flex items-center gap-1.5 shadow-lg">
-                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <div class="px-3 py-1.5 rounded-full bg-[#1c1c1e]/90 border border-white/10 text-[11px] font-medium text-white/90 backdrop-blur-2xl flex items-center gap-2 shadow-xl">
+                <span class="w-2 h-2 rounded-full bg-[#30d158]"></span>
                 <span id="activeListingsCount">150 квартир від власників</span>
             </div>
         </div>
     </div>
 
     <!-- ==========================================
-         BOTTOM CAROUSEL SECTION (PC Arrows + Touch Track)
+         BOTTOM CAROUSEL SECTION (Apple OLED Frosted Glass + Touch Track)
     ========================================== -->
-    <div class="shrink-0 bg-dark-900 border-t border-white/10 z-20 relative pt-1.5 pb-2">
+    <div class="shrink-0 bg-[#000000]/80 backdrop-blur-2xl border-t border-white/[0.08] z-20 relative pt-2 pb-2">
         <!-- Sub-header bar: Title + Desktop Arrows -->
-        <div class="px-3 flex items-center justify-between text-[11px] font-semibold text-slate-400 mb-1.5">
-            <div class="flex items-center gap-2">
-                <span>Квартири без комісії рієлтора</span>
-                <span class="text-emerald-400 font-bold">· Прямі контакти</span>
+        <div class="px-3.5 flex items-center justify-between text-[11px] font-medium text-[#8e8e93] mb-2">
+            <div class="flex items-center gap-1.5">
+                <span>Квартири без комісії</span>
+                <span class="text-[#30d158] font-semibold">· Прямі контакти</span>
             </div>
             <!-- Arrow controls for PC -->
             <div class="flex items-center gap-1.5">
-                <button onclick="scrollCarousel(-1)" class="carousel-arrow-btn" title="Попередня">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                <button onclick="scrollCarousel(-1)" class="w-6 h-6 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] border border-white/[0.08] text-white flex items-center justify-center transition-all active:scale-90" title="Попередня">
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
                 </button>
-                <button onclick="scrollCarousel(1)" class="carousel-arrow-btn" title="Наступна">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                <button onclick="scrollCarousel(1)" class="w-6 h-6 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] border border-white/[0.08] text-white flex items-center justify-center transition-all active:scale-90" title="Наступна">
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
                 </button>
             </div>
         </div>
 
         <!-- Carousel Track -->
         <!-- Floating Left/Right PC Side Arrows -->
-        <button onclick="scrollCarousel(-1)" class="absolute left-1 top-[60%] -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-dark-950/90 border border-white/20 text-white flex items-center justify-center hover:bg-dark-850 hover:scale-110 active:scale-95 transition-all shadow-xl" title="Попередня квартира">
+        <button onclick="scrollCarousel(-1)" class="absolute left-1.5 top-[60%] -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-[#1c1c1e]/90 hover:bg-[#2c2c2e] border border-white/10 text-white flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl backdrop-blur-md" title="Попередня квартира">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
-        <button onclick="scrollCarousel(1)" class="absolute right-1 top-[60%] -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-dark-950/90 border border-white/20 text-white flex items-center justify-center hover:bg-dark-850 hover:scale-110 active:scale-95 transition-all shadow-xl" title="Наступна квартира">
+        <button onclick="scrollCarousel(1)" class="absolute right-1.5 top-[60%] -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-[#1c1c1e]/90 hover:bg-[#2c2c2e] border border-white/10 text-white flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl backdrop-blur-md" title="Наступна квартира">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
         </button>
 
@@ -416,61 +423,64 @@
     </div>
 
     <!-- ==========================================
-         DEAL DETAIL MODAL (Bottom Sheet)
+         DEAL DETAIL MODAL (Apple iOS Native Bottom Sheet)
     ========================================== -->
-    <div id="dealModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-dark-900 border border-white/10 w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in">
-            <!-- Modal Header -->
-            <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between shrink-0">
+    <div id="dealModal" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity duration-200">
+        <div class="bg-[#1c1c1e] border border-white/[0.08] w-full sm:max-w-md rounded-t-[28px] sm:rounded-[28px] max-h-[92vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in">
+            <!-- iOS Grabber Handle -->
+            <div class="w-9 h-1 rounded-full bg-white/25 mx-auto mt-2.5 mb-1 shrink-0"></div>
+
+            <!-- Modal Navigation Header -->
+            <div class="px-4 py-2 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 text-[11px] font-bold">0% комісії</span>
-                    <span id="modalMetro" class="text-xs text-slate-300 font-medium">Печерська</span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-[#30d158]/15 text-[#30d158] text-[11px] font-semibold">0% комісії</span>
+                    <span id="modalMetro" class="text-xs text-[#8e8e93] font-medium">Печерська</span>
                 </div>
-                <button onclick="closeDealModal()" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white flex items-center justify-center transition-colors">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                <button onclick="closeDealModal()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/15 text-[#8e8e93] hover:text-white flex items-center justify-center transition-colors">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </button>
             </div>
 
-            <!-- Modal Content (Scrollable) -->
-            <div class="p-4 overflow-y-auto space-y-4 custom-scroll text-xs">
+            <!-- Modal Content (Scrollable Inset Grouped layout) -->
+            <div class="p-3.5 overflow-y-auto space-y-3 custom-scroll text-xs">
                 <!-- Gallery Image -->
-                <div class="relative h-56 rounded-xl overflow-hidden bg-dark-950 border border-white/10">
+                <div class="relative h-56 rounded-2xl overflow-hidden bg-black border border-white/[0.06]">
                     <img id="modalImage" src="" alt="Квартира" class="w-full h-full object-cover">
                     <!-- Photo switchers -->
-                    <button onclick="switchModalPhoto(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors">
+                    <button onclick="switchModalPhoto(-1)" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/70 active:scale-95 transition-all">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
                     </button>
-                    <button onclick="switchModalPhoto(1)" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors">
+                    <button onclick="switchModalPhoto(1)" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/70 active:scale-95 transition-all">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
                     </button>
-                    <div id="modalPhotoIndex" class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 text-[10px] text-white font-mono">1/3</div>
+                    <div id="modalPhotoIndex" class="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] text-white/90 font-mono tracking-wider">1/3</div>
                 </div>
 
-                <!-- Price & Savings -->
-                <div class="flex items-baseline justify-between">
+                <!-- Price & Savings Summary -->
+                <div class="flex items-baseline justify-between px-1">
                     <div>
-                        <div id="modalPrice" class="text-xl font-bold text-white tabular-nums">19 000 ₴/міс</div>
-                        <div id="modalSavings" class="text-emerald-400 font-semibold text-xs mt-0.5">Економія на рієлторі: 9 500 ₴</div>
+                        <div id="modalPrice" class="text-[24px] font-bold text-white tracking-tight tabular-nums">19 000 ₴<span class="text-xs font-normal text-[#8e8e93]">/міс</span></div>
+                        <div id="modalSavings" class="text-[#30d158] font-medium text-[12px]">Економія на рієлторі: 9 500 ₴</div>
                     </div>
-                    <div id="modalSpecs" class="text-right text-slate-400">
+                    <div id="modalSpecs" class="text-right text-[#8e8e93] text-[12px] font-medium">
                         2 кімн · 54 м² · 4/9 пов.
                     </div>
                 </div>
 
-                <!-- Direct Phone Box with Freemium & Paywall Controls -->
-                <div id="modalPhoneContainer" class="p-3 rounded-xl bg-white/5 border border-white/10 space-y-2">
+                <!-- Direct Phone Box with Freemium & Paywall Controls (Apple Inset Grouped) -->
+                <div id="modalPhoneContainer" class="p-3.5 rounded-2xl bg-[#2c2c2e]/70 border border-white/[0.06] space-y-2.5">
                     <!-- Locked State -->
                     <div id="phoneLockedBox" class="space-y-2">
                         <div class="flex items-center justify-between text-[11px]">
-                            <span class="text-slate-400 uppercase tracking-wider text-[10px] font-semibold">Прямий номер власника (без рієлтора)</span>
-                            <span id="freeTrialPill" class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-bold text-[10px]">1-й контакт безкоштовно</span>
+                            <span class="text-[#8e8e93] uppercase tracking-wider text-[10px] font-semibold">Прямий номер власника</span>
+                            <span id="freeTrialPill" class="px-2 py-0.5 rounded-full bg-[#30d158]/15 text-[#30d158] font-semibold text-[10px]">1-й контакт безкоштовно</span>
                         </div>
-                        <div class="flex items-center justify-between p-2 rounded-lg bg-dark-950 border border-white/10">
+                        <div class="flex items-center justify-between p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06]">
                             <div>
-                                <div id="modalMaskedPhone" class="text-sm font-bold text-white font-mono tracking-wider">+38 (095) •••-••-86</div>
-                                <div class="text-[10px] text-slate-400">Рієлтори беруть <span id="modalRealtorSavings" class="text-emerald-400 font-bold">8 000 ₴</span> за цей номер</div>
+                                <div id="modalMaskedPhone" class="text-[14px] font-bold text-white font-mono tracking-wider">+38 (095) •••-••-86</div>
+                                <div class="text-[10px] text-[#8e8e93]">Рієлтори беруть <span id="modalRealtorSavings" class="text-[#30d158] font-semibold">8 000 ₴</span> за цей номер</div>
                             </div>
-                            <button onclick="handleUnlockClick()" id="btnUnlockTrigger" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center gap-1.5 transition-transform active:scale-95 shadow-md">
+                            <button onclick="handleUnlockClick()" id="btnUnlockTrigger" class="px-3.5 py-2 rounded-full bg-[#30d158] hover:bg-[#30d158]/90 text-black font-semibold text-xs flex items-center gap-1.5 transition-transform active:scale-95 shadow-sm">
                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 019.9-1"/></svg>
                                 <span id="unlockTriggerText">Відкрити номер</span>
                             </button>
@@ -480,50 +490,50 @@
                     <!-- Unlocked State -->
                     <div id="phoneUnlockedBox" class="hidden space-y-2">
                         <div class="flex items-center justify-between text-[11px]">
-                            <span class="text-emerald-400 font-bold text-[10px] flex items-center gap-1">
-                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-                                <span>Контакт перевірено (Прямий власник)</span>
+                            <span class="text-[#30d158] font-semibold text-[11px] flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                                <span>Прямий контакт перевірено</span>
                             </span>
-                            <span class="text-slate-400 text-[10px]">0% комісії</span>
+                            <span class="text-[#8e8e93] text-[10px]">0% комісії</span>
                         </div>
-                        <div class="flex items-center justify-between p-2 rounded-lg bg-dark-950 border border-emerald-500/30">
+                        <div class="flex items-center justify-between p-2.5 rounded-xl bg-[#1c1c1e] border border-[#30d158]/30">
                             <div>
-                                <div id="modalPhoneText" class="text-sm font-bold text-white font-mono tracking-wide">+380 95 123 45 67</div>
-                                <div class="text-[10px] text-emerald-400">Прямий орендодавець без посередників</div>
+                                <div id="modalPhoneText" class="text-[15px] font-bold text-white font-mono tracking-wide">+380 95 123 45 67</div>
+                                <div class="text-[10px] text-[#30d158]">Прямий орендодавець без посередників</div>
                             </div>
-                            <button onclick="copyCurrentPhone()" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 border border-white/10 text-white text-[11px] font-semibold flex items-center gap-1 transition-colors">
-                                <svg class="w-3 h-3 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                            <button onclick="copyCurrentPhone()" class="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/10 text-white text-[11px] font-semibold flex items-center gap-1 transition-colors active:scale-95">
+                                <svg class="w-3 h-3 text-[#8e8e93]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                                 <span>Скопіювати</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Address -->
-                <div class="p-2.5 rounded-lg bg-white/5 border border-white/10 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    <span id="modalAddress" class="text-slate-200 font-medium">вул. Хрещатик, 15</span>
+                <!-- Address (Apple Inset Row) -->
+                <div class="p-3 rounded-2xl bg-[#2c2c2e]/70 border border-white/[0.06] flex items-center gap-2">
+                    <svg class="w-4 h-4 text-[#8e8e93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span id="modalAddress" class="text-white font-medium text-xs">вул. Хрещатик, 15</span>
                 </div>
 
-                <!-- Blackout Equipment Checklist -->
-                <div>
-                    <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Автономність при блекаутах</div>
+                <!-- Blackout Equipment Checklist (Apple Inset Grouped) -->
+                <div class="p-3.5 rounded-2xl bg-[#2c2c2e]/70 border border-white/[0.06] space-y-2">
+                    <div class="text-[11px] font-semibold text-[#8e8e93] uppercase tracking-wider">Автономність при блекаутах</div>
                     <div class="grid grid-cols-2 gap-2" id="modalEquipment">
                         <!-- Populated by JS -->
                     </div>
                 </div>
 
-                <!-- Description -->
-                <div>
-                    <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Опис квартири</div>
-                    <p id="modalDesc" class="text-slate-300 leading-relaxed">Затишна квартира з новим ремонтом від власника.</p>
+                <!-- Description (Apple Inset Grouped) -->
+                <div class="p-3.5 rounded-2xl bg-[#2c2c2e]/70 border border-white/[0.06] space-y-1.5">
+                    <div class="text-[11px] font-semibold text-[#8e8e93] uppercase tracking-wider">Опис квартири</div>
+                    <p id="modalDesc" class="text-white/80 leading-relaxed text-xs">Затишна квартира з новим ремонтом від власника.</p>
                 </div>
 
-                <!-- Verified Reviews -->
-                <div class="pt-2 border-t border-white/10">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Відгуки орендарів</span>
-                        <span class="text-amber-400 font-bold">4.9 / 5.0 (Перевірено)</span>
+                <!-- Verified Reviews (Apple Inset Grouped) -->
+                <div class="p-3.5 rounded-2xl bg-[#2c2c2e]/70 border border-white/[0.06] space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-semibold text-[#8e8e93] uppercase tracking-wider">Відгуки орендарів</span>
+                        <span class="text-[#ff9f0a] font-semibold text-xs">★ 4.9 (Перевірено)</span>
                     </div>
                     <div id="modalReviewsList" class="space-y-2">
                         <!-- Populated by JS -->
@@ -531,18 +541,18 @@
                 </div>
             </div>
 
-            <!-- Modal Action Buttons -->
-            <div class="p-3 border-t border-white/10 bg-dark-950 flex gap-2 shrink-0">
-                <button id="modalCallBtn" onclick="handleCallClick(event)" class="flex-1 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-center text-xs flex items-center justify-center gap-1.5 transition-colors shadow-md">
+            <!-- Modal Action Buttons (Apple Action Bar) -->
+            <div class="p-3 border-t border-white/[0.08] bg-[#1c1c1e]/90 backdrop-blur-2xl flex gap-2 shrink-0">
+                <button id="modalCallBtn" onclick="handleCallClick(event)" class="flex-1 py-3 rounded-full bg-[#30d158] hover:bg-[#30d158]/90 text-black font-semibold text-center text-xs flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-98">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
                     <span>Подзвонити</span>
                 </button>
-                <button id="modalTgBtn" onclick="handleTgClick(event)" class="px-3.5 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold text-center text-xs flex items-center justify-center gap-1.5 transition-colors">
-                    <svg class="w-3.5 h-3.5 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .36z"/></svg>
+                <button id="modalTgBtn" onclick="handleTgClick(event)" class="px-4 py-3 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] border border-white/[0.08] text-white font-medium text-center text-xs flex items-center justify-center gap-1.5 transition-all active:scale-98">
+                    <svg class="w-3.5 h-3.5 text-[#0a84ff]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .36z"/></svg>
                     <span>Telegram</span>
                 </button>
-                <button onclick="sendContactToBotChat()" class="px-3.5 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold text-center text-xs flex items-center justify-center gap-1.5 transition-colors" title="Надіслати номер у мій Telegram-чат, щоб зручно набрати з мобільного">
-                    <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                <button onclick="sendContactToBotChat()" class="px-3.5 py-3 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] border border-white/[0.08] text-white font-medium text-center text-xs flex items-center justify-center gap-1.5 transition-all active:scale-98" title="Надіслати номер у мій Telegram-чат, щоб зручно набрати з мобільного">
+                    <svg class="w-3.5 h-3.5 text-[#30d158]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
                     <span>У чат</span>
                 </button>
             </div>
@@ -624,29 +634,32 @@
     </div>
 
     <!-- ==========================================
-         LANDLORD SUBMISSION MODAL
+         LANDLORD SUBMISSION MODAL (Apple Sheet)
     ========================================== -->
-    <div id="landlordModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-dark-900 border border-white/10 w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl flex flex-col overflow-hidden shadow-2xl">
-            <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-                <span class="text-xs font-bold text-white">Опублікувати квартиру (0% комісії)</span>
-                <button onclick="closeLandlordModal()" class="w-6 h-6 rounded bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    <div id="landlordModal" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-[#1c1c1e] border border-white/[0.08] w-full sm:max-w-md rounded-t-[28px] sm:rounded-[28px] flex flex-col overflow-hidden shadow-2xl animate-fade-in pb-4">
+            <!-- iOS Grabber Handle -->
+            <div class="w-9 h-1 rounded-full bg-white/25 mx-auto mt-2.5 mb-1 shrink-0"></div>
+
+            <div class="px-4 py-2 flex items-center justify-between shrink-0">
+                <span class="text-xs font-semibold text-white">Опублікувати квартиру (0% комісії)</span>
+                <button onclick="closeLandlordModal()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/15 text-[#8e8e93] hover:text-white flex items-center justify-center transition-colors">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </button>
             </div>
-            <div class="p-4 space-y-3 text-xs">
+            <div class="p-3.5 space-y-3 text-xs">
                 <div>
-                    <label class="text-slate-400 block mb-1">Адреса та район</label>
-                    <input type="text" id="llAddress" placeholder="вул. Велика Васильківська, 40" class="w-full bg-dark-950 border border-white/10 rounded px-2.5 py-1.5 text-white">
+                    <label class="text-[#8e8e93] block mb-1">Адреса та район</label>
+                    <input type="text" id="llAddress" placeholder="вул. Велика Васильківська, 40" class="w-full bg-[#2c2c2e] border border-white/[0.08] rounded-xl px-3 py-2 text-white placeholder-[#8e8e93] focus:outline-none focus:border-[#0a84ff]">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="text-slate-400 block mb-1">Ціна (₴/міс)</label>
-                        <input type="number" id="llPrice" placeholder="18000" class="w-full bg-dark-950 border border-white/10 rounded px-2.5 py-1.5 text-white">
+                        <label class="text-[#8e8e93] block mb-1">Ціна (₴/міс)</label>
+                        <input type="number" id="llPrice" placeholder="18000" class="w-full bg-[#2c2c2e] border border-white/[0.08] rounded-xl px-3 py-2 text-white placeholder-[#8e8e93] focus:outline-none focus:border-[#0a84ff]">
                     </div>
                     <div>
-                        <label class="text-slate-400 block mb-1">Кімнат</label>
-                        <select id="llRooms" class="w-full bg-dark-950 border border-white/10 rounded px-2.5 py-1.5 text-white">
+                        <label class="text-[#8e8e93] block mb-1">Кімнат</label>
+                        <select id="llRooms" class="w-full bg-[#2c2c2e] border border-white/[0.08] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#0a84ff]">
                             <option value="1">1 кімната</option>
                             <option value="2">2 кімнати</option>
                             <option value="3">3+ кімнати</option>
@@ -654,20 +667,20 @@
                     </div>
                 </div>
                 <div>
-                    <label class="text-slate-400 block mb-1">Номер телефону / Telegram</label>
-                    <input type="text" id="llPhone" placeholder="+380... або @username" class="w-full bg-dark-950 border border-white/10 rounded px-2.5 py-1.5 text-white">
+                    <label class="text-[#8e8e93] block mb-1">Номер телефону / Telegram</label>
+                    <input type="text" id="llPhone" placeholder="+380... або @username" class="w-full bg-[#2c2c2e] border border-white/[0.08] rounded-xl px-3 py-2 text-white placeholder-[#8e8e93] focus:outline-none focus:border-[#0a84ff]">
                 </div>
                 <div class="flex items-center gap-3 pt-1">
                     <label class="flex items-center gap-1.5 cursor-pointer">
-                        <input type="checkbox" id="llGpon" class="rounded bg-dark-950 border-white/10 text-emerald-500">
-                        <span class="text-slate-300">GPON інтернет</span>
+                        <input type="checkbox" id="llGpon" class="rounded bg-[#2c2c2e] border-white/10 text-[#30d158]">
+                        <span class="text-white/80">GPON інтернет</span>
                     </label>
                     <label class="flex items-center gap-1.5 cursor-pointer">
-                        <input type="checkbox" id="llGen" class="rounded bg-dark-950 border-white/10 text-amber-500">
-                        <span class="text-slate-300">Генератор</span>
+                        <input type="checkbox" id="llGen" class="rounded bg-[#2c2c2e] border-white/10 text-[#ff9f0a]">
+                        <span class="text-white/80">Генератор</span>
                     </label>
                 </div>
-                <button onclick="handleLandlordSubmit()" class="w-full mt-2 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-center transition-colors">
+                <button onclick="handleLandlordSubmit()" class="w-full mt-2 py-3 rounded-full bg-[#30d158] hover:bg-[#30d158]/90 text-black font-semibold text-center transition-all active:scale-98">
                     Надіслати на модерацію (Безкоштовно)
                 </button>
             </div>
@@ -675,28 +688,33 @@
     </div>
 
     <!-- ==========================================
-         CITY SELECTOR MODAL
+         CITY SELECTOR MODAL (Apple Action Sheet)
     ========================================== -->
-    <div id="cityModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-dark-900 border border-white/10 w-full max-w-xs rounded-xl p-4 space-y-2 text-xs">
-            <div class="font-bold text-white mb-2">Оберіть місто</div>
-            <button onclick="selectCity('Київ')" class="w-full text-left p-2.5 rounded bg-white/10 border border-emerald-500/40 text-white font-semibold flex items-center justify-between">
-                <span>Київ</span>
-                <span class="text-emerald-400 text-[10px] font-bold">Активно (150)</span>
-            </button>
-            <button onclick="selectCity('Львів')" class="w-full text-left p-2.5 rounded bg-white/5 text-slate-400 flex items-center justify-between">
-                <span>Львів</span>
-                <span class="text-[10px] text-slate-500">Незабаром</span>
-            </button>
-            <button onclick="selectCity('Одеса')" class="w-full text-left p-2.5 rounded bg-white/5 text-slate-400 flex items-center justify-between">
-                <span>Одеса</span>
-                <span class="text-[10px] text-slate-500">Незабаром</span>
-            </button>
-            <button onclick="selectCity('Дніпро')" class="w-full text-left p-2.5 rounded bg-white/5 text-slate-400 flex items-center justify-between">
-                <span>Дніпро</span>
-                <span class="text-[10px] text-slate-500">Незабаром</span>
-            </button>
-            <button onclick="closeCityModal()" class="w-full mt-2 py-1.5 text-center text-slate-400 hover:text-white">Закрити</button>
+    <div id="cityModal" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-[#1c1c1e] border border-white/[0.08] w-full sm:max-w-xs rounded-t-[28px] sm:rounded-[28px] p-4 space-y-2 text-xs shadow-2xl animate-fade-in pb-4">
+            <!-- iOS Grabber Handle -->
+            <div class="w-9 h-1 rounded-full bg-white/25 mx-auto mb-2 shrink-0"></div>
+            
+            <div class="text-[14px] font-semibold text-white mb-2 text-center">Оберіть місто</div>
+            <div class="rounded-2xl bg-[#2c2c2e]/70 border border-white/[0.06] overflow-hidden divide-y divide-white/[0.06]">
+                <button onclick="selectCity('Київ')" class="w-full text-left px-3.5 py-3 text-white font-medium flex items-center justify-between hover:bg-white/[0.04]">
+                    <span>Київ</span>
+                    <span class="text-[#30d158] text-[11px] font-semibold">150 квартир ✓</span>
+                </button>
+                <button onclick="selectCity('Львів')" class="w-full text-left px-3.5 py-3 text-[#8e8e93] flex items-center justify-between hover:bg-white/[0.04]">
+                    <span>Львів</span>
+                    <span class="text-[10px] text-[#636366]">Незабаром</span>
+                </button>
+                <button onclick="selectCity('Одеса')" class="w-full text-left px-3.5 py-3 text-[#8e8e93] flex items-center justify-between hover:bg-white/[0.04]">
+                    <span>Одеса</span>
+                    <span class="text-[10px] text-[#636366]">Незабаром</span>
+                </button>
+                <button onclick="selectCity('Дніпро')" class="w-full text-left px-3.5 py-3 text-[#8e8e93] flex items-center justify-between hover:bg-white/[0.04]">
+                    <span>Дніпро</span>
+                    <span class="text-[10px] text-[#636366]">Незабаром</span>
+                </button>
+            </div>
+            <button onclick="closeCityModal()" class="w-full mt-2 py-2 text-center text-[#0a84ff] font-medium text-xs">Закрити</button>
         </div>
     </div>
 
@@ -913,7 +931,7 @@
         }
 
         // 4. FILTERING & MULTI-CRITERIA SORTING
-        let currentSort = 'default'; // 'distance' | 'price_asc' | 'price_desc' | 'newest' | 'area_desc'
+        let currentSort = 'distance'; // 'distance' | 'price_asc' | 'price_desc' | 'newest' | 'area_desc'
 
         function openSortModal() {
             updateSortModalUI();
@@ -959,7 +977,7 @@
             keys.forEach(k => {
                 const btn = document.getElementById(`sortOpt-${k}`);
                 const check = document.getElementById(`check-${k}`);
-                const isCur = (currentSort === k) || (k === 'distance' && currentSort === 'default' && userCoords);
+                const isCur = (currentSort === k) || (k === 'distance' && (currentSort === 'default' || !currentSort));
                 if (btn) {
                     if (isCur) {
                         btn.className = "w-full px-4 py-3 flex items-center justify-between text-left transition-colors bg-white/[0.04]";
@@ -1057,9 +1075,9 @@
                 const btn = document.getElementById(id);
                 if (btn) {
                     if (key === type) {
-                        btn.className = "px-3 py-1 rounded-md bg-white text-dark-950 font-bold transition-colors";
+                        btn.className = "px-2.5 py-1 rounded-full bg-white text-black font-semibold shadow-sm transition-all";
                     } else {
-                        btn.className = "px-3 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-colors flex items-center gap-1.5";
+                        btn.className = "px-2.5 py-1 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] border border-white/[0.08] font-medium text-[#8e8e93] hover:text-white transition-all flex items-center gap-1";
                     }
                 }
             });
@@ -1135,7 +1153,7 @@
 
             if (items.length === 0) {
                 track.innerHTML = `
-                    <div class="py-6 px-4 text-center text-slate-400 bg-dark-950 border border-white/10 rounded-xl w-full">
+                    <div class="py-6 px-4 text-center text-[#8e8e93] bg-[#1c1c1e] border border-white/[0.08] rounded-2xl w-full">
                         Нічого не знайдено за вашим фільтром. Спробуйте змінити критерії пошуку.
                     </div>
                 `;
@@ -1159,34 +1177,34 @@
 
                 return `
                     <div class="carousel-card ${item.id === currentActiveId ? 'active-deal' : ''}" id="card-${item.id}" onclick="if (dragMovedDistance < 10) openDealModalById(${item.id})">
-                        <!-- Left Thumbnail with REAL unique photos -->
-                        <div class="w-[108px] h-full relative shrink-0 overflow-hidden bg-dark-950">
+                        <!-- Left Thumbnail with Apple rounded corners -->
+                        <div class="w-[112px] h-full relative shrink-0 overflow-hidden bg-black">
                             <img src="${mainPhoto}" alt="${item.title}" class="w-full h-full object-cover">
-                            <span class="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/70 text-[9px] text-white font-mono">1/${photos.length}</span>
+                            <span class="absolute bottom-2 left-2 px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[9px] text-white/90 font-mono tracking-wider">1/${photos.length}</span>
                         </div>
 
                         <!-- Right Content -->
-                        <div class="flex-1 p-2.5 flex flex-col justify-between overflow-hidden">
+                        <div class="flex-1 p-3 flex flex-col justify-between overflow-hidden">
                             <!-- Top: Metro & District -->
                             <div class="flex items-center justify-between gap-1">
-                                <div class="text-[11px] font-semibold text-slate-300 truncate">
+                                <div class="text-[11px] font-medium text-[#8e8e93] truncate">
                                     ${item.metro ? `${item.metro} · ${item.walkMin || 5} хв` : item.district}
                                 </div>
-                                <button onclick="toggleFavorite(event, ${item.id})" class="p-1 rounded text-slate-400 hover:text-rose-400 transition-colors">
-                                    <svg class="w-3.5 h-3.5 ${isFav ? 'text-rose-500 fill-rose-500' : 'text-slate-400'}" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                <button onclick="toggleFavorite(event, ${item.id})" class="p-0.5 text-[#8e8e93] hover:text-[#ff453a] transition-colors">
+                                    <svg class="w-3.5 h-3.5 ${isFav ? 'text-[#ff453a] fill-[#ff453a]' : 'text-[#8e8e93]'}" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                                 </button>
                             </div>
 
                             <!-- Middle: Price & Savings -->
                             <div>
-                                <div class="text-sm font-bold text-white tabular-nums">${item.price.toLocaleString()} ₴/міс</div>
-                                <div class="text-[10px] text-emerald-400 font-semibold mt-0.5">Економія: ${savedAmount.toLocaleString()} ₴ (0%)</div>
+                                <div class="text-[16px] font-bold text-white tracking-tight tabular-nums">${item.price.toLocaleString()} ₴<span class="text-xs font-normal text-[#8e8e93]">/міс</span></div>
+                                <div class="text-[11px] text-[#30d158] font-medium">Економія ${savedAmount.toLocaleString()} ₴ (0%)</div>
                             </div>
 
                             <!-- Bottom: Tags -->
-                            <div class="flex items-center gap-1.5 text-[10px] text-slate-400">
-                                <span>${item.rooms || 1} кімн · ${item.area || 45} м²</span>
-                                ${hasPower ? '<span class="px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-300 text-[9px] font-bold">Світло</span>' : ''}
+                            <div class="flex items-center gap-1.5 text-[10px] text-[#8e8e93]">
+                                <span>${item.rooms || 1}к · ${item.area || 45} м²</span>
+                                ${hasPower ? '<span class="px-1.5 py-0.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-[9px] font-semibold">Світло</span>' : ''}
                                 ${distancePill}
                             </div>
                         </div>
@@ -1257,7 +1275,7 @@
                 if (modalPhoneText) modalPhoneText.innerText = deal.phone || "+380671112233";
 
                 if (modalCallBtn) {
-                    modalCallBtn.className = "flex-1 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-center text-xs flex items-center justify-center gap-1.5 transition-colors shadow-md";
+                    modalCallBtn.className = "flex-1 py-3 rounded-full bg-[#30d158] hover:bg-[#30d158]/90 text-black font-semibold text-center text-xs flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-98";
                     modalCallBtn.innerHTML = `
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
                         <span>Подзвонити (${deal.phone || '+380...'})</span>
@@ -1276,7 +1294,7 @@
                     if (unlockTriggerText) unlockTriggerText.innerText = "Відкрити безкоштовно";
 
                     if (modalCallBtn) {
-                        modalCallBtn.className = "flex-1 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-center text-xs flex items-center justify-center gap-1.5 transition-colors shadow-md animate-pulse";
+                        modalCallBtn.className = "flex-1 py-3 rounded-full bg-[#30d158] hover:bg-[#30d158]/90 text-black font-semibold text-center text-xs flex items-center justify-center gap-1.5 transition-all shadow-md animate-pulse active:scale-98";
                         modalCallBtn.innerHTML = `
                             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 019.9-1"/></svg>
                             <span>Отримати контакт (Безкоштовно)</span>
@@ -1287,7 +1305,7 @@
                     if (unlockTriggerText) unlockTriggerText.innerText = "Відкрити номер · 99 ₴";
 
                     if (modalCallBtn) {
-                        modalCallBtn.className = "flex-1 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-dark-950 font-bold text-center text-xs flex items-center justify-center gap-1.5 transition-colors shadow-md";
+                        modalCallBtn.className = "flex-1 py-3 rounded-full bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white font-semibold text-center text-xs flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-98";
                         modalCallBtn.innerHTML = `
                             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 019.9-1"/></svg>
                             <span>Відкрити номер (від 99 ₴)</span>
@@ -1339,14 +1357,14 @@
 
             if (plan === 'single') {
                 document.getElementById('planSingle').checked = true;
-                singleWrap.className = "p-3 rounded-xl bg-white/5 border-2 border-emerald-500 flex items-center justify-between cursor-pointer transition-all";
-                passWrap.className = "p-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 flex items-center justify-between cursor-pointer transition-all";
+                singleWrap.className = "p-3.5 rounded-2xl bg-[#2c2c2e] border-2 border-[#0a84ff] flex items-center justify-between cursor-pointer transition-all";
+                passWrap.className = "p-3.5 rounded-2xl bg-[#2c2c2e]/50 border border-white/[0.06] hover:border-white/20 flex items-center justify-between cursor-pointer transition-all";
                 payBtnLabel.innerText = "Оплатити 99 ₴ (Картка / Apple Pay)";
                 starsBtnLabel.innerText = "Оплатити через Telegram Stars (50 ★)";
             } else {
                 document.getElementById('planPass').checked = true;
-                passWrap.className = "p-3 rounded-xl bg-white/5 border-2 border-emerald-500 flex items-center justify-between cursor-pointer transition-all";
-                singleWrap.className = "p-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 flex items-center justify-between cursor-pointer transition-all";
+                passWrap.className = "p-3.5 rounded-2xl bg-[#2c2c2e] border-2 border-[#0a84ff] flex items-center justify-between cursor-pointer transition-all";
+                singleWrap.className = "p-3.5 rounded-2xl bg-[#2c2c2e]/50 border border-white/[0.06] hover:border-white/20 flex items-center justify-between cursor-pointer transition-all";
                 payBtnLabel.innerText = "Оплатити 299 ₴ (Радар-Пас на 7 днів)";
                 starsBtnLabel.innerText = "Оплатити через Telegram Stars (150 ★)";
             }
@@ -1535,36 +1553,36 @@
             const phone = deal.phone || "+380671112233";
             document.getElementById('modalPhoneText').innerText = deal.phoneMasked ? `${deal.phoneMasked} (Прямий номер)` : phone;
 
-            // Equipment list
+            // Equipment list (Apple Inset Grouped items)
             const eqContainer = document.getElementById('modalEquipment');
             eqContainer.innerHTML = `
-                <div class="p-2 rounded bg-white/5 border border-white/10 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full ${deal.gpon ? 'bg-emerald-400' : 'bg-slate-600'}"></span>
-                    <span class="text-slate-300">GPON інтернет: <b>${deal.gpon ? 'Так (працює)' : 'Ні'}</b></span>
+                <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full ${deal.gpon ? 'bg-[#30d158]' : 'bg-[#636366]'}"></span>
+                    <span class="text-white/80 text-[11px]">GPON: <b>${deal.gpon ? 'Працює' : 'Ні'}</b></span>
                 </div>
-                <div class="p-2 rounded bg-white/5 border border-white/10 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full ${deal.generator ? 'bg-amber-400' : 'bg-slate-600'}"></span>
-                    <span class="text-slate-300">Генератор: <b>${deal.generator ? 'Є у будинку' : 'Немає'}</b></span>
+                <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full ${deal.generator ? 'bg-[#ff9f0a]' : 'bg-[#636366]'}"></span>
+                    <span class="text-white/80 text-[11px]">Генератор: <b>${deal.generator ? 'Є у будинку' : 'Немає'}</b></span>
                 </div>
-                <div class="p-2 rounded bg-white/5 border border-white/10 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full ${deal.pets ? 'bg-emerald-400' : 'bg-slate-600'}"></span>
-                    <span class="text-slate-300">Можна з тваринами: <b>${deal.pets ? 'Так' : 'Ні'}</b></span>
+                <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full ${deal.pets ? 'bg-[#30d158]' : 'bg-[#636366]'}"></span>
+                    <span class="text-white/80 text-[11px]">Тварини: <b>${deal.pets ? 'Можна' : 'Ні'}</b></span>
                 </div>
-                <div class="p-2 rounded bg-white/5 border border-white/10 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                    <span class="text-slate-300">Комісія рієлтора: <b>0%</b></span>
+                <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#30d158]"></span>
+                    <span class="text-white/80 text-[11px]">Комісія: <b>0% (Власник)</b></span>
                 </div>
             `;
 
-            // Reviews
+            // Reviews (Apple Inset Grouped review item)
             const reviewsContainer = document.getElementById('modalReviewsList');
             reviewsContainer.innerHTML = `
-                <div class="p-2.5 rounded bg-white/5 border border-white/10">
-                    <div class="flex items-center justify-between text-slate-300 mb-1">
-                        <span class="font-semibold">${deal.ownerName || 'Власник'} (Прямий орендодавець)</span>
-                        <span class="text-amber-400">★★★★★</span>
+                <div class="p-3 rounded-xl bg-[#1c1c1e] border border-white/[0.06] space-y-1">
+                    <div class="flex items-center justify-between text-white/90">
+                        <span class="font-medium text-[12px]">${deal.ownerName || 'Власник'} (Прямий орендодавець)</span>
+                        <span class="text-[#ff9f0a] text-xs">★★★★★</span>
                     </div>
-                    <p class="text-slate-400 text-[11px]">Оголошення перевірено модератором. Документи на право власності підтверджено. Без додаткових платежів.</p>
+                    <p class="text-[#8e8e93] text-[11px] leading-relaxed">Оголошення перевірено модератором. Документи на право власності підтверджено. Без додаткових платежів.</p>
                 </div>
             `;
 
@@ -1717,92 +1735,95 @@
     </script>
 
     <!-- ==========================================
-         MONOBANK-STYLE PAYWALL MODAL (Zero AI Slop)
+         APPLE IN-APP PURCHASE STYLE PAYWALL MODAL
     ========================================== -->
-    <div id="paywallModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-dark-900 border border-white/10 w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in">
+    <div id="paywallModal" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity duration-200">
+        <div class="bg-[#1c1c1e] border border-white/[0.08] w-full sm:max-w-md rounded-t-[28px] sm:rounded-[28px] max-h-[92vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in pb-4">
+            <!-- iOS Grabber Handle -->
+            <div class="w-9 h-1 rounded-full bg-white/25 mx-auto mt-2.5 mb-1 shrink-0"></div>
+
             <!-- Header -->
-            <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between shrink-0">
+            <div class="px-4 py-2 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                    <span class="text-xs font-bold text-white tracking-wide">Прямий контакт власника</span>
+                    <span class="w-2 h-2 rounded-full bg-[#30d158]"></span>
+                    <span class="text-xs font-semibold text-white tracking-wide">Прямий зв'язок без посередників</span>
                 </div>
-                <button onclick="closePaywallModal()" class="w-6 h-6 rounded bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                <button onclick="closePaywallModal()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/15 text-[#8e8e93] hover:text-white flex items-center justify-center transition-colors">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </button>
             </div>
 
-            <!-- Content -->
-            <div class="p-4 space-y-3.5 text-xs overflow-y-auto custom-scroll">
-                <!-- Value Comparison Pill -->
-                <div class="p-3 rounded-xl bg-dark-950 border border-white/10 space-y-2">
-                    <div class="flex items-center justify-between text-slate-400">
+            <!-- Content (Apple Inset Grouped) -->
+            <div class="p-3.5 space-y-3 text-xs overflow-y-auto custom-scroll">
+                <!-- Value Comparison Box -->
+                <div class="p-3 rounded-2xl bg-[#2c2c2e]/70 border border-white/[0.06] space-y-2">
+                    <div class="flex items-center justify-between text-[#8e8e93]">
                         <span>Комісія агентства (50%):</span>
-                        <span id="paywallRealtorCost" class="line-through text-rose-400 font-bold">8 000 ₴</span>
+                        <span id="paywallRealtorCost" class="line-through text-[#ff453a] font-semibold">8 000 ₴</span>
                     </div>
-                    <div class="flex items-center justify-between text-white font-semibold">
+                    <div class="flex items-center justify-between text-white font-medium">
                         <span>Прямий контакт у додатку:</span>
-                        <span class="text-emerald-400 font-bold">від 99 ₴ (Економія 98%)</span>
+                        <span class="text-[#30d158] font-bold">від 99 ₴ (Економія 98%)</span>
                     </div>
                 </div>
 
                 <!-- Plan Options -->
                 <div class="space-y-2">
-                    <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Оберіть тариф</div>
+                    <div class="text-[11px] font-semibold text-[#8e8e93] uppercase tracking-wider">Оберіть тариф</div>
                     
                     <!-- Plan 1: Single contact -->
-                    <label onclick="selectPlan('single')" id="planSingleWrap" class="p-3 rounded-xl bg-white/5 border-2 border-emerald-500 flex items-center justify-between cursor-pointer transition-all">
-                        <div class="flex items-center gap-2.5">
-                            <input type="radio" name="planChoice" id="planSingle" value="single" checked class="text-emerald-500">
+                    <label onclick="selectPlan('single')" id="planSingleWrap" class="p-3.5 rounded-2xl bg-[#2c2c2e] border-2 border-[#0a84ff] flex items-center justify-between cursor-pointer transition-all">
+                        <div class="flex items-center gap-3">
+                            <input type="radio" name="planChoice" id="planSingle" value="single" checked class="text-[#0a84ff] w-4 h-4">
                             <div>
-                                <div class="font-bold text-white text-xs">1 контакт власника</div>
-                                <div class="text-[10px] text-slate-400">Прямий номер обраної квартири</div>
+                                <div class="font-semibold text-white text-xs">1 контакт власника</div>
+                                <div class="text-[10px] text-[#8e8e93]">Прямий номер обраної квартири</div>
                             </div>
                         </div>
                         <div class="text-right">
                             <div class="font-bold text-white text-sm tabular-nums">99 ₴</div>
-                            <div class="text-[9px] text-emerald-400">Разово</div>
+                            <div class="text-[9px] text-[#30d158] font-medium">Разово</div>
                         </div>
                     </label>
 
                     <!-- Plan 2: 7 Days Pass -->
-                    <label onclick="selectPlan('pass')" id="planPassWrap" class="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 flex items-center justify-between cursor-pointer transition-all">
-                        <div class="flex items-center gap-2.5">
-                            <input type="radio" name="planChoice" id="planPass" value="pass" class="text-emerald-500">
+                    <label onclick="selectPlan('pass')" id="planPassWrap" class="p-3.5 rounded-2xl bg-[#2c2c2e]/50 border border-white/[0.06] hover:border-white/20 flex items-center justify-between cursor-pointer transition-all">
+                        <div class="flex items-center gap-3">
+                            <input type="radio" name="planChoice" id="planPass" value="pass" class="text-[#0a84ff] w-4 h-4">
                             <div>
                                 <div class="flex items-center gap-1.5">
-                                    <span class="font-bold text-white text-xs">Радар-Пас на 7 днів</span>
-                                    <span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[9px] font-bold">ХІТ</span>
+                                    <span class="font-semibold text-white text-xs">Радар-Пас на 7 днів</span>
+                                    <span class="px-1.5 py-0.5 rounded-full bg-[#ff9f0a]/20 text-[#ff9f0a] text-[9px] font-bold">ХІТ</span>
                                 </div>
-                                <div class="text-[10px] text-slate-400">Безліміт до всіх 150+ номерів власників</div>
+                                <div class="text-[10px] text-[#8e8e93]">Безліміт до всіх 150+ номерів власників</div>
                             </div>
                         </div>
                         <div class="text-right">
                             <div class="font-bold text-white text-sm tabular-nums">299 ₴</div>
-                            <div class="text-[9px] text-slate-400">на тиждень</div>
+                            <div class="text-[9px] text-[#8e8e93]">на тиждень</div>
                         </div>
                     </label>
                 </div>
 
                 <!-- Payment Methods -->
                 <div class="space-y-2 pt-1">
-                    <button onclick="executePayment('monobank')" class="w-full py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-center text-xs flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-md">
+                    <button onclick="executePayment('monobank')" class="w-full py-3 rounded-full bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white font-semibold text-center text-xs flex items-center justify-center gap-2 transition-transform active:scale-98 shadow-lg shadow-blue-500/20">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                         <span id="payBtnLabel">Оплатити 99 ₴ (Картка / Apple Pay)</span>
                     </button>
                     
-                    <button onclick="executePayment('stars')" class="w-full py-2 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold text-center text-xs flex items-center justify-center gap-1.5 transition-colors">
-                        <span class="text-amber-400">★</span>
+                    <button onclick="executePayment('stars')" class="w-full py-2.5 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] border border-white/[0.08] text-white font-medium text-center text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-98">
+                        <span class="text-[#ff9f0a]">★</span>
                         <span id="starsBtnLabel">Оплатити через Telegram Stars (50 ★)</span>
                     </button>
 
                     <!-- Instant Simulation for Testing -->
-                    <button onclick="executePayment('test_sim')" class="w-full py-1.5 text-[11px] text-slate-400 hover:text-emerald-400 border border-dashed border-white/10 rounded-lg text-center transition-colors">
+                    <button onclick="executePayment('test_sim')" class="w-full py-1 text-[11px] text-[#8e8e93] hover:text-[#30d158] text-center transition-colors">
                         ⚡ Тестова миттєва оплата (Симуляція 1 клік)
                     </button>
                 </div>
 
-                <div class="text-[10px] text-center text-slate-500">
+                <div class="text-[10px] text-center text-[#8e8e93]">
                     Безпечна оплата. Прямий контакт перевірено модератором.
                 </div>
             </div>
