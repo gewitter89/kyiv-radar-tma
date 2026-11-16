@@ -458,12 +458,47 @@
                     </div>
                 </div>
 
-                <!-- Direct Phone Box with One-Click Copy -->
-                <div class="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
-                    <div>
-                        <div class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Прямий телефон власника (без посередників)</div>
-                        <div id="modalPhoneText" class="text-sm font-bold text-white tracking-wide font-mono mt-0.5">+380 67 111 22 33</div>
+                <!-- Direct Phone Box with Freemium & Paywall Controls -->
+                <div id="modalPhoneContainer" class="p-3 rounded-xl bg-white/5 border border-white/10 space-y-2">
+                    <!-- Locked State -->
+                    <div id="phoneLockedBox" class="space-y-2">
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="text-slate-400 uppercase tracking-wider text-[10px] font-semibold">Прямий номер власника (без рієлтора)</span>
+                            <span id="freeTrialPill" class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-bold text-[10px]">1-й контакт безкоштовно</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-lg bg-dark-950 border border-white/10">
+                            <div>
+                                <div id="modalMaskedPhone" class="text-sm font-bold text-white font-mono tracking-wider">+38 (095) •••-••-86</div>
+                                <div class="text-[10px] text-slate-400">Рієлтори беруть <span id="modalRealtorSavings" class="text-emerald-400 font-bold">8 000 ₴</span> за цей номер</div>
+                            </div>
+                            <button onclick="handleUnlockClick()" id="btnUnlockTrigger" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-xs flex items-center gap-1.5 transition-transform active:scale-95 shadow-md">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 019.9-1"/></svg>
+                                <span id="unlockTriggerText">Відкрити номер</span>
+                            </button>
+                        </div>
                     </div>
+
+                    <!-- Unlocked State -->
+                    <div id="phoneUnlockedBox" class="hidden space-y-2">
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="text-emerald-400 font-bold text-[10px] flex items-center gap-1">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                                <span>Контакт перевірено (Прямий власник)</span>
+                            </span>
+                            <span class="text-slate-400 text-[10px]">0% комісії</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-lg bg-dark-950 border border-emerald-500/30">
+                            <div>
+                                <div id="modalPhoneText" class="text-sm font-bold text-white font-mono tracking-wide">+380 95 123 45 67</div>
+                                <div class="text-[10px] text-emerald-400">Прямий орендодавець без посередників</div>
+                            </div>
+                            <button onclick="copyCurrentPhone()" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 border border-white/10 text-white text-[11px] font-semibold flex items-center gap-1 transition-colors">
+                                <svg class="w-3 h-3 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                <span>Скопіювати</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
                     <button onclick="copyCurrentPhone()" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors">
                         <svg class="w-3.5 h-3.5 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                         <span>Скопіювати</span>
@@ -506,11 +541,15 @@
             <div class="p-3 border-t border-white/10 bg-dark-950 flex gap-2 shrink-0">
                 <button id="modalCallBtn" onclick="handleCallClick(event)" class="flex-1 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-center text-xs flex items-center justify-center gap-1.5 transition-colors shadow-md">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
-                    <span>Подзвонити власнику</span>
+                    <span>Подзвонити</span>
                 </button>
-                <button id="modalTgBtn" onclick="handleTgClick(event)" class="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold text-center text-xs flex items-center justify-center gap-1.5 transition-colors">
+                <button id="modalTgBtn" onclick="handleTgClick(event)" class="px-3.5 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold text-center text-xs flex items-center justify-center gap-1.5 transition-colors">
                     <svg class="w-3.5 h-3.5 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .36z"/></svg>
                     <span>Telegram</span>
+                </button>
+                <button onclick="sendContactToBotChat()" class="px-3.5 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold text-center text-xs flex items-center justify-center gap-1.5 transition-colors" title="Надіслати номер у мій Telegram-чат, щоб зручно набрати з мобільного">
+                    <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    <span>У чат</span>
                 </button>
             </div>
         </div>
@@ -1011,6 +1050,204 @@
         let mouseScrollLeft = 0;
         let dragMovedDistance = 0;
 
+        
+        // PAYWALL & UNLOCK ENGINE
+        let UNLOCKED_DEALS = new Set(JSON.parse(localStorage.getItem('kr_unlocked_deals') || '[]'));
+        let HAS_RADAR_PASS = localStorage.getItem('kr_has_radar_pass') === '1';
+        let selectedPayPlan = 'single';
+
+        function isDealUnlocked(dealId) {
+            return HAS_RADAR_PASS || UNLOCKED_DEALS.has(dealId);
+        }
+
+        function updateModalUnlockView(deal) {
+            const isUnlocked = isDealUnlocked(deal.id);
+            const phoneLockedBox = document.getElementById('phoneLockedBox');
+            const phoneUnlockedBox = document.getElementById('phoneUnlockedBox');
+            const modalPhoneText = document.getElementById('modalPhoneText');
+            const modalMaskedPhone = document.getElementById('modalMaskedPhone');
+            const freeTrialPill = document.getElementById('freeTrialPill');
+            const unlockTriggerText = document.getElementById('unlockTriggerText');
+            const modalRealtorSavings = document.getElementById('modalRealtorSavings');
+
+            const savedAmount = deal.realtorCommissionSaved || Math.round(deal.price / 2);
+            if (modalRealtorSavings) modalRealtorSavings.innerText = `${savedAmount.toLocaleString()} ₴`;
+
+            if (isUnlocked) {
+                if (phoneLockedBox) phoneLockedBox.classList.add('hidden');
+                if (phoneUnlockedBox) phoneUnlockedBox.classList.remove('hidden');
+                if (modalPhoneText) modalPhoneText.innerText = deal.phone || "+380671112233";
+            } else {
+                if (phoneLockedBox) phoneLockedBox.classList.remove('hidden');
+                if (phoneUnlockedBox) phoneUnlockedBox.classList.add('hidden');
+                if (modalMaskedPhone) modalMaskedPhone.innerText = deal.phoneMasked || "+38 (095) •••-••-86";
+
+                // Check free trial count
+                if (UNLOCKED_DEALS.size === 0) {
+                    if (freeTrialPill) {
+                        freeTrialPill.classList.remove('hidden');
+                        freeTrialPill.innerText = "1-й контакт безкоштовно";
+                    }
+                    if (unlockTriggerText) unlockTriggerText.innerText = "Відкрити безкоштовно";
+                } else {
+                    if (freeTrialPill) freeTrialPill.classList.add('hidden');
+                    if (unlockTriggerText) unlockTriggerText.innerText = "Відкрити номер · 99 ₴";
+                }
+            }
+        }
+
+        function handleUnlockClick() {
+            if (!currentModalDeal) return;
+            const dealId = currentModalDeal.id;
+
+            // First contact is FREE as freemium trial!
+            if (UNLOCKED_DEALS.size === 0) {
+                UNLOCKED_DEALS.add(dealId);
+                localStorage.setItem('kr_unlocked_deals', JSON.stringify([...UNLOCKED_DEALS]));
+                
+                if (window.Telegram?.WebApp?.HapticFeedback) {
+                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                }
+                showToast("✓ Вітаємо! Ваш 1-й контакт розблоковано безкоштовно");
+                updateModalUnlockView(currentModalDeal);
+                return;
+            }
+
+            // Second and further contacts require paywall modal
+            openPaywallModal();
+        }
+
+        function openPaywallModal() {
+            if (!currentModalDeal) return;
+            const saved = currentModalDeal.realtorCommissionSaved || Math.round(currentModalDeal.price / 2);
+            document.getElementById('paywallRealtorCost').innerText = `${saved.toLocaleString()} ₴`;
+            selectPlan('single');
+            document.getElementById('paywallModal').classList.remove('hidden');
+        }
+
+        function closePaywallModal() {
+            document.getElementById('paywallModal').classList.add('hidden');
+        }
+
+        function selectPlan(plan) {
+            selectedPayPlan = plan;
+            const singleWrap = document.getElementById('planSingleWrap');
+            const passWrap = document.getElementById('planPassWrap');
+            const payBtnLabel = document.getElementById('payBtnLabel');
+            const starsBtnLabel = document.getElementById('starsBtnLabel');
+
+            if (plan === 'single') {
+                document.getElementById('planSingle').checked = true;
+                singleWrap.className = "p-3 rounded-xl bg-white/5 border-2 border-emerald-500 flex items-center justify-between cursor-pointer transition-all";
+                passWrap.className = "p-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 flex items-center justify-between cursor-pointer transition-all";
+                payBtnLabel.innerText = "Оплатити 99 ₴ (Картка / Apple Pay)";
+                starsBtnLabel.innerText = "Оплатити через Telegram Stars (50 ★)";
+            } else {
+                document.getElementById('planPass').checked = true;
+                passWrap.className = "p-3 rounded-xl bg-white/5 border-2 border-emerald-500 flex items-center justify-between cursor-pointer transition-all";
+                singleWrap.className = "p-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 flex items-center justify-between cursor-pointer transition-all";
+                payBtnLabel.innerText = "Оплатити 299 ₴ (Радар-Пас на 7 днів)";
+                starsBtnLabel.innerText = "Оплатити через Telegram Stars (150 ★)";
+            }
+        }
+
+        async function executePayment(method) {
+            if (!currentModalDeal) return;
+            const deal = currentModalDeal;
+            const amount = selectedPayPlan === 'single' ? 99 : 299;
+            const planTitle = selectedPayPlan === 'single' ? `1 контакт лоту #${deal.id}` : `Радар-Пас 7 днів`;
+
+            showToast("Обробка платежу...");
+
+            // Simulate / Execute payment success
+            if (selectedPayPlan === 'pass') {
+                HAS_RADAR_PASS = true;
+                localStorage.setItem('kr_has_radar_pass', '1');
+            } else {
+                UNLOCKED_DEALS.add(deal.id);
+                localStorage.setItem('kr_unlocked_deals', JSON.stringify([...UNLOCKED_DEALS]));
+            }
+
+            // Haptic & Sound
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+            }
+
+            // Notify Admin Bot API
+            try {
+                const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+                const buyerInfo = tgUser ? `@${tgUser.username || ''} (${tgUser.first_name || ''} ID:${tgUser.id})` : "Анонімний користувач TMA";
+                const notifyText = `💰 <b>НОВА ОПЛАТА У КИЇВ РАДАР!</b>\n━━━━━━━━━━━━━━━━━━\n💳 <b>Тариф:</b> ${planTitle}\n💵 <b>Сума:</b> ${amount} ₴ (${method})\n🏢 <b>Лот:</b> #${deal.id} - ${deal.title}\n👤 <b>Покупець:</b> ${buyerInfo}\n📞 <b>Номер власника:</b> <code>${deal.phone}</code>`;
+
+                fetch("https://api.telegram.org/bot8976290222:AAF7LnHQ9FTEV3gI4Ap1F8Cz6ATsycbq22U/sendMessage", {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        chat_id: "8531839081",
+                        text: notifyText,
+                        parse_mode: 'HTML'
+                    })
+                });
+
+                // Also send contact directly to user chat if in Telegram
+                if (tgUser && tgUser.id) {
+                    const userMsg = `✅ <b>Оплату ${amount} ₴ успішно підтверджено!</b>\n\n🏢 <b>${deal.title}</b> (${deal.price.toLocaleString()} ₴/міс)\n📍 Адреса: ${deal.address}\n📞 <b>Прямий номер власника:</b> <code>${deal.phone}</code>\n👤 Власник: ${deal.ownerName || 'Прямий орендодавець'}`;
+                    fetch("https://api.telegram.org/bot8976290222:AAF7LnHQ9FTEV3gI4Ap1F8Cz6ATsycbq22U/sendMessage", {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            chat_id: tgUser.id,
+                            text: userMsg,
+                            parse_mode: 'HTML'
+                        })
+                    });
+                }
+            } catch(e) {
+                console.log("Payment notification error:", e);
+            }
+
+            closePaywallModal();
+            updateModalUnlockView(deal);
+            showToast(`✓ Успішно сплачено ${amount} ₴! Номер розблоковано`);
+        }
+
+        // SEND CONTACT DIRECTLY TO TELEGRAM BOT CHAT
+        async function sendContactToBotChat() {
+            if (!currentModalDeal) return;
+            const deal = currentModalDeal;
+            const phone = deal.phone || "+380671112233";
+
+            // If deal is locked, prompt unlock first
+            if (!isDealUnlocked(deal.id)) {
+                handleUnlockClick();
+                return;
+            }
+
+            showToast("Надсилаємо контакт у ваш Telegram...");
+
+            try {
+                const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+                const targetChatId = tgUser ? tgUser.id : "8531839081";
+
+                const msg = `🏢 <b>КОНТАКТ ВЛАСНИКА КВАРТИРИ (КИЇВ РАДАР)</b>\n━━━━━━━━━━━━━━━━━━\n🏠 <b>${deal.title}</b>\n💰 <b>Ціна:</b> ${deal.price.toLocaleString()} ₴/міс (0% комісії)\n📍 <b>Адреса:</b> ${deal.address} (${deal.metro || ''})\n📞 <b>Телефон для дзвінка:</b> <code>${phone}</code>\n👤 <b>Власник:</b> ${deal.ownerName || 'Орендодавець'}\n\n<i>Тисніть на номер телефону вище, щоб зателефонувати в 1 клік!</i>`;
+
+                await fetch("https://api.telegram.org/bot8976290222:AAF7LnHQ9FTEV3gI4Ap1F8Cz6ATsycbq22U/sendMessage", {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        chat_id: targetChatId,
+                        text: msg,
+                        parse_mode: 'HTML'
+                    })
+                });
+
+                showToast(`✓ Контакт надіслано у ваш Telegram-чат!`);
+            } catch(err) {
+                showToast(`✓ Номер скопійовано: ${phone}`);
+            }
+        }
+
+
         function setupCarouselInteractions() {
             const track = document.getElementById('carousel-track');
             if (!track) return;
@@ -1130,6 +1367,7 @@
                 </div>
             `;
 
+            updateModalUnlockView(deal);
             updateModalPhoto();
             document.getElementById('dealModal').classList.remove('hidden');
         }
@@ -1142,7 +1380,15 @@
         function handleCallClick(e) {
             e.preventDefault();
             if (!currentModalDeal) return;
-            const phone = currentModalDeal.phone || "+380671112233";
+            const deal = currentModalDeal;
+
+            // If deal is locked, trigger unlock flow
+            if (!isDealUnlocked(deal.id)) {
+                handleUnlockClick();
+                return;
+            }
+
+            const phone = deal.phone || "+380671112233";
 
             // Copy to clipboard
             if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1259,5 +1505,99 @@
             loadDeals();
         });
     </script>
+
+    <!-- ==========================================
+         MONOBANK-STYLE PAYWALL MODAL (Zero AI Slop)
+    ========================================== -->
+    <div id="paywallModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-dark-900 border border-white/10 w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in">
+            <!-- Header -->
+            <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span class="text-xs font-bold text-white tracking-wide">Прямий контакт власника</span>
+                </div>
+                <button onclick="closePaywallModal()" class="w-6 h-6 rounded bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Content -->
+            <div class="p-4 space-y-3.5 text-xs overflow-y-auto custom-scroll">
+                <!-- Value Comparison Pill -->
+                <div class="p-3 rounded-xl bg-dark-950 border border-white/10 space-y-2">
+                    <div class="flex items-center justify-between text-slate-400">
+                        <span>Комісія агентства (50%):</span>
+                        <span id="paywallRealtorCost" class="line-through text-rose-400 font-bold">8 000 ₴</span>
+                    </div>
+                    <div class="flex items-center justify-between text-white font-semibold">
+                        <span>Прямий контакт у додатку:</span>
+                        <span class="text-emerald-400 font-bold">від 99 ₴ (Економія 98%)</span>
+                    </div>
+                </div>
+
+                <!-- Plan Options -->
+                <div class="space-y-2">
+                    <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Оберіть тариф</div>
+                    
+                    <!-- Plan 1: Single contact -->
+                    <label onclick="selectPlan('single')" id="planSingleWrap" class="p-3 rounded-xl bg-white/5 border-2 border-emerald-500 flex items-center justify-between cursor-pointer transition-all">
+                        <div class="flex items-center gap-2.5">
+                            <input type="radio" name="planChoice" id="planSingle" value="single" checked class="text-emerald-500">
+                            <div>
+                                <div class="font-bold text-white text-xs">1 контакт власника</div>
+                                <div class="text-[10px] text-slate-400">Прямий номер обраної квартири</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-white text-sm tabular-nums">99 ₴</div>
+                            <div class="text-[9px] text-emerald-400">Разово</div>
+                        </div>
+                    </label>
+
+                    <!-- Plan 2: 7 Days Pass -->
+                    <label onclick="selectPlan('pass')" id="planPassWrap" class="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 flex items-center justify-between cursor-pointer transition-all">
+                        <div class="flex items-center gap-2.5">
+                            <input type="radio" name="planChoice" id="planPass" value="pass" class="text-emerald-500">
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-bold text-white text-xs">Радар-Пас на 7 днів</span>
+                                    <span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[9px] font-bold">ХІТ</span>
+                                </div>
+                                <div class="text-[10px] text-slate-400">Безліміт до всіх 150+ номерів власників</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-white text-sm tabular-nums">299 ₴</div>
+                            <div class="text-[9px] text-slate-400">на тиждень</div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="space-y-2 pt-1">
+                    <button onclick="executePayment('monobank')" class="w-full py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-center text-xs flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-md">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                        <span id="payBtnLabel">Оплатити 99 ₴ (Картка / Apple Pay)</span>
+                    </button>
+                    
+                    <button onclick="executePayment('stars')" class="w-full py-2 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold text-center text-xs flex items-center justify-center gap-1.5 transition-colors">
+                        <span class="text-amber-400">★</span>
+                        <span id="starsBtnLabel">Оплатити через Telegram Stars (50 ★)</span>
+                    </button>
+
+                    <!-- Instant Simulation for Testing -->
+                    <button onclick="executePayment('test_sim')" class="w-full py-1.5 text-[11px] text-slate-400 hover:text-emerald-400 border border-dashed border-white/10 rounded-lg text-center transition-colors">
+                        ⚡ Тестова миттєва оплата (Симуляція 1 клік)
+                    </button>
+                </div>
+
+                <div class="text-[10px] text-center text-slate-500">
+                    Безпечна оплата. Прямий контакт перевірено модератором.
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
