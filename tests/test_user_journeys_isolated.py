@@ -146,7 +146,8 @@ def test_landlord_submit_isolated(isolated_app):
             "rooms": 1,
             "phone": "+380501234567",
             "gpon": True,
-            "generator": False
+            "generator": False,
+            "initData": generate_valid_init_data(TEST_BOT_TOKEN, user_id=TEST_USER_ID)
         }
         resp = client.post("/api/landlords/submit", json=payload)
         assert resp.status_code == 200
