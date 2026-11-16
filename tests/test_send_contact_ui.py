@@ -78,7 +78,7 @@ async def test_browser_mode_with_phone():
 
 @pytest.mark.asyncio
 async def test_browser_mode_without_phone():
-    """Outside Telegram: default deal with phone=null displays truthful 'Номер не вказано'."""
+    """Outside Telegram: default masked deal directs users to Telegram instead of leaking a number."""
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         context = await browser.new_context(
@@ -95,11 +95,11 @@ async def test_browser_mode_without_phone():
         assert await page.is_visible("#dealModal")
 
         # Click "У чат" button
-        await page.click("#modalChatBtn")
+        await page.click("#modalCallBtn")
         await page.wait_for_timeout(400)
 
         toast = await page.inner_text("#toastText")
-        assert "Номер не вказано" in toast or "захищено" in toast, f"Expected privacy/no-number message, got '{toast}'"
+        assert "захищено" in toast or "Telegram" in toast, f"Expected privacy/Telegram message, got '{toast}'"
         assert "+380671112233" not in toast, "Fake fallback phone MUST NOT be used!"
 
         await browser.close()
@@ -126,7 +126,7 @@ async def test_telegram_mode_successful_delivery():
         await page.locator(".carousel-card").first.click()
         await page.wait_for_timeout(500)
 
-        await page.click("#modalChatBtn")
+        await page.click("#modalCallBtn")
         await page.wait_for_timeout(500)
 
         toast = await page.inner_text("#toastText")
@@ -159,7 +159,7 @@ async def test_telegram_mode_error_unmasked():
         await page.locator(".carousel-card").first.click()
         await page.wait_for_timeout(500)
 
-        await page.click("#modalChatBtn")
+        await page.click("#modalCallBtn")
         await page.wait_for_timeout(500)
 
         toast = await page.inner_text("#toastText")
