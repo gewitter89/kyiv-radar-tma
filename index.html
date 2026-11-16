@@ -219,6 +219,11 @@
             scrollbar-width: none;
         }
 
+                #carousel-track img {
+            pointer-events: none;
+            -webkit-user-drag: none;
+            user-select: none;
+        }
         .carousel-card {
             scroll-snap-align: start;
             flex-shrink: 0;
@@ -387,7 +392,7 @@
                 <span class="text-emerald-400 font-bold">· Прямі контакти</span>
             </div>
             <!-- Arrow controls for PC -->
-            <div class="hidden md:flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5">
                 <button onclick="scrollCarousel(-1)" class="carousel-arrow-btn" title="Попередня">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
                 </button>
@@ -398,6 +403,14 @@
         </div>
 
         <!-- Carousel Track -->
+        <!-- Floating Left/Right PC Side Arrows -->
+        <button onclick="scrollCarousel(-1)" class="absolute left-1 top-[60%] -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-dark-950/90 border border-white/20 text-white flex items-center justify-center hover:bg-dark-850 hover:scale-110 active:scale-95 transition-all shadow-xl" title="Попередня квартира">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button onclick="scrollCarousel(1)" class="absolute right-1 top-[60%] -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-dark-950/90 border border-white/20 text-white flex items-center justify-center hover:bg-dark-850 hover:scale-110 active:scale-95 transition-all shadow-xl" title="Наступна квартира">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+
         <div id="carousel-track" class="relative">
             <!-- Cards populated dynamically by JS -->
         </div>
@@ -929,7 +942,7 @@
                 }
 
                 return `
-                    <div class="carousel-card ${item.id === currentActiveId ? 'active-deal' : ''}" id="card-${item.id}" onclick="openDealModalById(${item.id})">
+                    <div class="carousel-card ${item.id === currentActiveId ? 'active-deal' : ''}" id="card-${item.id}" onclick="if (dragMovedDistance < 10) openDealModalById(${item.id})">
                         <!-- Left Thumbnail with REAL unique photos -->
                         <div class="w-[108px] h-full relative shrink-0 overflow-hidden bg-dark-950">
                             <img src="${mainPhoto}" alt="${item.title}" class="w-full h-full object-cover">
@@ -993,16 +1006,66 @@
             }
         }
 
+        let isMouseDragging = false;
+        let mouseStartX = 0;
+        let mouseScrollLeft = 0;
+        let dragMovedDistance = 0;
+
         function setupCarouselInteractions() {
             const track = document.getElementById('carousel-track');
             if (!track) return;
 
+            // A. Smooth Mouse Wheel
             track.addEventListener('wheel', (e) => {
                 if (e.deltaY !== 0) {
                     e.preventDefault();
-                    track.scrollLeft += e.deltaY * 1.5;
+                    track.scrollBy({ left: e.deltaY * 2.2, behavior: 'smooth' });
                 }
             }, { passive: false });
+
+            // B. Mouse Drag-to-Scroll (затисни ліву кнопку миші та потягни)
+                        track.addEventListener('dragstart', (e) => e.preventDefault());
+            track.addEventListener('mousedown', (e) => {
+                isMouseDragging = true;
+                dragMovedDistance = 0;
+                mouseStartX = e.pageX - track.offsetLeft;
+                mouseScrollLeft = track.scrollLeft;
+                track.style.cursor = 'grabbing';
+                track.style.userSelect = 'none';
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (isMouseDragging) {
+                    isMouseDragging = false;
+                    track.style.cursor = 'default';
+                    track.style.userSelect = '';
+                }
+            });
+
+            track.addEventListener('mousemove', (e) => {
+                if (!isMouseDragging) return;
+                e.preventDefault();
+                const x = e.pageX - track.offsetLeft;
+                const walk = (x - mouseStartX) * 1.6;
+                dragMovedDistance += Math.abs(walk);
+                track.scrollLeft = mouseScrollLeft - walk;
+            });
+
+            // C. Keyboard Navigation (стрілочки на клавіатурі <- і ->)
+            window.addEventListener('keydown', (e) => {
+                // If modal is open, don't hijack unless it's photo
+                if (!document.getElementById('dealModal').classList.contains('hidden')) {
+                    if (e.key === 'ArrowRight') switchModalPhoto(1);
+                    if (e.key === 'ArrowLeft') switchModalPhoto(-1);
+                    if (e.key === 'Escape') closeDealModal();
+                    return;
+                }
+                if (e.key === 'ArrowRight') {
+                    scrollCarousel(1);
+                } else if (e.key === 'ArrowLeft') {
+                    scrollCarousel(-1);
+                }
+            });
         }
 
         function scrollCarousel(direction) {
