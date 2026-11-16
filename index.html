@@ -287,61 +287,52 @@
     </div>
 
     <!-- ==========================================
-         TOP NAVBAR: Brand + City + Search + Post
+         TOP NAVBAR: Sleek, Uncluttered, Modern
     ========================================== -->
-    <header class="h-13 shrink-0 bg-dark-900 border-b border-white/10 px-3 md:px-5 flex items-center justify-between gap-2.5 z-30">
-        <!-- Logo & City Switcher -->
-        <div class="flex items-center gap-2 shrink-0">
-            <div class="w-8 h-8 rounded-lg bg-white text-dark-950 font-bold text-xs flex items-center justify-center tracking-tight">
-                КР
-            </div>
-            <button onclick="openCityModal()" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 transition-colors">
-                <span id="cityNameLabel">Київ</span>
-                <span class="text-[10px] px-1 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-bold">0% комісії</span>
-                <svg class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 9l-7 7-7-7"/></svg>
-            </button>
+    <header class="h-12 shrink-0 bg-dark-900 border-b border-white/10 px-2.5 md:px-4 flex items-center justify-between gap-2 z-30">
+        <!-- City Switcher (Compact & Elegant) -->
+        <button onclick="openCityModal()" class="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-dark-950 border border-white/10 hover:border-white/20 text-xs font-semibold text-white transition-colors" title="Змінити місто">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span id="cityNameLabel">Київ</span>
+            <svg class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 9l-7 7-7-7"/></svg>
+        </button>
+
+        <!-- Search Bar (Takes all available width) -->
+        <div class="flex-1 relative min-w-0">
+            <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Пошук: метро, вулиця, район..." class="w-full bg-dark-950 border border-white/10 rounded-lg px-2.5 py-1.5 pl-7 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500/60 transition-colors">
+            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         </div>
 
-        <!-- Search Bar -->
-        <div class="flex-1 max-w-sm relative">
-            <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Пошук: метро, вулиця, район..." class="w-full bg-dark-950 border border-white/10 rounded-lg px-3 py-1.5 pl-8 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500/60 transition-colors">
-            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        </div>
-
-        <!-- Landlord Post Button -->
-        <button onclick="openLandlordModal()" class="shrink-0 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-dark-950 text-xs font-bold flex items-center gap-1.5 transition-transform active:scale-95">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-            <span>Здати 0%</span>
+        <!-- Landlord Post Button (Compact on mobile) -->
+        <button onclick="openLandlordModal()" class="shrink-0 h-8 px-2.5 rounded-lg bg-white/10 hover:bg-emerald-500 hover:text-dark-950 border border-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95" title="Опублікувати квартиру (0% комісії)">
+            <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            <span class="hidden sm:inline">Здати</span>
         </button>
     </header>
 
     <!-- ==========================================
-         FILTER BAR (Tactile Horizontal Pills)
+         FILTER BAR (Sleek Matte Chips)
     ========================================== -->
-    <div class="py-1.5 px-3 border-b border-white/10 bg-dark-950 shrink-0 z-20 overflow-x-auto custom-scroll">
-        <div class="flex items-center gap-1.5 min-w-max text-xs" id="filterContainer">
-            <button onclick="setFilter('all')" id="filterAll" class="px-3 py-1 rounded-md bg-white text-dark-950 font-bold transition-colors">Всі (150)</button>
-            <button onclick="setFilter('under15k')" id="filter15k" class="px-3 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-colors flex items-center gap-1">
+    <div class="py-1 px-2.5 border-b border-white/10 bg-dark-950 shrink-0 z-20 overflow-x-auto custom-scroll">
+        <div class="flex items-center gap-1.5 min-w-max text-[11px]" id="filterContainer">
+            <button onclick="setFilter('all')" id="filterAll" class="px-2.5 py-1 rounded-full bg-white text-dark-950 font-bold transition-all">Всі (150)</button>
+            <button onclick="setFilter('under15k')" id="filter15k" class="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all flex items-center gap-1">
                 <span>До 15 тис</span>
             </button>
-            <button onclick="setFilter('under20k')" id="filter20k" class="px-3 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-colors flex items-center gap-1">
+            <button onclick="setFilter('under20k')" id="filter20k" class="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all flex items-center gap-1">
                 <span>До 20 тис</span>
             </button>
-            <button onclick="setFilter('power')" id="filterPower" class="px-3 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-colors flex items-center gap-1.5">
-                <svg class="w-3 h-3 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                <span>GPON / Світло</span>
+            <button onclick="setFilter('power')" id="filterPower" class="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all flex items-center gap-1">
+                <svg class="w-3 h-3 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                <span>Світло / GPON</span>
             </button>
-            <button onclick="setFilter('pets')" id="filterPets" class="px-3 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-colors flex items-center gap-1.5">
+            <button onclick="setFilter('pets')" id="filterPets" class="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all flex items-center gap-1">
                 <svg class="w-3 h-3 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16c0 2 1.5 4 4 4s4-2 4-4-1.5-4-4-4-4 2-4 4zM16 16c0 2 1.5 4 4 4s4-2 4-4-1.5-4-4-4-4 2-4 4zM10 6c0 1.5-1 3-2.5 3S5 7.5 5 6s1-3 2.5-3S10 4.5 10 6zM19 6c0 1.5-1 3-2.5 3S14 7.5 14 6s1-3 2.5-3S19 4.5 19 6z"/></svg>
                 <span>З тваринами</span>
             </button>
-            <button onclick="setFilter('favs')" id="filterFavs" class="px-3 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-colors flex items-center gap-1.5">
+            <button onclick="setFilter('favs')" id="filterFavs" class="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all flex items-center gap-1">
                 <svg class="w-3 h-3 text-rose-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                <span>Збережені (<span id="favCount">0</span>)</span>
-            </button>
-            <button onclick="handleLocateClick()" id="filterNearby" class="px-3 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-colors flex items-center gap-1.5">
-                <svg class="w-3 h-3 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
-                <span>Поруч (GPS)</span>
+                <span>Обрані (<span id="favCount">0</span>)</span>
             </button>
         </div>
     </div>
@@ -354,27 +345,27 @@
         <div id="map" class="w-full h-full z-10"></div>
 
         <!-- Floating Radar Location Status Pill (Apple Maps style) -->
-        <div id="radarLocationPill" class="absolute top-3 left-1/2 -translate-x-1/2 z-20 hidden transition-all duration-300">
-            <div class="px-3.5 py-1.5 rounded-full bg-dark-900/95 border border-blue-500/40 text-xs font-semibold text-white shadow-2xl backdrop-blur-md flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-                <span id="radarLocationText">Поруч із вами · Сортування за дистанцією</span>
-                <button onclick="clearLocationFilter()" class="ml-1 text-slate-400 hover:text-white">✕</button>
+        <div id="radarLocationPill" class="absolute top-3 inset-x-3 z-20 hidden flex justify-center pointer-events-none transition-all duration-300">
+            <div class="pointer-events-auto px-3 py-1.5 rounded-full bg-dark-950/95 border border-blue-500/50 text-xs font-semibold text-white shadow-2xl backdrop-blur-md flex items-center gap-2 max-w-full">
+                <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse shrink-0"></span>
+                <span id="radarLocationText" class="truncate">Поруч із вами · Сортування за відстанню</span>
+                <button onclick="clearLocationFilter()" class="w-4 h-4 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center text-[10px] shrink-0 ml-0.5">✕</button>
             </div>
         </div>
 
         <!-- Floating Map Buttons (Top Right) -->
         <div class="absolute right-3 top-3 z-20 flex flex-col gap-2">
-            <button onclick="handleLocateClick()" class="w-9 h-9 rounded-lg bg-dark-900 border border-white/10 text-slate-200 hover:text-white flex items-center justify-center shadow-lg transition-transform active:scale-95" title="Поруч зі мною (GPS)">
+            <button onclick="handleLocateClick()" class="w-9 h-9 rounded-xl bg-dark-950/90 border border-white/15 text-slate-200 hover:text-white flex items-center justify-center shadow-xl backdrop-blur-sm transition-transform active:scale-95" title="Поруч зі мною (GPS)">
                 <svg class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
             </button>
-            <button onclick="recenterKyiv()" class="w-9 h-9 rounded-lg bg-dark-900 border border-white/10 text-slate-200 hover:text-white flex items-center justify-center shadow-lg transition-transform active:scale-95" title="Київ Центр">
+            <button onclick="recenterKyiv()" class="w-9 h-9 rounded-xl bg-dark-950/90 border border-white/15 text-slate-200 hover:text-white flex items-center justify-center shadow-xl backdrop-blur-sm transition-transform active:scale-95" title="Київ Центр">
                 <svg class="w-4 h-4 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
             </button>
         </div>
 
         <!-- Floating Counter Badge (Top Left) -->
-        <div class="absolute left-3 top-3 z-20 pointer-events-none">
-            <div class="px-2.5 py-1 rounded-md bg-dark-900/90 border border-white/10 text-[11px] font-medium text-slate-300 backdrop-blur-sm flex items-center gap-1.5">
+        <div id="activeListingsBadge" class="absolute left-3 top-3 z-20 pointer-events-none transition-opacity duration-200">
+            <div class="px-2.5 py-1 rounded-lg bg-dark-950/90 border border-white/10 text-[11px] font-medium text-slate-200 backdrop-blur-sm flex items-center gap-1.5 shadow-lg">
                 <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
                 <span id="activeListingsCount">150 квартир від власників</span>
             </div>
@@ -789,7 +780,10 @@
 
                     // 4. Activate Distance Sorting & Show Apple Status Pill
                     activeFilter = 'nearby';
-                    document.getElementById('radarLocationPill').classList.remove('hidden');
+                    const locPill = document.getElementById('radarLocationPill');
+                    const countBadge = document.getElementById('activeListingsBadge');
+                    if (locPill) locPill.classList.remove('hidden');
+                    if (countBadge) countBadge.classList.add('hidden'); // Eliminate overlap bug
 
                     showToast("✓ Локацію знайдено! Квартири відсортовано за відстанню");
                     renderAll();
@@ -803,7 +797,10 @@
         }
 
         function clearLocationFilter() {
-            document.getElementById('radarLocationPill').classList.add('hidden');
+            const locPill = document.getElementById('radarLocationPill');
+            const countBadge = document.getElementById('activeListingsBadge');
+            if (locPill) locPill.classList.add('hidden');
+            if (countBadge) countBadge.classList.remove('hidden'); // Restore count badge
             if (userLocationMarker) map.removeLayer(userLocationMarker);
             if (userRadarCircle) map.removeLayer(userRadarCircle);
             userCoords = null;
