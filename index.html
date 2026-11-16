@@ -30,6 +30,10 @@
     <!-- Leaflet Maps CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet MarkerCluster CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -63,21 +67,38 @@
             border: none !important;
         }
         .bird-pin {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 8px;
-            border-radius: 20px;
-            background: #13151f;
+            background: #111827;
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
             color: #ffffff;
             font-size: 11px;
             font-weight: 800;
-            letter-spacing: -0.2px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.18);
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 3px 8px;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
             white-space: nowrap;
-            user-select: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .bird-pin:hover, .bird-pin.active {
+            background: #10b981;
+            border-color: #ffffff;
+            color: #0b0c10;
+            transform: scale(1.1);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.6);
+            z-index: 1000 !important;
+        }
+        .bird-pin .pin-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 9999px;
+            background: #10b981;
+            flex-shrink: 0;
+        }
+        .bird-pin.active .pin-dot {
+            background: #0b0c10;
         }
         .bird-pin:hover {
             transform: scale(1.12);
@@ -175,6 +196,44 @@
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+            /* MarkerCluster Custom Theme for Kyiv Radar */
+        .custom-cluster-wrap {
+            background: transparent !important;
+            border: none !important;
+        }
+        .cluster-pill {
+            background: #111827;
+            border: 2px solid #3b82f6;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 13px;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.15);
+            transition: transform 0.15s ease, border-color 0.15s ease;
+            cursor: pointer;
+        }
+        .cluster-pill:hover, .cluster-pill:active {
+            transform: scale(1.1);
+            border-color: #10b981;
+        }
+        .cluster-pill.sm {
+            width: 36px;
+            height: 36px;
+            border-color: #3b82f6;
+        }
+        .cluster-pill.md {
+            width: 42px;
+            height: 42px;
+            border-color: #6366f1;
+        }
+        .cluster-pill.lg {
+            width: 48px;
+            height: 48px;
+            border-color: #10b981;
         }
     </style>
 </head>
@@ -305,7 +364,7 @@
             </div>
 
             <!-- Single Focused Card on Mobile (Pops up when tapping a map marker) -->
-            <div id="mobileFocusedCardContainer" class="md:hidden absolute bottom-16 left-3 right-3 z-30 hidden transition-transform duration-300">
+            <div id="mobileFocusedCardContainer" class="md:hidden fixed bottom-20 left-3 right-3 z-30 hidden transition-transform duration-300">
                 <!-- Rendered dynamically -->
             </div>
         </main>
@@ -314,9 +373,9 @@
              MOBILE BOTTOM FLOATING PILL SWITCHER: [ 📋 Список ] ⇄ [ 🗺 Карта ]
              Apple / Airbnb style: lets user flip effortlessly between map and list
         ───────────────────────────────────────────────────────────── -->
-        <div class="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-40">
-            <button id="btnMobileViewToggle" onclick="toggleMobileView()" class="px-5 py-2.5 rounded-full bg-white text-dark-950 font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-2xl active:scale-95 transition-all border border-black/10">
-                <span id="mobileViewIcon">📋</span>
+        <div class="md:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
+            <button id="btnMobileViewToggle" onclick="toggleMobileView()" class="px-6 py-3 rounded-full bg-white text-dark-950 font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-[0_10px_35px_rgba(0,0,0,0.8)] ring-2 ring-white/30 active:scale-95 transition-all hover:scale-105">
+                <span id="mobileViewIcon" class="text-sm">📋</span>
                 <span id="mobileViewLabel">Список (150)</span>
             </button>
         </div>
@@ -565,6 +624,8 @@
         }
 
         // INITIALIZE LEAFLET MAP
+        let markersCluster = null;
+
         function initMap() {
             map = L.map('map', {
                 zoomControl: false,
@@ -581,6 +642,32 @@
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
                 minZoom: 4, maxZoom: 18
             }).addTo(map);
+
+            // Initialize Leaflet MarkerCluster Group (Airbnb / Bird style)
+            if (typeof L.markerClusterGroup === 'function') {
+                markersCluster = L.markerClusterGroup({
+                    maxClusterRadius: 45,
+                    spiderfyOnMaxZoom: true,
+                    showCoverageOnHover: false,
+                    zoomToBoundsOnClick: true,
+                    disableClusteringAtZoom: 15,
+                    iconCreateFunction: function(cluster) {
+                        const count = cluster.getChildCount();
+                        let cls = 'sm';
+                        if (count >= 25) cls = 'lg';
+                        else if (count >= 10) cls = 'md';
+                        const size = cls === 'lg' ? 48 : (cls === 'md' ? 42 : 36);
+
+                        return L.divIcon({
+                            className: 'custom-cluster-wrap',
+                            html: `<div class="cluster-pill ${cls}"><span>${count}</span></div>`,
+                            iconSize: [size, size],
+                            iconAnchor: [size / 2, size / 2]
+                        });
+                    }
+                });
+                map.addLayer(markersCluster);
+            }
         }
 
         // HAVERSINE DISTANCE FORMULA
@@ -658,33 +745,50 @@
 
         // RENDER MAP MARKERS
         function renderMarkers(items) {
-            Object.values(mapMarkers).forEach(m => map.removeLayer(m));
+            if (markersCluster) {
+                markersCluster.clearLayers();
+            } else {
+                Object.values(mapMarkers).forEach(m => map.removeLayer(m));
+            }
             mapMarkers = {};
 
+            const clusterItems = [];
             items.forEach((item) => {
-                const label = (item.price / 1000).toFixed(1) + 'k ₴';
-                const tag = item.generator ? 'Ген' : (item.gpon ? 'GPON' : '');
+                const shortLabel = Math.round(item.price / 1000) + 'k ₴';
+                const hasPower = item.generator || item.gpon;
                 const isActive = item.id === currentActiveId;
 
                 const customIcon = L.divIcon({
                     className: 'bird-pin-wrap',
                     html: `
                         <div class="bird-pin ${isActive ? 'active' : ''}" id="pin-${item.id}">
-                            <span class="pin-dot"></span>
-                            <span>${label}</span>
-                            ${tag ? `<span class="pin-badge">${tag}</span>` : ''}
+                            ${hasPower ? '<span class="pin-dot"></span>' : ''}
+                            <span>${shortLabel}</span>
                         </div>
                     `,
-                    iconSize: [74, 28],
-                    iconAnchor: [37, 14]
+                    iconSize: [60, 26],
+                    iconAnchor: [30, 13]
                 });
 
-                const marker = L.marker([item.lat, item.lng], { icon: customIcon }).addTo(map);
-                marker.on('click', () => {
+                const marker = L.marker([item.lat, item.lng], { icon: customIcon });
+                marker.on('click', (e) => {
+                    if (e && e.originalEvent) {
+                        e.originalEvent.stopPropagation();
+                    }
                     focusDeal(item.id, true, true);
                 });
+
                 mapMarkers[item.id] = marker;
+                if (markersCluster) {
+                    clusterItems.push(marker);
+                } else {
+                    marker.addTo(map);
+                }
             });
+
+            if (markersCluster && clusterItems.length > 0) {
+                markersCluster.addLayers(clusterItems);
+            }
         }
 
         // RENDER VERTICAL FEED (Desktop Sidebar & Mobile List)
