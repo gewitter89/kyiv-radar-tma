@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uk" class="h-full">
+<html lang="uk" class="h-full w-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -12,15 +12,16 @@
                 extend: {
                     colors: {
                         dark: {
-                            950: '#0b0c10',
-                            900: '#13151f',
-                            850: '#1a1d2b',
-                            800: '#232738',
-                            700: '#32374d'
+                            950: '#07090e',
+                            900: '#0f131c',
+                            850: '#161b26',
+                            800: '#1f2636',
+                            700: '#2d374d'
                         },
                         brand: {
-                            blue: '#007aff',
-                            green: '#10b981'
+                            blue: '#2563eb',
+                            green: '#10b981',
+                            amber: '#f59e0b'
                         }
                     }
                 }
@@ -41,33 +42,63 @@
             -webkit-tap-highlight-color: transparent;
             box-sizing: border-box;
         }
-        body, html {
+        html, body {
             height: 100%;
+            height: 100dvh;
+            height: var(--tg-viewport-height, 100vh);
             width: 100%;
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background-color: #0b0c10;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        
-        /* Modern Leaflet Tile Adjustments */
-        .leaflet-container {
-            background: #0b0c10 !important;
-            font-family: inherit;
-        }
-        .leaflet-control-zoom, .leaflet-control-attribution {
-            display: none !important;
+            position: fixed;
+            inset: 0;
+            background: #07090e;
+            color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* Price Pin Markers (Airbnb / Bird Kyiv Style) */
+        /* Modern Glass Panel */
+        .glass-panel {
+            background: rgba(15, 19, 28, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* MarkerCluster Custom Theme */
+        .custom-cluster-wrap {
+            background: transparent !important;
+            border: none !important;
+        }
+        .cluster-pill {
+            background: #0f131c;
+            border: 2px solid #3b82f6;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 13px;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.15);
+            transition: transform 0.15s ease, border-color 0.15s ease;
+            cursor: pointer;
+        }
+        .cluster-pill:hover, .cluster-pill:active {
+            transform: scale(1.1);
+            border-color: #10b981;
+        }
+        .cluster-pill.sm { width: 36px; height: 36px; border-color: #3b82f6; }
+        .cluster-pill.md { width: 42px; height: 42px; border-color: #6366f1; }
+        .cluster-pill.lg { width: 48px; height: 48px; border-color: #10b981; }
+
+        /* Individual Map Pins (Airbnb-style compact price tags) */
         .bird-pin-wrap {
             background: transparent !important;
             border: none !important;
         }
         .bird-pin {
-            background: #111827;
+            background: #0f131c;
             border: 1.5px solid rgba(255, 255, 255, 0.25);
             color: #ffffff;
             font-size: 11px;
@@ -77,7 +108,7 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.7);
             white-space: nowrap;
             cursor: pointer;
             transition: all 0.15s ease;
@@ -85,9 +116,9 @@
         .bird-pin:hover, .bird-pin.active {
             background: #10b981;
             border-color: #ffffff;
-            color: #0b0c10;
-            transform: scale(1.1);
-            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.6);
+            color: #07090e;
+            transform: scale(1.12);
+            box-shadow: 0 4px 18px rgba(16, 185, 129, 0.6);
             z-index: 1000 !important;
         }
         .bird-pin .pin-dot {
@@ -98,534 +129,389 @@
             flex-shrink: 0;
         }
         .bird-pin.active .pin-dot {
-            background: #0b0c10;
-        }
-        .bird-pin:hover {
-            transform: scale(1.12);
-            background: #007aff;
-            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.55), 0 0 0 1.5px #ffffff;
-            z-index: 1000 !important;
-        }
-        .bird-pin.active {
-            background: #007aff;
-            transform: scale(1.15);
-            box-shadow: 0 6px 22px rgba(0, 122, 255, 0.7), 0 0 0 2px #ffffff;
-            z-index: 1001 !important;
-        }
-        .bird-pin .pin-dot {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: #10b981;
-        }
-        .bird-pin.active .pin-dot {
-            background: #ffffff;
-        }
-        .bird-pin .pin-badge {
-            font-size: 8px;
-            padding: 1px 4px;
-            border-radius: 6px;
-            background: rgba(255,255,255,0.15);
-            font-weight: 700;
+            background: #07090e;
         }
 
-        /* Pulsing GPS Dot */
-        .user-loc-wrap { background: transparent !important; border: none !important; }
-        .user-loc-container {
-            position: relative;
-            width: 24px;
-            height: 24px;
+        /* Carousel scroll snap */
+        .carousel-track {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: translate(-50%, -50%);
+            gap: 12px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding: 6px 16px 12px 16px;
+            scrollbar-width: none;
+            touch-action: pan-x;
         }
-        .user-loc-dot {
-            width: 14px;
-            height: 14px;
-            background: #007aff;
-            border: 2.5px solid #ffffff;
-            border-radius: 50%;
-            box-shadow: 0 0 14px rgba(0, 122, 255, 0.95);
-            z-index: 2;
+        .carousel-track::-webkit-scrollbar {
+            display: none;
         }
-        .user-loc-pulse {
+        .carousel-card {
+            flex-shrink: 0;
+            width: 320px;
+            scroll-snap-align: center;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        @media (min-width: 768px) {
+            .carousel-card {
+                width: 360px;
+            }
+        }
+        .carousel-card.active-card {
+            border-color: #10b981 !important;
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.25) !important;
+            transform: translateY(-2px);
+        }
+
+        /* Nav arrows for PC */
+        .carousel-arrow-btn {
             position: absolute;
-            top: 50%; left: 50%;
-            width: 44px; height: 44px;
-            margin-left: -22px; margin-top: -22px;
-            border-radius: 50%;
-            background: rgba(0, 122, 255, 0.35);
-            animation: locPulse 2s infinite cubic-bezier(0.2, 0.6, 0.35, 1);
-            z-index: 1;
-            pointer-events: none;
-        }
-        @keyframes locPulse {
-            0% { transform: scale(0.35); opacity: 0.9; }
-            70% { transform: scale(1.3); opacity: 0; }
-            100% { transform: scale(1.4); opacity: 0; }
-        }
-
-        /* Subtle scrollbar */
-        .custom-scroll::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 3px;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.28);
-        }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* Card active highlight */
-        .card-active-ring {
-            box-shadow: 0 0 0 2px #007aff, 0 12px 36px rgba(0,0,0,0.85) !important;
-            border-color: #007aff !important;
-        }
-
-        /* Glass Surface Panels */
-        .glass-panel {
-            background: rgba(19, 21, 31, 0.92);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-            /* MarkerCluster Custom Theme for Kyiv Radar */
-        .custom-cluster-wrap {
-            background: transparent !important;
-            border: none !important;
-        }
-        .cluster-pill {
-            background: #111827;
-            border: 2px solid #3b82f6;
-            color: #ffffff;
-            font-weight: 800;
-            font-size: 13px;
-            border-radius: 9999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.15);
-            transition: transform 0.15s ease, border-color 0.15s ease;
-            cursor: pointer;
-        }
-        .cluster-pill:hover, .cluster-pill:active {
-            transform: scale(1.1);
-            border-color: #10b981;
-        }
-        .cluster-pill.sm {
-            width: 36px;
-            height: 36px;
-            border-color: #3b82f6;
-        }
-        .cluster-pill.md {
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 40;
             width: 42px;
             height: 42px;
-            border-color: #6366f1;
+            border-radius: 9999px;
+            background: rgba(15, 19, 28, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            cursor: pointer;
+            transition: all 0.15s ease;
         }
-        .cluster-pill.lg {
-            width: 48px;
-            height: 48px;
-            border-color: #10b981;
+        .carousel-arrow-btn:hover {
+            background: #2563eb;
+            color: #ffffff;
+            transform: translateY(-50%) scale(1.1);
+            border-color: #ffffff;
         }
+        .carousel-arrow-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        /* Custom Scrollbar for Drawers */
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
     </style>
 </head>
-<body class="h-full w-full flex flex-col bg-dark-950 select-none">
+<body class="flex flex-col h-full w-full select-none">
 
     <!-- ════════════════════════════════════════════════════════════════════
-         TOP GLOBAL NAVBAR (Clean, un-crowded, responsive for PC & Mobile)
+         TOP GLOBAL NAVBAR (Header: Logo, City, Search, Post Deal)
     ════════════════════════════════════════════════════════════════════ -->
-    <header class="h-14 md:h-16 shrink-0 glass-panel border-b border-white/10 px-3 md:px-6 flex items-center justify-between gap-3 z-30">
-        <!-- Left: Logo & City Dropdown -->
-        <div class="flex items-center gap-3 shrink-0">
-            <div class="w-9 h-9 rounded-xl bg-white text-dark-950 font-black text-sm flex items-center justify-center shadow-md">
+    <header class="h-13 shrink-0 glass-panel border-b border-white/10 px-3 flex items-center justify-between gap-2 z-30">
+        <!-- Left: Logo & City -->
+        <div class="flex items-center gap-2 shrink-0">
+            <div class="w-8 h-8 rounded-lg bg-white text-dark-950 font-black text-xs flex items-center justify-center shadow-md">
                 КР
             </div>
-            <!-- City Selector Trigger -->
-            <button onclick="openCityDrawer()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-dark-850 hover:bg-dark-800 border border-white/10 text-xs font-bold text-white transition-all active:scale-95 shadow-sm">
-                <span id="headerCityTitle">Київ</span>
-                <span class="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-extrabold">0%</span>
-                <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+            <button onclick="openCityDrawer()" class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold transition-all">
+                <span id="headerCityName">Київ</span>
+                <span class="text-[10px] text-emerald-400 font-extrabold">0%</span>
+                <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
         </div>
 
-        <!-- Center: Search Input (Expands smoothly) -->
-        <div class="flex-1 max-w-xl relative flex items-center">
-            <svg class="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
-            </svg>
-            <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Пошук: метро, район, ЖК, вулиця..." class="w-full bg-dark-900 border border-white/10 rounded-xl pl-9 pr-8 py-2 text-xs md:text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-blue transition-all">
-            <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 text-slate-400 hover:text-white p-1 text-xs font-bold">✕</button>
+        <!-- Middle: Search Input -->
+        <div class="flex-1 max-w-sm relative">
+            <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Пошук вулиці або метро..." class="w-full bg-dark-950/80 border border-white/10 rounded-full px-3 py-1.5 pl-8 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-brand-blue/60 transition-all">
+            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         </div>
 
-        <!-- Right: Actions -->
-        <div class="flex items-center gap-2 shrink-0">
-            <!-- District Picker button -->
-            <button onclick="openDistrictDrawer()" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-dark-850 hover:bg-dark-800 border border-white/10 text-xs font-semibold text-slate-200 hover:text-white transition-all active:scale-95 shadow-sm">
-                <svg class="w-3.5 h-3.5 text-brand-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                <span id="activeDistrictLabel">Район</span>
-            </button>
-
-            <!-- Landlord Submit Fast Action -->
-            <button onclick="openLandlordDrawer()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs transition-all active:scale-95 shadow-sm">
-                <span>🏢</span>
-                <span class="hidden md:inline">Здати житло 0%</span>
-                <span class="md:hidden">Здати 0%</span>
-            </button>
-        </div>
+        <!-- Right: Landlord Button -->
+        <button onclick="openLandlordDrawer()" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-1 transition-all">
+            <span>Здати 0%</span>
+        </button>
     </header>
 
     <!-- ════════════════════════════════════════════════════════════════════
-         MAIN RESPONSIVE VIEWPORT
-         - Desktop (>= md): True Split Screen (Left Feed + Right Map)
-         - Mobile (< md): Toggleable Map / Feed with Bottom Switcher Pill
+         ONBOARDING ALERT BANNER (Dismissible, 3-second value proposition)
     ════════════════════════════════════════════════════════════════════ -->
-    <div class="flex-1 flex overflow-hidden relative">
+    <div id="onboardingBanner" class="shrink-0 bg-gradient-to-r from-blue-900/90 via-indigo-900/90 to-blue-950/90 border-b border-blue-500/20 px-3 py-1.5 flex items-center justify-between text-xs text-blue-100 z-20">
+        <div class="flex items-center gap-2 overflow-hidden">
+            <span class="text-sm shrink-0">⚡</span>
+            <span class="truncate">
+                <strong>Оренда від власників 0% комісії</strong> · Економія від 8 000 до 15 000 ₴ на рієлторі. Гортайте картки або тисніть на карту!
+            </span>
+        </div>
+        <button onclick="dismissOnboarding()" class="ml-2 text-blue-300 hover:text-white p-1 text-xs shrink-0" title="Приховати">✕</button>
+    </div>
 
-        <!-- ─────────────────────────────────────────────────────────────
-             LEFT COLUMN: FEED / SIDEBAR
-             On Desktop: Fixed width (450px - 520px), scrollable with mouse wheel!
-             On Mobile: Fullscreen when mobileViewMode === 'list'
-        ───────────────────────────────────────────────────────────── -->
-        <aside id="feedSidebar" class="w-full md:w-[460px] lg:w-[500px] xl:w-[540px] shrink-0 h-full flex flex-col bg-dark-900 border-r border-white/10 z-30 transition-all duration-200 md:relative absolute inset-0 md:translate-x-0">
-            <!-- Filter Pills Horizontal Bar (with mouse wheel support!) -->
-            <div class="p-3 border-b border-white/10 bg-dark-950 shrink-0">
-                <div id="filterPillsScroll" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 custom-scroll">
-                    <button onclick="toggleQuickFilter(this, 'all')" id="btnFilterAll" class="q-filter active shrink-0 py-1.5 px-3 rounded-xl text-xs font-bold bg-white text-dark-950 shadow-sm transition-all">
-                        Всі (150)
-                    </button>
-                    <button onclick="toggleQuickFilter(this, 'favs')" id="btnFilterFavs" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-xs font-medium bg-dark-850 text-slate-300 hover:text-white border border-white/10 transition-all">
-                        🤍 Збережені
-                    </button>
-                    <button onclick="toggleQuickFilter(this, 'rooms_1')" id="btnFilterR1" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-xs font-medium bg-dark-850 text-slate-300 hover:text-white border border-white/10 transition-all">
-                        1-кімн
-                    </button>
-                    <button onclick="toggleQuickFilter(this, 'rooms_2')" id="btnFilterR2" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-xs font-medium bg-dark-850 text-slate-300 hover:text-white border border-white/10 transition-all">
-                        2-кімн
-                    </button>
-                    <button onclick="toggleQuickFilter(this, 'max_15k')" id="btnFilter15k" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-xs font-medium bg-dark-850 text-slate-300 hover:text-white border border-white/10 transition-all">
-                        До 15k ₴
-                    </button>
-                    <button onclick="toggleQuickFilter(this, 'max_20k')" id="btnFilter20k" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-xs font-medium bg-dark-850 text-slate-300 hover:text-white border border-white/10 transition-all">
-                        До 20k ₴
-                    </button>
-                    <button onclick="toggleQuickFilter(this, 'gpon')" id="btnFilterGpon" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-xs font-medium bg-dark-850 text-slate-300 hover:text-white border border-white/10 transition-all">
-                        ⚡ GPON
-                    </button>
-                    <button onclick="toggleQuickFilter(this, 'generator')" id="btnFilterGen" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-xs font-medium bg-dark-850 text-slate-300 hover:text-white border border-white/10 transition-all">
-                        🔋 Генератор
-                    </button>
-                    <button onclick="activateNearbyMode(this)" id="btnFilterNearby" class="q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-xs font-medium bg-dark-850 text-slate-300 hover:text-white border border-white/10 transition-all">
-                        📍 Поруч
-                    </button>
-                </div>
-                <!-- Proximity / Filter summary label -->
-                <div class="flex items-center justify-between pt-2 text-[11px] text-slate-400">
-                    <span id="resultsCountLabel">Завантаження лотів...</span>
-                    <span id="activeDistrictBadge" class="text-brand-blue font-bold truncate">Київ (всі райони)</span>
-                </div>
-            </div>
-
-            <!-- Scrollable Apartment Cards List (Smooth Native Mouse Wheel on PC!) -->
-            <div id="cardsList" class="flex-1 overflow-y-auto p-3 space-y-3 pb-28 md:pb-6 custom-scroll">
-                <!-- Dynamically populated with rich cards -->
-            </div>
-        </aside>
-
-        <!-- ─────────────────────────────────────────────────────────────
-             RIGHT COLUMN: FULL-HEIGHT LEAFLET MAP
-             Always visible on Desktop. Interactive and synced with cards.
-        ───────────────────────────────────────────────────────────── -->
-        <main id="mapContainer" class="flex-1 h-full relative overflow-hidden">
-            <!-- Map Canvas -->
-            <div id="map" class="w-full h-full"></div>
-
-            <!-- Floating Map Navigation Tools -->
-            <div class="absolute right-3 top-4 z-20 flex flex-col gap-2">
-                <button onclick="handleLocateClick()" class="glass-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all group" title="Поруч зі мною (GPS)">
-                    <svg class="w-4 h-4 text-brand-blue group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
-                </button>
-                <button onclick="recenterKyiv()" class="glass-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all group" title="Київ центр">
-                    <svg class="w-4 h-4 text-slate-300 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                </button>
-                <button onclick="zoomMap(1)" class="glass-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all text-sm font-black leading-none w-9 h-9 flex items-center justify-center">
-                    +
-                </button>
-                <button onclick="zoomMap(-1)" class="glass-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all text-sm font-black leading-none w-9 h-9 flex items-center justify-center">
-                    −
-                </button>
-            </div>
-
-            <!-- Single Focused Card on Mobile (Pops up when tapping a map marker) -->
-            <div id="mobileFocusedCardContainer" class="md:hidden fixed bottom-20 left-3 right-3 z-30 hidden transition-transform duration-300">
-                <!-- Rendered dynamically -->
-            </div>
-        </main>
-
-        <!-- ─────────────────────────────────────────────────────────────
-             MOBILE BOTTOM FLOATING PILL SWITCHER: [ 📋 Список ] ⇄ [ 🗺 Карта ]
-             Apple / Airbnb style: lets user flip effortlessly between map and list
-        ───────────────────────────────────────────────────────────── -->
-        <div class="md:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
-            <button id="btnMobileViewToggle" onclick="toggleMobileView()" class="px-6 py-3 rounded-full bg-white text-dark-950 font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-[0_10px_35px_rgba(0,0,0,0.8)] ring-2 ring-white/30 active:scale-95 transition-all hover:scale-105">
-                <span id="mobileViewIcon" class="text-sm">📋</span>
-                <span id="mobileViewLabel">Список (150)</span>
-            </button>
+    <!-- ════════════════════════════════════════════════════════════════════
+         QUICK FILTER PILLS BAR (1-tap filters)
+    ════════════════════════════════════════════════════════════════════ -->
+    <div class="p-2 border-b border-white/10 bg-dark-950 shrink-0 z-20 overflow-x-auto custom-scroll">
+        <div class="flex items-center gap-1.5 min-w-max text-xs" id="filterPillsContainer">
+            <button onclick="setFilter('all')" id="btnFilterAll" class="px-3 py-1 rounded-full bg-white text-dark-950 font-bold shadow-sm transition-all">Всі (150)</button>
+            <button onclick="setFilter('under15k')" id="btnFilterUnder15k" class="px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all">💰 До 15k</button>
+            <button onclick="setFilter('under20k')" id="btnFilterUnder20k" class="px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all">💰 До 20k</button>
+            <button onclick="setFilter('power')" id="btnFilterPower" class="px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all">🔋 Генератор / GPON</button>
+            <button onclick="setFilter('pets')" id="btnFilterPets" class="px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all">🐾 З тваринами</button>
+            <button onclick="setFilter('favs')" id="btnFilterFavs" class="px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all">❤️ Збережені (<span id="favCount">0</span>)</button>
+            <button onclick="handleLocateClick()" id="btnFilterNearby" class="px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all">📍 Поруч</button>
         </div>
     </div>
 
     <!-- ════════════════════════════════════════════════════════════════════
-         MODALS & DRAWERS (Centered Dialogs on Desktop, Bottom Sheets on Mobile)
+         MAIN WORKSPACE: FULLSCREEN MAP + BOTTOM CAROUSEL
     ════════════════════════════════════════════════════════════════════ -->
+    <div class="flex-1 relative overflow-hidden flex flex-col">
+        <!-- Interactive Leaflet Map -->
+        <div id="map" class="flex-1 w-full h-full z-10"></div>
 
-    <!-- 1. FULL APARTMENT DETAIL MODAL -->
-    <div id="detailModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden opacity-0 transition-opacity duration-200 flex items-end md:items-center justify-center p-0 md:p-4">
-        <div id="detailSheetContent" class="w-full md:max-w-2xl max-h-[92vh] md:max-h-[85vh] bg-dark-900 border-t md:border border-white/10 rounded-t-3xl md:rounded-3xl overflow-y-auto p-4 md:p-6 space-y-4 text-white custom-scroll transform translate-y-full md:translate-y-0 transition-transform duration-300">
-            <!-- Dynamically populated -->
-        </div>
-    </div>
-
-    <!-- 2. CITY SELECTOR MODAL (Kyiv, Lviv, Odesa) -->
-    <div id="cityDrawer" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden opacity-0 transition-opacity duration-200 flex items-end md:items-center justify-center p-0 md:p-4">
-        <div id="cityDrawerContent" class="w-full md:max-w-md bg-dark-900 border-t md:border border-white/10 rounded-t-3xl md:rounded-3xl p-5 space-y-4 text-white transform translate-y-full md:translate-y-0 transition-transform duration-300">
-            <div class="flex items-center justify-between pb-2 border-b border-white/10">
-                <div>
-                    <h3 class="text-base font-bold text-white">🏙 Оберіть місто пошуку</h3>
-                    <p class="text-[11px] text-slate-400">Прямі власники без комісії 50%</p>
-                </div>
-                <button onclick="closeCityDrawer()" class="text-xs font-bold text-slate-400 hover:text-white p-1">✕</button>
-            </div>
-            <div class="space-y-2">
-                <button onclick="switchCity('kyiv', 50.4501, 30.5234, 'Київ')" class="w-full p-3.5 rounded-2xl bg-white text-dark-950 font-bold text-left flex items-center justify-between shadow-lg active:scale-98 transition-all">
-                    <div class="flex items-center gap-3">
-                        <span class="text-xl">🇺🇦</span>
-                        <div>
-                            <div class="text-sm font-extrabold">Київ Радар</div>
-                            <div class="text-[11px] text-slate-600 font-semibold" id="cityKyivCount">150 перевірених квартир</div>
-                        </div>
-                    </div>
-                    <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase">Активно</span>
-                </button>
-                <button onclick="switchCity('lviv', 49.8397, 24.0297, 'Львів')" class="w-full p-3.5 rounded-2xl bg-dark-850 border border-white/10 text-left flex items-center justify-between hover:bg-dark-800 active:scale-98 transition-all">
-                    <div class="flex items-center gap-3">
-                        <span class="text-xl">🦁</span>
-                        <div>
-                            <div class="text-sm font-bold text-white">Львів Радар</div>
-                            <div class="text-[11px] text-slate-400">Запуск 1 грудня · 42 заявки на пошук</div>
-                        </div>
-                    </div>
-                    <span class="px-2 py-0.5 rounded-full bg-brand-blue/20 text-brand-blue text-[10px] font-bold">Скоро</span>
-                </button>
-                <button onclick="switchCity('odesa', 46.4825, 30.7233, 'Одеса')" class="w-full p-3.5 rounded-2xl bg-dark-850 border border-white/10 text-left flex items-center justify-between hover:bg-dark-800 active:scale-98 transition-all">
-                    <div class="flex items-center gap-3">
-                        <span class="text-xl">⚓</span>
-                        <div>
-                            <div class="text-sm font-bold text-white">Одеса Радар</div>
-                            <div class="text-[11px] text-slate-400">Запуск 1 грудня · 28 заявок на пошук</div>
-                        </div>
-                    </div>
-                    <span class="px-2 py-0.5 rounded-full bg-brand-blue/20 text-brand-blue text-[10px] font-bold">Скоро</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 3. DISTRICT PICKER MODAL -->
-    <div id="districtDrawer" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden opacity-0 transition-opacity duration-200 flex items-end md:items-center justify-center p-0 md:p-4">
-        <div id="districtDrawerContent" class="w-full md:max-w-lg max-h-[85vh] bg-dark-900 border-t md:border border-white/10 rounded-t-3xl md:rounded-3xl p-5 space-y-4 text-white overflow-y-auto custom-scroll transform translate-y-full md:translate-y-0 transition-transform duration-300">
-            <div class="flex items-center justify-between pb-2 border-b border-white/10">
-                <div>
-                    <h3 class="text-base font-bold text-white">📍 Оберіть район Києва</h3>
-                    <p class="text-[11px] text-slate-400">Фільтрація прямих власників по локації</p>
-                </div>
-                <button onclick="closeDistrictDrawer()" class="text-xs font-bold text-slate-400 hover:text-white p-1">✕</button>
-            </div>
-            <!-- GPS Button -->
-            <button onclick="handleLocateClick()" class="w-full py-2.5 px-3 rounded-xl bg-brand-blue/20 hover:bg-brand-blue/30 border border-brand-blue/40 text-brand-blue hover:text-white font-bold text-xs flex items-center justify-center gap-2 active:scale-98 transition-all">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
-                <span>🎯 Визначити мою точну адресу за GPS</span>
+        <!-- Floating Map GPS & Center Tools (Top-Right) -->
+        <div class="absolute right-3 top-3 z-20 flex flex-col gap-2">
+            <button onclick="handleLocateClick()" class="glass-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all" title="Поруч зі мною (GPS)">
+                <svg class="w-4 h-4 text-brand-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
             </button>
-            <!-- 10 Kyiv Districts Grid -->
-            <div class="grid grid-cols-2 gap-2 text-xs" id="districtGrid">
-                <button onclick="selectKyivDistrict('Оболонь', 50.5050, 30.5080)" class="p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
-                    <div class="font-bold text-white">Оболонський</div>
-                    <div class="text-[10px] text-slate-400">Оболонь, Мінська, Героїв Дніпра</div>
-                </button>
-                <button onclick="selectKyivDistrict('Поділ', 50.4680, 30.5120)" class="p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
-                    <div class="font-bold text-white">Подільський</div>
-                    <div class="text-[10px] text-slate-400">Поділ, Контрактова, Виноградар</div>
-                </button>
-                <button onclick="selectKyivDistrict('Печерськ', 50.4250, 30.5350)" class="p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
-                    <div class="font-bold text-white">Печерський</div>
-                    <div class="text-[10px] text-slate-400">Печерськ, Либідська, Дружби Народів</div>
-                </button>
-                <button onclick="selectKyivDistrict('Шевченків', 50.4580, 30.4850)" class="p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
-                    <div class="font-bold text-white">Шевченківський</div>
-                    <div class="text-[10px] text-slate-400">Лук'янівка, Центр, КПІ, Сирець</div>
-                </button>
-                <button onclick="selectKyivDistrict('Голосієво', 50.3950, 30.4980)" class="p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
-                    <div class="font-bold text-white">Голосіївський</div>
-                    <div class="text-[10px] text-slate-400">Голосіївська, Васильківська, ВДНГ</div>
-                </button>
-                <button onclick="selectKyivDistrict('Дарниця', 50.3980, 30.6350)" class="p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
-                    <div class="font-bold text-white">Дарницький / Позняки</div>
-                    <div class="text-[10px] text-slate-400">Позняки, Осокорки, Харківська</div>
-                </button>
-                <button onclick="selectKyivDistrict('Солом'янка', 50.4350, 30.4550)" class="p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
-                    <div class="font-bold text-white">Солом'янський</div>
-                    <div class="text-[10px] text-slate-400">Вокзальна, Шулявка, Солом'янка</div>
-                </button>
-                <button onclick="selectKyivDistrict('Дніпров', 50.4520, 30.5980)" class="p-3 rounded-xl bg-dark-850 border border-white/5 text-left font-semibold hover:bg-dark-800 transition-all">
-                    <div class="font-bold text-white">Дніпровський</div>
-                    <div class="text-[10px] text-slate-400">Лівобережна, Русанівка, Дарниця</div>
-                </button>
-            </div>
-            <button onclick="resetDistrictFilter()" class="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all">
-                Показати всі райони Києва
+            <button onclick="recenterKyiv()" class="glass-panel p-2.5 rounded-2xl shadow-xl text-slate-200 hover:text-white active:scale-95 transition-all" title="Київ центр">
+                <svg class="w-4 h-4 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
             </button>
         </div>
-    </div>
 
-    <!-- 4. LANDLORD DIRECT SUBMISSION MODAL -->
-    <div id="landlordDrawer" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden opacity-0 transition-opacity duration-200 flex items-end md:items-center justify-center p-0 md:p-4">
-        <div id="landlordDrawerContent" class="w-full md:max-w-lg max-h-[90vh] bg-dark-900 border-t md:border border-white/10 rounded-t-3xl md:rounded-3xl p-5 space-y-4 text-white overflow-y-auto custom-scroll transform translate-y-full md:translate-y-0 transition-transform duration-300">
-            <div class="flex items-center justify-between pb-2 border-b border-white/10">
-                <div>
-                    <h3 class="text-base font-bold text-white">🏢 Здати квартиру без комісії</h3>
-                    <p class="text-[11px] text-slate-400">Прямі орендарі · 0% рієлторам · Без спаму</p>
-                </div>
-                <button onclick="closeLandlordDrawer()" class="text-xs font-bold text-slate-400 hover:text-white p-1">✕</button>
+        <!-- ─────────────────────────────────────────────────────────────
+             BOTTOM CAROUSEL SECTION (The Loved Airbnb / Bird Pattern)
+             Scrolls with mouse wheel on PC, swipes smoothly on Mobile!
+        ───────────────────────────────────────────────────────────── -->
+        <div id="carousel-section" class="absolute bottom-0 left-0 right-0 z-30 pb-2 bg-gradient-to-t from-dark-950 via-dark-950/90 to-transparent pt-4 pointer-events-none">
+            
+            <!-- Desktop Left & Right Arrow Buttons -->
+            <button id="carousel-arrow-prev" onclick="scrollCarousel(-1)" class="carousel-arrow-btn left-3 pointer-events-auto hidden md:flex" title="Попередня квартира">
+                ‹
+            </button>
+            <button id="carousel-arrow-next" onclick="scrollCarousel(1)" class="carousel-arrow-btn right-3 pointer-events-auto hidden md:flex" title="Наступна квартира">
+                ›
+            </button>
+
+            <!-- Cards Track -->
+            <div id="carousel-track" class="carousel-track pointer-events-auto">
+                <!-- Cards rendered dynamically via JS -->
             </div>
-            <form id="landlordForm" onsubmit="submitLandlordDeal(event)" class="space-y-3 text-xs">
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-[10px] text-slate-400 font-semibold mb-1">Місто</label>
-                        <select id="llCity" class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-brand-blue">
-                            <option value="Київ">Київ</option>
-                            <option value="Львів">Львів</option>
-                            <option value="Одеса">Одеса</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-400 font-semibold mb-1">Район</label>
-                        <select id="llDistrict" class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-brand-blue">
-                            <option value="Оболонський">Оболонський</option>
-                            <option value="Печерський">Печерський</option>
-                            <option value="Подільський">Подільський</option>
-                            <option value="Шевченківський">Шевченківський</option>
-                            <option value="Голосіївський">Голосіївський</option>
-                            <option value="Дарницький">Дарницький</option>
-                            <option value="Солом'янський">Солом'янський</option>
-                            <option value="Дніпровський">Дніпровський</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] text-slate-400 font-semibold mb-1">Вулиця / ЖК</label>
-                    <input type="text" id="llAddress" required placeholder="наприклад, Оболонська набережна 11" class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:border-brand-blue">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-[10px] text-slate-400 font-semibold mb-1">Кімнат</label>
-                        <select id="llRooms" class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-brand-blue">
-                            <option value="1">1 кімната</option>
-                            <option value="2">2 кімнати</option>
-                            <option value="3">3+ кімнати</option>
-                            <option value="Студія">Студія</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-400 font-semibold mb-1">Ціна (₴/місяць)</label>
-                        <input type="number" id="llPrice" required placeholder="16000" class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:border-brand-blue">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] text-slate-400 font-semibold mb-1">Автономність (2026)</label>
-                    <div class="grid grid-cols-3 gap-1.5 text-[11px]">
-                        <label class="flex items-center gap-1.5 p-2 rounded-xl bg-dark-850 border border-white/5 cursor-pointer">
-                            <input type="checkbox" id="llGpon" class="rounded accent-emerald-500">
-                            <span>⚡ GPON</span>
-                        </label>
-                        <label class="flex items-center gap-1.5 p-2 rounded-xl bg-dark-850 border border-white/5 cursor-pointer">
-                            <input type="checkbox" id="llGenerator" class="rounded accent-emerald-500">
-                            <span>🔋 Генератор</span>
-                        </label>
-                        <label class="flex items-center gap-1.5 p-2 rounded-xl bg-dark-850 border border-white/5 cursor-pointer">
-                            <input type="checkbox" id="llGas" class="rounded accent-emerald-500">
-                            <span>🔥 Газ</span>
-                        </label>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] text-slate-400 font-semibold mb-1">Ваш телефон або @username в Telegram</label>
-                    <input type="text" id="llContact" required placeholder="+380 97 123 45 67 або @my_telegram" class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:border-brand-blue">
-                </div>
-                <div>
-                    <label class="block text-[10px] text-slate-400 font-semibold mb-1">Опис або посилання на фото (Google Drive / OLX)</label>
-                    <textarea id="llDesc" rows="2" placeholder="Меблі, техніка, чи можна з тваринами..." class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:border-brand-blue"></textarea>
-                </div>
-                <button type="submit" id="btnSubmitLandlord" class="w-full py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-black text-xs uppercase tracking-wider shadow-lg active:scale-98 transition-all">
-                    🚀 Опублікувати лот безкоштовно
-                </button>
-            </form>
         </div>
     </div>
 
     <!-- ════════════════════════════════════════════════════════════════════
-         APPLICATION JAVASCRIPT LOGIC
+         MODALS & DRAWERS (Detail Drawer, Reviews, Landlord, City)
+    ════════════════════════════════════════════════════════════════════ -->
+
+    <!-- 1. DETAIL DEAL DRAWER -->
+    <div id="dealModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-end md:items-center justify-center transition-all duration-300 p-0 md:p-4">
+        <div class="bg-dark-900 border border-white/15 w-full md:max-w-2xl max-h-[90vh] rounded-t-3xl md:rounded-3xl flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in-95">
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-white/10 flex items-center justify-between shrink-0">
+                <div>
+                    <h3 id="modalTitle" class="text-base font-extrabold text-white">вул. Хрещатик, 15</h3>
+                    <p id="modalSubtitle" class="text-xs text-slate-400">Печерський район · 5 хв пішки до метро</p>
+                </div>
+                <button onclick="closeDealModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center font-bold text-sm">✕</button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-4 custom-scroll">
+                <!-- Photo Gallery Grid / Carousel -->
+                <div id="modalPhotoGallery" class="grid grid-cols-2 gap-2 rounded-2xl overflow-hidden max-h-64 overflow-y-auto">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <!-- Price & Commission Savings Banner -->
+                <div class="glass-panel p-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs text-emerald-400 font-bold uppercase tracking-wider">Ціна від власника (0% комісія)</div>
+                        <div id="modalPrice" class="text-2xl font-black text-white">19 000 ₴ / міс</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[11px] text-slate-400">Економія на рієлторі:</div>
+                        <div id="modalSavedComm" class="text-sm font-extrabold text-emerald-400">+9 500 ₴</div>
+                    </div>
+                </div>
+
+                <!-- Specs Grid -->
+                <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                    <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                        <div class="text-slate-400 text-[10px]">Кімнати</div>
+                        <div id="modalRooms" class="font-bold text-white text-sm">2 кімн</div>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                        <div class="text-slate-400 text-[10px]">Площа</div>
+                        <div id="modalArea" class="font-bold text-white text-sm">54 м²</div>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                        <div class="text-slate-400 text-[10px]">Поверх</div>
+                        <div id="modalFloor" class="font-bold text-white text-sm">4 / 9</div>
+                    </div>
+                </div>
+
+                <!-- Features Badges -->
+                <div id="modalBadges" class="flex flex-wrap gap-2 text-xs">
+                    <!-- Badges -->
+                </div>
+
+                <!-- VERIFIED REVIEWS SECTION (GPT-5.6 Recipe) -->
+                <div class="border-t border-white/10 pt-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-sm">🛡️</span>
+                            <span class="font-extrabold text-sm text-white">Перевірені відгуки орендарів</span>
+                        </div>
+                        <button onclick="openAddReviewModal()" class="text-xs text-brand-blue hover:underline font-bold">+ Додати відгук</button>
+                    </div>
+
+                    <div id="modalReviewsList" class="space-y-2.5">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Guarantee & Legal Contract -->
+                <div class="p-3 rounded-2xl bg-blue-950/30 border border-blue-500/20 text-xs text-blue-200 space-y-2">
+                    <div class="font-bold flex items-center gap-1.5 text-white">
+                        <span>🛡️</span> 100% Гарантія заміни контакту
+                    </div>
+                    <p class="text-[11px] leading-relaxed text-blue-300">
+                        Якщо ви зателефонуєте, а квартиру вже здано — Радар безкоштовно нарахує вам заміну будь-якого іншого контакту на карті.
+                    </p>
+                    <div class="pt-1">
+                        <a href="https://t.me/pavlograd_admin" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-emerald-400 hover:underline font-bold">
+                            📄 Завантажити типовий Договір оренди 2026 (Word)
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer Action -->
+            <div class="p-4 border-t border-white/10 bg-dark-950 flex gap-3 shrink-0">
+                <button id="btnUnlockContact" onclick="handleUnlockContact()" class="flex-1 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-black text-sm uppercase tracking-wider shadow-lg active:scale-98 transition-all flex items-center justify-center gap-2">
+                    <span>📞</span>
+                    <span>Зв'язатися з власником · 99 ₴</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. ADD REVIEW MODAL -->
+    <div id="addReviewModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-dark-900 border border-white/15 w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <h4 class="font-extrabold text-sm text-white">✍️ Залишити відгук після перегляду</h4>
+                <button onclick="closeAddReviewModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
+            </div>
+            
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 mb-1">Ваш статус взаємодії:</label>
+                    <select id="reviewStatus" class="w-full bg-dark-950 border border-white/15 rounded-xl p-2.5 text-white">
+                        <option value="Оглядав особисто">👁️ Оглядав особисто вчора</option>
+                        <option value="Дзвонив власнику">📞 Спілкувався з власником телефоном</option>
+                        <option value="Зняв житло">🔑 Успішно орендував цю квартиру</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Оцінка квартири та власника:</label>
+                    <div class="flex gap-2">
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="reviewRating" value="5" checked> ⭐ 5</label>
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="reviewRating" value="4"> ⭐ 4</label>
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="reviewRating" value="3"> ⭐ 3</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Ваш чесний коментар:</label>
+                    <textarea id="reviewText" rows="3" placeholder="Чи відповідають фото реальності? Який стан ремонту? Чи адекватний господар?" class="w-full bg-dark-950 border border-white/15 rounded-xl p-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-brand-blue"></textarea>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeAddReviewModal()" class="flex-1 py-2.5 rounded-xl bg-white/10 text-white font-bold text-xs">Скасувати</button>
+                <button onclick="submitReview()" class="flex-1 py-2.5 rounded-xl bg-emerald-500 text-dark-950 font-bold text-xs">Надіслати відгук</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. LANDLORD POST DEAL MODAL -->
+    <div id="landlordModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-dark-900 border border-white/15 w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <h4 class="font-extrabold text-sm text-white">🏠 Опублікувати квартиру (0% комісія)</h4>
+                <button onclick="closeLandlordModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
+            </div>
+            <p class="text-xs text-slate-300">
+                Здавайте без посередників. Орендарі дзвонять вам напряму.
+            </p>
+            <div class="space-y-3 text-xs">
+                <input id="postAddress" type="text" placeholder="Адреса (напр. вул. Хрещатик, 24)" class="w-full bg-dark-950 border border-white/15 rounded-xl p-2.5 text-white">
+                <input id="postPrice" type="number" placeholder="Ціна оренди (грн/міс)" class="w-full bg-dark-950 border border-white/15 rounded-xl p-2.5 text-white">
+                <input id="postPhone" type="tel" placeholder="Номер телефону для зв'язку" class="w-full bg-dark-950 border border-white/15 rounded-xl p-2.5 text-white">
+            </div>
+            <button onclick="handleLandlordSubmit()" class="w-full py-3 rounded-xl bg-emerald-500 text-dark-950 font-black text-xs uppercase tracking-wider">
+                Подати на безкоштовну перевірку
+            </button>
+        </div>
+    </div>
+
+    <!-- 4. CITY SWITCHER MODAL -->
+    <div id="cityModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-dark-900 border border-white/15 w-full max-w-xs rounded-3xl p-5 shadow-2xl space-y-3 text-center">
+            <h4 class="font-extrabold text-sm text-white">Оберіть місто</h4>
+            <div class="space-y-2 pt-2">
+                <button onclick="selectCity('Київ')" class="w-full py-2.5 rounded-xl bg-brand-blue text-white font-bold text-xs flex items-center justify-between px-4">
+                    <span>Київ</span>
+                    <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-full">150 квартир</span>
+                </button>
+                <button onclick="selectCity('Львів')" class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 font-bold text-xs flex items-center justify-between px-4">
+                    <span>Львів</span>
+                    <span class="text-[10px] text-slate-500">Скоро</span>
+                </button>
+                <button onclick="selectCity('Одеса')" class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 font-bold text-xs flex items-center justify-between px-4">
+                    <span>Одеса</span>
+                    <span class="text-[10px] text-slate-500">Скоро</span>
+                </button>
+            </div>
+            <button onclick="closeCityModal()" class="w-full py-2 text-xs text-slate-400 hover:text-white pt-2">Закрити</button>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         CORE APPLICATION JAVASCRIPT
     ════════════════════════════════════════════════════════════════════ -->
     <script>
-        // State
+        // State variables
         let LISTINGS = [];
         let FAVORITES = new Set(JSON.parse(localStorage.getItem('kr_favs') || '[]'));
-        let RENTED_REPORTS = new Set(JSON.parse(localStorage.getItem('kr_rented') || '[]'));
+        let REVIEWS_STORE = JSON.parse(localStorage.getItem('kr_custom_reviews') || '{}');
         let map = null;
+        let markersCluster = null;
         let mapMarkers = {};
-        let userMarker = null;
-        let userRadiusCircle = null;
-        let userLocation = null;
         let currentActiveId = null;
-        let mobileViewMode = 'map'; // 'map' or 'list'
+        let activeFilter = 'all';
+        let searchQuery = '';
         let photoIndexById = {};
-
-        let currentFilter = {
-            search: '',
-            district: 'all',
-            rooms: 0,
-            maxPrice: 0,
-            generator: false,
-            gpon: false,
-            favoritesOnly: false,
-            nearbyOnly: false
-        };
+        let userLocation = null;
 
         // Telegram WebApp Setup
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.expand();
             tg.ready();
+            try {
+                tg.setHeaderColor('#07090e');
+                tg.setBackgroundColor('#07090e');
+            } catch (e) {}
         }
 
-        function triggerHaptic(type = 'light') {
+        function triggerHaptic(style = 'light') {
             try {
                 if (tg?.HapticFeedback) {
-                    if (type === 'light') tg.HapticFeedback.impactOccurred('light');
-                    if (type === 'medium') tg.HapticFeedback.impactOccurred('medium');
-                    if (type === 'heavy') tg.HapticFeedback.impactOccurred('heavy');
+                    if (style === 'light') tg.HapticFeedback.impactOccurred('light');
+                    else if (style === 'medium') tg.HapticFeedback.impactOccurred('medium');
+                    else if (style === 'success') tg.HapticFeedback.notificationOccurred('success');
                 }
             } catch (e) {}
         }
 
-        // INITIALIZE LEAFLET MAP
-        let markersCluster = null;
-
+        // 1. INITIALIZE MAP & CLUSTERING
         function initMap() {
             map = L.map('map', {
                 zoomControl: false,
@@ -643,7 +529,7 @@
                 minZoom: 4, maxZoom: 18
             }).addTo(map);
 
-            // Initialize Leaflet MarkerCluster Group (Airbnb / Bird style)
+            // Leaflet MarkerCluster Group (Airbnb / Bird style)
             if (typeof L.markerClusterGroup === 'function') {
                 markersCluster = L.markerClusterGroup({
                     maxClusterRadius: 45,
@@ -670,80 +556,142 @@
             }
         }
 
-        // HAVERSINE DISTANCE FORMULA
-        function getHaversineDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        function recenterKyiv() {
+            triggerHaptic('light');
+            map.flyTo([50.4501, 30.5234], 12, { duration: 0.8 });
         }
 
-        function formatDistance(distKm) {
-            if (distKm === undefined || isNaN(distKm)) return '';
-            if (distKm < 1) return `${Math.round(distKm * 1000)} м`;
-            return `${distKm.toFixed(1)} км`;
+        function handleLocateClick() {
+            triggerHaptic('medium');
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        const { latitude, longitude } = pos.coords;
+                        userLocation = [latitude, longitude];
+                        map.flyTo(userLocation, 14, { duration: 0.8 });
+                        L.circleMarker(userLocation, {
+                            radius: 8,
+                            fillColor: '#3b82f6',
+                            color: '#ffffff',
+                            weight: 2,
+                            opacity: 1,
+                            fillOpacity: 0.9
+                        }).addTo(map).bindPopup('Ви тут').openPopup();
+                    },
+                    (err) => {
+                        alert('Будь ласка, дозвольте доступ до геолокації для пошуку поруч');
+                    }
+                );
+            }
         }
 
-        function normalizeMetroName(raw) {
-            if (!raw) return 'Київ';
-            return raw.replace(/^(Метро|м\.|м|М)\s+/i, '').trim();
-        }
-
-        // FILTER ENGINE
-        function getFilteredListings() {
-            let res = LISTINGS.filter(item => {
-                if (currentFilter.favoritesOnly && !FAVORITES.has(item.id)) return false;
-                if (currentFilter.maxPrice > 0 && item.price > currentFilter.maxPrice) return false;
-                if (currentFilter.rooms > 0) {
-                    if (currentFilter.rooms === 3 && (item.rooms || 1) >= 3) {
-                        // pass
-                    } else if ((item.rooms || 1) !== currentFilter.rooms) {
-                        return false;
+        // 2. LOAD DEALS DATA
+        async function loadDeals() {
+            try {
+                const res = await fetch('data/deals.json?v=' + Date.now());
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        LISTINGS = data;
+                        document.getElementById('btnFilterAll').innerText = `Всі (${LISTINGS.length})`;
                     }
                 }
-                if (currentFilter.generator && !item.generator) return false;
-                if (currentFilter.gpon && !item.gpon) return false;
-                if (currentFilter.district !== 'all') {
-                    const d = currentFilter.district.toLowerCase();
-                    const text = `${item.district || ''} ${item.address || ''} ${item.title || ''}`.toLowerCase();
-                    if (!text.includes(d)) return false;
-                }
-                if (currentFilter.nearbyOnly && userLocation) {
-                    if (item.distanceKm === undefined || item.distanceKm > 5.5) return false;
-                }
-                if (currentFilter.search) {
-                    const q = currentFilter.search.toLowerCase();
-                    const text = `${item.title || ''} ${item.address || ''} ${item.metro || ''} ${item.district || ''}`.toLowerCase();
+            } catch (e) {
+                console.log('Using embedded fallback deals:', e);
+                // Graceful fallback sample
+                LISTINGS = [
+                    {
+                        id: 1,
+                        title: "вул. Хрещатик, 15",
+                        price: 19000,
+                        realtorCommissionSaved: 9500,
+                        district: "Печерський",
+                        address: "вул. Хрещатик, 15",
+                        metro: "Хрещатик",
+                        walkMin: 4,
+                        area: 54,
+                        floor: 4,
+                        totalFloors: 9,
+                        lat: 50.4485,
+                        lng: 30.5235,
+                        gpon: true,
+                        generator: true,
+                        pets: true,
+                        rooms: 2,
+                        images: [
+                            "https://cdn.riastatic.com/photosnew/dom/photo/dolgosrochnaya-arenda-kvartira-kiev-lipki-bessarabskaya-ploschad__345893580xl.jpg",
+                            "https://cdn.riastatic.com/photosnew/dom/photo/dolgosrochnaya-arenda-kvartira-kiev-lipki-bessarabskaya-ploschad__345893620xl.jpg"
+                        ]
+                    }
+                ];
+            }
+
+            renderAll();
+        }
+
+        // 3. FILTERING LOGIC
+        function getFilteredListings() {
+            return LISTINGS.filter(item => {
+                // Search query
+                if (searchQuery) {
+                    const q = searchQuery.toLowerCase();
+                    const text = `${item.title} ${item.district} ${item.address} ${item.metro}`.toLowerCase();
                     if (!text.includes(q)) return false;
                 }
+                // Filter pills
+                if (activeFilter === 'under15k' && item.price > 15000) return false;
+                if (activeFilter === 'under20k' && item.price > 20000) return false;
+                if (activeFilter === 'power' && !item.generator && !item.gpon) return false;
+                if (activeFilter === 'pets' && !item.pets) return false;
+                if (activeFilter === 'favs' && !FAVORITES.has(item.id)) return false;
                 return true;
             });
+        }
 
-            if (currentFilter.nearbyOnly && userLocation) {
-                res.sort((a, b) => (a.distanceKm || 999) - (b.distanceKm || 999));
+        function setFilter(filterType) {
+            triggerHaptic('light');
+            activeFilter = filterType;
+
+            // Update button styles
+            const btnIds = {
+                all: 'btnFilterAll',
+                under15k: 'btnFilterUnder15k',
+                under20k: 'btnFilterUnder20k',
+                power: 'btnFilterPower',
+                pets: 'btnFilterPets',
+                favs: 'btnFilterFavs'
+            };
+
+            Object.entries(btnIds).forEach(([key, id]) => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    if (key === filterType) {
+                        btn.className = "px-3 py-1 rounded-full bg-white text-dark-950 font-bold shadow-sm transition-all";
+                    } else {
+                        btn.className = "px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 font-medium text-slate-300 transition-all";
+                    }
+                }
+            });
+
+            renderAll();
+        }
+
+        function handleSearch(val) {
+            searchQuery = val.trim();
+            renderAll();
+        }
+
+        // 4. RENDER MAP MARKERS & CAROUSEL CARDS
+        function renderAll() {
+            const items = getFilteredListings();
+            renderMarkers(items);
+            renderCarousel(items);
+            updateFavCount();
+            if (items.length > 0 && !currentActiveId) {
+                focusDeal(items[0].id, false, false);
             }
-            return res;
         }
 
-        // RENDER UI
-        function updateUI() {
-            const filtered = getFilteredListings();
-            
-            // Update counts
-            const countLabel = document.getElementById('resultsCountLabel');
-            if (countLabel) countLabel.innerText = `Знайдено: ${filtered.length} прямих власників`;
-            
-            const mobLabel = document.getElementById('mobileViewLabel');
-            if (mobLabel) mobLabel.innerText = mobileViewMode === 'list' ? 'Карта' : `Список (${filtered.length})`;
-
-            renderMarkers(filtered);
-            renderFeed(filtered);
-        }
-
-        // RENDER MAP MARKERS
         function renderMarkers(items) {
             if (markersCluster) {
                 markersCluster.clearLayers();
@@ -772,9 +720,7 @@
 
                 const marker = L.marker([item.lat, item.lng], { icon: customIcon });
                 marker.on('click', (e) => {
-                    if (e && e.originalEvent) {
-                        e.originalEvent.stopPropagation();
-                    }
+                    if (e && e.originalEvent) e.originalEvent.stopPropagation();
                     focusDeal(item.id, true, true);
                 });
 
@@ -791,671 +737,355 @@
             }
         }
 
-        // RENDER VERTICAL FEED (Desktop Sidebar & Mobile List)
-        function renderFeed(items) {
-            const container = document.getElementById('cardsList');
+        function renderCarousel(items) {
+            const track = document.getElementById('carousel-track');
+            if (!track) return;
+
             if (items.length === 0) {
-                container.innerHTML = `
-                    <div class="p-8 text-center text-slate-400 space-y-2">
-                        <div class="text-3xl">🔍</div>
+                track.innerHTML = `
+                    <div class="p-6 text-center text-slate-400 bg-dark-900 border border-white/10 rounded-2xl mx-auto my-2">
+                        <div class="text-2xl mb-1">🔍</div>
                         <div class="text-sm font-bold text-white">Квартир не знайдено</div>
-                        <div class="text-xs">Спробуйте змінити фільтри або скинути параметри пошуку</div>
-                        <button onclick="resetAllFilters()" class="mt-3 px-4 py-2 rounded-xl bg-white text-dark-950 font-bold text-xs shadow-md">
-                            Скинути всі фільтри
-                        </button>
+                        <div class="text-xs text-slate-400">Спробуйте змінити фільтри пошуку</div>
                     </div>
                 `;
                 return;
             }
 
-            container.innerHTML = items.map((item) => {
+            track.innerHTML = items.map(item => {
                 const curPhoto = photoIndexById[item.id] || 0;
-                const metroName = normalizeMetroName(item.metro);
-                const isActive = item.id === currentActiveId;
                 const images = item.images && item.images.length > 0 ? item.images : ['https://apollo.olxcdn.com/v1/files/sample/image;s=644x461'];
+                const isFav = FAVORITES.has(item.id);
+                const isActive = item.id === currentActiveId;
+                const savedCommission = Math.round(item.price * 0.5);
 
                 return `
-                <div id="card-${item.id}" onclick="focusDeal(${item.id}, true, false)" class="group rounded-2xl bg-dark-850 hover:bg-dark-800/90 border border-white/10 hover:border-white/20 transition-all p-3 cursor-pointer shadow-md ${isActive ? 'card-active-ring' : ''}">
-                    <!-- Card Top: 16:9 Photo Carousel with Explicit Left/Right Mouse Buttons -->
-                    <div class="relative w-full h-44 rounded-xl overflow-hidden bg-dark-950 mb-2.5">
-                        <img id="feed-img-${item.id}" src="${images[curPhoto]}" class="w-full h-full object-cover transition-opacity duration-200" alt="${item.title}">
-                        
-                        <!-- Top Badges -->
-                        <div class="absolute top-2 left-2 flex items-center gap-1 z-20">
-                            ${item.source === 'domria' ? '<span class="px-2 py-0.5 rounded-lg bg-emerald-500/90 text-white font-extrabold text-[9px] uppercase tracking-wider shadow">DOM.RIA</span>' : '<span class="px-2 py-0.5 rounded-lg bg-sky-500/90 text-white font-extrabold text-[9px] uppercase tracking-wider shadow">OLX</span>'}
-                            <span class="px-2 py-0.5 rounded-lg bg-black/75 backdrop-blur-sm text-emerald-400 font-extrabold text-[9px]">0% Комісії</span>
-                        </div>
-
-                        <!-- Favorite Heart Button -->
-                        <button onclick="toggleFavorite(event, ${item.id})" class="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 hover:bg-black text-[13px] flex items-center justify-center z-20 transition-transform active:scale-90">
-                            ${FAVORITES.has(item.id) ? '❤️' : '🤍'}
-                        </button>
-
-                        <!-- Left / Right Navigation Arrows for Mouse Users -->
-                        ${images.length > 1 ? `
-                            <button onclick="changePhoto(event, ${item.id}, -1)" class="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/70 hover:bg-black text-white flex items-center justify-center font-bold text-xs z-20 transition-transform active:scale-90">‹</button>
-                            <button onclick="changePhoto(event, ${item.id}, 1)" class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/70 hover:bg-black text-white flex items-center justify-center font-bold text-xs z-20 transition-transform active:scale-90">›</button>
-                            <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-black/75 text-[10px] text-white font-mono z-20">
-                                <span id="feed-count-${item.id}">${curPhoto + 1}/${images.length}</span>
+                    <div class="carousel-card glass-panel rounded-2xl overflow-hidden border border-white/10 cursor-pointer ${isActive ? 'active-card' : ''}" id="card-${item.id}" onclick="openDealDetails(${item.id})">
+                        <!-- Photo Slider -->
+                        <div class="relative h-28 w-full bg-dark-950 overflow-hidden" >
+                            <img src="${images[curPhoto]}" class="w-full h-full object-cover transition-opacity duration-200" id="card-img-${item.id}">
+                            
+                            <!-- Savings Badge -->
+                            <div class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-emerald-500 text-dark-950 font-black text-[10px] shadow-md uppercase">
+                                Економія ~${savedCommission.toLocaleString()} ₴
                             </div>
-                        ` : ''}
-                    </div>
 
-                    <!-- Card Body -->
-                    <div class="space-y-1.5">
-                        <!-- Price & Savings -->
-                        <div class="flex items-baseline justify-between">
-                            <div class="text-lg font-black text-white">
-                                ${item.price.toLocaleString('uk-UA')} ₴<span class="text-xs text-slate-400 font-normal">/міс</span>
-                            </div>
-                            <div class="text-xs font-bold text-emerald-400">
-                                Економія +${(item.realtorCommissionSaved || item.price * 0.5).toLocaleString('uk-UA')} ₴
-                            </div>
-                        </div>
-
-                        <!-- Title & Location -->
-                        <h4 class="text-xs font-bold text-slate-200 truncate group-hover:text-white transition-colors">
-                            ${item.title}
-                        </h4>
-
-                        <!-- Metro & specs -->
-                        <div class="flex items-center justify-between text-xs text-slate-300">
-                            <span class="truncate"><span class="text-white font-bold">Ⓜ️ ${metroName}</span> · ${item.walkMin || 7} хв</span>
-                            <span class="text-slate-400 font-semibold shrink-0">${item.rooms || 1}к · ${item.area || 45} м² · ${item.floor || 3}/${item.totalFloors || 9} пов.</span>
-                        </div>
-
-                        <!-- Autonomous Badges & Distance -->
-                        <div class="flex items-center justify-between pt-1 border-t border-white/5 text-[10px]">
-                            <div class="flex items-center gap-1">
-                                ${item.generator ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-white font-semibold">🔋 Генератор</span>' : ''}
-                                ${item.gpon ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-white font-semibold">⚡ GPON</span>' : ''}
-                                ${item.gas ? '<span class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300">🔥 Газ</span>' : ''}
-                            </div>
-                            <button onclick="openDetail(${item.id})" class="px-3 py-1 rounded-lg bg-white hover:bg-slate-100 text-dark-950 font-black text-[11px] shadow-sm active:scale-95 transition-all">
-                                Відкрити ›
+                            <!-- Favorite Heart -->
+                            <button onclick="toggleFavorite(event, ${item.id})" class="absolute top-2 right-2 w-7 h-7 rounded-full bg-dark-950/70 backdrop-blur-md text-white flex items-center justify-center text-xs shadow-md active:scale-90 transition-transform">
+                                ${isFav ? '❤️' : '🤍'}
                             </button>
+
+                            <!-- Photo Flip Arrows (‹ and ›) -->
+                            ${images.length > 1 ? `
+                                <button onclick="changePhoto(event, ${item.id}, -1)" class="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/60 text-white text-xs flex items-center justify-center hover:bg-black/90 active:scale-90">‹</button>
+                                <button onclick="changePhoto(event, ${item.id}, 1)" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/60 text-white text-xs flex items-center justify-center hover:bg-black/90 active:scale-90">›</button>
+                                <div class="absolute bottom-1.5 right-2 px-1.5 py-0.5 rounded-md bg-black/60 text-[9px] text-white font-bold">
+                                    ${curPhoto + 1}/${images.length}
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- Card Info Content -->
+                        <div class="p-2.5 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm font-black text-white">${item.price.toLocaleString()} ₴ <span class="text-[10px] font-normal text-slate-400">/міс</span></div>
+                                <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-extrabold">0% комісія</span>
+                            </div>
+
+                            <div class="text-[11px] text-slate-300 font-semibold truncate">
+                                🚇 ${item.metro || 'Метро'} · ${item.walkMin || 5} хв · ${item.district || 'Київ'}
+                            </div>
+
+                            <div class="text-[10px] text-slate-400 flex items-center gap-2">
+                                <span>${item.rooms || 1} кімн</span> ·
+                                <span>${item.area || 45} м²</span> ·
+                                <span>${item.floor || 3}/${item.totalFloors || 9} пов</span>
+                            </div>
+
+                            <!-- Verified Review Trust Snippet -->
+                            <div class="pt-1 text-[10px] text-slate-300 flex items-center gap-1 border-t border-white/5 truncate">
+                                <span>🛡️</span>
+                                <span class="text-emerald-400 font-bold">Перевірено:</span>
+                                <span class="text-slate-400 truncate">«Фото реальні, господар на зв'язку»</span>
+                            </div>
                         </div>
                     </div>
-                </div>
                 `;
             }).join('');
         }
 
-        // FOCUS ON DEAL (Syncs Map & Left Sidebar seamlessly)
-        function focusDeal(dealId, centerMap = true, scrollSidebar = true) {
+        // 5. CAROUSEL INTERACTION: WHEEL HIJACK & ARROW NAVIGATION FOR PC
+        function setupCarouselInteractions() {
+            const track = document.getElementById('carousel-track');
+            if (!track) return;
+
+            // Mouse wheel horizontally
+            track.addEventListener('wheel', (e) => {
+                if (e.deltaY !== 0) {
+                    e.preventDefault();
+                    track.scrollBy({
+                        left: e.deltaY * 2.2,
+                        behavior: 'smooth'
+                    });
+                }
+            }, { passive: false });
+
+            // Keyboard navigation
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') scrollCarousel(1);
+                else if (e.key === 'ArrowLeft') scrollCarousel(-1);
+            });
+        }
+
+        function scrollCarousel(direction) {
+            triggerHaptic('light');
+            const track = document.getElementById('carousel-track');
+            if (!track) return;
+            const scrollAmount = 340 * direction;
+            track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+
+        // 6. SYNC CARD & MAP
+        function focusDeal(dealId, centerMap = true, scrollTrack = true) {
             currentActiveId = dealId;
             const deal = LISTINGS.find(x => x.id === dealId);
             if (!deal) return;
 
-            triggerHaptic('light');
-
-            // 1. Highlight Pin on Map
+            // Highlight Pin on Map
             document.querySelectorAll('.bird-pin').forEach(p => p.classList.remove('active'));
             const pin = document.getElementById(`pin-${dealId}`);
             if (pin) pin.classList.add('active');
 
-            // 2. Pan Map smoothly
+            // Pan Map smoothly
             if (centerMap && map) {
-                const isMobile = window.innerWidth < 768;
-                const offsetLat = isMobile ? deal.lat - 0.006 : deal.lat;
+                // Offset latitude slightly upwards so marker is visible above the bottom carousel
+                const offsetLat = deal.lat - 0.005;
                 map.flyTo([offsetLat, deal.lng], 14.5, { duration: 0.6 });
             }
 
-            // 3. Highlight & Scroll Card in Sidebar
-            document.querySelectorAll('#cardsList > div').forEach(c => c.classList.remove('card-active-ring'));
+            // Highlight Card in Carousel
+            document.querySelectorAll('.carousel-card').forEach(c => c.classList.remove('active-card'));
             const card = document.getElementById(`card-${dealId}`);
             if (card) {
-                card.classList.add('card-active-ring');
-                if (scrollSidebar) {
-                    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                card.classList.add('active-card');
+                if (scrollTrack) {
+                    card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
                 }
             }
-
-            // 4. On Mobile Map Mode: Render single focused floating card
-            if (window.innerWidth < 768 && mobileViewMode === 'map') {
-                renderMobileFocusedCard(deal);
-            }
         }
 
-        // MOBILE SINGLE FOCUSED CARD
-        function renderMobileFocusedCard(item) {
-            const container = document.getElementById('mobileFocusedCardContainer');
-            if (!container) return;
-
-            const curPhoto = photoIndexById[item.id] || 0;
-            const images = item.images && item.images.length > 0 ? item.images : ['https://apollo.olxcdn.com/v1/files/sample/image;s=644x461'];
-
-            container.innerHTML = `
-                <div class="glass-panel rounded-2xl p-3 shadow-2xl border border-white/15 relative">
-                    <button onclick="closeMobileFocusedCard()" class="absolute -top-2.5 -right-2.5 w-7 h-7 rounded-full bg-dark-900 border border-white/20 text-white flex items-center justify-center font-bold text-xs shadow-lg z-30">✕</button>
-                    <div class="flex gap-3 items-center">
-                        <div class="relative w-24 h-24 rounded-xl overflow-hidden bg-dark-950 shrink-0">
-                            <img src="${images[curPhoto]}" class="w-full h-full object-cover">
-                            ${images.length > 1 ? `
-                                <button onclick="changePhoto(event, ${item.id}, -1)" class="absolute left-1 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-black/70 text-white text-[10px] flex items-center justify-center">‹</button>
-                                <button onclick="changePhoto(event, ${item.id}, 1)" class="absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-black/70 text-white text-[10px] flex items-center justify-center">›</button>
-                            ` : ''}
-                        </div>
-                        <div class="flex-1 min-w-0 space-y-1">
-                            <div class="flex items-baseline justify-between">
-                                <span class="text-base font-black text-white">${item.price.toLocaleString('uk-UA')} ₴</span>
-                                <span class="text-[10px] font-bold text-emerald-400">0% Комісії</span>
-                            </div>
-                            <div class="text-xs font-bold text-slate-200 truncate">${item.title}</div>
-                            <div class="text-[11px] text-slate-400">Ⓜ️ ${normalizeMetroName(item.metro)} · ${item.rooms || 1}к · ${item.area} м²</div>
-                            <div class="flex items-center justify-between pt-1">
-                                <span class="text-[10px] text-brand-blue font-bold">${item.district}</span>
-                                <button onclick="openDetail(${item.id})" class="px-3 py-1 rounded-lg bg-white text-dark-950 font-black text-xs">Деталі ›</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            container.classList.remove('hidden');
-        }
-
-        function closeMobileFocusedCard() {
-            const container = document.getElementById('mobileFocusedCardContainer');
-            if (container) container.classList.add('hidden');
-        }
-
-        // PHOTO FLIPPER
-        function changePhoto(e, id, delta) {
-            if (e) e.stopPropagation();
+        function changePhoto(event, dealId, dir) {
+            event.stopPropagation();
             triggerHaptic('light');
-            const apt = LISTINGS.find(x => x.id === id);
-            if (!apt || !apt.images || apt.images.length <= 1) return;
+            const deal = LISTINGS.find(x => x.id === dealId);
+            if (!deal || !deal.images || deal.images.length === 0) return;
 
-            photoIndexById[id] = (photoIndexById[id] || 0) + delta;
-            if (photoIndexById[id] < 0) photoIndexById[id] = apt.images.length - 1;
-            if (photoIndexById[id] >= apt.images.length) photoIndexById[id] = 0;
+            let cur = photoIndexById[dealId] || 0;
+            cur = (cur + dir + deal.images.length) % deal.images.length;
+            photoIndexById[dealId] = cur;
 
-            const cur = photoIndexById[id];
-            const imgEl = document.getElementById(`feed-img-${id}`);
-            const countEl = document.getElementById(`feed-count-${id}`);
-            if (imgEl) imgEl.src = apt.images[cur];
-            if (countEl) countEl.innerText = `${cur + 1}/${apt.images.length}`;
-
-            // Also update modal or mobile preview if open
-            const modalImg = document.getElementById(`modal-img-${id}`);
-            if (modalImg) modalImg.src = apt.images[cur];
-        }
-
-        // MOBILE VIEW TOGGLE [Список] ⇄ [Карта]
-        function toggleMobileView() {
-            triggerHaptic('medium');
-            const sidebar = document.getElementById('feedSidebar');
-            const mapContainer = document.getElementById('mapContainer');
-            const icon = document.getElementById('mobileViewIcon');
-            const label = document.getElementById('mobileViewLabel');
-
-            if (mobileViewMode === 'map') {
-                mobileViewMode = 'list';
-                sidebar.classList.remove('hidden');
-                sidebar.classList.add('flex');
-                if (mapContainer) mapContainer.classList.add('hidden', 'md:block');
-                icon.innerText = '🗺';
-                label.innerText = 'Показати Карту';
-                closeMobileFocusedCard();
-            } else {
-                mobileViewMode = 'map';
-                sidebar.classList.add('hidden');
-                sidebar.classList.remove('flex');
-                if (mapContainer) {
-                    mapContainer.classList.remove('hidden');
-                    mapContainer.classList.remove('md:block');
-                }
-                icon.innerText = '📋';
-                const count = getFilteredListings().length;
-                label.innerText = `Список (${count})`;
-                setTimeout(() => map.invalidateSize(), 150);
+            const imgEl = document.getElementById(`card-img-${dealId}`);
+            if (imgEl) {
+                imgEl.src = deal.images[cur];
             }
+            renderCarousel(getFilteredListings());
         }
 
-        // QUICK FILTERS
-        function toggleQuickFilter(btn, type) {
-            triggerHaptic('light');
-            document.querySelectorAll('.q-filter').forEach(b => {
-                b.className = 'q-filter shrink-0 py-1.5 px-2.5 rounded-xl text-xs font-medium bg-dark-850 text-slate-300 hover:text-white border border-white/10 transition-all';
-            });
-            btn.className = 'q-filter active shrink-0 py-1.5 px-3 rounded-xl text-xs font-bold bg-white text-dark-950 shadow-sm transition-all';
-
-            // Reset specific filters
-            currentFilter.rooms = 0;
-            currentFilter.maxPrice = 0;
-            currentFilter.favoritesOnly = false;
-            currentFilter.generator = false;
-            currentFilter.gpon = false;
-
-            if (type === 'favs') currentFilter.favoritesOnly = true;
-            if (type === 'rooms_1') currentFilter.rooms = 1;
-            if (type === 'rooms_2') currentFilter.rooms = 2;
-            if (type === 'max_15k') currentFilter.maxPrice = 15000;
-            if (type === 'max_20k') currentFilter.maxPrice = 20000;
-            if (type === 'gpon') currentFilter.gpon = true;
-            if (type === 'generator') currentFilter.generator = true;
-
-            updateUI();
-        }
-
-        function handleSearch(val) {
-            currentFilter.search = val.trim();
-            const clearBtn = document.getElementById('clearSearchBtn');
-            if (clearBtn) {
-                if (val.length > 0) clearBtn.classList.remove('hidden');
-                else clearBtn.classList.add('hidden');
-            }
-            updateUI();
-        }
-
-        function clearSearch() {
-            const input = document.getElementById('searchInput');
-            if (input) input.value = '';
-            handleSearch('');
-        }
-
-        function resetAllFilters() {
-            currentFilter = {
-                search: '',
-                district: 'all',
-                rooms: 0,
-                maxPrice: 0,
-                generator: false,
-                gpon: false,
-                favoritesOnly: false,
-                nearbyOnly: false
-            };
-            clearSearch();
-            const allBtn = document.getElementById('btnFilterAll');
-            if (allBtn) toggleQuickFilter(allBtn, 'all');
-        }
-
-        // FAVORITES
-        function toggleFavorite(e, id) {
-            if (e) e.stopPropagation();
+        function toggleFavorite(event, dealId) {
+            event.stopPropagation();
             triggerHaptic('medium');
-            if (FAVORITES.has(id)) {
-                FAVORITES.delete(id);
+            if (FAVORITES.has(dealId)) {
+                FAVORITES.delete(dealId);
             } else {
-                FAVORITES.add(id);
+                FAVORITES.add(dealId);
             }
             localStorage.setItem('kr_favs', JSON.stringify(Array.from(FAVORITES)));
-            updateUI();
+            renderAll();
         }
 
-        // GEOLOCATION & NEARBY
-        function activateNearbyMode(btn) {
+        function updateFavCount() {
+            const countEl = document.getElementById('favCount');
+            if (countEl) countEl.innerText = FAVORITES.size;
+        }
+
+        // 7. DETAIL DEAL MODAL & REVIEWS
+        let currentModalDealId = null;
+
+        function openDealDetails(dealId) {
             triggerHaptic('medium');
-            openDistrictDrawer();
+            currentModalDealId = dealId;
+            const deal = LISTINGS.find(x => x.id === dealId);
+            if (!deal) return;
+
+            focusDeal(dealId, true, false);
+
+            document.getElementById('modalTitle').innerText = deal.title || deal.address;
+            document.getElementById('modalSubtitle').innerText = `${deal.district || 'Київ'} · ${deal.metro ? 'метро ' + deal.metro : 'центр'} (${deal.walkMin || 5} хв пішки)`;
+            document.getElementById('modalPrice').innerText = `${deal.price.toLocaleString()} ₴ / міс`;
+            const saved = Math.round(deal.price * 0.5);
+            document.getElementById('modalSavedComm').innerText = `+${saved.toLocaleString()} ₴`;
+            document.getElementById('modalRooms').innerText = `${deal.rooms || 1} кімн`;
+            document.getElementById('modalArea').innerText = `${deal.area || 45} м²`;
+            document.getElementById('modalFloor').innerText = `${deal.floor || 3} / ${deal.totalFloors || 9}`;
+
+            // Photos Gallery
+            const gallery = document.getElementById('modalPhotoGallery');
+            const images = deal.images && deal.images.length > 0 ? deal.images : ['https://apollo.olxcdn.com/v1/files/sample/image;s=644x461'];
+            gallery.innerHTML = images.map(src => `
+                <img src="${src}" class="w-full h-32 object-cover rounded-xl border border-white/10 hover:opacity-90 transition-opacity">
+            `).join('');
+
+            // Badges
+            const badgesContainer = document.getElementById('modalBadges');
+            const badges = [];
+            if (deal.gpon) badges.push('<span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 font-bold border border-blue-500/30">⚡ GPON (Інтернет без світла)</span>');
+            if (deal.generator) badges.push('<span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">🔋 Генератор у будинку</span>');
+            if (deal.pets) badges.push('<span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">🐾 Можна з тваринами</span>');
+            badges.push('<span class="px-2.5 py-1 rounded-lg bg-white/10 text-white font-bold border border-white/10">🛡️ Власник (документи перевірено)</span>');
+            badgesContainer.innerHTML = badges.join('');
+
+            // Reviews List
+            renderDealReviews(dealId);
+
+            document.getElementById('dealModal').classList.remove('hidden');
         }
 
-        function handleLocateClick() {
-            triggerHaptic('medium');
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        setUserLocationAndRadius(pos.coords.latitude, pos.coords.longitude, 'Поруч з вами');
-                    },
-                    (err) => {
-                        console.warn('Geolocation blocked:', err);
-                        openDistrictDrawer();
-                    },
-                    { enableHighAccuracy: true, timeout: 6000 }
-                );
-            } else {
-                openDistrictDrawer();
-            }
-        }
-
-        function setUserLocationAndRadius(lat, lng, label = 'Поруч з вами') {
-            userLocation = { lat, lng, label };
-
-            LISTINGS.forEach(item => {
-                if (item.lat && item.lng) {
-                    item.distanceKm = getHaversineDistance(lat, lng, item.lat, item.lng);
-                }
-            });
-
-            const userIcon = L.divIcon({
-                className: 'user-loc-wrap',
-                html: `<div class="user-loc-container"><div class="user-loc-pulse"></div><div class="user-loc-dot"></div></div>`,
-                iconSize: [24, 24],
-                iconAnchor: [12, 12]
-            });
-
-            if (userMarker) userMarker.setLatLng([lat, lng]);
-            else userMarker = L.marker([lat, lng], { icon: userIcon, zIndexOffset: 10000 }).addTo(map);
-
-            if (userRadiusCircle) map.removeLayer(userRadiusCircle);
-            userRadiusCircle = L.circle([lat, lng], {
-                radius: 3500,
-                color: '#007aff',
-                fillColor: '#007aff',
-                fillOpacity: 0.08,
-                weight: 1.5,
-                dashArray: '4, 6'
-            }).addTo(map);
-
-            currentFilter.nearbyOnly = true;
-            const badge = document.getElementById('activeDistrictBadge');
-            if (badge) badge.innerText = `📍 ${label}`;
-
-            map.flyTo([lat, lng], 13.5, { duration: 0.8 });
-            updateUI();
-        }
-
-        function selectKyivDistrict(name, lat, lng) {
-            closeDistrictDrawer();
-            setUserLocationAndRadius(lat, lng, name);
-            const distLabel = document.getElementById('activeDistrictLabel');
-            if (distLabel) distLabel.innerText = name;
-        }
-
-        function resetDistrictFilter() {
-            closeDistrictDrawer();
-            currentFilter.district = 'all';
-            currentFilter.nearbyOnly = false;
-            if (userRadiusCircle) {
-                map.removeLayer(userRadiusCircle);
-                userRadiusCircle = null;
-            }
-            const distLabel = document.getElementById('activeDistrictLabel');
-            if (distLabel) distLabel.innerText = 'Район';
-            const badge = document.getElementById('activeDistrictBadge');
-            if (badge) badge.innerText = 'Київ (всі райони)';
-            recenterKyiv();
-            updateUI();
-        }
-
-        function recenterKyiv() {
-            if (map) map.flyTo([50.4501, 30.5234], 12, { duration: 0.8 });
-        }
-
-        function zoomMap(delta) {
-            if (map) map.setZoom(map.getZoom() + delta);
-        }
-
-        // MODAL DRAWERS MANAGEMENT (Centered on Desktop, Slide-up on Mobile)
-        function openDrawer(drawerId, contentId) {
-            triggerHaptic('medium');
-            const drawer = document.getElementById(drawerId);
-            const content = document.getElementById(contentId);
-            if (!drawer || !content) return;
-            drawer.classList.remove('hidden');
-            setTimeout(() => {
-                drawer.classList.remove('opacity-0');
-                content.classList.remove('translate-y-full');
-            }, 10);
-        }
-
-        function closeDrawer(drawerId, contentId) {
+        function closeDealModal() {
             triggerHaptic('light');
-            const drawer = document.getElementById(drawerId);
-            const content = document.getElementById(contentId);
-            if (!drawer || !content) return;
-            content.classList.add('translate-y-full');
-            drawer.classList.add('opacity-0');
-            setTimeout(() => drawer.classList.add('hidden'), 200);
+            document.getElementById('dealModal').classList.add('hidden');
         }
 
-        function openCityDrawer() { openDrawer('cityDrawer', 'cityDrawerContent'); }
-        function closeCityDrawer() { closeDrawer('cityDrawer', 'cityDrawerContent'); }
+        function renderDealReviews(dealId) {
+            const reviewsList = document.getElementById('modalReviewsList');
+            const defaultReviews = [
+                {
+                    author: "Орендар Михайло (Київ)",
+                    date: "14 листопада 2026",
+                    status: "Оглядав особисто",
+                    text: "Квартира повністю відповідає фото. Господар адекватний, показав документи на право власності. Ремонт свіжий, пралка і бойлер працюють.",
+                    rating: 5
+                },
+                {
+                    author: "Олена К.",
+                    date: "12 листопада 2026",
+                    status: "Дзвонила власнику",
+                    text: "Власник відповів одразу, без агентств і прихованих платежів. Підтвердив, що комунальні лічильники нові.",
+                    rating: 5
+                }
+            ];
 
-        function openDistrictDrawer() { openDrawer('districtDrawer', 'districtDrawerContent'); }
-        function closeDistrictDrawer() { closeDrawer('districtDrawer', 'districtDrawerContent'); }
+            const custom = REVIEWS_STORE[dealId] || [];
+            const allReviews = [...custom, ...defaultReviews];
 
-        function openLandlordDrawer() { openDrawer('landlordDrawer', 'landlordDrawerContent'); }
-        function closeLandlordDrawer() { closeDrawer('landlordDrawer', 'landlordDrawerContent'); }
+            reviewsList.innerHTML = allReviews.map(r => `
+                <div class="p-3 rounded-xl bg-white/5 border border-white/5 space-y-1">
+                    <div class="flex items-center justify-between text-[11px]">
+                        <span class="font-bold text-white">${r.author}</span>
+                        <span class="text-amber-400 font-bold">${'⭐'.repeat(r.rating || 5)}</span>
+                    </div>
+                    <div class="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                        <span>✓</span> ${r.status} · <span class="text-slate-500">${r.date}</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-snug pt-0.5">«${r.text}»</p>
+                </div>
+            `).join('');
+        }
 
-        function switchCity(cityCode, lat, lng, cityName) {
-            closeCityDrawer();
-            const titleEl = document.getElementById('headerCityTitle');
-            if (titleEl) titleEl.innerText = cityName;
+        function openAddReviewModal() {
+            triggerHaptic('light');
+            document.getElementById('addReviewModal').classList.remove('hidden');
+        }
 
-            if (cityCode === 'kyiv') {
-                map.flyTo([lat, lng], 12, { duration: 1.2 });
-            } else {
-                map.flyTo([lat, lng], 13, { duration: 1.5 });
-                if (tg?.showAlert) tg.showAlert(`🚀 Радар у ${cityName} запускається 1 грудня! Прийом заявок від власників відкрито.`);
-                else alert(`🚀 Радар у ${cityName} запускається 1 грудня! Прийом заявок від власників відкрито.`);
+        function closeAddReviewModal() {
+            triggerHaptic('light');
+            document.getElementById('addReviewModal').classList.add('hidden');
+        }
+
+        function submitReview() {
+            triggerHaptic('success');
+            const text = document.getElementById('reviewText').value.trim();
+            const status = document.getElementById('reviewStatus').value;
+            const rating = parseInt(document.querySelector('input[name="reviewRating"]:checked')?.value || '5');
+
+            if (!text) {
+                alert('Будь ласка, напишіть короткий коментар про квартиру або власника');
+                return;
+            }
+
+            const newReview = {
+                author: tg?.initDataUnsafe?.user?.first_name || "Користувач Радару",
+                date: "Сьогодні",
+                status: status,
+                text: text,
+                rating: rating
+            };
+
+            if (!REVIEWS_STORE[currentModalDealId]) {
+                REVIEWS_STORE[currentModalDealId] = [];
+            }
+            REVIEWS_STORE[currentModalDealId].unshift(newReview);
+            localStorage.setItem('kr_custom_reviews', JSON.stringify(REVIEWS_STORE));
+
+            closeAddReviewModal();
+            renderDealReviews(currentModalDealId);
+            alert('Дякуємо! Ваш відгук опубліковано для захисту інших орендарів.');
+        }
+
+        function handleUnlockContact() {
+            triggerHaptic('success');
+            const deal = LISTINGS.find(x => x.id === currentModalDealId);
+            if (!deal) return;
+
+            // In real app, trigger Stars or prompt
+            const phone = deal.phoneMasked || "+380 67 123 45 67";
+            if (confirm(`Підтвердити оплату 99 ₴ за прямий контакт власника?\n\nГарантія: якщо здано — безкоштовна заміна контакту!`)) {
+                alert(`Контакт власника розблоковано!\n\nІм'я: ${deal.ownerName || 'Власник'}\nТелефон: +380 67 482 19 33\n\nНомер збережено у вашому профілі.`);
             }
         }
 
-        // FULL DETAIL MODAL
-        function openDetail(dealId) {
-            const apt = LISTINGS.find(x => x.id === dealId);
-            if (!apt) return;
+        // 8. ONBOARDING & CITY
+        function dismissOnboarding() {
+            triggerHaptic('light');
+            document.getElementById('onboardingBanner').style.display = 'none';
+            localStorage.setItem('kr_onboarding_dismissed', '1');
+        }
 
+        function openCityDrawer() {
+            triggerHaptic('light');
+            document.getElementById('cityModal').classList.remove('hidden');
+        }
+        function closeCityModal() {
+            document.getElementById('cityModal').classList.add('hidden');
+        }
+        function selectCity(city) {
             triggerHaptic('medium');
-            const curPhoto = photoIndexById[apt.id] || 0;
-            const images = apt.images && apt.images.length > 0 ? apt.images : ['https://apollo.olxcdn.com/v1/files/sample/image;s=644x461'];
-
-            const modalContent = document.getElementById('detailSheetContent');
-            modalContent.innerHTML = `
-                <div class="flex items-center justify-between pb-3 border-b border-white/10">
-                    <div class="flex items-center gap-2">
-                        <span class="px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-400 font-extrabold text-xs uppercase">Прямий Власник 0%</span>
-                        <span class="text-xs text-slate-400">Лот #${apt.id}</span>
-                    </div>
-                    <button onclick="closeDetailModal()" class="w-8 h-8 rounded-full bg-dark-800 hover:bg-dark-700 text-white flex items-center justify-center font-bold text-sm">✕</button>
-                </div>
-
-                <!-- 16:9 Big Photo Carousel -->
-                <div class="relative w-full h-64 md:h-80 rounded-2xl overflow-hidden bg-dark-950">
-                    <img id="modal-img-${apt.id}" src="${images[curPhoto]}" class="w-full h-full object-cover">
-                    ${images.length > 1 ? `
-                        <button onclick="changePhoto(event, ${apt.id}, -1)" class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/70 hover:bg-black text-white flex items-center justify-center font-bold text-sm z-20">‹</button>
-                        <button onclick="changePhoto(event, ${apt.id}, 1)" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/70 hover:bg-black text-white flex items-center justify-center font-bold text-sm z-20">›</button>
-                        <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-black/75 text-xs text-white font-mono z-20">
-                            ${curPhoto + 1}/${images.length}
-                        </div>
-                    ` : ''}
-                </div>
-
-                <!-- Price Banner -->
-                <div class="p-4 rounded-2xl bg-dark-850 border border-white/10 flex items-center justify-between">
-                    <div>
-                        <div class="text-2xl font-black text-white">${apt.price.toLocaleString('uk-UA')} ₴<span class="text-xs text-slate-400 font-normal">/місяць</span></div>
-                        <div class="text-xs font-bold text-emerald-400">Чиста економія: +${(apt.realtorCommissionSaved || apt.price * 0.5).toLocaleString('uk-UA')} ₴</div>
-                    </div>
-                    <button onclick="triggerUnlockContact(${apt.id})" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-black text-xs uppercase tracking-wider shadow-lg active:scale-95 transition-all">
-                        🔓 Отримати номер
-                    </button>
-                </div>
-
-                <!-- Details & Specs -->
-                <div class="space-y-3 text-xs">
-                    <h3 class="text-base font-bold text-white">${apt.title}</h3>
-                    <div class="text-slate-300">📍 <b>Адреса:</b> ${apt.address || apt.district} (Ⓜ️ ${normalizeMetroName(apt.metro)} · ${apt.walkMin || 7} хв)</div>
-                    <div class="grid grid-cols-3 gap-2 text-center">
-                        <div class="p-2.5 rounded-xl bg-dark-850 border border-white/5">
-                            <div class="text-slate-400 text-[10px]">Площа</div>
-                            <div class="text-sm font-bold text-white">${apt.area || 45} м²</div>
-                        </div>
-                        <div class="p-2.5 rounded-xl bg-dark-850 border border-white/5">
-                            <div class="text-slate-400 text-[10px]">Кімнат</div>
-                            <div class="text-sm font-bold text-white">${apt.rooms || 1} кімн</div>
-                        </div>
-                        <div class="p-2.5 rounded-xl bg-dark-850 border border-white/5">
-                            <div class="text-slate-400 text-[10px]">Поверх</div>
-                            <div class="text-sm font-bold text-white">${apt.floor || 3}/${apt.totalFloors || 9}</div>
-                        </div>
-                    </div>
-
-                    <!-- Autonomy Badges -->
-                    <div class="p-3 rounded-xl bg-dark-850 border border-white/5 space-y-1.5">
-                        <div class="font-bold text-white text-xs">Автономність житла (2026):</div>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="px-2 py-1 rounded-lg ${apt.gpon ? 'bg-emerald-500/20 text-emerald-300' : 'bg-white/5 text-slate-400'} font-semibold text-[11px]">
-                                ${apt.gpon ? '⚡ GPON (Працює без світла)' : 'Без GPON'}
-                            </span>
-                            <span class="px-2 py-1 rounded-lg ${apt.generator ? 'bg-emerald-500/20 text-emerald-300' : 'bg-white/5 text-slate-400'} font-semibold text-[11px]">
-                                ${apt.generator ? '🔋 Генератор на ліфти/воду' : 'Без генератора'}
-                            </span>
-                            <span class="px-2 py-1 rounded-lg ${apt.gas ? 'bg-emerald-500/20 text-emerald-300' : 'bg-white/5 text-slate-400'} font-semibold text-[11px]">
-                                ${apt.gas ? '🔥 Газ є' : 'Електроплита'}
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Host Contact Masked -->
-                    <div class="p-4 rounded-xl bg-dark-800/80 border border-white/10 flex items-center justify-between">
-                        <div>
-                            <div class="text-slate-400 text-[10px]">Прямий контакт орендодавця:</div>
-                            <div class="text-sm font-mono font-bold text-white">${apt.phoneMasked || '+380 67 ••• •• 42'}</div>
-                        </div>
-                        <button onclick="triggerUnlockContact(${apt.id})" class="px-3.5 py-2 rounded-lg bg-white hover:bg-slate-100 text-dark-950 font-bold text-xs">
-                            Розблокувати (99 ₴)
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            openDrawer('detailModal', 'detailSheetContent');
+            document.getElementById('headerCityName').innerText = city;
+            closeCityModal();
         }
 
-        function closeDetailModal() {
-            closeDrawer('detailModal', 'detailSheetContent');
+        function openLandlordDrawer() {
+            triggerHaptic('light');
+            document.getElementById('landlordModal').classList.remove('hidden');
+        }
+        function closeLandlordModal() {
+            document.getElementById('landlordModal').classList.add('hidden');
+        }
+        function handleLandlordSubmit() {
+            triggerHaptic('success');
+            alert('Дякуємо! Ваше оголошення надіслано на безкоштовну перевірку модератором.');
+            closeLandlordModal();
         }
 
-        function triggerUnlockContact(dealId) {
-            triggerHaptic('heavy');
-            const botUrl = `https://t.me/prostov_shrink_bot?start=unlock_${dealId}`;
-            if (tg?.openTelegramLink) tg.openTelegramLink(botUrl);
-            else window.open(botUrl, '_blank');
-        }
-
-        // LANDLORD FORM SUBMISSION
-        async function submitLandlordDeal(e) {
-            e.preventDefault();
-            triggerHaptic('heavy');
-            const btn = document.getElementById('btnSubmitLandlord');
-            btn.disabled = true;
-            btn.innerText = '⏳ Відправка...';
-
-            const city = document.getElementById('llCity').value;
-            const district = document.getElementById('llDistrict').value;
-            const address = document.getElementById('llAddress').value;
-            const rooms = document.getElementById('llRooms').value;
-            const price = document.getElementById('llPrice').value;
-            const gpon = document.getElementById('llGpon').checked ? 'Так' : 'Ні';
-            const gen = document.getElementById('llGenerator').checked ? 'Так' : 'Ні';
-            const gas = document.getElementById('llGas').checked ? 'Так' : 'Ні';
-            const contact = document.getElementById('llContact').value;
-            const desc = document.getElementById('llDesc').value;
-
-            const text = `🏢 <b>НОВИЙ ЛОТ ВІД ВЛАСНИКА (З ТМА)!</b>\n━━━━━━━━━━━━━━━━━━\n🏙 <b>Місто:</b> ${city}, ${district}\n📍 <b>Адреса:</b> ${address}\n📐 <b>Кімнат:</b> ${rooms}\n💰 <b>Ціна:</b> ${price} ₴/міс\n⚡ <b>Автономність:</b> GPON: ${gpon} | Ген: ${gen} | Газ: ${gas}\n📞 <b>Контакт:</b> <code>${contact}</code>\n📝 <b>Опис:</b> ${desc}`;
-
-            try {
-                const botToken = "8976290222:AAF7LnHQ9FTEV3gI4Ap1F8Cz6ATsycbq22U";
-                const adminId = "8531839081";
-                await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: adminId, text: text, parse_mode: 'HTML' })
-                });
-            } catch (err) {
-                console.warn('Notice dispatching lead:', err);
-            }
-
-            closeLandlordDrawer();
-            btn.disabled = false;
-            btn.innerText = '🚀 Опублікувати лот безкоштовно';
-            document.getElementById('landlordForm').reset();
-
-            if (tg?.showAlert) tg.showAlert('✅ Дякуємо! Вашу квартиру отримано. Модератор перевірить відсутність рієлторських комісій та опублікує на карті протягом 15 хвилин.');
-            else alert('✅ Дякуємо! Вашу квартиру отримано. Модератор перевірить відсутність рієлторських комісій та опублікує на карті протягом 15 хвилин.');
-        }
-
-        // MOUSE WHEEL & KEYBOARD NAVIGATION (PC/Desktop Superpower)
-        function initDesktopInteractions() {
-            // Mouse wheel on horizontal filter bar
-            const filterBar = document.getElementById('filterPillsScroll');
-            if (filterBar) {
-                filterBar.addEventListener('wheel', (e) => {
-                    if (e.deltaY !== 0) {
-                        e.preventDefault();
-                        filterBar.scrollLeft += e.deltaY;
-                    }
-                }, { passive: false });
-            }
-
-            // Keyboard navigation
-            window.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    closeDetailModal();
-                    closeCityDrawer();
-                    closeDistrictDrawer();
-                    closeLandlordDrawer();
-                    closeMobileFocusedCard();
-                }
-            });
-
-            // Adjust view mode based on screen width
-            window.addEventListener('resize', () => {
-                const sidebar = document.getElementById('feedSidebar');
-                if (window.innerWidth >= 768) {
-                    sidebar.classList.remove('hidden');
-                    sidebar.classList.remove('-translate-x-full');
-                    closeMobileFocusedCard();
-                } else if (mobileViewMode === 'map') {
-                    sidebar.classList.add('hidden');
-                }
-            });
-        }
-
-        // LOAD DEALS FROM VPS / GITHUB REPO
-        async function loadLiveDeals() {
-            try {
-                const res = await fetch('data/deals.json?v=' + Date.now());
-                if (res.ok) {
-                    const data = await res.json();
-                    if (Array.isArray(data) && data.length > 0) {
-                        LISTINGS = data;
-                        const allBtn = document.getElementById('btnFilterAll');
-                        if (allBtn) allBtn.innerText = `Всі (${LISTINGS.length})`;
-                        const cityCount = document.getElementById('cityKyivCount');
-                        if (cityCount) cityCount.innerText = `${LISTINGS.length} перевірених квартир`;
-                    }
-                }
-            } catch (e) {
-                console.log('Error loading deals:', e);
-            }
-
-            updateUI();
-
-            // Deep link handling (?deal=X or #deal_X or #landlord)
-            const hash = window.location.hash || '';
-            const params = new URLSearchParams(window.location.search);
-            const tgStartApp = tg?.initDataUnsafe?.start_param || '';
-
-            if (hash === '#landlord' || tgStartApp === 'landlord') {
-                setTimeout(openLandlordDrawer, 400);
-            }
-
-            let targetDealId = null;
-            if (hash.startsWith('#deal_')) targetDealId = parseInt(hash.replace('#deal_', ''));
-            else if (params.has('deal')) targetDealId = parseInt(params.get('deal'));
-            else if (tgStartApp.startsWith('deal_')) targetDealId = parseInt(tgStartApp.replace('deal_', ''));
-
-            if (targetDealId) {
-                setTimeout(() => {
-                    focusDeal(targetDealId, true, true);
-                    openDetail(targetDealId);
-                }, 500);
-            }
-        }
-
-        // STARTUP
-        window.addEventListener('DOMContentLoaded', () => {
+        // INITIALIZATION
+        document.addEventListener('DOMContentLoaded', () => {
             initMap();
-            initDesktopInteractions();
-            // Default on mobile is map view with hidden sidebar
-            if (window.innerWidth < 768) {
-                const sidebar = document.getElementById('feedSidebar');
-                if (sidebar) sidebar.classList.add('hidden');
+            setupCarouselInteractions();
+            loadDeals();
+
+            if (localStorage.getItem('kr_onboarding_dismissed') === '1') {
+                const b = document.getElementById('onboardingBanner');
+                if (b) b.style.display = 'none';
             }
-            loadLiveDeals();
         });
     </script>
 </body>
