@@ -1339,7 +1339,7 @@
         function getCommissionSubtitle(item) {
             if (item.commissionVerified) {
                 return item.realtorCommissionSaved && item.realtorCommissionSaved > 0
-                    ? `Економія: ~${item.realtorCommissionSaved.toLocaleString()} ₴ (0% комісії)`
+                    ? `Економія: ~${item.realtorCommissionSaved.toLocaleString('uk-UA')} ₴ (0% комісії)`
                     : `0% комісії (підтверджено)`;
             }
             if (item.isOwnerVerified) {
@@ -1409,7 +1409,7 @@
 
                             <div class="absolute bottom-2.5 left-3 right-3 flex items-end justify-between z-10">
                                 <div>
-                                    <div class="text-lg font-bold text-white leading-tight">${item.price ? item.price.toLocaleString() + ' ₴' : 'Ціна уточнюється'}<span class="text-xs font-normal text-white/70">/міс</span></div>
+                                    <div class="text-lg font-bold text-white leading-tight">${item.price ? item.price.toLocaleString('uk-UA') + ' ₴' : 'Ціна уточнюється'}<span class="text-xs font-normal text-white/70">/міс</span></div>
                                     <div class="text-[11px] text-[#30d158] font-medium">${savingsStr}</div>
                                 </div>
                             </div>
@@ -1560,7 +1560,7 @@
                             <!-- Row 2: Price & Distance Pill -->
                             <div class="flex items-baseline justify-between gap-1">
                                 <div class="text-[16px] font-bold text-white tracking-tight tabular-nums">
-                                    ${item.price ? item.price.toLocaleString() + ' ₴' : 'Ціна уточнюється'}<span class="text-xs font-normal text-[#8e8e93]">/міс</span>
+                                    ${item.price ? item.price.toLocaleString('uk-UA') + ' ₴' : 'Ціна уточнюється'}<span class="text-xs font-normal text-[#8e8e93]">/міс</span>
                                 </div>
                                 ${distancePill}
                             </div>
@@ -1837,7 +1837,7 @@
             currentModalPhotoIdx = 0;
 
             document.getElementById('modalMetro').innerText = deal.metro ? `${deal.metro} · ${deal.district}` : (deal.district || 'Київ');
-            document.getElementById('modalPrice').innerText = deal.price ? `${deal.price.toLocaleString()} ₴/міс` : 'Ціна уточнюється';
+            document.getElementById('modalPrice').innerText = deal.price ? `${deal.price.toLocaleString('uk-UA')} ₴/міс` : 'Ціна уточнюється';
             
             // Do NOT compute fake savings (price / 2) unless owner is verified AND confirmed 0% commission
             const saved = (deal.isOwnerVerified && deal.commissionVerified && deal.realtorCommissionSaved && deal.realtorCommissionSaved > 0)
@@ -1848,7 +1848,7 @@
             if (savingsEl) {
                 if (deal.commissionVerified && saved > 0) {
                     savingsEl.className = "text-[#30d158] font-medium text-[12px]";
-                    savingsEl.innerText = `Економія на рієлторі: ~${saved.toLocaleString()} ₴ (0% комісії)`;
+                    savingsEl.innerText = `Економія на рієлторі: ~${saved.toLocaleString('uk-UA')} ₴ (0% комісії)`;
                 } else if (deal.isOwnerVerified) {
                     savingsEl.className = "text-[#30d158] font-medium text-[12px]";
                     savingsEl.innerText = `Документи власника перевірено (комісія уточнюється)`;
@@ -1984,7 +1984,7 @@
             const realtorSavingsEl = document.getElementById('modalRealtorSavings');
             if (realtorSavingsEl) {
                 if (deal.commissionVerified && saved > 0) {
-                    realtorSavingsEl.innerText = `Економія: ~${saved.toLocaleString()} ₴ (0% комісії)`;
+                    realtorSavingsEl.innerText = `Економія: ~${saved.toLocaleString('uk-UA')} ₴ (0% комісії)`;
                 } else if (deal.isOwnerVerified) {
                     realtorSavingsEl.innerText = `Власник підтверджений (комісія уточнюється)`;
                 } else if (deal.contactVerified) {
