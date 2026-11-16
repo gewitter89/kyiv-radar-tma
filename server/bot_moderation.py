@@ -177,7 +177,7 @@ def process_landlord_approval(
                 "gas": None,
                 "lowFloor": None,
                 "pets": None,
-                "ownerName": "Орендодавець",
+                "ownerName": "Контактна особа",
                 "phone": None,  # PRIVACY: Raw phone stripped from public catalog
                 "phoneMasked": phone_val[:6] + "***" if len(phone_val) >= 6 else phone_val,
                 "images": [f"{MEDIA_BASE_URL}/api/media/{pid}" for pid in photos_val],
