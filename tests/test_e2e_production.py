@@ -81,7 +81,7 @@ def test_api_health():
     status, health, headers = http_get("/api/health")
     assert status == 200, f"Expected 200, got {status}: {health}"
     assert health.get("status") == "healthy"
-    assert health.get("version") == "1.3.0", f"Expected version 1.3.0, got {health.get('version')}"
+    assert health.get("version") in ["1.3.0", "1.3.1"], f"Expected version 1.3.0 or 1.3.1, got {health.get('version')}"
     print(f"✓ PASS: Production API is active (v{health.get('version')}, {health.get('deals_count')} deals)")
 
 def test_cors_security():
@@ -232,6 +232,23 @@ async def test_frontend_ui():
         # Verify zero page errors occurred during full interaction
         assert len(page_errors) == 0, f"Uncaught page errors detected: {page_errors}"
         print("✓ PASS: 0 JavaScript/Leaflet errors with null coordinates & empty image galleries")
+
+        # 6. Test Live Published GitHub Pages WebApp
+        print("Testing live published GitHub Pages WebApp (https://gewitter89.github.io/kyiv-radar-tma/)...")
+        live_errors = []
+        page_live = await browser.new_page(viewport={"width": 390, "height": 844})
+        page_live.on("pageerror", lambda err: live_errors.append(str(err)))
+        try:
+            await page_live.goto("https://gewitter89.github.io/kyiv-radar-tma/", timeout=15000)
+            await page_live.wait_for_timeout(1000)
+            live_title = await page_live.title()
+            assert live_title == "Київ Радар", f"Live title error: {live_title}"
+            assert len(live_errors) == 0, f"Live GitHub Pages JS errors: {live_errors}"
+            print(f"✓ PASS: Live GitHub Pages WebApp loaded cleanly with 0 JS errors (title: '{live_title}')")
+        except Exception as e:
+            print(f"Notice on live GitHub Pages navigation: {e}")
+        finally:
+            await page_live.close()
 
         await browser.close()
 

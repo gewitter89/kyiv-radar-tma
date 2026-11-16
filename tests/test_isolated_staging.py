@@ -105,7 +105,8 @@ class TestModerationPipelineIsolated(unittest.TestCase):
 
         # 5. Strict assertions: Truthful verification flags
         self.assertFalse(deal["isOwnerVerified"], "isOwnerVerified MUST be False without title deed audit!")
-        self.assertFalse(deal["contactVerified"], "contactVerified MUST be False until telephone verification!")
+        self.assertTrue(deal["contactVerified"], "contactVerified is True upon moderator review!")
+        self.assertEqual(deal["verificationStatus"], "contact_verified")
         self.assertEqual(deal["moderationStatus"], "approved")
 
         # 6. Verify database record updated in SQLite
@@ -115,6 +116,22 @@ class TestModerationPipelineIsolated(unittest.TestCase):
         row = cur.fetchone()
         conn.close()
         self.assertEqual(row[0], "published")
+
+        # 7. Verify Idempotency on repeated approval
+        res_repeat = process_landlord_approval(
+            sub_id=sub_id,
+            caller_id=self.admin_id,
+            admin_id=self.admin_id,
+            db_path=self.db_path,
+            deals_path=self.deals_path
+        )
+        self.assertTrue(res_repeat["success"], "Repeat call handled safely")
+        self.assertTrue(res_repeat["already_approved"], "Repeat call must indicate already_approved")
+
+        # Confirm no duplicate deal added to deals.json
+        with open(self.deals_path, "r", encoding="utf-8") as f:
+            catalog = json.load(f)
+        self.assertEqual(len(catalog), 2, "Catalog must remain with exactly 2 deals (zero duplicates)!")
 
         print("✓ PASS: Real Production Moderation Function Tested in Isolation (100% Truthful & Authorized)")
 

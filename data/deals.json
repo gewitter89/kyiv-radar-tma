@@ -7,7 +7,7 @@
     "metro": "Метро Позняки",
     "walkMin": 8,
     "price": 16500,
-    "realtorCommissionSaved": 8250,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 8,
     "totalFloors": 14,
@@ -40,7 +40,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 2,
@@ -50,7 +54,7 @@
     "metro": "Метро Позняки",
     "walkMin": 6,
     "price": 9000,
-    "realtorCommissionSaved": 4500,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 2,
     "totalFloors": 16,
@@ -81,7 +85,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 3,
@@ -91,7 +99,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 6,
     "price": 17000,
-    "realtorCommissionSaved": 8500,
+    "realtorCommissionSaved": null,
     "area": 45,
     "floor": 3,
     "totalFloors": 14,
@@ -123,7 +131,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 4,
@@ -133,7 +145,7 @@
     "metro": "Метро Печерська",
     "walkMin": 6,
     "price": 25000,
-    "realtorCommissionSaved": 12500,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 7,
     "totalFloors": 25,
@@ -162,7 +174,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Печерський"
+    "cleanAddress": "Печерський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 5,
@@ -172,7 +188,7 @@
     "metro": "Метро Позняки",
     "walkMin": 11,
     "price": 12500,
-    "realtorCommissionSaved": 6250,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 4,
     "totalFloors": 9,
@@ -205,7 +221,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 6,
@@ -215,7 +235,7 @@
     "metro": "Метро Лівобережна",
     "walkMin": 7,
     "price": 16000,
-    "realtorCommissionSaved": 8000,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 5,
     "totalFloors": 25,
@@ -248,7 +268,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 7,
@@ -258,7 +282,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 6,
     "price": 24000,
-    "realtorCommissionSaved": 12000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 9,
     "totalFloors": 14,
@@ -291,7 +315,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 8,
@@ -301,7 +329,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 6,
     "price": 10000,
-    "realtorCommissionSaved": 5000,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 4,
     "totalFloors": 9,
@@ -334,7 +362,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 9,
@@ -344,7 +376,7 @@
     "metro": "Метро Лівобережна",
     "walkMin": 4,
     "price": 13500,
-    "realtorCommissionSaved": 6750,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 4,
     "totalFloors": 14,
@@ -377,7 +409,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 10,
@@ -387,7 +423,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 9,
     "price": 21000,
-    "realtorCommissionSaved": 10500,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 2,
     "totalFloors": 16,
@@ -420,7 +456,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 11,
@@ -430,7 +470,7 @@
     "metro": "Метро Лівобережна",
     "walkMin": 6,
     "price": 10000,
-    "realtorCommissionSaved": 5000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 5,
     "totalFloors": 14,
@@ -463,7 +503,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 12,
@@ -473,7 +517,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 9,
     "price": 27000,
-    "realtorCommissionSaved": 13500,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 6,
     "totalFloors": 14,
@@ -506,7 +550,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 13,
@@ -516,7 +564,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 5,
     "price": 25500,
-    "realtorCommissionSaved": 12750,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 2,
     "totalFloors": 16,
@@ -548,7 +596,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 14,
@@ -558,7 +610,7 @@
     "metro": "Метро Позняки",
     "walkMin": 7,
     "price": 13500,
-    "realtorCommissionSaved": 6750,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 8,
     "totalFloors": 25,
@@ -590,7 +642,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 15,
@@ -600,7 +656,7 @@
     "metro": "Метро Лівобережна",
     "walkMin": 9,
     "price": 16000,
-    "realtorCommissionSaved": 8000,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 7,
     "totalFloors": 16,
@@ -631,7 +687,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 16,
@@ -641,7 +701,7 @@
     "metro": "Метро Чернігівська",
     "walkMin": 12,
     "price": 12000,
-    "realtorCommissionSaved": 6000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 6,
     "totalFloors": 9,
@@ -674,7 +734,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Деснянський"
+    "cleanAddress": "Деснянський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 17,
@@ -684,7 +748,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 10,
     "price": 15000,
-    "realtorCommissionSaved": 7500,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 8,
     "totalFloors": 25,
@@ -717,7 +781,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 18,
@@ -727,7 +795,7 @@
     "metro": "Метро Лівобережна",
     "walkMin": 9,
     "price": 9000,
-    "realtorCommissionSaved": 4500,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 7,
     "totalFloors": 16,
@@ -760,7 +828,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 19,
@@ -770,7 +842,7 @@
     "metro": "Метро Житомирська",
     "walkMin": 7,
     "price": 19988,
-    "realtorCommissionSaved": 9994,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 9,
     "totalFloors": 16,
@@ -803,7 +875,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Святошинський"
+    "cleanAddress": "Святошинський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 20,
@@ -813,7 +889,7 @@
     "metro": "Метро Контрактова площа",
     "walkMin": 7,
     "price": 26000,
-    "realtorCommissionSaved": 13000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 2,
     "totalFloors": 16,
@@ -846,7 +922,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Подільський"
+    "cleanAddress": "Подільський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 21,
@@ -856,7 +936,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 9,
     "price": 13500,
-    "realtorCommissionSaved": 6750,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 3,
     "totalFloors": 25,
@@ -889,7 +969,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 22,
@@ -899,7 +983,7 @@
     "metro": "Метро Позняки",
     "walkMin": 7,
     "price": 15500,
-    "realtorCommissionSaved": 7750,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 5,
     "totalFloors": 9,
@@ -932,7 +1016,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 23,
@@ -942,7 +1030,7 @@
     "metro": "Метро Печерська",
     "walkMin": 6,
     "price": 19000,
-    "realtorCommissionSaved": 9500,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 7,
     "totalFloors": 16,
@@ -975,7 +1063,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Печерський"
+    "cleanAddress": "Печерський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 24,
@@ -985,7 +1077,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 4,
     "price": 23000,
-    "realtorCommissionSaved": 11500,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 8,
     "totalFloors": 14,
@@ -1018,7 +1110,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "23 000 грнДодати в обраневул. Кирило"
+    "cleanAddress": "23 000 грнДодати в обраневул. Кирило",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 25,
@@ -1028,7 +1124,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 7,
     "price": 20000,
-    "realtorCommissionSaved": 10000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 5,
     "totalFloors": 14,
@@ -1059,7 +1155,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 26,
@@ -1069,7 +1169,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 3,
     "price": 18380,
-    "realtorCommissionSaved": 9190,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 8,
     "totalFloors": 16,
@@ -1102,7 +1202,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Шевченківський"
+    "cleanAddress": "Шевченківський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 27,
@@ -1112,7 +1216,7 @@
     "metro": "Метро Позняки",
     "walkMin": 8,
     "price": 11000,
-    "realtorCommissionSaved": 5500,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 4,
     "totalFloors": 25,
@@ -1143,7 +1247,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "11 000 грнДодати в обраневул. 191"
+    "cleanAddress": "11 000 грнДодати в обраневул. 191",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 28,
@@ -1153,7 +1261,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 9,
     "price": 11000,
-    "realtorCommissionSaved": 5500,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 6,
     "totalFloors": 14,
@@ -1182,7 +1290,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 29,
@@ -1192,7 +1304,7 @@
     "metro": "Метро Позняки",
     "walkMin": 6,
     "price": 17000,
-    "realtorCommissionSaved": 8500,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 9,
     "totalFloors": 14,
@@ -1225,7 +1337,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "17 000 грнДодати в обраневул. Ахматової Анни, 13Позняки·Позняки·Дарницький·Київ1 кімната65 м²21 поверх з 29Оренда 1"
+    "cleanAddress": "17 000 грнДодати в обраневул. Ахматової Анни, 13Позняки·Позняки·Дарницький·Київ1 кімната65 м²21 поверх з 29Оренда 1",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 30,
@@ -1235,7 +1351,7 @@
     "metro": "Метро Лівобережна",
     "walkMin": 9,
     "price": 13000,
-    "realtorCommissionSaved": 6500,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 6,
     "totalFloors": 9,
@@ -1268,7 +1384,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "13 000 грнДодати в обраневул. Андрія Малишка, 21АЧернігівська·Північно"
+    "cleanAddress": "13 000 грнДодати в обраневул. Андрія Малишка, 21АЧернігівська·Північно",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 31,
@@ -1278,7 +1398,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 9,
     "price": 23000,
-    "realtorCommissionSaved": 11500,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 6,
     "totalFloors": 14,
@@ -1309,7 +1429,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "23 000 грнДодати в обранебул. Вацлава Гавела, 6/7АБерестейська·Шулявка·Солом'янський·Київ·ЖК L"
+    "cleanAddress": "23 000 грнДодати в обранебул. Вацлава Гавела, 6/7АБерестейська·Шулявка·Солом'янський·Київ·ЖК L",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 32,
@@ -1319,7 +1443,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 6,
     "price": 14800,
-    "realtorCommissionSaved": 7400,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 4,
     "totalFloors": 25,
@@ -1348,7 +1472,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 33,
@@ -1358,7 +1486,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 3,
     "price": 16000,
-    "realtorCommissionSaved": 8000,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 9,
     "totalFloors": 14,
@@ -1386,7 +1514,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Шевченківський"
+    "cleanAddress": "Шевченківський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 34,
@@ -1396,7 +1528,7 @@
     "metro": "Метро Позняки",
     "walkMin": 9,
     "price": 14000,
-    "realtorCommissionSaved": 7000,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 9,
     "totalFloors": 25,
@@ -1424,7 +1556,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 35,
@@ -1434,7 +1570,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 9,
     "price": 16500,
-    "realtorCommissionSaved": 8250,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 7,
     "totalFloors": 9,
@@ -1467,7 +1603,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 36,
@@ -1477,7 +1617,7 @@
     "metro": "Метро Печерська",
     "walkMin": 3,
     "price": 22000,
-    "realtorCommissionSaved": 11000,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 8,
     "totalFloors": 16,
@@ -1510,7 +1650,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Печерський"
+    "cleanAddress": "Печерський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 37,
@@ -1520,7 +1664,7 @@
     "metro": "Метро Позняки",
     "walkMin": 11,
     "price": 18000,
-    "realtorCommissionSaved": 9000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 5,
     "totalFloors": 9,
@@ -1553,7 +1697,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 38,
@@ -1563,7 +1711,7 @@
     "metro": "Метро Печерська",
     "walkMin": 2,
     "price": 32000,
-    "realtorCommissionSaved": 16000,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 7,
     "totalFloors": 9,
@@ -1596,7 +1744,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Печерський"
+    "cleanAddress": "Печерський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 39,
@@ -1606,7 +1758,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 8,
     "price": 28000,
-    "realtorCommissionSaved": 14000,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 4,
     "totalFloors": 14,
@@ -1639,7 +1791,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 40,
@@ -1649,7 +1805,7 @@
     "metro": "Метро Житомирська",
     "walkMin": 6,
     "price": 14000,
-    "realtorCommissionSaved": 7000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 4,
     "totalFloors": 16,
@@ -1681,7 +1837,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Святошинський"
+    "cleanAddress": "Святошинський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 41,
@@ -1691,7 +1851,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 8,
     "price": 30000,
-    "realtorCommissionSaved": 15000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 7,
     "totalFloors": 14,
@@ -1724,7 +1884,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 42,
@@ -1734,7 +1898,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 3,
     "price": 20000,
-    "realtorCommissionSaved": 10000,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 9,
     "totalFloors": 16,
@@ -1767,7 +1931,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Шевченківський"
+    "cleanAddress": "Шевченківський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 43,
@@ -1777,7 +1945,7 @@
     "metro": "Метро Контрактова площа",
     "walkMin": 10,
     "price": 20000,
-    "realtorCommissionSaved": 10000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 8,
     "totalFloors": 14,
@@ -1810,7 +1978,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Подільський"
+    "cleanAddress": "Подільський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 44,
@@ -1820,7 +1992,7 @@
     "metro": "Метро Житомирська",
     "walkMin": 7,
     "price": 15000,
-    "realtorCommissionSaved": 7500,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 2,
     "totalFloors": 9,
@@ -1853,7 +2025,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Святошинський"
+    "cleanAddress": "Святошинський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 45,
@@ -1863,7 +2039,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 3,
     "price": 17000,
-    "realtorCommissionSaved": 8500,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 9,
     "totalFloors": 25,
@@ -1896,7 +2072,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Шевченківський"
+    "cleanAddress": "Шевченківський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 46,
@@ -1906,7 +2086,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 8,
     "price": 16000,
-    "realtorCommissionSaved": 8000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 8,
     "totalFloors": 9,
@@ -1939,7 +2119,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Шевченківський"
+    "cleanAddress": "Шевченківський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 47,
@@ -1949,7 +2133,7 @@
     "metro": "Метро Печерська",
     "walkMin": 3,
     "price": 36760,
-    "realtorCommissionSaved": 18380,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 4,
     "totalFloors": 9,
@@ -1977,7 +2161,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Печерський"
+    "cleanAddress": "Печерський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 48,
@@ -1987,7 +2175,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 5,
     "price": 36760,
-    "realtorCommissionSaved": 18380,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 3,
     "totalFloors": 16,
@@ -2020,7 +2208,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "36 760 грнДодати в обраневул. Степана Рудницького(Академіка Вільямса), 19/14Іподром·Теремки"
+    "cleanAddress": "36 760 грнДодати в обраневул. Степана Рудницького(Академіка Вільямса), 19/14Іподром·Теремки",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 49,
@@ -2030,7 +2222,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 5,
     "price": 27570,
-    "realtorCommissionSaved": 13785,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 4,
     "totalFloors": 9,
@@ -2063,7 +2255,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 50,
@@ -2073,7 +2269,7 @@
     "metro": "Метро Контрактова площа",
     "walkMin": 5,
     "price": 21000,
-    "realtorCommissionSaved": 10500,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 6,
     "totalFloors": 25,
@@ -2106,7 +2302,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Подільський"
+    "cleanAddress": "Подільський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 51,
@@ -2116,7 +2316,7 @@
     "metro": "Метро Позняки",
     "walkMin": 6,
     "price": 36000,
-    "realtorCommissionSaved": 18000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 3,
     "totalFloors": 14,
@@ -2149,7 +2349,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 52,
@@ -2159,7 +2363,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 6,
     "price": 25000,
-    "realtorCommissionSaved": 12500,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 7,
     "totalFloors": 14,
@@ -2192,7 +2396,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 53,
@@ -2202,7 +2410,7 @@
     "metro": "Метро Лівобережна",
     "walkMin": 7,
     "price": 8300,
-    "realtorCommissionSaved": 4150,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 7,
     "totalFloors": 14,
@@ -2235,7 +2443,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 54,
@@ -2245,7 +2457,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 6,
     "price": 25273,
-    "realtorCommissionSaved": 12636,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 2,
     "totalFloors": 25,
@@ -2278,7 +2490,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Шевченківський"
+    "cleanAddress": "Шевченківський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 55,
@@ -2288,7 +2504,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 10,
     "price": 36760,
-    "realtorCommissionSaved": 18380,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 3,
     "totalFloors": 25,
@@ -2321,7 +2537,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 56,
@@ -2331,7 +2551,7 @@
     "metro": "Метро Контрактова площа",
     "walkMin": 10,
     "price": 22000,
-    "realtorCommissionSaved": 11000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 2,
     "totalFloors": 25,
@@ -2364,7 +2584,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Подільський"
+    "cleanAddress": "Подільський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 57,
@@ -2374,7 +2598,7 @@
     "metro": "Метро Печерська",
     "walkMin": 5,
     "price": 21500,
-    "realtorCommissionSaved": 10750,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 3,
     "totalFloors": 14,
@@ -2405,7 +2629,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Печерський"
+    "cleanAddress": "Печерський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 58,
@@ -2415,7 +2643,7 @@
     "metro": "Метро Житомирська",
     "walkMin": 7,
     "price": 18000,
-    "realtorCommissionSaved": 9000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 5,
     "totalFloors": 25,
@@ -2448,7 +2676,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Святошинський"
+    "cleanAddress": "Святошинський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 59,
@@ -2458,7 +2690,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 3,
     "price": 36000,
-    "realtorCommissionSaved": 18000,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 6,
     "totalFloors": 16,
@@ -2491,7 +2723,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Шевченківський"
+    "cleanAddress": "Шевченківський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 60,
@@ -2501,7 +2737,7 @@
     "metro": "Метро Житомирська",
     "walkMin": 7,
     "price": 8000,
-    "realtorCommissionSaved": 4000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 6,
     "totalFloors": 16,
@@ -2532,7 +2768,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Святошинський"
+    "cleanAddress": "Святошинський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 61,
@@ -2542,7 +2782,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 3,
     "price": 29868,
-    "realtorCommissionSaved": 14934,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 4,
     "totalFloors": 9,
@@ -2575,7 +2815,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Шевченківський"
+    "cleanAddress": "Шевченківський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 62,
@@ -2585,7 +2829,7 @@
     "metro": "Метро Житомирська",
     "walkMin": 8,
     "price": 16000,
-    "realtorCommissionSaved": 8000,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 9,
     "totalFloors": 16,
@@ -2618,7 +2862,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Святошинський"
+    "cleanAddress": "Святошинський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 63,
@@ -2628,7 +2876,7 @@
     "metro": "Метро Контрактова площа",
     "walkMin": 6,
     "price": 23990,
-    "realtorCommissionSaved": 11995,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 7,
     "totalFloors": 9,
@@ -2661,7 +2909,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "23 990 грнДодати в обраневул. Набережно"
+    "cleanAddress": "23 990 грнДодати в обраневул. Набережно",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 64,
@@ -2671,7 +2923,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 8,
     "price": 7800,
-    "realtorCommissionSaved": 3900,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 6,
     "totalFloors": 16,
@@ -2704,7 +2956,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 65,
@@ -2714,7 +2970,7 @@
     "metro": "Метро Контрактова площа",
     "walkMin": 6,
     "price": 9200,
-    "realtorCommissionSaved": 4600,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 4,
     "totalFloors": 9,
@@ -2747,7 +3003,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Подільський"
+    "cleanAddress": "Подільський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 66,
@@ -2757,7 +3017,7 @@
     "metro": "Метро Позняки",
     "walkMin": 10,
     "price": 45000,
-    "realtorCommissionSaved": 22500,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 9,
     "totalFloors": 9,
@@ -2790,7 +3050,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 67,
@@ -2800,7 +3064,7 @@
     "metro": "Метро Позняки",
     "walkMin": 9,
     "price": 13000,
-    "realtorCommissionSaved": 6500,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 3,
     "totalFloors": 9,
@@ -2833,7 +3097,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 68,
@@ -2843,7 +3111,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 5,
     "price": 38000,
-    "realtorCommissionSaved": 19000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 6,
     "totalFloors": 14,
@@ -2876,7 +3144,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 69,
@@ -2886,7 +3158,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 6,
     "price": 34463,
-    "realtorCommissionSaved": 17231,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 2,
     "totalFloors": 9,
@@ -2915,7 +3187,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 70,
@@ -2925,7 +3201,7 @@
     "metro": "Метро Лівобережна",
     "walkMin": 8,
     "price": 6500,
-    "realtorCommissionSaved": 3250,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 2,
     "totalFloors": 16,
@@ -2958,7 +3234,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 71,
@@ -2968,7 +3248,7 @@
     "metro": "Метро Житомирська",
     "walkMin": 5,
     "price": 15000,
-    "realtorCommissionSaved": 7500,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 2,
     "totalFloors": 25,
@@ -2999,7 +3279,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Святошинський"
+    "cleanAddress": "Святошинський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 72,
@@ -3009,7 +3293,7 @@
     "metro": "Метро Позняки",
     "walkMin": 7,
     "price": 8000,
-    "realtorCommissionSaved": 4000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 7,
     "totalFloors": 14,
@@ -3042,7 +3326,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 73,
@@ -3052,7 +3340,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 6,
     "price": 9000,
-    "realtorCommissionSaved": 4500,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 7,
     "totalFloors": 25,
@@ -3080,7 +3368,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 74,
@@ -3090,7 +3382,7 @@
     "metro": "Метро Позняки",
     "walkMin": 10,
     "price": 26500,
-    "realtorCommissionSaved": 13250,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 9,
     "totalFloors": 16,
@@ -3123,7 +3415,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 75,
@@ -3133,7 +3429,7 @@
     "metro": "Метро Печерська",
     "walkMin": 5,
     "price": 22000,
-    "realtorCommissionSaved": 11000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 6,
     "totalFloors": 25,
@@ -3166,7 +3462,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Печерський"
+    "cleanAddress": "Печерський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 76,
@@ -3176,7 +3476,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 7,
     "price": 40000,
-    "realtorCommissionSaved": 20000,
+    "realtorCommissionSaved": null,
     "area": 95,
     "floor": 4,
     "totalFloors": 16,
@@ -3209,7 +3509,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 77,
@@ -3219,7 +3523,7 @@
     "metro": "Метро Мінська",
     "walkMin": 4,
     "price": 9000,
-    "realtorCommissionSaved": 4500,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 4,
     "totalFloors": 25,
@@ -3252,7 +3556,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Оболонський"
+    "cleanAddress": "Оболонський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 78,
@@ -3262,7 +3570,7 @@
     "metro": "Метро Позняки",
     "walkMin": 8,
     "price": 12000,
-    "realtorCommissionSaved": 6000,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 4,
     "totalFloors": 14,
@@ -3295,7 +3603,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 79,
@@ -3305,7 +3617,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 5,
     "price": 19990,
-    "realtorCommissionSaved": 9995,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 7,
     "totalFloors": 16,
@@ -3338,7 +3650,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 80,
@@ -3348,7 +3664,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 7,
     "price": 27000,
-    "realtorCommissionSaved": 13500,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 7,
     "totalFloors": 9,
@@ -3381,7 +3697,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Шевченківський"
+    "cleanAddress": "Шевченківський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 81,
@@ -3391,7 +3711,7 @@
     "metro": "Метро Позняки",
     "walkMin": 7,
     "price": 25000,
-    "realtorCommissionSaved": 12500,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 7,
     "totalFloors": 14,
@@ -3424,7 +3744,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 82,
@@ -3434,7 +3758,7 @@
     "metro": "Метро Житомирська",
     "walkMin": 5,
     "price": 25000,
-    "realtorCommissionSaved": 12500,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 6,
     "totalFloors": 25,
@@ -3467,7 +3791,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "25 000 грнДодати в обранепросп. Берестейський(Перемоги)Нивки·ЖК Нивки"
+    "cleanAddress": "25 000 грнДодати в обранепросп. Берестейський(Перемоги)Нивки·ЖК Нивки",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 83,
@@ -3477,7 +3805,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 10,
     "price": 21000,
-    "realtorCommissionSaved": 10500,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 4,
     "totalFloors": 9,
@@ -3508,7 +3836,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 84,
@@ -3518,7 +3850,7 @@
     "metro": "Метро Позняки",
     "walkMin": 11,
     "price": 15000,
-    "realtorCommissionSaved": 7500,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 5,
     "totalFloors": 14,
@@ -3551,7 +3883,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 85,
@@ -3561,7 +3897,7 @@
     "metro": "Метро Лівобережна",
     "walkMin": 6,
     "price": 16000,
-    "realtorCommissionSaved": 8000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 4,
     "totalFloors": 16,
@@ -3594,7 +3930,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 86,
@@ -3604,7 +3944,7 @@
     "metro": "Метро Позняки",
     "walkMin": 11,
     "price": 10500,
-    "realtorCommissionSaved": 5250,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 4,
     "totalFloors": 25,
@@ -3637,7 +3977,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 87,
@@ -3647,7 +3991,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 8,
     "price": 16500,
-    "realtorCommissionSaved": 8250,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 4,
     "totalFloors": 14,
@@ -3680,7 +4024,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 88,
@@ -3690,7 +4038,7 @@
     "metro": "Метро Позняки",
     "walkMin": 10,
     "price": 24000,
-    "realtorCommissionSaved": 12000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 4,
     "totalFloors": 14,
@@ -3723,7 +4071,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 89,
@@ -3733,7 +4085,7 @@
     "metro": "Метро Лівобережна",
     "walkMin": 8,
     "price": 7000,
-    "realtorCommissionSaved": 3500,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 9,
     "totalFloors": 14,
@@ -3766,7 +4118,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 90,
@@ -3776,7 +4132,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 8,
     "price": 26000,
-    "realtorCommissionSaved": 13000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 3,
     "totalFloors": 25,
@@ -3807,7 +4163,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 91,
@@ -3817,7 +4177,7 @@
     "metro": "Метро Позняки",
     "walkMin": 6,
     "price": 16000,
-    "realtorCommissionSaved": 8000,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 3,
     "totalFloors": 9,
@@ -3850,7 +4210,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 92,
@@ -3860,7 +4224,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 9,
     "price": 18000,
-    "realtorCommissionSaved": 9000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 4,
     "totalFloors": 16,
@@ -3893,7 +4257,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 93,
@@ -3903,7 +4271,7 @@
     "metro": "Метро Позняки",
     "walkMin": 10,
     "price": 11999,
-    "realtorCommissionSaved": 5999,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 4,
     "totalFloors": 16,
@@ -3936,7 +4304,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 94,
@@ -3946,7 +4318,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 3,
     "price": 26000,
-    "realtorCommissionSaved": 13000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 7,
     "totalFloors": 14,
@@ -3979,7 +4351,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Шевченківський"
+    "cleanAddress": "Шевченківський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 95,
@@ -3989,7 +4365,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 9,
     "price": 16000,
-    "realtorCommissionSaved": 8000,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 7,
     "totalFloors": 16,
@@ -4022,7 +4398,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 96,
@@ -4032,7 +4412,7 @@
     "metro": "Метро Чернігівська",
     "walkMin": 10,
     "price": 10000,
-    "realtorCommissionSaved": 5000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 4,
     "totalFloors": 14,
@@ -4063,7 +4443,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Деснянський"
+    "cleanAddress": "Деснянський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 97,
@@ -4073,7 +4457,7 @@
     "metro": "Метро Житомирська",
     "walkMin": 8,
     "price": 8000,
-    "realtorCommissionSaved": 4000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 5,
     "totalFloors": 25,
@@ -4106,7 +4490,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Святошинський"
+    "cleanAddress": "Святошинський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 98,
@@ -4116,7 +4504,7 @@
     "metro": "Метро Позняки",
     "walkMin": 8,
     "price": 18500,
-    "realtorCommissionSaved": 9250,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 6,
     "totalFloors": 16,
@@ -4149,7 +4537,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 99,
@@ -4159,7 +4551,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 4,
     "price": 10900,
-    "realtorCommissionSaved": 5450,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 5,
     "totalFloors": 25,
@@ -4188,7 +4580,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 100,
@@ -4198,7 +4594,7 @@
     "metro": "Метро Печерська",
     "walkMin": 6,
     "price": 34999,
-    "realtorCommissionSaved": 17499,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 7,
     "totalFloors": 9,
@@ -4231,7 +4627,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Печерський"
+    "cleanAddress": "Печерський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 101,
@@ -4241,7 +4641,7 @@
     "metro": "Метро Контрактова площа",
     "walkMin": 5,
     "price": 10500,
-    "realtorCommissionSaved": 5250,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 8,
     "totalFloors": 16,
@@ -4274,7 +4674,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Подільський"
+    "cleanAddress": "Подільський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 102,
@@ -4284,7 +4688,7 @@
     "metro": "Метро Позняки",
     "walkMin": 11,
     "price": 35000,
-    "realtorCommissionSaved": 17500,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 2,
     "totalFloors": 14,
@@ -4317,7 +4721,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 103,
@@ -4327,7 +4735,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 8,
     "price": 22000,
-    "realtorCommissionSaved": 11000,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 5,
     "totalFloors": 25,
@@ -4360,7 +4768,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 104,
@@ -4370,7 +4782,7 @@
     "metro": "Метро Чернігівська",
     "walkMin": 13,
     "price": 10000,
-    "realtorCommissionSaved": 5000,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 7,
     "totalFloors": 14,
@@ -4403,7 +4815,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Деснянський"
+    "cleanAddress": "Деснянський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 105,
@@ -4413,7 +4829,7 @@
     "metro": "Метро Позняки",
     "walkMin": 9,
     "price": 12000,
-    "realtorCommissionSaved": 6000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 8,
     "totalFloors": 25,
@@ -4446,7 +4862,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 106,
@@ -4456,7 +4876,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 6,
     "price": 18000,
-    "realtorCommissionSaved": 9000,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 2,
     "totalFloors": 16,
@@ -4489,7 +4909,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 107,
@@ -4499,7 +4923,7 @@
     "metro": "Метро Позняки",
     "walkMin": 9,
     "price": 14500,
-    "realtorCommissionSaved": 7250,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 4,
     "totalFloors": 14,
@@ -4532,7 +4956,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 108,
@@ -4542,7 +4970,7 @@
     "metro": "Метро Мінська",
     "walkMin": 4,
     "price": 10000,
-    "realtorCommissionSaved": 5000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 7,
     "totalFloors": 14,
@@ -4575,7 +5003,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Оболонський"
+    "cleanAddress": "Оболонський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 109,
@@ -4585,7 +5017,7 @@
     "metro": "Метро Контрактова площа",
     "walkMin": 7,
     "price": 11000,
-    "realtorCommissionSaved": 5500,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 6,
     "totalFloors": 16,
@@ -4613,7 +5045,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Подільський"
+    "cleanAddress": "Подільський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 110,
@@ -4623,7 +5059,7 @@
     "metro": "Метро Контрактова площа",
     "walkMin": 9,
     "price": 16000,
-    "realtorCommissionSaved": 8000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 6,
     "totalFloors": 16,
@@ -4655,7 +5091,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Подільський"
+    "cleanAddress": "Подільський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 111,
@@ -4665,7 +5105,7 @@
     "metro": "Метро Житомирська",
     "walkMin": 5,
     "price": 10500,
-    "realtorCommissionSaved": 5250,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 8,
     "totalFloors": 16,
@@ -4695,7 +5135,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Святошинський"
+    "cleanAddress": "Святошинський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 112,
@@ -4705,7 +5149,7 @@
     "metro": "Метро Печерська",
     "walkMin": 7,
     "price": 22000,
-    "realtorCommissionSaved": 11000,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 4,
     "totalFloors": 14,
@@ -4734,7 +5178,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Печерський"
+    "cleanAddress": "Печерський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 113,
@@ -4744,7 +5192,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 8,
     "price": 18000,
-    "realtorCommissionSaved": 9000,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 2,
     "totalFloors": 9,
@@ -4777,7 +5225,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 114,
@@ -4787,7 +5239,7 @@
     "metro": "Метро Чернігівська",
     "walkMin": 13,
     "price": 10000,
-    "realtorCommissionSaved": 5000,
+    "realtorCommissionSaved": null,
     "area": 55,
     "floor": 9,
     "totalFloors": 16,
@@ -4820,7 +5272,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Деснянський"
+    "cleanAddress": "Деснянський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 115,
@@ -4830,7 +5286,7 @@
     "metro": "Метро Лівобережна",
     "walkMin": 7,
     "price": 11000,
-    "realtorCommissionSaved": 5500,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 2,
     "totalFloors": 9,
@@ -4863,7 +5319,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 116,
@@ -4873,7 +5333,7 @@
     "metro": "Метро Чернігівська",
     "walkMin": 8,
     "price": 8500,
-    "realtorCommissionSaved": 4250,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 5,
     "totalFloors": 16,
@@ -4906,7 +5366,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з DOM.RIA (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Деснянський"
+    "cleanAddress": "Деснянський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 117,
@@ -4916,7 +5380,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 3,
     "price": 10000,
-    "realtorCommissionSaved": 5000,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 4,
     "totalFloors": 16,
@@ -4949,7 +5413,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Шевченківський"
+    "cleanAddress": "Шевченківський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 118,
@@ -4959,7 +5427,7 @@
     "metro": "Метро Позняки",
     "walkMin": 11,
     "price": 13000,
-    "realtorCommissionSaved": 6500,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 8,
     "totalFloors": 14,
@@ -4992,7 +5460,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 119,
@@ -5002,7 +5474,7 @@
     "metro": "Метро Мінська",
     "walkMin": 5,
     "price": 23000,
-    "realtorCommissionSaved": 11500,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 7,
     "totalFloors": 9,
@@ -5035,7 +5507,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Оболонський"
+    "cleanAddress": "Оболонський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 120,
@@ -5045,7 +5521,7 @@
     "metro": "Метро Контрактова площа",
     "walkMin": 5,
     "price": 13500,
-    "realtorCommissionSaved": 6750,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 8,
     "totalFloors": 14,
@@ -5078,7 +5554,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Подільський"
+    "cleanAddress": "Подільський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 121,
@@ -5088,7 +5568,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 7,
     "price": 13000,
-    "realtorCommissionSaved": 6500,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 9,
     "totalFloors": 16,
@@ -5121,7 +5601,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 122,
@@ -5131,7 +5615,7 @@
     "metro": "Метро Позняки",
     "walkMin": 6,
     "price": 8500,
-    "realtorCommissionSaved": 4250,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 2,
     "totalFloors": 9,
@@ -5161,7 +5645,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 123,
@@ -5171,7 +5659,7 @@
     "metro": "Метро Мінська",
     "walkMin": 7,
     "price": 10600,
-    "realtorCommissionSaved": 5300,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 9,
     "totalFloors": 16,
@@ -5204,7 +5692,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Оболонський"
+    "cleanAddress": "Оболонський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 124,
@@ -5214,7 +5706,7 @@
     "metro": "Метро Лівобережна",
     "walkMin": 7,
     "price": 16000,
-    "realtorCommissionSaved": 8000,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 7,
     "totalFloors": 25,
@@ -5247,7 +5739,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 125,
@@ -5257,7 +5753,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 6,
     "price": 24000,
-    "realtorCommissionSaved": 12000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 3,
     "totalFloors": 9,
@@ -5290,7 +5786,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 126,
@@ -5300,7 +5800,7 @@
     "metro": "Метро Позняки",
     "walkMin": 6,
     "price": 15000,
-    "realtorCommissionSaved": 7500,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 6,
     "totalFloors": 14,
@@ -5333,7 +5833,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 127,
@@ -5343,7 +5847,7 @@
     "metro": "Метро Мінська",
     "walkMin": 4,
     "price": 20000,
-    "realtorCommissionSaved": 10000,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 7,
     "totalFloors": 9,
@@ -5376,7 +5880,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Оболонський"
+    "cleanAddress": "Оболонський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 128,
@@ -5386,7 +5894,7 @@
     "metro": "Метро Чернігівська",
     "walkMin": 10,
     "price": 12000,
-    "realtorCommissionSaved": 6000,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 4,
     "totalFloors": 25,
@@ -5419,7 +5927,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Деснянський"
+    "cleanAddress": "Деснянський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 129,
@@ -5429,7 +5941,7 @@
     "metro": "Метро Позняки",
     "walkMin": 11,
     "price": 9500,
-    "realtorCommissionSaved": 4750,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 3,
     "totalFloors": 25,
@@ -5462,7 +5974,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 130,
@@ -5472,7 +5988,7 @@
     "metro": "Метро Позняки",
     "walkMin": 10,
     "price": 14990,
-    "realtorCommissionSaved": 7495,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 2,
     "totalFloors": 9,
@@ -5505,7 +6021,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 131,
@@ -5515,7 +6035,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 6,
     "price": 23000,
-    "realtorCommissionSaved": 11500,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 5,
     "totalFloors": 25,
@@ -5548,7 +6068,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 132,
@@ -5558,7 +6082,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 8,
     "price": 20000,
-    "realtorCommissionSaved": 10000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 9,
     "totalFloors": 14,
@@ -5591,7 +6115,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Шевченківський"
+    "cleanAddress": "Шевченківський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 133,
@@ -5601,7 +6129,7 @@
     "metro": "Метро Печерська",
     "walkMin": 4,
     "price": 18000,
-    "realtorCommissionSaved": 9000,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 8,
     "totalFloors": 25,
@@ -5634,7 +6162,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Печерський"
+    "cleanAddress": "Печерський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 134,
@@ -5644,7 +6176,7 @@
     "metro": "Метро Лівобережна",
     "walkMin": 4,
     "price": 9000,
-    "realtorCommissionSaved": 4500,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 4,
     "totalFloors": 14,
@@ -5677,7 +6209,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 135,
@@ -5687,7 +6223,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 4,
     "price": 25000,
-    "realtorCommissionSaved": 12500,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 3,
     "totalFloors": 9,
@@ -5720,7 +6256,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Шевченківський"
+    "cleanAddress": "Шевченківський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 136,
@@ -5730,7 +6270,7 @@
     "metro": "Метро Печерська",
     "walkMin": 2,
     "price": 19000,
-    "realtorCommissionSaved": 9500,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 9,
     "totalFloors": 25,
@@ -5763,7 +6303,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Печерський"
+    "cleanAddress": "Печерський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 137,
@@ -5773,7 +6317,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 8,
     "price": 23000,
-    "realtorCommissionSaved": 11500,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 5,
     "totalFloors": 9,
@@ -5806,7 +6350,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 138,
@@ -5816,7 +6364,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 5,
     "price": 21000,
-    "realtorCommissionSaved": 10500,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 3,
     "totalFloors": 9,
@@ -5849,7 +6397,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 139,
@@ -5859,7 +6411,7 @@
     "metro": "Метро Лівобережна",
     "walkMin": 9,
     "price": 9000,
-    "realtorCommissionSaved": 4500,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 2,
     "totalFloors": 16,
@@ -5892,7 +6444,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дніпровський"
+    "cleanAddress": "Дніпровський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 140,
@@ -5902,7 +6458,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 4,
     "price": 40000,
-    "realtorCommissionSaved": 20000,
+    "realtorCommissionSaved": null,
     "area": 72,
     "floor": 8,
     "totalFloors": 25,
@@ -5935,7 +6491,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 141,
@@ -5945,7 +6505,7 @@
     "metro": "Метро Деміївська",
     "walkMin": 9,
     "price": 18190,
-    "realtorCommissionSaved": 9095,
+    "realtorCommissionSaved": null,
     "area": 38,
     "floor": 4,
     "totalFloors": 14,
@@ -5978,7 +6538,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Голосіївський"
+    "cleanAddress": "Голосіївський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 142,
@@ -5988,7 +6552,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 8,
     "price": 11500,
-    "realtorCommissionSaved": 5750,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 4,
     "totalFloors": 14,
@@ -6020,7 +6584,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 143,
@@ -6030,7 +6598,7 @@
     "metro": "Метро Печерська",
     "walkMin": 3,
     "price": 17500,
-    "realtorCommissionSaved": 8750,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 7,
     "totalFloors": 9,
@@ -6061,7 +6629,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Печерський"
+    "cleanAddress": "Печерський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 144,
@@ -6071,7 +6643,7 @@
     "metro": "Метро Мінська",
     "walkMin": 6,
     "price": 13000,
-    "realtorCommissionSaved": 6500,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 6,
     "totalFloors": 14,
@@ -6104,7 +6676,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Оболонський"
+    "cleanAddress": "Оболонський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 145,
@@ -6114,7 +6690,7 @@
     "metro": "Метро Позняки",
     "walkMin": 8,
     "price": 12500,
-    "realtorCommissionSaved": 6250,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 4,
     "totalFloors": 25,
@@ -6144,7 +6720,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 146,
@@ -6154,7 +6734,7 @@
     "metro": "Метро Позняки",
     "walkMin": 9,
     "price": 10000,
-    "realtorCommissionSaved": 5000,
+    "realtorCommissionSaved": null,
     "area": 44,
     "floor": 4,
     "totalFloors": 14,
@@ -6185,7 +6765,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 147,
@@ -6195,7 +6779,7 @@
     "metro": "Метро Лук'янівська",
     "walkMin": 5,
     "price": 14000,
-    "realtorCommissionSaved": 7000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 5,
     "totalFloors": 25,
@@ -6228,7 +6812,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Шевченківський"
+    "cleanAddress": "Шевченківський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 148,
@@ -6238,7 +6826,7 @@
     "metro": "Метро Позняки",
     "walkMin": 6,
     "price": 18000,
-    "realtorCommissionSaved": 9000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 5,
     "totalFloors": 14,
@@ -6269,7 +6857,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 149,
@@ -6279,7 +6871,7 @@
     "metro": "Метро Вокзальна",
     "walkMin": 10,
     "price": 16500,
-    "realtorCommissionSaved": 8250,
+    "realtorCommissionSaved": null,
     "area": 52,
     "floor": 4,
     "totalFloors": 9,
@@ -6312,7 +6904,11 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Солом'янський"
+    "cleanAddress": "Солом'янський",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   },
   {
     "id": 150,
@@ -6322,7 +6918,7 @@
     "metro": "Метро Позняки",
     "walkMin": 7,
     "price": 14000,
-    "realtorCommissionSaved": 7000,
+    "realtorCommissionSaved": null,
     "area": 60,
     "floor": 2,
     "totalFloors": 25,
@@ -6352,6 +6948,10 @@
     "status": "Опубліковано",
     "verifiedAt": "Імпортовано з OLX (16.11.2026)",
     "isOwnerVerified": false,
-    "cleanAddress": "Дарницький"
+    "cleanAddress": "Дарницький",
+    "verificationStatus": "imported",
+    "statusLabel": "Імпортовано",
+    "contactVerified": false,
+    "actualityConfirmed": false
   }
 ]

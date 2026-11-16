@@ -24,8 +24,8 @@ import hmac
 import hashlib
 import json
 import time
+import logging
 import urllib.parse
-from collections import defaultdict
 from typing import Optional, List, Dict, Any
 
 import sqlite3
@@ -33,6 +33,21 @@ import aiohttp
 from fastapi import FastAPI, Request, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+
+# Configure structured logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] [kyiv_radar_api] %(message)s'
+)
+logger = logging.getLogger("kyiv_radar_api")
+
+# In-memory metrics for health monitoring
+API_METRICS = {
+    "requests_total": 0,
+    "telegram_errors": 0,
+    "db_errors": 0,
+    "last_error": None
+}
 
 # Load environment configuration from .env if present
 def _load_env_file(filepath: str = "/opt/agent-bot/.env"):
@@ -54,15 +69,15 @@ DB_PATH = os.getenv("KYIV_RADAR_DB_PATH", "/opt/resell-radar-ukraine/data/rent_d
 DEALS_JSON_PATH = os.getenv("KYIV_RADAR_DEALS_PATH", "/opt/kyiv-radar-tma/data/deals.json")
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID", "8531839081"))
 
-# MANDATORY SECURITY CHECK: BOT_TOKEN MUST BE SUPPLIED IN ENVIRONMENT
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+# MANDATORY SECURITY CHECK: BOT_TOKEN or TELEGRAM_BOT_TOKEN MUST BE SUPPLIED IN ENVIRONMENT
+BOT_TOKEN = os.getenv("BOT_TOKEN") or os.getenv("TELEGRAM_BOT_TOKEN")
 if not BOT_TOKEN and APP_ENV != "test":
-    raise RuntimeError("CRITICAL SECURITY ERROR: BOT_TOKEN environment variable is not configured!")
+    raise RuntimeError("CRITICAL SECURITY ERROR: BOT_TOKEN (or TELEGRAM_BOT_TOKEN) environment variable is not configured!")
 
 app = FastAPI(
     title="Kyiv Radar Production API",
     description="Secure Production HTTPS Backend for Kyiv Radar Rent Aggregator",
-    version="1.3.0"
+    version="1.3.1"
 )
 
 # STRICT CORS CONFIGURATION: Wildcard '*' is strictly forbidden
@@ -84,31 +99,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Shared SQLite Rate Limiter (consistent across multiple Uvicorn workers)
-RATE_LIMITS = defaultdict(list)
-
+# Shared SQLite Rate Limiter (consistent across multiple Uvicorn workers, zero in-memory desync)
 def check_rate_limit(key: str, max_requests: int, window_seconds: int) -> bool:
     now = time.time()
     cutoff = now - window_seconds
     try:
-        conn = sqlite3.connect(DB_PATH, timeout=5)
-        cur = conn.cursor()
-        cur.execute("DELETE FROM rate_limits WHERE key = ? AND timestamp < ?", (key, cutoff))
-        cur.execute("SELECT COUNT(*) FROM rate_limits WHERE key = ? AND timestamp >= ?", (key, cutoff))
-        count = cur.fetchone()[0]
-        if count >= max_requests:
-            conn.close()
-            return False
-        cur.execute("INSERT INTO rate_limits (key, timestamp) VALUES (?, ?)", (key, now))
-        conn.commit()
-        conn.close()
-        return True
-    except Exception as e:
-        RATE_LIMITS[key] = [t for t in RATE_LIMITS[key] if now - t < window_seconds]
-        if len(RATE_LIMITS[key]) >= max_requests:
-            return False
-        RATE_LIMITS[key].append(now)
-        return True
+        with sqlite3.connect(DB_PATH, timeout=10.0) as conn:
+            cur = conn.cursor()
+            cur.execute("DELETE FROM rate_limits WHERE key = ? AND timestamp < ?", (key, cutoff))
+            cur.execute("SELECT COUNT(*) FROM rate_limits WHERE key = ? AND timestamp >= ?", (key, cutoff))
+            count = cur.fetchone()[0]
+            if count >= max_requests:
+                return False
+            cur.execute("INSERT INTO rate_limits (key, timestamp) VALUES (?, ?)", (key, now))
+            conn.commit()
+            return True
+    except sqlite3.Error as e:
+        logger.error(f"Rate limiter database error for key '{key}': {e}")
+        API_METRICS["db_errors"] += 1
+        API_METRICS["last_error"] = f"DB Rate Limit Error: {str(e)}"
+        # Safe fail-closed: reject requests rather than unmetered bypass across workers
+        return False
 
 # Telegram initData Cryptographic Signature & Expiry Validation
 def validate_telegram_init_data(init_data: str, max_age_seconds: int = 86400) -> Optional[dict]:
@@ -160,8 +171,10 @@ def validate_telegram_init_data(init_data: str, max_age_seconds: int = 86400) ->
 def init_db():
     if not os.path.exists(os.path.dirname(DB_PATH)):
         os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=10.0)
     cur = conn.cursor()
+    cur.execute("PRAGMA journal_mode=WAL;")
+    cur.execute("PRAGMA busy_timeout=5000;")
     cur.execute("""
         CREATE TABLE IF NOT EXISTS complaints (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -202,11 +215,12 @@ if APP_ENV != "test":
     try:
         init_db()
     except Exception as e:
-        print(f"init_db notice: {e}")
+        logger.error(f"init_db notice: {e}")
 
 # Telegram Bot Message Dispatcher
 async def send_telegram_alert(text: str, reply_markup: Optional[dict] = None, target_chat: int = ADMIN_CHAT_ID) -> bool:
     if not BOT_TOKEN:
+        logger.warning("Telegram alert skipped: BOT_TOKEN is empty.")
         return False
     api_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     payload = {
@@ -224,10 +238,14 @@ async def send_telegram_alert(text: str, reply_markup: Optional[dict] = None, ta
                     return bool(data.get("ok"))
                 else:
                     err_txt = await resp.text()
-                    print(f"Telegram alert error ({resp.status}): {err_txt}")
+                    logger.warning(f"Telegram alert error (status {resp.status}) to chat {target_chat}: {err_txt}")
+                    API_METRICS["telegram_errors"] += 1
+                    API_METRICS["last_error"] = f"Telegram status {resp.status}: {err_txt[:100]}"
                     return False
     except Exception as e:
-        print(f"Failed to dispatch Telegram message: {e}")
+        logger.error(f"Failed to dispatch Telegram message to chat {target_chat}: {e}")
+        API_METRICS["telegram_errors"] += 1
+        API_METRICS["last_error"] = f"Telegram exception: {str(e)}"
         return False
 
 # Helper: Load trusted catalog
@@ -237,7 +255,8 @@ def load_trusted_deals() -> List[Dict[str, Any]]:
             with open(DEALS_JSON_PATH, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception as e:
-            print(f"Error loading deals.json: {e}")
+            logger.error(f"Error loading deals.json: {e}")
+            API_METRICS["db_errors"] += 1
     return []
 
 # Pydantic Schemas
@@ -271,8 +290,10 @@ async def health():
         "status": "healthy",
         "service": "kyiv-radar-api",
         "env": APP_ENV,
-        "version": "1.3.0",
+        "version": "1.3.1",
         "deals_count": len(deals),
+        "bot_token_configured": bool(BOT_TOKEN),
+        "metrics": API_METRICS,
         "timestamp": int(time.time())
     }
 
