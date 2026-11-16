@@ -165,7 +165,8 @@ def test_photo_upload_rejects_too_many(privacy_test_env):
         ("photos", (f"photo_{i}.jpg", io.BytesIO(jpeg_bytes), "image/jpeg"))
         for i in range(11)
     ]
-    resp = client.post("/api/landlords/upload_photos", files=files)
+    auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=123456)
+    resp = client.post("/api/landlords/upload_photos", data={"initData": auth}, files=files)
     assert resp.status_code == 400
     assert "1 до 10 фотографій" in resp.json()["detail"]
 
