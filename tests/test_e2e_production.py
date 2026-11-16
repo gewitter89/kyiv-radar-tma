@@ -233,24 +233,70 @@ async def test_frontend_ui():
         assert len(page_errors) == 0, f"Uncaught page errors detected: {page_errors}"
         print("✓ PASS: 0 JavaScript/Leaflet errors with null coordinates & empty image galleries")
 
-        # 6. Test Live Published GitHub Pages WebApp
+        # 6. Test Live Published GitHub Pages WebApp (Strict Requirement - NO try/except catch)
         print("Testing live published GitHub Pages WebApp (https://gewitter89.github.io/kyiv-radar-tma/)...")
         live_errors = []
         page_live = await browser.new_page(viewport={"width": 390, "height": 844})
         page_live.on("pageerror", lambda err: live_errors.append(str(err)))
-        try:
-            await page_live.goto("https://gewitter89.github.io/kyiv-radar-tma/", timeout=15000)
-            await page_live.wait_for_timeout(1000)
-            live_title = await page_live.title()
-            assert live_title == "Київ Радар", f"Live title error: {live_title}"
-            assert len(live_errors) == 0, f"Live GitHub Pages JS errors: {live_errors}"
-            print(f"✓ PASS: Live GitHub Pages WebApp loaded cleanly with 0 JS errors (title: '{live_title}')")
-        except Exception as e:
-            print(f"Notice on live GitHub Pages navigation: {e}")
-        finally:
-            await page_live.close()
+
+        await page_live.goto("https://gewitter89.github.io/kyiv-radar-tma/", timeout=20000)
+        await page_live.wait_for_timeout(1500)
+        live_title = await page_live.title()
+        assert live_title == "Київ Радар", f"Live title error: expected 'Київ Радар', got '{live_title}'"
+        assert len(live_errors) == 0, f"Live GitHub Pages JS errors detected: {live_errors}"
+
+        # Verify live cards rendered
+        live_cards_count = await page_live.locator(".carousel-card").count()
+        assert live_cards_count > 0, "Live GitHub Pages should render carousel cards"
+
+        # Verify live modal opens and does NOT contain fake 0% commission claims
+        await page_live.locator(".carousel-card").first.click()
+        await page_live.wait_for_timeout(600)
+        assert await page_live.is_visible("#dealModal")
+        live_modal_text = await page_live.inner_text("#dealModal")
+        assert "Економія на рієлторі: 9 500 ₴" not in live_modal_text, "Hardcoded fake savings found in live modal!"
+        await page_live.click("#dealModal button[onclick='closeDealModal()']")
+        await page_live.close()
+
+        print(f"✓ PASS: Live GitHub Pages WebApp strictly verified (cards: {live_cards_count}, 0 errors)")
 
         await browser.close()
+
+def test_production_user_journeys():
+    print("\n--- [7/7] Testing Production User Journeys (Submit, Report, Contact) ---")
+    
+    # Scenario 1: Landlord Submits Apartment
+    sub_payload = {
+        "address": "вул. Володимирська, 50, Київ",
+        "price": "28000",
+        "rooms": 2,
+        "phone": "+380671234599",
+        "gpon": True,
+        "generator": False
+    }
+    status_sub, res_sub, _ = http_post("/api/landlords/submit", data=sub_payload)
+    assert status_sub == 200, f"Landlord submission failed: {status_sub} - {res_sub}"
+    assert res_sub.get("success") is True, f"Expected success=True, got {res_sub}"
+    sub_id = res_sub.get("id")
+    assert sub_id and sub_id > 0, f"Expected valid sub_id, got {sub_id}"
+    print(f"✓ PASS: Scenario 1 - Landlord successfully submitted apartment (ID #{sub_id})")
+
+    # Scenario 2: User Files a Truthful Report / Complaint
+    rep_payload = {
+        "dealId": 1,
+        "reason": "Невірний статус або телефон",
+        "details": "Перевірка якості модерації Київ Радар"
+    }
+    status_rep, res_rep, _ = http_post("/api/reports", data=rep_payload)
+    assert status_rep == 200, f"Report submission failed: {status_rep} - {res_rep}"
+    assert res_rep.get("success") is True, f"Expected success=True, got {res_rep}"
+    print("✓ PASS: Scenario 2 - User report successfully submitted to moderation queue")
+
+    # Scenario 3: Tenant Contact Lookup Security
+    # Verifies deal existence and authorization enforcement
+    status_c, res_c, _ = http_post("/api/send_contact", data={"dealId": 1, "initData": ""})
+    assert status_c == 401, f"Expected 401 Unauthorized for unauthenticated contact request, got {status_c}"
+    print("✓ PASS: Scenario 3 - Tenant contact endpoint securely protects landlord data")
 
 def main():
     print("==================================================")
@@ -261,6 +307,7 @@ def main():
     test_staging_endpoints_closure()
     test_send_contact_crypto_security()
     test_catalog_integrity()
+    test_production_user_journeys()
     asyncio.run(test_frontend_ui())
     print("\n==================================================")
     print("ALL PRODUCTION SECURITY AUDIT CHECKS PASSED (100% GREEN)!")

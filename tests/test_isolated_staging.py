@@ -105,9 +105,25 @@ class TestModerationPipelineIsolated(unittest.TestCase):
 
         # 5. Strict assertions: Truthful verification flags
         self.assertFalse(deal["isOwnerVerified"], "isOwnerVerified MUST be False without title deed audit!")
-        self.assertTrue(deal["contactVerified"], "contactVerified is True upon moderator review!")
-        self.assertEqual(deal["verificationStatus"], "contact_verified")
+        self.assertFalse(deal["contactVerified"], "contactVerified MUST be False upon initial approval!")
+        self.assertEqual(deal["verificationStatus"], "published_unverified")
         self.assertEqual(deal["moderationStatus"], "approved")
+
+        # 5b. Separate Contact Verification Action
+        from server.bot_moderation import process_contact_verification
+        res_cv = process_contact_verification(
+            sub_id=sub_id,
+            caller_id=self.admin_id,
+            admin_id=self.admin_id,
+            db_path=self.db_path,
+            deals_path=self.deals_path,
+            method="phone"
+        )
+        self.assertTrue(res_cv["success"], "Explicit contact verification must succeed")
+        with open(self.deals_path, "r", encoding="utf-8") as f:
+            cat_after_cv = json.load(f)
+        self.assertTrue(cat_after_cv[0]["contactVerified"], "contactVerified must be True after verification!")
+        self.assertEqual(cat_after_cv[0]["verificationStatus"], "contact_verified")
 
         # 6. Verify database record updated in SQLite
         conn = sqlite3.connect(self.db_path)

@@ -208,6 +208,18 @@ def init_db():
         )
     """)
     cur.execute("CREATE INDEX IF NOT EXISTS idx_rate_limits_key_time ON rate_limits(key, timestamp)")
+
+    # Ensure verification metadata columns exist in landlord_submissions
+    for col_def in [
+        ("contact_verified", "INTEGER DEFAULT 0"),
+        ("verified_at", "TEXT"),
+        ("verification_method", "TEXT")
+    ]:
+        try:
+            cur.execute(f"ALTER TABLE landlord_submissions ADD COLUMN {col_def[0]} {col_def[1]}")
+        except sqlite3.OperationalError:
+            pass # already exists
+
     conn.commit()
     conn.close()
 
@@ -421,7 +433,7 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
     admin_kb = {
         "inline_keyboard": [
             [
-                {"text": "✅ Схвалити в базу (0%)", "callback_data": f"ll_approve_{sub_id}"},
+                {"text": "✅ Опублікувати в каталог", "callback_data": f"ll_approve_{sub_id}"},
                 {"text": "❌ Відхилити", "callback_data": f"ll_reject_{sub_id}"}
             ]
         ]

@@ -42,9 +42,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 2,
@@ -87,9 +89,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 3,
@@ -133,9 +137,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 4,
@@ -176,9 +182,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Печерський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 5,
@@ -223,9 +231,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 6,
@@ -270,9 +280,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 7,
@@ -317,9 +329,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 8,
@@ -364,9 +378,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 9,
@@ -411,9 +427,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 10,
@@ -458,9 +476,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 11,
@@ -505,9 +525,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 12,
@@ -552,9 +574,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 13,
@@ -598,9 +622,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 14,
@@ -644,9 +670,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 15,
@@ -689,9 +717,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 16,
@@ -736,9 +766,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Деснянський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 17,
@@ -783,9 +815,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 18,
@@ -830,9 +864,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 19,
@@ -877,9 +913,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Святошинський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 20,
@@ -924,9 +962,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Подільський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 21,
@@ -971,9 +1011,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 22,
@@ -1018,9 +1060,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 23,
@@ -1065,9 +1109,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Печерський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 24,
@@ -1112,9 +1158,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "23 000 грнДодати в обраневул. Кирило",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 25,
@@ -1157,9 +1205,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 26,
@@ -1204,9 +1254,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Шевченківський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 27,
@@ -1249,9 +1301,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "11 000 грнДодати в обраневул. 191",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 28,
@@ -1292,9 +1346,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 29,
@@ -1339,9 +1395,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "17 000 грнДодати в обраневул. Ахматової Анни, 13Позняки·Позняки·Дарницький·Київ1 кімната65 м²21 поверх з 29Оренда 1",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 30,
@@ -1386,9 +1444,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "13 000 грнДодати в обраневул. Андрія Малишка, 21АЧернігівська·Північно",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 31,
@@ -1431,9 +1491,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "23 000 грнДодати в обранебул. Вацлава Гавела, 6/7АБерестейська·Шулявка·Солом'янський·Київ·ЖК L",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 32,
@@ -1474,9 +1536,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 33,
@@ -1516,9 +1580,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Шевченківський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 34,
@@ -1558,9 +1624,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 35,
@@ -1605,9 +1673,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 36,
@@ -1652,9 +1722,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Печерський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 37,
@@ -1699,9 +1771,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 38,
@@ -1746,9 +1820,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Печерський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 39,
@@ -1793,9 +1869,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 40,
@@ -1839,9 +1917,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Святошинський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 41,
@@ -1886,9 +1966,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 42,
@@ -1933,9 +2015,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Шевченківський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 43,
@@ -1980,9 +2064,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Подільський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 44,
@@ -2027,9 +2113,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Святошинський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 45,
@@ -2074,9 +2162,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Шевченківський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 46,
@@ -2121,9 +2211,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Шевченківський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 47,
@@ -2163,9 +2255,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Печерський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 48,
@@ -2210,9 +2304,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "36 760 грнДодати в обраневул. Степана Рудницького(Академіка Вільямса), 19/14Іподром·Теремки",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 49,
@@ -2257,9 +2353,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 50,
@@ -2304,9 +2402,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Подільський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 51,
@@ -2351,9 +2451,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 52,
@@ -2398,9 +2500,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 53,
@@ -2445,9 +2549,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 54,
@@ -2492,9 +2598,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Шевченківський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 55,
@@ -2539,9 +2647,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 56,
@@ -2586,9 +2696,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Подільський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 57,
@@ -2631,9 +2743,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Печерський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 58,
@@ -2678,9 +2792,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Святошинський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 59,
@@ -2725,9 +2841,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Шевченківський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 60,
@@ -2770,9 +2888,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Святошинський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 61,
@@ -2817,9 +2937,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Шевченківський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 62,
@@ -2864,9 +2986,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Святошинський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 63,
@@ -2911,9 +3035,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "23 990 грнДодати в обраневул. Набережно",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 64,
@@ -2958,9 +3084,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 65,
@@ -3005,9 +3133,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Подільський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 66,
@@ -3052,9 +3182,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 67,
@@ -3099,9 +3231,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 68,
@@ -3146,9 +3280,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 69,
@@ -3189,9 +3325,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 70,
@@ -3236,9 +3374,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 71,
@@ -3281,9 +3421,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Святошинський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 72,
@@ -3328,9 +3470,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 73,
@@ -3370,9 +3514,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 74,
@@ -3417,9 +3563,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 75,
@@ -3464,9 +3612,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Печерський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 76,
@@ -3511,9 +3661,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 77,
@@ -3558,9 +3710,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Оболонський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 78,
@@ -3605,9 +3759,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 79,
@@ -3652,9 +3808,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 80,
@@ -3699,9 +3857,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Шевченківський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 81,
@@ -3746,9 +3906,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 82,
@@ -3793,9 +3955,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "25 000 грнДодати в обранепросп. Берестейський(Перемоги)Нивки·ЖК Нивки",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 83,
@@ -3838,9 +4002,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 84,
@@ -3885,9 +4051,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 85,
@@ -3932,9 +4100,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 86,
@@ -3979,9 +4149,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 87,
@@ -4026,9 +4198,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 88,
@@ -4073,9 +4247,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 89,
@@ -4120,9 +4296,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 90,
@@ -4165,9 +4343,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 91,
@@ -4212,9 +4392,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 92,
@@ -4259,9 +4441,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 93,
@@ -4306,9 +4490,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 94,
@@ -4353,9 +4539,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Шевченківський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 95,
@@ -4400,9 +4588,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 96,
@@ -4445,9 +4635,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Деснянський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 97,
@@ -4492,9 +4684,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Святошинський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 98,
@@ -4539,9 +4733,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 99,
@@ -4582,9 +4778,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 100,
@@ -4629,9 +4827,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Печерський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 101,
@@ -4676,9 +4876,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Подільський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 102,
@@ -4723,9 +4925,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 103,
@@ -4770,9 +4974,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 104,
@@ -4817,9 +5023,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Деснянський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 105,
@@ -4864,9 +5072,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 106,
@@ -4911,9 +5121,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 107,
@@ -4958,9 +5170,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 108,
@@ -5005,9 +5219,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Оболонський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 109,
@@ -5047,9 +5263,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Подільський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 110,
@@ -5093,9 +5311,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Подільський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 111,
@@ -5137,9 +5357,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Святошинський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 112,
@@ -5180,9 +5402,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Печерський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 113,
@@ -5227,9 +5451,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 114,
@@ -5274,9 +5500,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Деснянський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 115,
@@ -5321,9 +5549,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 116,
@@ -5368,9 +5598,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Деснянський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 117,
@@ -5415,9 +5647,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Шевченківський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 118,
@@ -5462,9 +5696,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 119,
@@ -5509,9 +5745,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Оболонський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 120,
@@ -5556,9 +5794,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Подільський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 121,
@@ -5603,9 +5843,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 122,
@@ -5647,9 +5889,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 123,
@@ -5694,9 +5938,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Оболонський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 124,
@@ -5741,9 +5987,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 125,
@@ -5788,9 +6036,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 126,
@@ -5835,9 +6085,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 127,
@@ -5882,9 +6134,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Оболонський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 128,
@@ -5929,9 +6183,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Деснянський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 129,
@@ -5976,9 +6232,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 130,
@@ -6023,9 +6281,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 131,
@@ -6070,9 +6330,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 132,
@@ -6117,9 +6379,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Шевченківський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 133,
@@ -6164,9 +6428,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Печерський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 134,
@@ -6211,9 +6477,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 135,
@@ -6258,9 +6526,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Шевченківський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 136,
@@ -6305,9 +6575,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Печерський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 137,
@@ -6352,9 +6624,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 138,
@@ -6399,9 +6673,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 139,
@@ -6446,9 +6722,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дніпровський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 140,
@@ -6493,9 +6771,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 141,
@@ -6540,9 +6820,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Голосіївський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 142,
@@ -6586,9 +6868,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 143,
@@ -6631,9 +6915,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Печерський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 144,
@@ -6678,9 +6964,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Оболонський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 145,
@@ -6722,9 +7010,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 146,
@@ -6767,9 +7057,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 147,
@@ -6814,9 +7106,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Шевченківський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 148,
@@ -6859,9 +7153,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 149,
@@ -6906,9 +7202,11 @@
     "isOwnerVerified": false,
     "cleanAddress": "Солом'янський",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   },
   {
     "id": 150,
@@ -6950,8 +7248,10 @@
     "isOwnerVerified": false,
     "cleanAddress": "Дарницький",
     "verificationStatus": "imported",
-    "statusLabel": "Імпортовано",
+    "statusLabel": "Імпортовано з відкритих джерел",
     "contactVerified": false,
-    "actualityConfirmed": false
+    "actualityConfirmed": false,
+    "commissionVerified": false,
+    "commissionNote": "Комісія уточнюється"
   }
 ]
