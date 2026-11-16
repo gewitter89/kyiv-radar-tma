@@ -454,7 +454,7 @@
          DEAL DETAIL MODAL (Apple iOS Native Bottom Sheet)
     ========================================== -->
     <div id="dealModal" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity duration-200">
-        <div class="bg-[#1c1c1e] border border-white/[0.08] w-full sm:max-w-md rounded-t-[28px] sm:rounded-[28px] max-h-[92vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in">
+        <div class="bg-[#1c1c1e] border border-white/[0.08] w-full sm:max-w-lg lg:max-w-xl rounded-t-[28px] sm:rounded-[28px] max-h-[92vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in">
             <!-- iOS Grabber Handle -->
             <div class="w-9 h-1 rounded-full bg-white/25 mx-auto mt-2.5 mb-1 shrink-0"></div>
 
@@ -472,14 +472,14 @@
             <!-- Modal Content (Scrollable Inset Grouped layout) -->
             <div class="p-3.5 overflow-y-auto space-y-3 custom-scroll text-xs">
                 <!-- Apartment photo gallery -->
-                <div class="relative h-60 sm:h-64 rounded-[22px] overflow-hidden bg-black select-none group" id="modalPhotoContainer" role="region" aria-label="Фотографії квартири">
+                <div class="relative h-60 sm:h-80 rounded-[22px] overflow-hidden bg-black select-none group" id="modalPhotoContainer" role="region" aria-label="Фотографії квартири">
                     <img id="modalImage" src="" alt="Фото квартири" draggable="false" class="w-full h-full object-cover transition-opacity duration-200">
                     
                     <!-- Desktop controls; touch devices use horizontal swipe. -->
-                    <button id="modalPhotoPrev" type="button" aria-label="Попереднє фото" onclick="switchModalPhoto(-1)" class="photo-desktop-arrow absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white/90 flex items-center justify-center transition-all active:scale-90" title="Попередня">
+                    <button id="modalPhotoPrev" type="button" aria-label="Попереднє фото" onclick="switchModalPhoto(-1)" class="photo-desktop-arrow absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white/90 flex items-center justify-center transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80" title="Попередня">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
                     </button>
-                    <button id="modalPhotoNext" type="button" aria-label="Наступне фото" onclick="switchModalPhoto(1)" class="photo-desktop-arrow absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white/90 flex items-center justify-center transition-all active:scale-90" title="Наступна">
+                    <button id="modalPhotoNext" type="button" aria-label="Наступне фото" onclick="switchModalPhoto(1)" class="photo-desktop-arrow absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white/90 flex items-center justify-center transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80" title="Наступна">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
                     </button>
 
