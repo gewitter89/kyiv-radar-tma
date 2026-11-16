@@ -212,12 +212,12 @@
         /* Carousel Horizontal Track */
         #carousel-track {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
-            padding: 0 12px 10px 12px;
+            padding: 10px 14px 16px 14px;
         }
         #carousel-track::-webkit-scrollbar {
             display: none;
@@ -251,9 +251,10 @@
             transform: translateY(-2px);
         }
         .carousel-card.active-deal {
-            border-color: #0a84ff;
-            background: #242426;
-            box-shadow: 0 4px 18px rgba(10, 132, 255, 0.25);
+            border-color: #0a84ff !important;
+            background: #222226 !important;
+            box-shadow: 0 0 22px rgba(10, 132, 255, 0.45) !important;
+            transform: scale(1.02);
         }
 
         /* Desktop Carousel Navigation Arrows */
@@ -442,16 +443,29 @@
             <!-- Modal Content (Scrollable Inset Grouped layout) -->
             <div class="p-3.5 overflow-y-auto space-y-3 custom-scroll text-xs">
                 <!-- Gallery Image -->
-                <div class="relative h-56 rounded-2xl overflow-hidden bg-black border border-white/[0.06]">
-                    <img id="modalImage" src="" alt="Квартира" class="w-full h-full object-cover">
-                    <!-- Photo switchers -->
-                    <button onclick="switchModalPhoto(-1)" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/70 active:scale-95 transition-all">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                <!-- Apple Photos Style Gallery Viewer -->
+                <div class="relative h-60 sm:h-64 rounded-[22px] overflow-hidden bg-black select-none group" id="modalPhotoContainer">
+                    <img id="modalImage" src="" alt="Квартира" class="w-full h-full object-cover transition-opacity duration-200">
+                    
+                    <!-- Left / Right Tap Zones (40% each) -->
+                    <div onclick="switchModalPhoto(-1)" class="absolute inset-y-0 left-0 w-[40%] z-10 cursor-pointer" title="Попереднє фото"></div>
+                    <div onclick="switchModalPhoto(1)" class="absolute inset-y-0 right-0 w-[40%] z-10 cursor-pointer" title="Наступне фото"></div>
+
+                    <!-- Apple Discreet Edge Chevrons (Only shown when > 1 photo) -->
+                    <button id="modalPhotoPrev" onclick="switchModalPhoto(-1)" class="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white/90 flex items-center justify-center transition-all active:scale-90" title="Попередня">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
                     </button>
-                    <button onclick="switchModalPhoto(1)" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/70 active:scale-95 transition-all">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                    <button id="modalPhotoNext" onclick="switchModalPhoto(1)" class="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white/90 flex items-center justify-center transition-all active:scale-90" title="Наступна">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
                     </button>
-                    <div id="modalPhotoIndex" class="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] text-white/90 font-mono tracking-wider">1/3</div>
+
+                    <!-- Apple iOS Pagination Dots (Bottom Center) -->
+                    <div id="modalPhotoDots" class="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md pointer-events-none">
+                        <!-- Populated dynamically: active dot is elongated pill, inactive are dots -->
+                    </div>
+
+                    <!-- Counter Badge (Bottom Right) -->
+                    <div id="modalPhotoIndex" class="absolute bottom-2.5 right-2.5 z-20 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] text-white/90 font-mono tracking-wider">1/3</div>
                 </div>
 
                 <!-- Price & Savings Summary -->
@@ -1095,7 +1109,9 @@
             renderCarousel(items);
             updateFavCount();
 
-            // Do not force active-deal on initial load (clean state without forced blue ring)
+            if (items.length > 0 && !currentActiveId) {
+                focusDeal(items[0].id, false, false);
+            }
         }
 
         function renderMarkers(items) {
@@ -1378,58 +1394,58 @@
             const amount = selectedPayPlan === 'single' ? 99 : 299;
             const planTitle = selectedPayPlan === 'single' ? `1 контакт лоту #${deal.id}` : `Радар-Пас 7 днів`;
 
-            showToast("Обробка платежу...");
-
-            // Simulate / Execute payment success
-            if (selectedPayPlan === 'pass') {
-                HAS_RADAR_PASS = true;
-                localStorage.setItem('kr_has_radar_pass', '1');
-            } else {
-                UNLOCKED_DEALS.add(deal.id);
-                localStorage.setItem('kr_unlocked_deals', JSON.stringify([...UNLOCKED_DEALS]));
-            }
-
-            // Haptic & Sound
-            if (window.Telegram?.WebApp?.HapticFeedback) {
-                window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-            }
-
-            // Notify Admin Bot API
-            try {
-                const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-                const buyerInfo = tgUser ? `@${tgUser.username || ''} (${tgUser.first_name || ''} ID:${tgUser.id})` : "Анонімний користувач TMA";
-                const notifyText = `💰 <b>НОВА ОПЛАТА У КИЇВ РАДАР!</b>\n━━━━━━━━━━━━━━━━━━\n💳 <b>Тариф:</b> ${planTitle}\n💵 <b>Сума:</b> ${amount} ₴ (${method})\n🏢 <b>Лот:</b> #${deal.id} - ${deal.title}\n👤 <b>Покупець:</b> ${buyerInfo}\n📞 <b>Номер власника:</b> <code>${deal.phone}</code>`;
-
-                fetch("https://api.telegram.org/bot8976290222:AAF7LnHQ9FTEV3gI4Ap1F8Cz6ATsycbq22U/sendMessage", {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        chat_id: "8531839081",
-                        text: notifyText,
-                        parse_mode: 'HTML'
-                    })
-                });
-
-                // Also send contact directly to user chat if in Telegram
-                if (tgUser && tgUser.id) {
-                    const userMsg = `✅ <b>Оплату ${amount} ₴ успішно підтверджено!</b>\n\n🏢 <b>${deal.title}</b> (${deal.price.toLocaleString()} ₴/міс)\n📍 Адреса: ${deal.address}\n📞 <b>Прямий номер власника:</b> <code>${deal.phone}</code>\n👤 Власник: ${deal.ownerName || 'Прямий орендодавець'}`;
-                    fetch("https://api.telegram.org/bot8976290222:AAF7LnHQ9FTEV3gI4Ap1F8Cz6ATsycbq22U/sendMessage", {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            chat_id: tgUser.id,
-                            text: userMsg,
-                            parse_mode: 'HTML'
-                        })
-                    });
+            if (method === 'test_sim') {
+                // Developer test instant unlock (for testing without charging money)
+                showToast("⚡ Тестова оплата підтверджена розробником");
+                if (selectedPayPlan === 'pass') {
+                    HAS_RADAR_PASS = true;
+                    localStorage.setItem('kr_has_radar_pass', '1');
+                } else {
+                    UNLOCKED_DEALS.add(deal.id);
+                    localStorage.setItem('kr_unlocked_deals', JSON.stringify([...UNLOCKED_DEALS]));
                 }
-            } catch(e) {
-                console.log("Payment notification error:", e);
+
+                if (window.Telegram?.WebApp?.HapticFeedback) {
+                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                }
+
+                closePaywallModal();
+                updateModalUnlockView(deal);
+                showToast(`✓ Лот #${deal.id} розблоковано в тестовому режимі`);
+                return;
             }
 
-            closePaywallModal();
-            updateModalUnlockView(deal);
-            showToast(`✓ Успішно сплачено ${amount} ₴! Номер розблоковано`);
+            if (method === 'stars') {
+                // Real Telegram Stars flow: open bot with invoice
+                showToast("⭐️ Формування рахунку Telegram Stars...");
+                if (window.Telegram?.WebApp?.HapticFeedback) {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                }
+                const invoiceUrl = `https://t.me/prostov_shrink_bot?start=stars_${selectedPayPlan}_${deal.id}`;
+                if (window.Telegram?.WebApp?.openTelegramLink) {
+                    window.Telegram.WebApp.openTelegramLink(invoiceUrl);
+                } else {
+                    window.open(invoiceUrl, '_blank');
+                }
+                showToast("⭐️ Рахунок Stars відправлено у ваш бот-чат. Сплатіть для отримання контакту!");
+                return;
+            }
+
+            if (method === 'monobank') {
+                // Real Monobank acquiring / Apple Pay flow
+                showToast("💳 Відкриття шлюзу Monobank / Apple Pay...");
+                if (window.Telegram?.WebApp?.HapticFeedback) {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                }
+                const monoUrl = `https://send.monobank.ua/jar/8Z3Q9U6fU2?a=${amount}&text=KyivRadar_${deal.id}`;
+                if (window.Telegram?.WebApp?.openLink) {
+                    window.Telegram.WebApp.openLink(monoUrl);
+                } else {
+                    window.open(monoUrl, '_blank');
+                }
+                showToast("💳 Завершіть оплату в Monobank для відкриття номеру");
+                return;
+            }
         }
 
         // SEND CONTACT DIRECTLY TO TELEGRAM BOT CHAT
@@ -1672,7 +1688,32 @@
                 "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80"
             ];
             document.getElementById('modalImage').src = photos[currentModalPhotoIdx];
-            document.getElementById('modalPhotoIndex').innerText = `${currentModalPhotoIdx + 1}/${photos.length}`;
+            
+            const prevBtn = document.getElementById('modalPhotoPrev');
+            const nextBtn = document.getElementById('modalPhotoNext');
+            const dotsContainer = document.getElementById('modalPhotoDots');
+            const indexBadge = document.getElementById('modalPhotoIndex');
+
+            if (photos.length <= 1) {
+                if (prevBtn) prevBtn.classList.add('hidden');
+                if (nextBtn) nextBtn.classList.add('hidden');
+                if (dotsContainer) dotsContainer.classList.add('hidden');
+                if (indexBadge) indexBadge.classList.add('hidden');
+            } else {
+                if (prevBtn) prevBtn.classList.remove('hidden');
+                if (nextBtn) nextBtn.classList.remove('hidden');
+                if (indexBadge) {
+                    indexBadge.classList.remove('hidden');
+                    indexBadge.innerText = `${currentModalPhotoIdx + 1}/${photos.length}`;
+                }
+                if (dotsContainer) {
+                    dotsContainer.classList.remove('hidden');
+                    dotsContainer.innerHTML = photos.map((_, i) => {
+                        const isActive = i === currentModalPhotoIdx;
+                        return `<span class="${isActive ? 'w-3.5 h-1 bg-white' : 'w-1 h-1 bg-white/40'} rounded-full transition-all duration-300"></span>`;
+                    }).join('');
+                }
+            }
         }
 
         function switchModalPhoto(dir) {
@@ -1834,7 +1875,7 @@
 
                     <!-- Instant Simulation for Testing -->
                     <button onclick="executePayment('test_sim')" class="w-full py-1 text-[11px] text-[#8e8e93] hover:text-[#30d158] text-center transition-colors">
-                        ⚡ Тестова миттєва оплата (Симуляція 1 клік)
+                        ⚡ Тестова миттєва оплата (Для розробника)
                     </button>
                 </div>
 
