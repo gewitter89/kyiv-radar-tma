@@ -22,6 +22,7 @@ import json
 import logging
 import sqlite3
 import threading
+import re
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 
@@ -29,6 +30,8 @@ logger = logging.getLogger(__name__)
 
 # Concurrency lock to prevent simultaneous write race conditions on catalog
 _moderation_lock = threading.Lock()
+PHOTO_ID_PATTERN = re.compile(r"^[0-9a-f]{32}$")
+MEDIA_BASE_URL = os.getenv("KYIV_RADAR_PUBLIC_API_BASE", "https://vmi3445944.contaboserver.net").rstrip("/")
 
 def process_landlord_approval(
     sub_id: int,
@@ -111,6 +114,28 @@ def process_landlord_approval(
                     "error": f"Помилка читання каталогу {deals_path}: {e}"
                 }
 
+        # A submitted photo is an opaque registered ID, never a client-provided URL.
+        if len(photos_val) > 10 or any(
+            not isinstance(pid, str) or not PHOTO_ID_PATTERN.fullmatch(pid)
+            for pid in photos_val
+        ):
+            conn.close()
+            return {"success": False, "error": "Некоректні фото у заявці. Потрібна ручна перевірка."}
+        if photos_val:
+            try:
+                placeholders = ",".join("?" for _ in photos_val)
+                available = cur.execute(
+                    f"SELECT photo_id FROM landlord_uploads WHERE submission_id = ? "
+                    f"AND status = 'pending' AND photo_id IN ({placeholders})",
+                    (sub_id, *photos_val)
+                ).fetchall()
+                if len(available) != len(photos_val) or len(set(photos_val)) != len(photos_val):
+                    conn.close()
+                    return {"success": False, "error": "Не всі фото прив'язані до заявки."}
+            except sqlite3.Error:
+                conn.close()
+                return {"success": False, "error": "Неможливо перевірити право на фото."}
+
         deal_in_catalog = next((d for d in deals_list if d.get("submission_id") == sub_id), None)
 
         # Idempotency check: only if published in DB AND already present in catalog
@@ -155,7 +180,7 @@ def process_landlord_approval(
                 "ownerName": "Орендодавець",
                 "phone": None,  # PRIVACY: Raw phone stripped from public catalog
                 "phoneMasked": phone_val[:6] + "***" if len(phone_val) >= 6 else phone_val,
-                "images": photos_val if isinstance(photos_val, list) else [],
+                "images": [f"{MEDIA_BASE_URL}/api/media/{pid}" for pid in photos_val],
                 "desc": "Оголошення додано орендодавцем через Київ Радар.",
                 "source": "Київ Радар (Пряма заявка)",
                 "status": "Опубліковано",
@@ -209,6 +234,14 @@ def process_landlord_approval(
                 "INSERT OR REPLACE INTO private_deal_contacts (deal_id, phone, owner_name, phone_masked) VALUES (?, ?, ?, ?)",
                 (new_deal["id"], phone_val, "Орендодавець", masked_phone)
             )
+            if photos_val:
+                cur.execute(
+                    "UPDATE landlord_uploads SET status = 'approved' "
+                    "WHERE submission_id = ? AND status = 'pending'",
+                    (sub_id,)
+                )
+                if cur.rowcount != len(photos_val):
+                    raise sqlite3.IntegrityError("Не вдалося опублікувати всі фотографії")
             cur.execute(
                 "UPDATE landlord_submissions SET status = 'published', moderator_notes = ? WHERE id = ?",
                 (moderator_notes, sub_id)
