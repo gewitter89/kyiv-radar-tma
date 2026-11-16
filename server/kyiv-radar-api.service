@@ -1,0 +1,20 @@
+[Unit]
+Description=Kyiv Radar Production FastAPI Backend
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/agent-bot
+Environment="APP_ENV=production"
+Environment="KYIV_RADAR_DB_PATH=/opt/resell-radar-ukraine/data/rent_deals.db"
+Environment="KYIV_RADAR_DEALS_PATH=/opt/kyiv-radar-tma/data/deals.json"
+Environment="ADMIN_CHAT_ID=8531839081"
+EnvironmentFile=-/opt/agent-bot/.env
+ExecStart=/opt/agent-bot/venv/bin/uvicorn kyiv_radar_api:app --host 127.0.0.1 --port 8000 --workers 2
+Restart=always
+RestartSec=5
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

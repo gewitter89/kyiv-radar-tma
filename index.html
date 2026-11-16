@@ -966,22 +966,40 @@
             renderAll();
         }
 
-        // 3. LOAD DEALS (Direct high-speed instant load)
+        // 3. LOAD DEALS (High-speed load with live VPS API synchronization)
         async function loadDeals() {
             if (typeof KYIV_DEALS_INIT !== 'undefined' && Array.isArray(KYIV_DEALS_INIT)) {
                 LISTINGS = KYIV_DEALS_INIT;
             }
 
-            // Also check for newer async data if on web server
+            // Sync with live production HTTPS API so newly approved landlord deals appear immediately
             try {
-                const res = await fetch('data/deals.json?v=' + Date.now());
+                const res = await fetch('https://vmi3445944.contaboserver.net/api/deals?v=' + Date.now());
                 if (res.ok) {
                     const data = await res.json();
-                    if (Array.isArray(data) && data.length > 0) {
-                        LISTINGS = data;
+                    if (data && data.success && Array.isArray(data.deals) && data.deals.length > 0) {
+                        LISTINGS = data.deals;
+                    }
+                } else {
+                    const resJson = await fetch('data/deals.json?v=' + Date.now());
+                    if (resJson.ok) {
+                        const dataJson = await resJson.json();
+                        if (Array.isArray(dataJson) && dataJson.length > 0) {
+                            LISTINGS = dataJson;
+                        }
                     }
                 }
-            } catch (e) {}
+            } catch (e) {
+                try {
+                    const resJson = await fetch('data/deals.json?v=' + Date.now());
+                    if (resJson.ok) {
+                        const dataJson = await resJson.json();
+                        if (Array.isArray(dataJson) && dataJson.length > 0) {
+                            LISTINGS = dataJson;
+                        }
+                    }
+                } catch (err) {}
+            }
 
             document.getElementById('filterAll').innerText = `Всі (${LISTINGS.length})`;
             document.getElementById('activeListingsCount').innerText = `${LISTINGS.length} квартир від власників`;
@@ -1542,7 +1560,7 @@
 
             showToast("Надсилаємо контакт...");
 
-            // If in Telegram, send via real HTTPS backend to Telegram user chat
+            // If in Telegram, send via real HTTPS backend to Telegram user chat (server looks up trusted details)
             if (initData) {
                 try {
                     const res = await fetch("https://vmi3445944.contaboserver.net/api/send_contact", {
@@ -1550,10 +1568,6 @@
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             dealId: deal.id,
-                            title: deal.title,
-                            price: deal.price,
-                            phone: phone,
-                            address: deal.address,
                             initData: initData
                         })
                     });
