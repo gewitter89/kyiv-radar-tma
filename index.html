@@ -65,6 +65,29 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
+        :root {
+            color-scheme: dark;
+            --kr-bg: #080a0e;
+            --kr-surface: #1c1e24;
+            --kr-border: rgba(255,255,255,0.10);
+            --kr-text: #f5f7fb;
+            --kr-muted: #b2b7c3;
+            --kr-accent: #72b4ff;
+            --kr-success: #41d3a5;
+        }
+        button, input, select, textarea { font: inherit; }
+        button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 2px solid var(--kr-accent);
+            outline-offset: 3px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
         * {
             -webkit-tap-highlight-color: transparent;
             box-sizing: border-box;
@@ -592,7 +615,7 @@
                 <!-- Protected Masked Direct Contact Info -->
                 <div class="p-3 rounded-2xl bg-[#2c2c2e]/70 border border-white/[0.06] flex items-center justify-between">
                     <div>
-                        <div class="text-[11px] font-semibold text-[#8e8e93] uppercase tracking-wider">Прямий контакт орендодавця</div>
+                        <div class="text-[11px] font-semibold text-[#8e8e93] uppercase tracking-wider">Контакт з оголошення</div>
                         <div id="modalMaskedPhone" class="text-white font-medium text-xs font-mono mt-0.5">+38 (0••) •••-••-••</div>
                     </div>
                     <span class="px-2 py-0.5 rounded-full bg-[#0a84ff]/15 text-[#0a84ff] text-[10px] font-semibold">Захищено від спаму</span>
@@ -601,9 +624,9 @@
 
             <!-- Modal Action Buttons (Apple Action Bar) -->
             <div class="p-3 border-t border-white/[0.08] bg-[#1c1c1e]/95 backdrop-blur-2xl flex items-center gap-2 shrink-0">
-                <button id="modalCallBtn" onclick="handleCallClick(event)" class="flex-1 h-12 px-4 rounded-full bg-[#30d158] hover:bg-[#30d158]/90 text-black font-bold text-[13px] flex items-center justify-center gap-2 transition-all shadow-lg active:scale-98">
+                <button id="modalCallBtn" onclick="handleCallClick(event)" class="flex-1 h-12 px-4 rounded-full bg-[#30d158] hover:bg-[#30d158]/90 text-black font-bold text-[14px] flex items-center justify-center gap-2 transition-all shadow-lg active:scale-98">
                     <svg class="w-4 h-4 shrink-0 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
-                    <span>Зателефонувати</span>
+                    <span id="modalCallLabel">Отримати контакт</span>
                 </button>
                 <button id="modalTgBtn" onclick="handleTgClick(event)" class="hidden h-12 px-4 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] border border-white/[0.08] text-white font-medium text-xs flex items-center justify-center gap-2 transition-all active:scale-95 shrink-0" title="Написати орендодавцю в Telegram">
                     <svg class="w-4 h-4 text-[#0a84ff] shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
@@ -725,8 +748,8 @@
                     </div>
                 </div>
                 <div>
-                    <label class="text-[#8e8e93] block mb-1">Номер телефону / Telegram</label>
-                    <input type="text" id="llPhone" placeholder="+380... або @username" class="w-full bg-[#2c2c2e] border border-white/[0.08] rounded-xl px-3 py-2 text-white placeholder-[#8e8e93] focus:outline-none focus:border-[#0a84ff]">
+                    <label class="text-[#8e8e93] block mb-1">Контактний номер телефону</label>
+                    <input type="text" id="llPhone" placeholder="+380XXXXXXXXX" inputmode="tel" autocomplete="tel" class="w-full bg-[#2c2c2e] border border-white/[0.08] rounded-xl px-3 py-2 text-white placeholder-[#8e8e93] focus:outline-none focus:border-[#0a84ff]">
                 </div>
                 <div>
                     <label class="text-[#8e8e93] block mb-1">Фотографії квартири (до 10 фото)</label>
@@ -736,6 +759,7 @@
                         <span id="llPhotoCountLabel">Додати фотографії квартири</span>
                     </button>
                     <div id="llPhotoPreviews" class="grid grid-cols-5 gap-1.5 mt-2 hidden"></div>
+                    <p class="text-[11px] text-[#b2b7c3] mt-2 leading-relaxed">JPG, PNG або WebP. До 10 фото, до 8 МБ кожне, разом до 32 МБ. Фото стануть доступними після перевірки.</p>
                 </div>
                 <div class="flex items-center gap-3 pt-1">
                     <label class="flex items-center gap-1.5 cursor-pointer">
@@ -747,7 +771,7 @@
                         <span class="text-white/80">Генератор</span>
                     </label>
                 </div>
-                <button onclick="handleLandlordSubmit()" class="w-full mt-2 py-3 rounded-full bg-[#30d158] hover:bg-[#30d158]/90 text-black font-semibold text-center transition-all active:scale-98">
+                <button id="llSubmitBtn" onclick="handleLandlordSubmit()" class="w-full mt-2 py-3 rounded-full bg-[#30d158] hover:bg-[#30d158]/90 text-black font-semibold text-center transition-all active:scale-98">
                     Надіслати оголошення на модерацію
                 </button>
             </div>
@@ -1620,7 +1644,7 @@
             if (deal.phone) {
                 window.location.href = `tel:${deal.phone}`;
             } else {
-                showToast("🔒 Контакт захищено від спаму. Натисніть «У чат» для отримання в Telegram");
+                sendContactToBotChat();
             }
         }
 
@@ -1883,7 +1907,11 @@
                 }
             }
 
-            // Masked Contact Presentation (Anti-Scraping Privacy)
+            // Contact details are released after server-side Telegram authorization.
+            const callLabel = document.getElementById('modalCallLabel');
+            if (callLabel) callLabel.textContent = deal.phone ? 'Зателефонувати' : 'Отримати контакт';
+            const chatButton = document.getElementById('modalChatBtn');
+            if (chatButton) chatButton.classList.toggle('hidden', !deal.phone);
             const maskedPhoneEl = document.getElementById('modalMaskedPhone');
             if (maskedPhoneEl) {
                 maskedPhoneEl.innerText = deal.phoneMasked || (deal.phone ? (deal.phone.slice(0, 6) + '***') : 'Контакт захищено від спаму');
