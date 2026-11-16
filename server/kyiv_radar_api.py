@@ -71,7 +71,7 @@ def _load_env_file(filepath: str = "/opt/agent-bot/.env"):
                         k, v = line.split("=", 1)
                         os.environ.setdefault(k.strip(), v.strip().strip("'\""))
         except Exception as e:
-            print(f"Warning: could not read {filepath}: {e}")
+            logger.warning("Unable to read environment configuration: %s", type(e).__name__)
 
 _load_env_file()
 
@@ -394,15 +394,14 @@ async def send_telegram_alert(text: str, reply_markup: Optional[dict] = None, ta
                 if resp.status == 200:
                     return True
                 else:
-                    err_txt = await resp.text()
-                    logger.warning(f"Telegram alert error (status {resp.status}) to chat {target_chat}: {err_txt}")
+                    logger.warning("Telegram message failed with HTTP %s", resp.status)
                     API_METRICS["telegram_errors"] += 1
-                    API_METRICS["last_error"] = f"Telegram status {resp.status}: {err_txt[:100]}"
+                    API_METRICS["last_error"] = f"Telegram status {resp.status}"
                     return False
     except Exception as e:
-        logger.error(f"Failed to dispatch Telegram message to chat {target_chat}: {e}")
+        logger.error("Telegram message dispatch failure: %s", type(e).__name__)
         API_METRICS["telegram_errors"] += 1
-        API_METRICS["last_error"] = f"Telegram exception: {str(e)}"
+        API_METRICS["last_error"] = f"Telegram exception: {type(e).__name__}"
         return False
 
 # Pydantic Schemas
@@ -559,8 +558,21 @@ async def send_landlord_photo_previews(photo_ids: List[str], submission_id: int)
         key = "photo" + str(index)
         form.add_field(key, jpeg_bytes, filename=key + ".jpg", content_type="image/jpeg")
         media.append({"type": "photo", "media": "attach://" + key})
-    form.add_field("media", json.dumps(media))
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMediaGroup"
+    if len(media) == 1:
+        # Telegram sendMediaGroup requires at least two items.
+        single_photo_id = photo_ids[0]
+        path = os.path.join(UPLOADS_BASE_DIR, single_photo_id + ".webp")
+        with Image.open(path) as img:
+            output = io.BytesIO()
+            img.convert("RGB").save(output, "JPEG", quality=78)
+            only_photo = output.getvalue()
+        form = aiohttp.FormData()
+        form.add_field("chat_id", str(ADMIN_CHAT_ID))
+        form.add_field("photo", only_photo, filename="preview.jpg", content_type="image/jpeg")
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
+    else:
+        form.add_field("media", json.dumps(media))
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMediaGroup"
     try:
         async with aiohttp.ClientSession() as client:
             async with client.post(url, data=form, timeout=aiohttp.ClientTimeout(total=30)) as response:
@@ -782,7 +794,9 @@ async def send_contact(req: SendContactRequest):
 
     priv = get_private_contact(req.dealId)
     raw_phone = priv.get("phone") if priv else deal.get("phone")
-    trusted_phone = raw_phone if (raw_phone and str(raw_phone).strip()) else "Номер уточнюється"
+    if not raw_phone or not str(raw_phone).strip():
+        raise HTTPException(status_code=404, detail="Контакт цього оголошення наразі недоступний")
+    trusted_phone = str(raw_phone).strip()
 
     safe_title = html.escape(deal.get("title", "Квартира"))
     safe_address = html.escape(deal.get("address", "Київ"))
