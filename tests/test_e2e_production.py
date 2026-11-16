@@ -148,7 +148,8 @@ async def test_frontend_ui():
         page_errors = []
         page.on("pageerror", lambda err: page_errors.append(str(err)))
 
-        file_url = "file:///" + os.path.abspath("kyiv-radar-tma/index.html").replace("\\", "/")
+        index_path = os.path.abspath("index.html") if os.path.exists("index.html") else os.path.abspath("kyiv-radar-tma/index.html")
+        file_url = "file:///" + index_path.replace("\\", "/")
         await page.goto(file_url)
         await page.wait_for_timeout(1500)
 
