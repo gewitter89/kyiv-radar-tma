@@ -499,11 +499,6 @@
                         </div>
                     </div>
                 </div>
-                    <button onclick="copyCurrentPhone()" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors">
-                        <svg class="w-3.5 h-3.5 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                        <span>Скопіювати</span>
-                    </button>
-                </div>
 
                 <!-- Address -->
                 <div class="p-2.5 rounded-lg bg-white/5 border border-white/10 flex items-center gap-2">
@@ -1069,6 +1064,7 @@
             const freeTrialPill = document.getElementById('freeTrialPill');
             const unlockTriggerText = document.getElementById('unlockTriggerText');
             const modalRealtorSavings = document.getElementById('modalRealtorSavings');
+            const modalCallBtn = document.getElementById('modalCallBtn');
 
             const savedAmount = deal.realtorCommissionSaved || Math.round(deal.price / 2);
             if (modalRealtorSavings) modalRealtorSavings.innerText = `${savedAmount.toLocaleString()} ₴`;
@@ -1077,21 +1073,44 @@
                 if (phoneLockedBox) phoneLockedBox.classList.add('hidden');
                 if (phoneUnlockedBox) phoneUnlockedBox.classList.remove('hidden');
                 if (modalPhoneText) modalPhoneText.innerText = deal.phone || "+380671112233";
+
+                if (modalCallBtn) {
+                    modalCallBtn.className = "flex-1 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-center text-xs flex items-center justify-center gap-1.5 transition-colors shadow-md";
+                    modalCallBtn.innerHTML = `
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+                        <span>Подзвонити (${deal.phone || '+380...'})</span>
+                    `;
+                }
             } else {
                 if (phoneLockedBox) phoneLockedBox.classList.remove('hidden');
                 if (phoneUnlockedBox) phoneUnlockedBox.classList.add('hidden');
                 if (modalMaskedPhone) modalMaskedPhone.innerText = deal.phoneMasked || "+38 (095) •••-••-86";
 
-                // Check free trial count
                 if (UNLOCKED_DEALS.size === 0) {
                     if (freeTrialPill) {
                         freeTrialPill.classList.remove('hidden');
                         freeTrialPill.innerText = "1-й контакт безкоштовно";
                     }
                     if (unlockTriggerText) unlockTriggerText.innerText = "Відкрити безкоштовно";
+
+                    if (modalCallBtn) {
+                        modalCallBtn.className = "flex-1 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-dark-950 font-bold text-center text-xs flex items-center justify-center gap-1.5 transition-colors shadow-md animate-pulse";
+                        modalCallBtn.innerHTML = `
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 019.9-1"/></svg>
+                            <span>Отримати контакт (Безкоштовно)</span>
+                        `;
+                    }
                 } else {
                     if (freeTrialPill) freeTrialPill.classList.add('hidden');
                     if (unlockTriggerText) unlockTriggerText.innerText = "Відкрити номер · 99 ₴";
+
+                    if (modalCallBtn) {
+                        modalCallBtn.className = "flex-1 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-dark-950 font-bold text-center text-xs flex items-center justify-center gap-1.5 transition-colors shadow-md";
+                        modalCallBtn.innerHTML = `
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 019.9-1"/></svg>
+                            <span>Відкрити номер (від 99 ₴)</span>
+                        `;
+                    }
                 }
             }
         }
@@ -1390,7 +1409,7 @@
 
             const phone = deal.phone || "+380671112233";
 
-            // Copy to clipboard
+            // Always Copy to clipboard
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(phone);
             }
@@ -1399,12 +1418,21 @@
                 window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
             }
 
-            showToast(`✓ Номер скопійовано: ${phone}`);
+            // Desktop vs Mobile handling
+            const isDesktop = window.Telegram?.WebApp?.platform === 'tdesktop' || 
+                              window.Telegram?.WebApp?.platform === 'web' || 
+                              window.Telegram?.WebApp?.platform === 'macos' || 
+                              !('ontouchstart' in window);
 
-            // Initiate tel link for mobile
-            setTimeout(() => {
-                window.location.href = `tel:${phone}`;
-            }, 300);
+            if (isDesktop) {
+                showToast(`✓ Номер ${phone} скопійовано! Надсилаємо у Telegram-чат...`);
+                sendContactToBotChat();
+            } else {
+                showToast(`✓ Номер скопійовано: ${phone}`);
+                setTimeout(() => {
+                    window.location.href = `tel:${phone}`;
+                }, 300);
+            }
         }
 
         function copyCurrentPhone() {
