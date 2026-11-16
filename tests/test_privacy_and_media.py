@@ -57,6 +57,8 @@ def privacy_test_env():
                 "address": "вул. Хрещатик, 1",
                 "price": 15000,
                 "phone": "+380671112233", # Raw phone in disk catalog
+                "private_note": "internal moderation note must never be public",
+                "ownerName": "private submitter's name",
                 "phoneMasked": "+38 (067) •••-••-33",
                 "isOwnerVerified": False
             }
@@ -117,6 +119,8 @@ def test_public_catalog_sanitizes_phones(privacy_test_env):
     assert data["deals"][0]["phone"] is None
     # Masked representation remains safe
     assert data["deals"][0]["phoneMasked"] == "+38 (067) •••-••-33"
+    assert "private_note" not in data["deals"][0]
+    assert "ownerName" not in data["deals"][0]
 
 def test_photo_upload_valid_exif_stripped(privacy_test_env):
     """POST /api/landlords/upload_photos accepts valid JPEG, strips EXIF, converts to WebP."""
@@ -253,7 +257,7 @@ def test_photo_ownership_and_moderated_public_access(privacy_test_env):
     assert client.get("/api/media/not-a-valid-uuid").status_code == 404
 
     catalog = client.get("/api/deals").json()["deals"]
-    published = next(x for x in catalog if x.get("submission_id") == submission_id)
+    published = next(x for x in catalog if x["id"] == accepted["published_deal"]["id"])
     assert published["phone"] is None
     assert published["images"] == [
         "https://vmi3445944.contaboserver.net/api/media/" + photo_id
