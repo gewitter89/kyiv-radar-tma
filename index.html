@@ -618,7 +618,7 @@
                         <div class="text-[11px] font-semibold text-[#8e8e93] uppercase tracking-wider">Контакт з оголошення</div>
                         <div id="modalMaskedPhone" class="text-white font-medium text-xs font-mono mt-0.5">+38 (0••) •••-••-••</div>
                     </div>
-                    <span class="px-2 py-0.5 rounded-full bg-[#0a84ff]/15 text-[#0a84ff] text-[10px] font-semibold">Захищено від спаму</span>
+                    <span class="px-2 py-0.5 rounded-full bg-[#0a84ff]/15 text-[#0a84ff] text-[10px] font-semibold">Номер приховано</span>
                 </div>
             </div>
 
@@ -2001,7 +2001,7 @@
             const phoneEl = document.getElementById('modalPhoneText');
             if (phoneEl) phoneEl.innerText = phone;
             const ownerEl = document.getElementById('modalOwnerName');
-            if (ownerEl) ownerEl.innerText = deal.ownerName || "Орендодавець";
+            if (ownerEl) ownerEl.innerText = deal.ownerName || "Контактна особа";
             const realtorSavingsEl = document.getElementById('modalRealtorSavings');
             if (realtorSavingsEl) {
                 if (deal.commissionVerified && saved > 0) {
@@ -2021,15 +2021,15 @@
                 eqContainer.innerHTML = `
                     <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full ${deal.gpon ? 'bg-[#30d158]' : 'bg-[#636366]'}"></span>
-                        <span class="text-white/80 text-[11px]">GPON: <b>${deal.gpon ? 'Працює' : 'Ні'}</b></span>
+                        <span class="text-white/80 text-[11px]">GPON: <b>${deal.gpon ? 'Заявлено' : 'Не вказано'}</b></span>
                     </div>
                     <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full ${deal.generator ? 'bg-[#ff9f0a]' : 'bg-[#636366]'}"></span>
-                        <span class="text-white/80 text-[11px]">Генератор: <b>${deal.generator ? 'Є у будинку' : 'Немає'}</b></span>
+                        <span class="text-white/80 text-[11px]">Генератор: <b>${deal.generator ? 'Заявлено' : 'Не вказано'}</b></span>
                     </div>
                     <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full ${deal.pets ? 'bg-[#30d158]' : 'bg-[#636366]'}"></span>
-                        <span class="text-white/80 text-[11px]">Тварини: <b>${deal.pets ? 'Можна' : 'Ні'}</b></span>
+                        <span class="text-white/80 text-[11px]">Тварини: <b>${deal.pets ? 'Заявлено, що можна' : 'Уточнюйте'}</b></span>
                     </div>
                     <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full ${deal.commissionVerified ? 'bg-[#30d158]' : 'bg-[#8e8e93]'}"></span>
