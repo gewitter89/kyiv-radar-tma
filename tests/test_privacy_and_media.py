@@ -228,7 +228,7 @@ def test_photo_ownership_and_moderated_public_access(privacy_test_env):
     payload = {
         "address": "вул. Глибочицька, 12, Київ",
         "price": "17500", "rooms": 1,
-        "phone": "+380671234567", "photos": [photo_id]
+        "phone": "+380671234567", "rightsConfirmed": True, "photos": [photo_id]
     }
     with patch("server.kyiv_radar_api.send_telegram_alert", new_callable=AsyncMock) as alert, \
          patch("server.kyiv_radar_api.send_landlord_photo_previews", new_callable=AsyncMock) as previews:
