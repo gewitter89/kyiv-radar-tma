@@ -1534,29 +1534,50 @@
             });
         }
 
-        async function sendContactToBotChat() {
+                async function sendContactToBotChat() {
             if (!currentModalDeal) return;
             const deal = currentModalDeal;
             const phone = deal.phone || "+380671112233";
+            const initData = window.Telegram?.WebApp?.initData || "";
 
-            // If deal is locked, prompt unlock first
-            if (!isDealUnlocked(deal.id)) {
-                handleUnlockClick();
-                return;
+            showToast("Надсилаємо контакт...");
+
+            // If in Telegram, send via real HTTPS backend to Telegram user chat
+            if (initData) {
+                try {
+                    const res = await fetch("https://vmi3445944.contaboserver.net/api/send_contact", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            dealId: deal.id,
+                            title: deal.title,
+                            price: deal.price,
+                            phone: phone,
+                            address: deal.address,
+                            initData: initData
+                        })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        if (window.Telegram?.WebApp?.HapticFeedback) {
+                            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                        }
+                        showToast("✓ Контакт надіслано у ваш Telegram-чат!");
+                        return;
+                    }
+                } catch (e) {
+                    console.error("sendContact error:", e);
+                }
             }
 
-            showToast("Надсилаємо контакт у ваш Telegram...");
-
-            // Secure Client Handler - Zero client-side bot tokens
+            // Fallback: Copy to clipboard if regular browser or API error
             try {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    await navigator.clipboard.writeText(phone);
-                }
+                await navigator.clipboard.writeText(phone);
                 if (window.Telegram?.WebApp?.HapticFeedback) {
                     window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
                 }
-                showToast(`✓ Номер ${phone} скопійовано у буфер`);
-            } catch(err) {
+                showToast(`✓ Номер ${phone} скопійовано`);
+            } catch (err) {
                 showToast(`✓ Номер власника: ${phone}`);
             }
         }
@@ -1867,32 +1888,37 @@
         function closeReportModal() {
             document.getElementById('reportModal')?.classList.add('hidden');
         }
-                function submitReport(reason) {
+                        async function submitReport(reason) {
             if (!currentModalDeal) return;
             const dealId = currentModalDeal.id;
+            const initData = window.Telegram?.WebApp?.initData || "";
 
-            // Real Telegram Mini App transmission
-            const payload = {
-                action: "report_deal",
-                dealId: dealId,
-                reason: reason,
-                timestamp: Date.now()
-            };
+            showToast("Надсилаємо скаргу модератору...");
 
-            if (window.Telegram?.WebApp?.sendData) {
-                try {
-                    window.Telegram.WebApp.sendData(JSON.stringify(payload));
-                } catch (e) {
-                    console.error("sendData error:", e);
+            try {
+                const res = await fetch("https://vmi3445944.contaboserver.net/api/reports", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        dealId: dealId,
+                        reason: reason,
+                        initData: initData
+                    })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    if (window.Telegram?.WebApp?.HapticFeedback) {
+                        window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                    }
+                    closeReportModal();
+                    showToast(`✓ Скаргу #${data.id} прийнято на перевірку`);
+                } else {
+                    showToast(data.detail || "Помилка надсилання скарги");
                 }
+            } catch (e) {
+                console.error("Report submit error:", e);
+                showToast("Помилка з'єднання із сервером. Спробуйте ще раз.");
             }
-
-            if (window.Telegram?.WebApp?.HapticFeedback) {
-                window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-            }
-
-            closeReportModal();
-            showToast("✓ Скаргу передано модератору на перевірку");
         }
 
         function openLandlordModal() {
@@ -1901,57 +1927,70 @@
         function closeLandlordModal() {
             document.getElementById('landlordModal').classList.add('hidden');
         }
-                function handleLandlordSubmit() {
-            const address = document.getElementById('llAddress')?.value?.trim();
-            const price = document.getElementById('llPrice')?.value?.trim();
-            const rooms = document.getElementById('llRooms')?.value;
-            const phone = document.getElementById('llPhone')?.value?.trim();
-            const gpon = document.getElementById('llGpon')?.checked;
-            const generator = document.getElementById('llGenerator')?.checked;
+                        async function handleLandlordSubmit() {
+            const addressInput = document.getElementById('llAddress');
+            const priceInput = document.getElementById('llPrice');
+            const roomsInput = document.getElementById('llRooms');
+            const phoneInput = document.getElementById('llPhone');
+            const gponInput = document.getElementById('llGpon');
+            const genInput = document.getElementById('llGen');
 
-            if (!address) {
-                showToast("Будь ласка, вкажіть адресу квартири");
+            const address = addressInput?.value?.trim();
+            const price = priceInput?.value?.trim();
+            const rooms = roomsInput ? parseInt(roomsInput.value) || 1 : 1;
+            const phone = phoneInput?.value?.trim();
+            const gpon = gponInput?.checked || false;
+            const generator = genInput?.checked || false;
+
+            if (!address || address.length < 5) {
+                showToast("Вкажіть точну адресу (вулиця, номер будинку)");
                 return;
             }
-            if (!price) {
-                showToast("Будь ласка, вкажіть ціну оренди");
+            if (!price || price.length < 2) {
+                showToast("Вкажіть ціну оренди в гривнях");
                 return;
             }
             if (!phone || phone.length < 9) {
-                showToast("Будь ласка, вкажіть дійсний номер телефону");
+                showToast("Вкажіть дійсний номер телефону або @username");
                 return;
             }
 
-            const payload = {
-                action: "new_landlord_deal",
-                address: address,
-                price: price,
-                rooms: rooms,
-                phone: phone,
-                gpon: !!gpon,
-                generator: !!generator,
-                timestamp: Date.now()
-            };
+            showToast("Зберігаємо заявку на сервері...");
 
-            if (window.Telegram?.WebApp?.sendData) {
-                try {
-                    window.Telegram.WebApp.sendData(JSON.stringify(payload));
-                } catch (e) {
-                    console.error("sendData error:", e);
+            try {
+                const initData = window.Telegram?.WebApp?.initData || "";
+                const res = await fetch("https://vmi3445944.contaboserver.net/api/landlords/submit", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        address: address,
+                        price: price,
+                        rooms: rooms,
+                        phone: phone,
+                        gpon: gpon,
+                        generator: generator,
+                        initData: initData
+                    })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    if (window.Telegram?.WebApp?.HapticFeedback) {
+                        window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                    }
+                    closeLandlordModal();
+                    showToast(`✓ Заявку #${data.id} прийнято на модерацію. Дякуємо!`);
+                    
+                    // Clear inputs only on confirmed server success
+                    if (addressInput) addressInput.value = '';
+                    if (priceInput) priceInput.value = '';
+                    if (phoneInput) phoneInput.value = '';
+                } else {
+                    showToast(data.detail || "Помилка збереження заявки на сервері");
                 }
+            } catch (e) {
+                console.error("Landlord submit error:", e);
+                showToast("Помилка з'єднання із сервером. Дані збережено у формі, спробуйте ще раз.");
             }
-
-            if (window.Telegram?.WebApp?.HapticFeedback) {
-                window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-            }
-
-            closeLandlordModal();
-            showToast("✓ Вашу квартиру отримано на модерацію. Дякуємо!");
-
-            // Clear inputs
-            if (document.getElementById('llAddress')) document.getElementById('llAddress').value = '';
-            if (document.getElementById('llPrice')) document.getElementById('llPrice').value = '';
-            if (document.getElementById('llPhone')) document.getElementById('llPhone').value = '';
         }
 
         // 10. APP INIT
