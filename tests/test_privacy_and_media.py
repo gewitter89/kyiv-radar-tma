@@ -93,6 +93,8 @@ def privacy_test_env():
 
         yield {
             "client": client,
+            "db_path": test_db,
+            "deals_path": test_deals,
             "uploads_dir": test_uploads
         }
 
@@ -184,3 +186,74 @@ def test_send_contact_rate_limiting(privacy_test_env):
         resp_blocked = client.post("/api/send_contact", json={"dealId": 1, "initData": init_data})
         assert resp_blocked.status_code == 429
         assert "Перевищено ліміт запитів контактів" in resp_blocked.json()["detail"]
+
+
+def test_anonymous_media_upload_and_injected_references_are_rejected(privacy_test_env):
+    """Anonymous uploads and arbitrary strings cannot become published photo sources."""
+    client = privacy_test_env["client"]
+    img_bytes = create_test_image()
+    anonymous = client.post(
+        "/api/landlords/upload_photos",
+        files=[("photos", ("image.jpg", io.BytesIO(img_bytes), "image/jpeg"))]
+    )
+    assert anonymous.status_code in (401, 422)
+
+    auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=10001)
+    submit = client.post("/api/landlords/submit", json={
+        "address": "вул. Глибочицька, 9, Київ",
+        "price": "14000", "rooms": 1, "phone": "+380501234567",
+        "initData": auth, "photos": ["javascript:alert(1)"]
+    })
+    assert submit.status_code == 400
+    assert "фотографій" in submit.json()["detail"].lower()
+
+
+def test_photo_ownership_and_moderated_public_access(privacy_test_env):
+    """Upload -> private -> owner-bound submission -> moderator approval -> public WebP."""
+    from server.bot_moderation import process_landlord_approval
+
+    client = privacy_test_env["client"]
+    owner_auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=20002)
+    other_auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=30003)
+    response = client.post(
+        "/api/landlords/upload_photos",
+        data={"initData": owner_auth},
+        files=[("photos", ("room.jpg", io.BytesIO(create_test_image()), "image/jpeg"))]
+    )
+    assert response.status_code == 200, response.text
+    photo_id = response.json()["photos"][0]
+    assert client.get("/api/media/" + photo_id).status_code == 404
+
+    payload = {
+        "address": "вул. Глибочицька, 12, Київ",
+        "price": "17500", "rooms": 1,
+        "phone": "+380671234567", "photos": [photo_id]
+    }
+    with patch("server.kyiv_radar_api.send_telegram_alert", new_callable=AsyncMock) as alert, \
+         patch("server.kyiv_radar_api.send_landlord_photo_previews", new_callable=AsyncMock) as previews:
+        alert.return_value = True
+        previews.return_value = True
+        bad = client.post("/api/landlords/submit", json=dict(payload, initData=other_auth))
+        assert bad.status_code == 403
+        good = client.post("/api/landlords/submit", json=dict(payload, initData=owner_auth))
+        assert good.status_code == 200, good.text
+        submission_id = good.json()["id"]
+
+    # Submission alone must not disclose the photo on the public endpoint.
+    assert client.get("/api/media/" + photo_id).status_code == 404
+    accepted = process_landlord_approval(
+        submission_id, 555, 555,
+        privacy_test_env["db_path"], privacy_test_env["deals_path"]
+    )
+    assert accepted["success"] is True, accepted
+    photo = client.get("/api/media/" + photo_id)
+    assert photo.status_code == 200
+    assert photo.headers["content-type"].startswith("image/webp")
+    assert client.get("/api/media/not-a-valid-uuid").status_code == 404
+
+    catalog = client.get("/api/deals").json()["deals"]
+    published = next(x for x in catalog if x.get("submission_id") == submission_id)
+    assert published["phone"] is None
+    assert published["images"] == [
+        "https://vmi3445944.contaboserver.net/api/media/" + photo_id
+    ]
