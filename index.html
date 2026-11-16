@@ -6,7 +6,10 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Київ Радар — Оренда квартир без комісії рієлторам</title>
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="color-scheme" content="dark">
+    <title>Київ Радар 🇺🇦 Оренда без комісії</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -281,6 +284,8 @@
     </style>
 </head>
 <body class="flex flex-col h-full w-full select-none">
+    <!-- Ukrainian Flag Micro-Ribbon (Apple Aesthetic 2px Accent) -->
+    <div class="h-[2.5px] w-full shrink-0 bg-gradient-to-r from-[#0057B7] via-[#0057B7] to-[#FFD700] z-40"></div>
 
     <!-- ==========================================
          TOP NOTIFICATION TOAST
@@ -1725,6 +1730,19 @@
 
         // 10. APP INIT
         document.addEventListener('DOMContentLoaded', () => {
+            // Native Telegram WebApp Integration (Apple OLED Dark Title Bar)
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                try {
+                    tg.ready();
+                    tg.expand();
+                    tg.setHeaderColor('#000000');
+                    tg.setBackgroundColor('#000000');
+                } catch (e) {
+                    console.log("Telegram header styling error:", e);
+                }
+            }
+
             initMap();
             setupCarouselInteractions();
             loadDeals();
