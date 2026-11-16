@@ -1304,13 +1304,16 @@
         }
 
         function getCommissionSubtitle(item) {
-            if (item.isOwnerVerified && item.commissionVerified) {
+            if (item.commissionVerified) {
                 return item.realtorCommissionSaved && item.realtorCommissionSaved > 0
-                    ? `Економія на рієлторі: ~${item.realtorCommissionSaved.toLocaleString()} ₴`
-                    : `0% комісії (власник підтверджено)`;
+                    ? `Економія: ~${item.realtorCommissionSaved.toLocaleString()} ₴ (0% комісії)`
+                    : `0% комісії (підтверджено)`;
+            }
+            if (item.isOwnerVerified) {
+                return `Власник підтверджений (комісія уточнюється)`;
             }
             if (item.contactVerified) {
-                return `Прямий контакт з орендодавцем`;
+                return `Прямий контакт (комісія уточнюється)`;
             }
             if (item.actualityConfirmed) {
                 return `Актуальність підтверджено`;
@@ -1805,9 +1808,12 @@
 
             const savingsEl = document.getElementById('modalSavings');
             if (savingsEl) {
-                if (deal.isOwnerVerified && deal.commissionVerified && saved > 0) {
+                if (deal.commissionVerified && saved > 0) {
                     savingsEl.className = "text-[#30d158] font-medium text-[12px]";
                     savingsEl.innerText = `Економія на рієлторі: ~${saved.toLocaleString()} ₴ (0% комісії)`;
+                } else if (deal.isOwnerVerified) {
+                    savingsEl.className = "text-[#30d158] font-medium text-[12px]";
+                    savingsEl.innerText = `Документи власника перевірено (комісія уточнюється)`;
                 } else if (deal.contactVerified) {
                     savingsEl.className = "text-[#ff9f0a] font-medium text-[12px]";
                     savingsEl.innerText = `Прямий контакт з орендодавцем (комісія уточнюється)`;
@@ -1819,12 +1825,15 @@
 
             const modalBadgeEl = document.getElementById('modalCommissionBadge');
             if (modalBadgeEl) {
-                if (deal.isOwnerVerified && deal.commissionVerified) {
+                if (deal.commissionVerified) {
                     modalBadgeEl.className = "px-2.5 py-0.5 rounded-full bg-[#30d158]/15 text-[#30d158] text-[11px] font-semibold";
                     modalBadgeEl.innerText = "0% комісії (перевірено)";
+                } else if (deal.isOwnerVerified) {
+                    modalBadgeEl.className = "px-2.5 py-0.5 rounded-full bg-[#30d158]/15 text-[#30d158] text-[11px] font-semibold";
+                    modalBadgeEl.innerText = "Власник перевірений";
                 } else if (deal.contactVerified) {
                     modalBadgeEl.className = "px-2.5 py-0.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-[11px] font-semibold";
-                    modalBadgeEl.innerText = "Контакт дійсний";
+                    modalBadgeEl.innerText = "Контакт перевірено";
                 } else {
                     modalBadgeEl.className = "px-2.5 py-0.5 rounded-full bg-white/10 text-white/90 text-[11px] font-semibold";
                     modalBadgeEl.innerText = "Комісія уточнюється";
@@ -1848,12 +1857,15 @@
             if (sourceDetails) {
                 if (deal.isOwnerVerified) {
                     if (verTag) verTag.innerHTML = '<span class="text-[#30d158] font-bold">✓ Власник верифікований</span>';
+                    const commDetail = deal.commissionVerified 
+                        ? '0% комісії підтверджено платформою.' 
+                        : 'Комісія орендодавця уточнюється (перевірка документів власності не підтверджує відсутність комісії).';
                     sourceDetails.innerHTML = `
                         <div class="flex items-center justify-between text-white/90">
                             <span class="font-medium">${escapeHtml(deal.ownerName || 'Власник житла')}</span>
                             <span class="text-[#30d158] text-[11px] font-semibold">Документи перевірено</span>
                         </div>
-                        <p class="text-[#8e8e93] text-[11px] leading-relaxed">Оголошення подано власником через Київ Радар. Документи на право власності підтверджено модератором. 0% комісії рієлторам.</p>
+                        <p class="text-[#8e8e93] text-[11px] leading-relaxed">Оголошення подано власником через Київ Радар. Документи на право власності підтверджено модератором. ${commDetail}</p>
                     `;
                 } else if (deal.contactVerified) {
                     if (verTag) verTag.innerHTML = '<span class="text-[#ff9f0a] font-bold">📞 Контакт перевірено</span>';
@@ -1862,7 +1874,7 @@
                             <span class="font-medium">Орендодавець</span>
                             <span class="text-[#ff9f0a] text-[11px] font-semibold">Прямий номер</span>
                         </div>
-                        <p class="text-[#8e8e93] text-[11px] leading-relaxed">Номер телефону та доступність перевірені модератором. Документи власності очікують підтвердження.</p>
+                        <p class="text-[#8e8e93] text-[11px] leading-relaxed">Номер телефону та доступність перевірені модератором. Документи власності та комісія очікують підтвердження.</p>
                     `;
                 } else if (deal.actualityConfirmed) {
                     if (verTag) verTag.innerHTML = '<span class="text-[#0a84ff] font-bold">✅ Актуальність підтверджено</span>';
@@ -1903,8 +1915,10 @@
             if (ownerEl) ownerEl.innerText = deal.ownerName || "Орендодавець";
             const realtorSavingsEl = document.getElementById('modalRealtorSavings');
             if (realtorSavingsEl) {
-                if (deal.isOwnerVerified && saved > 0) {
+                if (deal.commissionVerified && saved > 0) {
                     realtorSavingsEl.innerText = `Економія: ~${saved.toLocaleString()} ₴ (0% комісії)`;
+                } else if (deal.isOwnerVerified) {
+                    realtorSavingsEl.innerText = `Власник підтверджений (комісія уточнюється)`;
                 } else if (deal.contactVerified) {
                     realtorSavingsEl.innerText = `Прямий контакт з орендодавцем`;
                 } else {
@@ -1929,8 +1943,8 @@
                         <span class="text-white/80 text-[11px]">Тварини: <b>${deal.pets ? 'Можна' : 'Ні'}</b></span>
                     </div>
                     <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full ${deal.isOwnerVerified && deal.commissionVerified ? 'bg-[#30d158]' : 'bg-[#8e8e93]'}"></span>
-                        <span class="text-white/80 text-[11px]">Комісія: <b>${deal.isOwnerVerified && deal.commissionVerified ? '0% (Власник)' : 'Уточнюється'}</b></span>
+                        <span class="w-2 h-2 rounded-full ${deal.commissionVerified ? 'bg-[#30d158]' : 'bg-[#8e8e93]'}"></span>
+                        <span class="text-white/80 text-[11px]">Комісія: <b>${deal.commissionVerified ? '0% (Підтверджено)' : 'Уточнюється'}</b></span>
                     </div>
                 `;
             }

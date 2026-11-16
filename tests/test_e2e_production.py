@@ -262,55 +262,18 @@ async def test_frontend_ui():
 
         await browser.close()
 
-def test_production_user_journeys():
-    print("\n--- [7/7] Testing Production User Journeys (Submit, Report, Contact) ---")
-    
-    # Scenario 1: Landlord Submits Apartment
-    sub_payload = {
-        "address": "вул. Володимирська, 50, Київ",
-        "price": "28000",
-        "rooms": 2,
-        "phone": "+380671234599",
-        "gpon": True,
-        "generator": False
-    }
-    status_sub, res_sub, _ = http_post("/api/landlords/submit", data=sub_payload)
-    assert status_sub == 200, f"Landlord submission failed: {status_sub} - {res_sub}"
-    assert res_sub.get("success") is True, f"Expected success=True, got {res_sub}"
-    sub_id = res_sub.get("id")
-    assert sub_id and sub_id > 0, f"Expected valid sub_id, got {sub_id}"
-    print(f"✓ PASS: Scenario 1 - Landlord successfully submitted apartment (ID #{sub_id})")
-
-    # Scenario 2: User Files a Truthful Report / Complaint
-    rep_payload = {
-        "dealId": 1,
-        "reason": "Невірний статус або телефон",
-        "details": "Перевірка якості модерації Київ Радар"
-    }
-    status_rep, res_rep, _ = http_post("/api/reports", data=rep_payload)
-    assert status_rep == 200, f"Report submission failed: {status_rep} - {res_rep}"
-    assert res_rep.get("success") is True, f"Expected success=True, got {res_rep}"
-    print("✓ PASS: Scenario 2 - User report successfully submitted to moderation queue")
-
-    # Scenario 3: Tenant Contact Lookup Security
-    # Verifies deal existence and authorization enforcement
-    status_c, res_c, _ = http_post("/api/send_contact", data={"dealId": 1, "initData": ""})
-    assert status_c == 401, f"Expected 401 Unauthorized for unauthenticated contact request, got {status_c}"
-    print("✓ PASS: Scenario 3 - Tenant contact endpoint securely protects landlord data")
-
 def main():
     print("==================================================")
-    print("KYIV RADAR PRODUCTION SECURITY & UI VERIFICATION")
+    print("KYIV RADAR PRODUCTION READ-ONLY SECURITY & UI VERIFICATION")
     print("==================================================")
     test_api_health()
     test_cors_security()
     test_staging_endpoints_closure()
     test_send_contact_crypto_security()
     test_catalog_integrity()
-    test_production_user_journeys()
     asyncio.run(test_frontend_ui())
     print("\n==================================================")
-    print("ALL PRODUCTION SECURITY AUDIT CHECKS PASSED (100% GREEN)!")
+    print("ALL PRODUCTION READ-ONLY SECURITY AUDIT CHECKS PASSED (100% GREEN)!")
     print("==================================================")
 
 if __name__ == "__main__":

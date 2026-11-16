@@ -103,23 +103,30 @@ app.add_middleware(
 def check_rate_limit(key: str, max_requests: int, window_seconds: int) -> bool:
     now = time.time()
     cutoff = now - window_seconds
+    conn = None
     try:
-        with sqlite3.connect(DB_PATH, timeout=10.0) as conn:
-            cur = conn.cursor()
-            cur.execute("DELETE FROM rate_limits WHERE key = ? AND timestamp < ?", (key, cutoff))
-            cur.execute("SELECT COUNT(*) FROM rate_limits WHERE key = ? AND timestamp >= ?", (key, cutoff))
-            count = cur.fetchone()[0]
-            if count >= max_requests:
-                return False
-            cur.execute("INSERT INTO rate_limits (key, timestamp) VALUES (?, ?)", (key, now))
-            conn.commit()
-            return True
+        conn = sqlite3.connect(DB_PATH, timeout=10.0)
+        cur = conn.cursor()
+        cur.execute("DELETE FROM rate_limits WHERE key = ? AND timestamp < ?", (key, cutoff))
+        cur.execute("SELECT COUNT(*) FROM rate_limits WHERE key = ? AND timestamp >= ?", (key, cutoff))
+        count = cur.fetchone()[0]
+        if count >= max_requests:
+            return False
+        cur.execute("INSERT INTO rate_limits (key, timestamp) VALUES (?, ?)", (key, now))
+        conn.commit()
+        return True
     except sqlite3.Error as e:
         logger.error(f"Rate limiter database error for key '{key}': {e}")
         API_METRICS["db_errors"] += 1
         API_METRICS["last_error"] = f"DB Rate Limit Error: {str(e)}"
         # Safe fail-closed: reject requests rather than unmetered bypass across workers
         return False
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 # Telegram initData Cryptographic Signature & Expiry Validation
 def validate_telegram_init_data(init_data: str, max_age_seconds: int = 86400) -> Optional[dict]:
@@ -473,14 +480,15 @@ async def send_contact(req: SendContactRequest):
     trusted_phone = deal.get("phone", "Не вказано")
 
     user_id = user_data["id"]
+    commission_label = "0% комісії (підтверджено)" if deal.get("commissionVerified") else "Комісія уточнюється"
     msg_lines = [
         f"📞 <b>Контакт орендодавця (Лот #{req.dealId})</b>",
         "━━━━━━━━━━━━━━━━━━",
         f"🏢 <b>{trusted_title}</b>",
         f"📍 {trusted_address}",
-        f"💰 <b>Ціна:</b> {trusted_price:,} ₴/міс (0% комісії рієлторам)",
+        f"💰 <b>Ціна:</b> {trusted_price:,} ₴/міс ({commission_label})",
         "",
-        f"📱 <b>Телефон власника:</b> <code>{trusted_phone}</code>",
+        f"📱 <b>Телефон орендодавця:</b> <code>{trusted_phone}</code>",
         "",
         "<i>Зв'яжіться з орендодавцем безпосередньо. Вдалих переглядів!</i>"
     ]
