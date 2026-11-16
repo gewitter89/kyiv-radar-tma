@@ -80,11 +80,20 @@ PRIVATE_CONTACTS_PATH = os.getenv(
     "KYIV_RADAR_PRIVATE_CONTACTS_PATH",
     os.path.abspath(os.path.join(os.path.dirname(__file__), "data", "private_contacts.json"))
 )
-UPLOADS_BASE_DIR = os.getenv(
-    "KYIV_RADAR_UPLOADS_DIR",
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads", "landlords"))
-)
-os.makedirs(UPLOADS_BASE_DIR, exist_ok=True)
+if os.path.exists("/opt/kyiv-radar-tma"):
+    UPLOADS_BASE_DIR = os.getenv("KYIV_RADAR_UPLOADS_DIR", "/opt/kyiv-radar-tma/uploads/landlords")
+    STATIC_UPLOADS_ROOT = os.getenv("KYIV_RADAR_STATIC_UPLOADS", "/opt/kyiv-radar-tma/uploads")
+else:
+    UPLOADS_BASE_DIR = os.getenv(
+        "KYIV_RADAR_UPLOADS_DIR",
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads", "landlords"))
+    )
+    STATIC_UPLOADS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads"))
+
+try:
+    os.makedirs(UPLOADS_BASE_DIR, exist_ok=True)
+except Exception as ud_err:
+    logger.warning(f"Notice creating UPLOADS_BASE_DIR: {ud_err}")
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID", "8531839081"))
 
 # MANDATORY SECURITY CHECK: BOT_TOKEN or TELEGRAM_BOT_TOKEN MUST BE SUPPLIED IN ENVIRONMENT
@@ -99,7 +108,6 @@ app = FastAPI(
 )
 
 # Mount /uploads for serving verified landlord photos
-STATIC_UPLOADS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads"))
 if os.path.exists(STATIC_UPLOADS_ROOT):
     app.mount("/uploads", StaticFiles(directory=STATIC_UPLOADS_ROOT), name="uploads")
 
