@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Kyiv Radar Production HTTPS API
-Version: 1.4.0 (Enterprise Privacy & Media Hardened)
+Version: 1.5.0 (Authenticated moderation media)
 Production backend service for Kyiv Radar Telegram Mini App and Web Platform.
 
 Endpoints:
@@ -28,6 +28,8 @@ import io
 import hmac
 import html
 import uuid
+import re
+import warnings
 import hashlib
 import json
 import time
@@ -38,9 +40,9 @@ from typing import Optional, List, Dict, Any
 import sqlite3
 import aiohttp
 from PIL import Image, ImageOps, UnidentifiedImageError
-from fastapi import FastAPI, Request, HTTPException, Depends, Header, UploadFile, File
+from fastapi import FastAPI, Request, HTTPException, Depends, Header, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 # Configure structured logging
@@ -95,6 +97,11 @@ try:
 except Exception as ud_err:
     logger.warning(f"Notice creating UPLOADS_BASE_DIR: {ud_err}")
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID", "8531839081"))
+PUBLIC_API_BASE = os.getenv("KYIV_RADAR_PUBLIC_API_BASE", "https://vmi3445944.contaboserver.net").rstrip("/")
+MAX_IMAGE_BYTES = 8 * 1024 * 1024
+MAX_IMAGE_BATCH_BYTES = 32 * 1024 * 1024
+Image.MAX_IMAGE_PIXELS = 20_000_000
+PHOTO_ID_PATTERN = re.compile(r"^[0-9a-f]{32}$")
 
 # MANDATORY SECURITY CHECK: BOT_TOKEN or TELEGRAM_BOT_TOKEN MUST BE SUPPLIED IN ENVIRONMENT
 BOT_TOKEN = os.getenv("BOT_TOKEN") or os.getenv("TELEGRAM_BOT_TOKEN")
@@ -102,14 +109,12 @@ if not BOT_TOKEN and APP_ENV != "test":
     raise RuntimeError("CRITICAL SECURITY ERROR: BOT_TOKEN (or TELEGRAM_BOT_TOKEN) environment variable is not configured!")
 
 app = FastAPI(
-    title="Kyiv Radar Production API",
-    description="Secure Production HTTPS Backend for Kyiv Radar Rent Aggregator",
-    version="1.4.0"
+    title="Kyiv Radar API",
+    description="Listings and moderation API",
+    version="1.5.0"
 )
 
-# Mount /uploads for serving verified landlord photos
-if os.path.exists(STATIC_UPLOADS_ROOT):
-    app.mount("/uploads", StaticFiles(directory=STATIC_UPLOADS_ROOT), name="uploads")
+# Photos stay private on disk; /api/media/{id} serves only approved files.
 
 # STRICT CORS CONFIGURATION: Wildcard '*' is strictly forbidden
 ALLOWED_ORIGINS = [
@@ -246,11 +251,22 @@ def init_db():
             timestamp REAL NOT NULL
         )
     """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS landlord_uploads (
+            photo_id TEXT PRIMARY KEY,
+            owner_telegram_id INTEGER NOT NULL,
+            submission_id INTEGER,
+            status TEXT NOT NULL DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_landlord_uploads_submission ON landlord_uploads(submission_id)")
     cur.execute("CREATE INDEX IF NOT EXISTS idx_rate_limits_key_time ON rate_limits(key, timestamp)")
 
     # Ensure schema migrations
     for col_def in [
         ("photos", "TEXT DEFAULT '[]'"),
+        ("submitter_id", "INTEGER"),
         ("contact_verified", "INTEGER DEFAULT 0"),
         ("verified_at", "TEXT"),
         ("verification_method", "TEXT")
@@ -291,7 +307,7 @@ def sanitize_and_save_photo(photo_bytes: bytes, dest_filename: str) -> str:
     """
     if len(photo_bytes) < 32:
         raise ValueError("Файл занадто малий для зображення")
-    if len(photo_bytes) > 10 * 1024 * 1024:
+    if len(photo_bytes) > MAX_IMAGE_BYTES:
         raise ValueError("Розмір фотографії перевищує 10 МБ")
 
     in_io = io.BytesIO(photo_bytes)
@@ -300,6 +316,8 @@ def sanitize_and_save_photo(photo_bytes: bytes, dest_filename: str) -> str:
         if fmt not in ("JPEG", "JPG", "PNG", "WEBP"):
             raise ValueError(f"Непідтримуваний формат: {fmt}. Дозволено лише JPG, PNG, WEBP.")
 
+        if img.width * img.height > Image.MAX_IMAGE_PIXELS:
+            raise ValueError('Зображення має завеликі розміри')
         try:
             img = ImageOps.exif_transpose(img)
         except Exception:
@@ -318,7 +336,8 @@ def sanitize_and_save_photo(photo_bytes: bytes, dest_filename: str) -> str:
 
         dest_path = os.path.join(UPLOADS_BASE_DIR, dest_filename)
         converted.save(dest_path, format="WEBP", quality=82, method=4)
-        return f"/uploads/landlords/{dest_filename}"
+        # Return only a private path; the upload API returns an opaque photo ID.
+        return dest_path
 
 # Helper: Load trusted catalog
 def load_trusted_deals() -> List[Dict[str, Any]]:
@@ -417,11 +436,8 @@ async def health():
     return {
         "status": "healthy",
         "service": "kyiv-radar-api",
-        "env": APP_ENV,
-        "version": "1.4.0",
+        "version": "1.5.0",
         "deals_count": len(deals),
-        "bot_token_configured": bool(BOT_TOKEN),
-        "metrics": API_METRICS,
         "timestamp": int(time.time())
     }
 
