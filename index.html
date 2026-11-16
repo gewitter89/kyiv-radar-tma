@@ -586,8 +586,12 @@
                         <span id="modalVerificationTag" class="text-xs"></span>
                     </div>
                     <div id="modalSourceDetails" class="text-xs space-y-1">
-                        <!-- Populated truthful data -->
+                        <!-- Listing source and independent verification information -->
                     </div>
+                    <a id="modalOriginalLink" href="#" target="_blank" rel="noopener noreferrer nofollow"
+                       class="hidden text-[12px] font-semibold text-[#72b4ff] py-1 underline underline-offset-2">
+                        Переглянути оригінальне оголошення
+                    </a>
                 </div>
 
                 </div>
@@ -1908,6 +1912,20 @@
 
             // Truthful Tiered Source & Verification Details
             const sourceDetails = document.getElementById('modalSourceDetails');
+            const originalLink = document.getElementById('modalOriginalLink');
+            if (originalLink) {
+                const rawSource = typeof deal.url === 'string' ? deal.url : '';
+                const url = safePhotoUrl(rawSource);
+                let allowedSource = false;
+                if (url) {
+                    const host = new URL(url).hostname.toLowerCase();
+                    allowedSource = host === 'olx.ua' || host.endsWith('.olx.ua')
+                        || host === 'dom.ria.com' || host.endsWith('.dom.ria.com');
+                }
+                originalLink.classList.toggle('hidden', !allowedSource);
+                if (allowedSource) originalLink.href = url;
+                else originalLink.removeAttribute('href');
+            }
             const verTag = document.getElementById('modalVerificationTag');
             if (sourceDetails) {
                 if (deal.isOwnerVerified) {
