@@ -516,47 +516,128 @@ async def submit_report(req: ReportRequest, request: Request):
         "message": f"Скаргу #{comp_id} прийнято на розгляд модератором"
     }
 
+@app.get("/api/media/{photo_id}")
+async def get_approved_photo(photo_id: str):
+    """Serve a photo only after the corresponding listing has been approved."""
+    if not PHOTO_ID_PATTERN.fullmatch(photo_id):
+        raise HTTPException(status_code=404, detail="Фото не знайдено")
+    conn = sqlite3.connect(DB_PATH, timeout=5.0)
+    try:
+        row = conn.execute(
+            "SELECT status FROM landlord_uploads WHERE photo_id = ?",
+            (photo_id,)
+        ).fetchone()
+    finally:
+        conn.close()
+    if not row or row[0] != "approved":
+        raise HTTPException(status_code=404, detail="Фото не знайдено")
+    path = os.path.join(UPLOADS_BASE_DIR, photo_id + ".webp")
+    if not os.path.isfile(path):
+        raise HTTPException(status_code=404, detail="Фото не знайдено")
+    return FileResponse(path, media_type="image/webp",
+                        headers={"Cache-Control": "public, max-age=86400",
+                                 "X-Content-Type-Options": "nosniff"})
+
+
+async def send_landlord_photo_previews(photo_ids: List[str], submission_id: int) -> bool:
+    """Deliver pending photos privately to the moderator; never publish a preview URL."""
+    if not photo_ids:
+        return True
+    media = []
+    form = aiohttp.FormData()
+    form.add_field("chat_id", str(ADMIN_CHAT_ID))
+    for index, photo_id in enumerate(photo_ids):
+        path = os.path.join(UPLOADS_BASE_DIR, photo_id + ".webp")
+        try:
+            with Image.open(path) as img:
+                output = io.BytesIO()
+                img.convert("RGB").save(output, "JPEG", quality=78)
+                jpeg_bytes = output.getvalue()
+        except Exception as exc:
+            logger.warning("Failed to prepare moderation preview: %s", type(exc).__name__)
+            return False
+        key = "photo" + str(index)
+        form.add_field(key, jpeg_bytes, filename=key + ".jpg", content_type="image/jpeg")
+        media.append({"type": "photo", "media": "attach://" + key})
+    form.add_field("media", json.dumps(media))
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMediaGroup"
+    try:
+        async with aiohttp.ClientSession() as client:
+            async with client.post(url, data=form, timeout=aiohttp.ClientTimeout(total=30)) as response:
+                if response.status != 200:
+                    logger.warning("Moderation photos could not be delivered (HTTP %s)", response.status)
+                    return False
+        return True
+    except Exception as exc:
+        # Never log request URLs because they contain the bot token.
+        logger.warning("Moderation photo dispatch failed: %s", type(exc).__name__)
+        return False
+
+
 @app.post("/api/landlords/upload_photos")
 async def upload_landlord_photos(
     request: Request,
-    photos: List[UploadFile] = File(...)
+    photos: List[UploadFile] = File(...),
+    initData: str = Form(...)
 ):
-    """
-    Secure Landlord Photo Upload Endpoint:
-    - Validates file format (JPG, PNG, WEBP).
-    - Checks file size (max 10MB per photo).
-    - Completely strips all EXIF metadata (GPS coordinates, camera serials).
-    - Converts to high-performance WebP (max 1600px).
-    - Rate-limited per IP.
-    """
+    """Stage private, owner-bound images for moderation. Returns opaque IDs, not URLs."""
+    user = validate_telegram_init_data(initData)
+    if not user or not isinstance(user.get("id"), int):
+        raise HTTPException(status_code=401, detail="Відкрийте форму в Telegram для завантаження фото")
+    user_id = user["id"]
     client_ip = request.client.host if request.client else "unknown"
-    if not check_rate_limit(f"upload_{client_ip}", max_requests=25, window_seconds=600):
-        raise HTTPException(status_code=429, detail="Забагато завантажень. Зачекайте декілька хвилин.")
+    if not check_rate_limit(f"upload_user_{user_id}", max_requests=5, window_seconds=3600):
+        raise HTTPException(status_code=429, detail="Забагато завантажень. Спробуйте пізніше")
+    if not check_rate_limit(f"upload_ip_{client_ip}", max_requests=20, window_seconds=3600):
+        raise HTTPException(status_code=429, detail="Забагато запитів")
+    if not 1 <= len(photos) <= 10:
+        raise HTTPException(status_code=400, detail="Оберіть від 1 до 10 фотографій")
 
-    if not photos or len(photos) == 0:
-        raise HTTPException(status_code=400, detail="Будь ласка, оберіть хоча б одне фото")
-    if len(photos) > 10:
-        raise HTTPException(status_code=400, detail="Максимум 10 фотографій для одного оголошення")
+    total_bytes = 0
+    created_files = []
+    photo_ids = []
+    conn = None
+    try:
+        conn = sqlite3.connect(DB_PATH, timeout=10.0)
+        for photo in photos:
+            contents = await photo.read(MAX_IMAGE_BYTES + 1)
+            total_bytes += len(contents)
+            if total_bytes > MAX_IMAGE_BATCH_BYTES:
+                raise HTTPException(status_code=413, detail="Загальний розмір фото перевищує 32 МБ")
+            if len(contents) > MAX_IMAGE_BYTES:
+                raise HTTPException(status_code=413, detail="Фото не може перевищувати 8 МБ")
+            photo_id = uuid.uuid4().hex
+            path = sanitize_and_save_photo(contents, photo_id + ".webp")
+            created_files.append(path)
+            conn.execute(
+                "INSERT INTO landlord_uploads (photo_id, owner_telegram_id, status) VALUES (?, ?, 'pending')",
+                (photo_id, user_id)
+            )
+            photo_ids.append(photo_id)
+        conn.commit()
+    except HTTPException:
+        if conn: conn.rollback()
+        for path in created_files:
+            try: os.remove(path)
+            except OSError: pass
+        raise
+    except (ValueError, UnidentifiedImageError, Image.DecompressionBombError):
+        if conn: conn.rollback()
+        for path in created_files:
+            try: os.remove(path)
+            except OSError: pass
+        raise HTTPException(status_code=400, detail="Пошкоджене або непідтримуване фото")
+    except Exception as exc:
+        if conn: conn.rollback()
+        for path in created_files:
+            try: os.remove(path)
+            except OSError: pass
+        logger.error("Photo upload failed: %s", type(exc).__name__)
+        raise HTTPException(status_code=500, detail="Не вдалося зберегти фотографії")
+    finally:
+        if conn: conn.close()
+    return {"success": True, "count": len(photo_ids), "photos": photo_ids}
 
-    saved_urls = []
-    session_id = uuid.uuid4().hex[:12]
-    for idx, photo in enumerate(photos):
-        try:
-            contents = await photo.read()
-            clean_filename = f"{session_id}_{idx+1}.webp"
-            url = sanitize_and_save_photo(contents, clean_filename)
-            saved_urls.append(url)
-        except (ValueError, UnidentifiedImageError):
-            raise HTTPException(status_code=400, detail="Файл пошкоджений або має непідтримуваний формат зображення")
-        except Exception as e:
-            logger.error(f"Error processing upload: {e}")
-            raise HTTPException(status_code=500, detail="Помилка збереження фотографії")
-
-    return {
-        "success": True,
-        "count": len(saved_urls),
-        "photos": saved_urls
-    }
 
 @app.post("/api/landlords/submit")
 async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
