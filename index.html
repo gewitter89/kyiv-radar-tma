@@ -550,91 +550,74 @@
     </div>
 
     <!-- ==========================================
-         SORTING MODAL (Apple Bottom Sheet Style)
+         SORTING MODAL (Apple iOS Native Action Sheet)
     ========================================== -->
-    <div id="sortModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-dark-900 border border-white/10 w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl flex flex-col overflow-hidden shadow-2xl animate-fade-in">
-            <!-- Header -->
-            <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
-                    <span class="text-xs font-bold text-white">Оберіть порядок сортування</span>
-                </div>
-                <button onclick="closeSortModal()" class="w-6 h-6 rounded bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                </button>
+    <div id="sortModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity duration-200">
+        <div class="bg-[#1c1c1e] border border-white/[0.08] w-full sm:max-w-sm rounded-t-[24px] sm:rounded-[24px] flex flex-col overflow-hidden shadow-2xl animate-fade-in pb-4">
+            <!-- iOS Grabber Handle -->
+            <div class="w-9 h-1 rounded-full bg-white/25 mx-auto mt-2.5 mb-1.5 shrink-0"></div>
+
+            <!-- iOS Navigation Header -->
+            <div class="px-4 py-2 flex items-center justify-between shrink-0">
+                <span class="text-[15px] font-semibold text-white tracking-tight">Сортування</span>
+                <button onclick="closeSortModal()" class="text-[14px] font-semibold text-[#0a84ff] hover:opacity-80 active:opacity-60 transition-opacity">Готово</button>
             </div>
 
-            <!-- Sort Options List -->
-            <div class="p-3 space-y-1.5 text-xs">
-                <!-- Option 1: Distance -->
-                <button onclick="applySort('distance')" id="sortOpt-distance" class="w-full p-2.5 rounded-xl border flex items-center justify-between text-left transition-all bg-white/5 border-white/10 hover:border-white/20">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-7 h-7 rounded-lg bg-blue-500/15 text-blue-400 flex items-center justify-center shrink-0">
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
-                        </span>
-                        <div>
-                            <div class="font-bold text-white text-xs">Найближчі до мене</div>
-                            <div class="text-[10px] text-slate-400">За прямою відстанню від GPS / центру</div>
-                        </div>
+            <!-- iOS Inset Grouped Table -->
+            <div class="mx-3.5 my-1.5 rounded-2xl bg-[#2c2c2e]/70 border border-white/[0.06] overflow-hidden divide-y divide-white/[0.06]">
+                <!-- Row 1: Distance -->
+                <button onclick="applySort('distance')" id="sortOpt-distance" class="w-full px-4 py-3 flex items-center justify-between text-left transition-colors active:bg-white/10 hover:bg-white/[0.04]">
+                    <div>
+                        <div class="text-[14px] text-white font-medium leading-snug">Найближчі до мене</div>
+                        <div class="text-[11px] text-slate-400 leading-tight">За прямою відстанню від локації</div>
                     </div>
-                    <span id="check-distance" class="text-blue-400 font-bold hidden">✓</span>
+                    <div id="check-distance" class="text-[#0a84ff] shrink-0 pl-2 hidden">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>
+                    </div>
                 </button>
 
-                <!-- Option 2: Price ASC -->
-                <button onclick="applySort('price_asc')" id="sortOpt-price_asc" class="w-full p-2.5 rounded-xl border flex items-center justify-between text-left transition-all bg-white/5 border-white/10 hover:border-white/20">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0">
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-                        </span>
-                        <div>
-                            <div class="font-bold text-white text-xs">Спочатку дешевші</div>
-                            <div class="text-[10px] text-slate-400">Ціна: від найнижчої до високої</div>
-                        </div>
+                <!-- Row 2: Price ASC -->
+                <button onclick="applySort('price_asc')" id="sortOpt-price_asc" class="w-full px-4 py-3 flex items-center justify-between text-left transition-colors active:bg-white/10 hover:bg-white/[0.04]">
+                    <div>
+                        <div class="text-[14px] text-white font-medium leading-snug">Спочатку дешевші</div>
+                        <div class="text-[11px] text-slate-400 leading-tight">Ціна: від найнижчої до високої</div>
                     </div>
-                    <span id="check-price_asc" class="text-emerald-400 font-bold hidden">✓</span>
+                    <div id="check-price_asc" class="text-[#0a84ff] shrink-0 pl-2 hidden">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>
+                    </div>
                 </button>
 
-                <!-- Option 3: Price DESC -->
-                <button onclick="applySort('price_desc')" id="sortOpt-price_desc" class="w-full p-2.5 rounded-xl border flex items-center justify-between text-left transition-all bg-white/5 border-white/10 hover:border-white/20">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0">
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
-                        </span>
-                        <div>
-                            <div class="font-bold text-white text-xs">Спочатку дорожчі</div>
-                            <div class="text-[10px] text-slate-400">Ціна: від високої до низької</div>
-                        </div>
+                <!-- Row 3: Price DESC -->
+                <button onclick="applySort('price_desc')" id="sortOpt-price_desc" class="w-full px-4 py-3 flex items-center justify-between text-left transition-colors active:bg-white/10 hover:bg-white/[0.04]">
+                    <div>
+                        <div class="text-[14px] text-white font-medium leading-snug">Спочатку дорожчі</div>
+                        <div class="text-[11px] text-slate-400 leading-tight">Ціна: преміум сегмент</div>
                     </div>
-                    <span id="check-price_desc" class="text-amber-400 font-bold hidden">✓</span>
+                    <div id="check-price_desc" class="text-[#0a84ff] shrink-0 pl-2 hidden">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>
+                    </div>
                 </button>
 
-                <!-- Option 4: Newest -->
-                <button onclick="applySort('newest')" id="sortOpt-newest" class="w-full p-2.5 rounded-xl border flex items-center justify-between text-left transition-all bg-white/5 border-white/10 hover:border-white/20">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-7 h-7 rounded-lg bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0">
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                        </span>
-                        <div>
-                            <div class="font-bold text-white text-xs">Найновіші оголошення</div>
-                            <div class="text-[10px] text-slate-400">Свіжі перевірені лоти</div>
-                        </div>
+                <!-- Row 4: Newest -->
+                <button onclick="applySort('newest')" id="sortOpt-newest" class="w-full px-4 py-3 flex items-center justify-between text-left transition-colors active:bg-white/10 hover:bg-white/[0.04]">
+                    <div>
+                        <div class="text-[14px] text-white font-medium leading-snug">Найновіші оголошення</div>
+                        <div class="text-[11px] text-slate-400 leading-tight">Свіжі перевірені лоти від власників</div>
                     </div>
-                    <span id="check-newest" class="text-purple-400 font-bold hidden">✓</span>
+                    <div id="check-newest" class="text-[#0a84ff] shrink-0 pl-2 hidden">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>
+                    </div>
                 </button>
 
-                <!-- Option 5: Area DESC -->
-                <button onclick="applySort('area_desc')" id="sortOpt-area_desc" class="w-full p-2.5 rounded-xl border flex items-center justify-between text-left transition-all bg-white/5 border-white/10 hover:border-white/20">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-7 h-7 rounded-lg bg-cyan-500/15 text-cyan-400 flex items-center justify-center shrink-0">
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-                        </span>
-                        <div>
-                            <div class="font-bold text-white text-xs">За площею квартири</div>
-                            <div class="text-[10px] text-slate-400">Від найбільших (м²)</div>
-                        </div>
+                <!-- Row 5: Area DESC -->
+                <button onclick="applySort('area_desc')" id="sortOpt-area_desc" class="w-full px-4 py-3 flex items-center justify-between text-left transition-colors active:bg-white/10 hover:bg-white/[0.04]">
+                    <div>
+                        <div class="text-[14px] text-white font-medium leading-snug">За площею квартири</div>
+                        <div class="text-[11px] text-slate-400 leading-tight">Від найбільшого метражу (м²)</div>
                     </div>
-                    <span id="check-area_desc" class="text-cyan-400 font-bold hidden">✓</span>
+                    <div id="check-area_desc" class="text-[#0a84ff] shrink-0 pl-2 hidden">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>
+                    </div>
                 </button>
             </div>
         </div>
@@ -979,9 +962,9 @@
                 const isCur = (currentSort === k) || (k === 'distance' && currentSort === 'default' && userCoords);
                 if (btn) {
                     if (isCur) {
-                        btn.className = "w-full p-2.5 rounded-xl border-2 border-blue-500 bg-blue-500/10 flex items-center justify-between text-left transition-all";
+                        btn.className = "w-full px-4 py-3 flex items-center justify-between text-left transition-colors bg-white/[0.04]";
                     } else {
-                        btn.className = "w-full p-2.5 rounded-xl border border-white/10 bg-white/5 hover:border-white/20 flex items-center justify-between text-left transition-all";
+                        btn.className = "w-full px-4 py-3 flex items-center justify-between text-left transition-colors hover:bg-white/[0.02] active:bg-white/10";
                     }
                 }
                 if (check) {
