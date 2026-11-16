@@ -761,6 +761,11 @@
                     <div id="llPhotoPreviews" class="grid grid-cols-5 gap-1.5 mt-2 hidden"></div>
                     <p class="text-[11px] text-[#b2b7c3] mt-2 leading-relaxed">JPG, PNG або WebP. До 10 фото, до 8 МБ кожне, разом до 32 МБ. Фото стануть доступними після перевірки.</p>
                 </div>
+                <label class="flex items-start gap-2.5 py-2 text-[12px] text-[#b2b7c3] leading-relaxed cursor-pointer">
+                    <input type="checkbox" id="llRights" class="mt-0.5 rounded border-white/20 bg-[#2c2c2e]">
+                    <span>Я маю право подавати це оголошення, передавати зазначений номер та використовувати вибрані фотографії. Дані будуть перевірені перед публікацією.</span>
+                </label>
+                <p class="text-[11px] text-[#b2b7c3] leading-relaxed">Номер телефону не показується у відкритому каталозі. Користувачі отримують контакт через Telegram після запиту.</p>
                 <div class="flex items-center gap-3 pt-1">
                     <label class="flex items-center gap-1.5 cursor-pointer">
                         <input type="checkbox" id="llGpon" class="rounded bg-[#2c2c2e] border-white/10 text-[#30d158]">
@@ -2340,6 +2345,11 @@
             const phone = phoneInput?.value?.trim();
             const gpon = gponInput?.checked || false;
             const generator = genInput?.checked || false;
+            const rightsConfirmed = document.getElementById('llRights')?.checked || false;
+            if (!rightsConfirmed) {
+                showToast('Підтвердьте право на оголошення та фотографії');
+                return;
+            }
 
             if (!address || address.length < 5) {
                 showToast("Вкажіть точну адресу (вулиця, номер будинку)");
@@ -2383,6 +2393,7 @@
                         rooms: rooms,
                         phone: phone,
                         photos: landlordUploadedPhotoIds,
+                        rightsConfirmed: rightsConfirmed,
                         gpon: gpon,
                         generator: generator,
                         initData: initData
@@ -2400,6 +2411,8 @@
                     if (addressInput) addressInput.value = '';
                     if (priceInput) priceInput.value = '';
                     if (phoneInput) phoneInput.value = '';
+                    const rightsInput = document.getElementById('llRights');
+                    if (rightsInput) rightsInput.checked = false;
                 } else {
                     showToast(data.detail || "Помилка збереження заявки на сервері");
                 }
