@@ -29,7 +29,6 @@ import hmac
 import html
 import uuid
 import re
-import warnings
 import hashlib
 import json
 import time
@@ -278,8 +277,7 @@ def init_db():
 
     # Pre-populate private_deal_contacts table from private_contacts.json if empty
     try:
-        cur.execute("SELECT COUNT(*) FROM private_deal_contacts")
-        if cur.fetchone()[0] == 0 and os.path.exists(PRIVATE_CONTACTS_PATH):
+        if os.path.exists(PRIVATE_CONTACTS_PATH):
             with open(PRIVATE_CONTACTS_PATH, "r", encoding="utf-8") as pf:
                 priv_dict = json.load(pf)
                 for did_str, pinfo in priv_dict.items():
@@ -515,6 +513,32 @@ async def submit_report(req: ReportRequest, request: Request):
         "message": f"Скаргу #{comp_id} прийнято на розгляд модератором"
     }
 
+def cleanup_abandoned_uploads(max_age_hours: int = 48) -> None:
+    """Remove only unclaimed, unapproved uploads; never delete submitted photos."""
+    try:
+        conn = sqlite3.connect(DB_PATH, timeout=5.0)
+        try:
+            rows = conn.execute(
+                "SELECT photo_id FROM landlord_uploads WHERE status = 'pending' "
+                "AND submission_id IS NULL AND created_at < datetime('now', ?)",
+                (f"-{max_age_hours} hours",)
+            ).fetchmany(100)
+            for (photo_id,) in rows:
+                if PHOTO_ID_PATTERN.fullmatch(photo_id):
+                    path = os.path.join(UPLOADS_BASE_DIR, photo_id + ".webp")
+                    try:
+                        if os.path.exists(path): os.remove(path)
+                    except OSError:
+                        continue
+                    conn.execute("DELETE FROM landlord_uploads WHERE photo_id = ? "
+                                 "AND submission_id IS NULL AND status = 'pending'", (photo_id,))
+            conn.commit()
+        finally:
+            conn.close()
+    except sqlite3.Error:
+        logger.warning("Unable to purge abandoned uploads")
+
+
 @app.get("/api/media/{photo_id}")
 async def get_approved_photo(photo_id: str):
     """Serve a photo only after the corresponding listing has been approved."""
@@ -597,6 +621,9 @@ async def upload_landlord_photos(
     if not user or not isinstance(user.get("id"), int):
         raise HTTPException(status_code=401, detail="Відкрийте форму в Telegram для завантаження фото")
     user_id = user["id"]
+    request_bytes = request.headers.get("content-length")
+    if request_bytes and request_bytes.isdigit() and int(request_bytes) > MAX_IMAGE_BATCH_BYTES + 1024 * 1024:
+        raise HTTPException(status_code=413, detail="Перевищено максимальний обсяг завантаження")
     client_ip = request.client.host if request.client else "unknown"
     if not check_rate_limit(f"upload_user_{user_id}", max_requests=5, window_seconds=3600):
         raise HTTPException(status_code=429, detail="Забагато завантажень. Спробуйте пізніше")
@@ -605,6 +632,7 @@ async def upload_landlord_photos(
     if not 1 <= len(photos) <= 10:
         raise HTTPException(status_code=400, detail="Оберіть від 1 до 10 фотографій")
 
+    cleanup_abandoned_uploads()
     total_bytes = 0
     created_files = []
     photo_ids = []
