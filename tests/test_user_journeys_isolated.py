@@ -243,7 +243,7 @@ def test_successful_tenant_contact_delivery(isolated_app):
         assert target_chat == TEST_USER_ID, f"Expected alert sent to user {TEST_USER_ID}, got {target_chat}"
         assert "+380501112233" in msg_text, "Landlord phone must be in the Telegram message"
         assert "вул. Хрещатик, 15" in msg_text
-        assert "20,000 ₴/міс" in msg_text
+        assert "20 000 ₴/міс" in msg_text
         assert "Комісія уточнюється" in msg_text
         assert "0% комісії рієлторам" not in msg_text, "Unverified deal MUST NOT promise 0% commission!"
 
