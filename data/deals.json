@@ -1,34 +1,6 @@
 [
   {
     "id": 1,
-    "title": "Здам на місяць, вул Озерна 8, 3-кімнатну кв. ЛЮКС, БЕЗ КОМІСІІ...",
-    "district": "Оболон",
-    "address": "Київ, Оболонський",
-    "metro": "Метро Мінська",
-    "walkMin": 7,
-    "price": 27000,
-    "realtorCommissionSaved": 13500,
-    "area": 50,
-    "floor": 7,
-    "totalFloors": 14,
-    "lat": 50.49927,
-    "lng": 30.50912,
-    "generator": false,
-    "gpon": false,
-    "gas": false,
-    "lowFloor": false,
-    "pets": false,
-    "ownerName": "Олександр В.",
-    "phoneMasked": "+380 97 ••• •• 76",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/zdam-na-msyats-vul-ozerna-8-3-kmnatnu-kv-lyuks-bez-koms-5-hv-pshki-vd-m-g-dnpra-rayon-obolon-na-14-povers-pomesyachno-na-dovgiy-termn-ID11FaqC.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 2,
     "title": "Оренда квартири на Троєщині у ЖК Вигурівщина-20",
     "district": "Деснян",
     "address": "Київ, Деснянський",
@@ -56,7 +28,7 @@
     ]
   },
   {
-    "id": 3,
+    "id": 2,
     "title": "Довгострокова оренда 1 к квартири ЖК Кампус Нижньоключова 14 г...",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -84,7 +56,7 @@
     ]
   },
   {
-    "id": 4,
+    "id": 3,
     "title": "Здається 1 кімнатна квартира Святошинський район",
     "district": "Святошин",
     "address": "Київ, Святошинський",
@@ -112,7 +84,7 @@
     ]
   },
   {
-    "id": 5,
+    "id": 4,
     "title": "Генератор ‼️ Оренда квартири ЖК Зарічний, вул. Осокорська, 2а",
     "district": "Печер",
     "address": "Київ, Печерський",
@@ -140,7 +112,7 @@
     ]
   },
   {
-    "id": 6,
+    "id": 5,
     "title": "Сдам квартиру студию ЖК Каховская (ЖК Каховська)",
     "district": "Дніпров",
     "address": "Київ, Дніпровський",
@@ -168,7 +140,7 @@
     ]
   },
   {
-    "id": 7,
+    "id": 6,
     "title": "Здам 1-к квартиру Либідська Деміївська метро, проспект Науки",
     "district": "Голосіїв",
     "address": "Київ, Голосіївський",
@@ -196,7 +168,7 @@
     ]
   },
   {
-    "id": 8,
+    "id": 7,
     "title": "Оренда 3-кімнатної квартири",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -224,7 +196,7 @@
     ]
   },
   {
-    "id": 9,
+    "id": 8,
     "title": "Здається в оренлу 2 кімнатна квартира на Подолі. До метро Тара...",
     "district": "Поділь",
     "address": "Київ, Подільський",
@@ -252,91 +224,7 @@
     ]
   },
   {
-    "id": 10,
-    "title": "Сдам 1к квартиру новая с ремонтом ЖК Sky Avenue Можно с животными",
-    "district": "Солом'ян",
-    "address": "Київ, Солом'янський",
-    "metro": "Метро Вокзальна",
-    "walkMin": 13,
-    "price": 22000,
-    "realtorCommissionSaved": 11000,
-    "area": 42,
-    "floor": 5,
-    "totalFloors": 16,
-    "lat": 50.44059,
-    "lng": 30.46501,
-    "generator": true,
-    "gpon": true,
-    "gas": false,
-    "lowFloor": true,
-    "pets": true,
-    "ownerName": "Андрій Вікторович",
-    "phoneMasked": "+380 50 ••• •• 19",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/sdam-1k-kvartiru-novaya-s-remontom-zhk-sky-avenue-mozhno-s-zhivotnymi-ID11jqwY.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 11,
-    "title": "Здається в оренду однокімнатна квартира в районі \"шпалерного р...",
-    "district": "Святошин",
-    "address": "Київ, Святошинський",
-    "metro": "Метро Житомирська",
-    "walkMin": 7,
-    "price": 8000,
-    "realtorCommissionSaved": 4000,
-    "area": 68,
-    "floor": 4,
-    "totalFloors": 16,
-    "lat": 50.46536,
-    "lng": 30.35673,
-    "generator": false,
-    "gpon": false,
-    "gas": false,
-    "lowFloor": true,
-    "pets": false,
-    "ownerName": "Сергій Олександрович",
-    "phoneMasked": "+380 67 ••• •• 22",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/zdatsya-v-orendu-odnokmnatna-kvartira-v-rayon-shpalernogo-rinku-v-m-kiv-8000-grn-msyats-ID11CeVl.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 12,
-    "title": "Оренда! 2-кімн. вул. Хорива 50, Поділ!",
-    "district": "Поділь",
-    "address": "Київ, Подільський",
-    "metro": "Метро Контрактова площа",
-    "walkMin": 5,
-    "price": 20000,
-    "realtorCommissionSaved": 10000,
-    "area": 42,
-    "floor": 2,
-    "totalFloors": 9,
-    "lat": 50.4619,
-    "lng": 30.50216,
-    "generator": true,
-    "gpon": false,
-    "gas": true,
-    "lowFloor": true,
-    "pets": false,
-    "ownerName": "Марія Василівна",
-    "phoneMasked": "+380 67 ••• •• 32",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-2-kmn-vul-horiva-50-podl-ID11pQ0o.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 13,
+    "id": 9,
     "title": "ГАЗ Оренда 1к кв по вулиці Урлівська 1/8",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -364,7 +252,63 @@
     ]
   },
   {
-    "id": 14,
+    "id": 10,
+    "title": "Оренда 1К. Центр . Генератор . Паркінг.",
+    "district": "Солом'ян",
+    "address": "Київ, Солом'янський",
+    "metro": "Метро Вокзальна",
+    "walkMin": 11,
+    "price": 19990,
+    "realtorCommissionSaved": 9995,
+    "area": 36,
+    "floor": 7,
+    "totalFloors": 16,
+    "lat": 50.43965,
+    "lng": 30.46439,
+    "generator": true,
+    "gpon": true,
+    "gas": false,
+    "lowFloor": false,
+    "pets": false,
+    "ownerName": "Марія Василівна",
+    "phoneMasked": "+380 97 ••• •• 81",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-1k-tsentr-generator-parkng-IDZkosR.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 11,
+    "title": "Газ. Здам 1 кім. Квартиру. Борщагівка. вул. Якуба Коласа",
+    "district": "Святошин",
+    "address": "Київ, Святошинський",
+    "metro": "Метро Житомирська",
+    "walkMin": 7,
+    "price": 9999,
+    "realtorCommissionSaved": 4999,
+    "area": 58,
+    "floor": 6,
+    "totalFloors": 9,
+    "lat": 50.4613,
+    "lng": 30.34719,
+    "generator": false,
+    "gpon": false,
+    "gas": true,
+    "lowFloor": false,
+    "pets": true,
+    "ownerName": "Андрій Вікторович",
+    "phoneMasked": "+380 50 ••• •• 75",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/gaz-zdam-1-km-kvartiru-borschagvka-vul-yakuba-kolasa-ID11vFOU.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 12,
     "title": "Квартира, м. Берестейська, для 2-х осіб, від 6 місяців",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -392,7 +336,7 @@
     ]
   },
   {
-    "id": 15,
+    "id": 13,
     "title": "Оренда 1к квартири в ЖК Сучасний квартал/ Соломʼянський р-н/ п...",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -420,7 +364,7 @@
     ]
   },
   {
-    "id": 16,
+    "id": 14,
     "title": "Оренда 2-х кімнатної квартири ЖК \"Крістер Град\", вул.Сергія Да...",
     "district": "Поділь",
     "address": "Київ, Подільський",
@@ -448,7 +392,7 @@
     ]
   },
   {
-    "id": 17,
+    "id": 15,
     "title": "Сдам 1 комнатную кв-ру Русановский бульвар 9 м. Левобережная п...",
     "district": "Дніпров",
     "address": "Київ, Дніпровський",
@@ -476,7 +420,7 @@
     ]
   },
   {
-    "id": 18,
+    "id": 16,
     "title": "Оренда трикімнатної квартири в центрі, без комісії.",
     "district": "Голосіїв",
     "address": "Київ, Голосіївський",
@@ -504,7 +448,7 @@
     ]
   },
   {
-    "id": 19,
+    "id": 17,
     "title": "Сдам в аренду дизайнерскую видовую 1к квартиру 40м ЖК Славутич...",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -532,7 +476,7 @@
     ]
   },
   {
-    "id": 20,
+    "id": 18,
     "title": "Оренда  двохкімнатної квартири ЖК \"Крістер Град\"",
     "district": "Поділь",
     "address": "Київ, Подільський",
@@ -560,91 +504,7 @@
     ]
   },
   {
-    "id": 21,
-    "title": "Сдам 3к Голосіївський р-н м Деміївська вул Стратегічне Шоссе б...",
-    "district": "Голосіїв",
-    "address": "Київ, Голосіївський",
-    "metro": "Метро Деміївська",
-    "walkMin": 5,
-    "price": 15000,
-    "realtorCommissionSaved": 7500,
-    "area": 50,
-    "floor": 8,
-    "totalFloors": 25,
-    "lat": 50.40953,
-    "lng": 30.48042,
-    "generator": false,
-    "gpon": true,
-    "gas": false,
-    "lowFloor": false,
-    "pets": true,
-    "ownerName": "Олександр В.",
-    "phoneMasked": "+380 63 ••• •• 99",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/sdam-3k-golosvskiy-r-n-m-demvska-vul-strategchne-shosse-bud-11-ID11FFec.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 22,
-    "title": "Оренда 2К Софії Русової 7г. Позняки/ Осокорки",
-    "district": "Дарницький",
-    "address": "Київ, Дарницький",
-    "metro": "Метро Позняки",
-    "walkMin": 7,
-    "price": 21000,
-    "realtorCommissionSaved": 10500,
-    "area": 42,
-    "floor": 5,
-    "totalFloors": 16,
-    "lat": 50.39083,
-    "lng": 30.63125,
-    "generator": false,
-    "gpon": true,
-    "gas": false,
-    "lowFloor": true,
-    "pets": true,
-    "ownerName": "Андрій Вікторович",
-    "phoneMasked": "+380 63 ••• •• 51",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-2k-sof-rusovo-7g-poznyaki-osokorki-ID11Dl06.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 23,
-    "title": "Здаю власну 1-кім. кв. газ Харківське шосе 21/1",
-    "district": "Дарницький",
-    "address": "Київ, Дарницький",
-    "metro": "Метро Позняки",
-    "walkMin": 5,
-    "price": 10000,
-    "realtorCommissionSaved": 5000,
-    "area": 58,
-    "floor": 3,
-    "totalFloors": 16,
-    "lat": 50.40521,
-    "lng": 30.64839,
-    "generator": true,
-    "gpon": false,
-    "gas": true,
-    "lowFloor": true,
-    "pets": false,
-    "ownerName": "Марія Василівна",
-    "phoneMasked": "+380 63 ••• •• 80",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/zdayu-vlasnu-1-km-kv-gaz-harkvske-shose-21-1-ID11hZu4.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 24,
+    "id": 19,
     "title": "Оренда просторої 1-кімнатної квартири 60 м² | Печерськ | КБ «Ч...",
     "district": "Печер",
     "address": "Київ, Печерський",
@@ -672,7 +532,63 @@
     ]
   },
   {
-    "id": 25,
+    "id": 20,
+    "title": "Здам 3 кк вул. Древлянська, 14",
+    "district": "Шевченків",
+    "address": "Київ, Шевченківський",
+    "metro": "Метро Лук'янівська",
+    "walkMin": 11,
+    "price": 17000,
+    "realtorCommissionSaved": 8500,
+    "area": 68,
+    "floor": 7,
+    "totalFloors": 16,
+    "lat": 50.44516,
+    "lng": 30.50069,
+    "generator": false,
+    "gpon": false,
+    "gas": true,
+    "lowFloor": false,
+    "pets": false,
+    "ownerName": "Олександр В.",
+    "phoneMasked": "+380 67 ••• •• 24",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/zdam-3-kk-vul-drevlyanska-14-ID10Fcjl.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 21,
+    "title": "‼️Оренда без комісіі‼️ГАРНА квартири біля Дарницького Вокзалу ...",
+    "district": "Дарницький",
+    "address": "Київ, Дарницький",
+    "metro": "Метро Позняки",
+    "walkMin": 8,
+    "price": 7900,
+    "realtorCommissionSaved": 3950,
+    "area": 50,
+    "floor": 5,
+    "totalFloors": 9,
+    "lat": 50.38975,
+    "lng": 30.64587,
+    "generator": false,
+    "gpon": true,
+    "gas": true,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Олена Миколаївна",
+    "phoneMasked": "+380 50 ••• •• 19",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-bez-komsgarna-kvartiri-blya-darnitskogo-vokzalu-rinok-gaz-IDZPs67.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 22,
     "title": "Довгострокова оренда 1к квартира, Березняки",
     "district": "Дніпров",
     "address": "Київ, Дніпровський",
@@ -700,7 +616,7 @@
     ]
   },
   {
-    "id": 26,
+    "id": 23,
     "title": "Оренда однокімнатної квартири",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -728,7 +644,7 @@
     ]
   },
   {
-    "id": 27,
+    "id": 24,
     "title": "Здається квартира на вул. Назарівська, Другий поверх, м. Уніве...",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -756,7 +672,7 @@
     ]
   },
   {
-    "id": 28,
+    "id": 25,
     "title": "Здам 1 к.квартиру Максимовича ЖК 4 Сезона Голосіївський р-н Зд...",
     "district": "Голосіїв",
     "address": "Київ, Голосіївський",
@@ -784,7 +700,7 @@
     ]
   },
   {
-    "id": 29,
+    "id": 26,
     "title": "Здам 1-кімнатну smart-квартиру. ГАЗ .Солом’янський район, вул....",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -812,7 +728,7 @@
     ]
   },
   {
-    "id": 30,
+    "id": 27,
     "title": "Здаю 1-кімнатну студію Київ Куренівка ЖК НАВИГАТОР пер. Балтий...",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -840,7 +756,7 @@
     ]
   },
   {
-    "id": 31,
+    "id": 28,
     "title": "Здається 1 кiмн кв без посередникiв. Оболонь",
     "district": "Оболон",
     "address": "Київ, Оболонський",
@@ -868,7 +784,7 @@
     ]
   },
   {
-    "id": 32,
+    "id": 29,
     "title": "Довгострокова оренда 1-к квартири жк PODIL PLAZA & RESIDENCE, ...",
     "district": "Поділь",
     "address": "Київ, Шевченківський",
@@ -896,91 +812,7 @@
     ]
   },
   {
-    "id": 33,
-    "title": "Сдам 2к Шевченківський р-н м Нивки вул Щербаківського буд 51-А",
-    "district": "Шевченків",
-    "address": "Київ, Шевченківський",
-    "metro": "Метро Лук'янівська",
-    "walkMin": 8,
-    "price": 9000,
-    "realtorCommissionSaved": 4500,
-    "area": 36,
-    "floor": 5,
-    "totalFloors": 16,
-    "lat": 50.45179,
-    "lng": 30.4898,
-    "generator": false,
-    "gpon": false,
-    "gas": true,
-    "lowFloor": true,
-    "pets": false,
-    "ownerName": "Марія Василівна",
-    "phoneMasked": "+380 63 ••• •• 31",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/sdam-2k-shevchenkvskiy-r-n-m-nivki-vul-scherbakvskogo-bud-51-a-ID11Au6O.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 34,
-    "title": "ЗДАЮ недорого чудову гостинку (Шевченків.) і гарну кімнату (Го...",
-    "district": "Голосіїв",
-    "address": "Київ, Шевченківський",
-    "metro": "Метро Деміївська",
-    "walkMin": 6,
-    "price": 7000,
-    "realtorCommissionSaved": 3500,
-    "area": 58,
-    "floor": 8,
-    "totalFloors": 14,
-    "lat": 50.38569,
-    "lng": 30.48885,
-    "generator": false,
-    "gpon": true,
-    "gas": true,
-    "lowFloor": false,
-    "pets": false,
-    "ownerName": "Марія Василівна",
-    "phoneMasked": "+380 63 ••• •• 27",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/zdayu-nedorogo-chudovu-gostinku-shevchenkv-garnu-kmnatu-golosv-noviy-budinok-metro-pshki-ID11FNTi.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 35,
-    "title": "Від власника | Перша здача 1К | ЖК Діброва Парк | Автономність",
-    "district": "Поділь",
-    "address": "Київ, Подільський",
-    "metro": "Метро Контрактова площа",
-    "walkMin": 6,
-    "price": 18000,
-    "realtorCommissionSaved": 9000,
-    "area": 68,
-    "floor": 4,
-    "totalFloors": 25,
-    "lat": 50.46167,
-    "lng": 30.51558,
-    "generator": false,
-    "gpon": false,
-    "gas": true,
-    "lowFloor": true,
-    "pets": true,
-    "ownerName": "Сергій Олександрович",
-    "phoneMasked": "+380 97 ••• •• 57",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/vd-vlasnika-persha-zdacha-1k-zhk-dbrova-park-avtonomnst-ID11ushX.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 36,
+    "id": 30,
     "title": "Здам квартиру ЖК «OK'LAND» Київ, Повітряних сил пр-т DT",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -1008,7 +840,35 @@
     ]
   },
   {
-    "id": 37,
+    "id": 31,
+    "title": "ГЕНЕРАТОР‼️48кв 1 комнатная квартира с авторомним опаленням у ...",
+    "district": "Дарницький",
+    "address": "Київ, Дарницький",
+    "metro": "Метро Позняки",
+    "walkMin": 7,
+    "price": 15000,
+    "realtorCommissionSaved": 7500,
+    "area": 48,
+    "floor": 6,
+    "totalFloors": 14,
+    "lat": 50.39664,
+    "lng": 30.64452,
+    "generator": true,
+    "gpon": false,
+    "gas": false,
+    "lowFloor": false,
+    "pets": false,
+    "ownerName": "Олена Миколаївна",
+    "phoneMasked": "+380 63 ••• •• 80",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/generator48kv-1-komnatnaya-kvartira-s-avtoromnim-opalennyam-u-metro-harkovskaya-harkvska-zhk-revutskiy-odnokmnatna-v-orendu-arendu-poznyaki-vyrlitsa-ID11oyoE.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 32,
     "title": "Аренда 1к квартира Булгакова 16(Вахтанга Кікабідзе)",
     "district": "Святошин",
     "address": "Київ, Святошинський",
@@ -1036,7 +896,7 @@
     ]
   },
   {
-    "id": 38,
+    "id": 33,
     "title": "Сдам 2-х комнатную квартиру по ул. Героев Днепра, 35",
     "district": "Оболон",
     "address": "Київ, Оболонський",
@@ -1064,7 +924,7 @@
     ]
   },
   {
-    "id": 39,
+    "id": 34,
     "title": "Оренда 3-к в Києві | Велика Васильківська | Палац України | Бе...",
     "district": "Голосіїв",
     "address": "Київ, Голосіївський",
@@ -1092,7 +952,7 @@
     ]
   },
   {
-    "id": 40,
+    "id": 35,
     "title": "ЖК Британский квартал ул Луценко Дмитра 14 оренда квартіры  БЕ...",
     "district": "Голосіїв",
     "address": "Київ, Голосіївський",
@@ -1120,7 +980,7 @@
     ]
   },
   {
-    "id": 41,
+    "id": 36,
     "title": "Оренда 2 кімнатної квартири Кришталеві Джерела",
     "district": "Голосіїв",
     "address": "Київ, Голосіївський",
@@ -1148,7 +1008,7 @@
     ]
   },
   {
-    "id": 42,
+    "id": 37,
     "title": "Пропонується  в оренду 2 кімнатна кв Елізіум. Шевченківський р...",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -1176,7 +1036,7 @@
     ]
   },
   {
-    "id": 43,
+    "id": 38,
     "title": "Здам 1к квартиру ЖК Французький квартал 2 Либідська Печерськ Ц...",
     "district": "Печер",
     "address": "Київ, Печерський",
@@ -1204,7 +1064,7 @@
     ]
   },
   {
-    "id": 44,
+    "id": 39,
     "title": "Без комісії Здам свою Однокімнатну квартину на Позняках Осокор...",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -1226,13 +1086,13 @@
     "phoneMasked": "+380 63 ••• •• 76",
     "url": "https://www.olx.ua/d/uk/obyavlenie/bez-koms-zdam-svoyu-odnokmnatnu-kvartinu-na-poznyakah-osokorkah-54m2-gmir-4-ID11t3Kl.html",
     "images": [
-      "https://ireland.apollo.olxcdn.com:443/v1/files/las4ivfah85q3-UA/image;s=644x461",
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
     ]
   },
   {
-    "id": 45,
+    "id": 40,
     "title": "Оренда однокімнатної квартири від власника. ЖК Варшавський +, ...",
     "district": "Поділь",
     "address": "Київ, Подільський",
@@ -1260,91 +1120,7 @@
     ]
   },
   {
-    "id": 46,
-    "title": "Оренда 1-кімнатної квартири по просп. Соборності,13-А, Дніпров...",
-    "district": "Дарницький",
-    "address": "Київ, Дніпровський",
-    "metro": "Метро Позняки",
-    "walkMin": 6,
-    "price": 9000,
-    "realtorCommissionSaved": 4500,
-    "area": 42,
-    "floor": 5,
-    "totalFloors": 25,
-    "lat": 50.40666,
-    "lng": 30.63354,
-    "generator": false,
-    "gpon": true,
-    "gas": false,
-    "lowFloor": true,
-    "pets": true,
-    "ownerName": "Олена Миколаївна",
-    "phoneMasked": "+380 63 ••• •• 37",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-1-kmnatno-kvartiri-po-prosp-sobornost-13-a-dnprovskiy-r-n-darnitsya-bvr-metro-darnitsya-ID11aKqA.html",
-    "images": [
-      "https://ireland.apollo.olxcdn.com:443/v1/files/ak69yuwyp0p83-UA/image;s=644x461",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 47,
-    "title": "Оренда повноцінної 1к+ кухня-вітальня! ЛІФТ, ОПАЛЕННЯ, ВОДА- в...",
-    "district": "Голосіїв",
-    "address": "Київ, Голосіївський",
-    "metro": "Метро Деміївська",
-    "walkMin": 5,
-    "price": 21000,
-    "realtorCommissionSaved": 10500,
-    "area": 58,
-    "floor": 8,
-    "totalFloors": 25,
-    "lat": 50.39162,
-    "lng": 30.48718,
-    "generator": true,
-    "gpon": false,
-    "gas": false,
-    "lowFloor": false,
-    "pets": false,
-    "ownerName": "Олександр В.",
-    "phoneMasked": "+380 50 ••• •• 84",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-povnotsnno-1k-kuhnya-vtalnya-lft-opalennya-voda-vd-generatora-akamulyatorv-suchasniy-zhk-nova-anglya-do-metro-vasilkvska-15hv-pshki-ID11atTg.html",
-    "images": [
-      "https://ireland.apollo.olxcdn.com:443/v1/files/q9g07g7rnank1-UA/image;s=644x461",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 48,
-    "title": "Здам однокімнатну квартиру 36м2 Лаврська, 4",
-    "district": "Печер",
-    "address": "Київ, Печерський",
-    "metro": "Метро Печерська",
-    "walkMin": 7,
-    "price": 18500,
-    "realtorCommissionSaved": 9250,
-    "area": 36,
-    "floor": 5,
-    "totalFloors": 16,
-    "lat": 50.42442,
-    "lng": 30.54569,
-    "generator": false,
-    "gpon": true,
-    "gas": false,
-    "lowFloor": true,
-    "pets": false,
-    "ownerName": "Олена Миколаївна",
-    "phoneMasked": "+380 50 ••• •• 18",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/zdam-odnokmnatnu-kvartiru-36m2-lavrska-4-ID11yIfx.html",
-    "images": [
-      "https://ireland.apollo.olxcdn.com:443/v1/files/j52oips85q8q1-UA/image;s=644x461",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 49,
+    "id": 41,
     "title": "Оренда 1 кімн, Довженка м. Шулявська",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -1366,13 +1142,97 @@
     "phoneMasked": "+380 50 ••• •• 58",
     "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-1-kmn-dovzhenka-m-shulyavska-ID11DlJx.html",
     "images": [
+      "https://ireland.apollo.olxcdn.com:443/v1/files/ty5pru7n2nlg3-UA/image;s=644x461",
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
     ]
   },
   {
-    "id": 50,
+    "id": 42,
+    "title": "Здається 1 кімн. квартира. НАУ. проспект Любомира Гузара, 20-А",
+    "district": "Солом'ян",
+    "address": "Київ, Солом'янський",
+    "metro": "Метро Вокзальна",
+    "walkMin": 12,
+    "price": 14000,
+    "realtorCommissionSaved": 7000,
+    "area": 36,
+    "floor": 3,
+    "totalFloors": 16,
+    "lat": 50.42293,
+    "lng": 30.4623,
+    "generator": false,
+    "gpon": true,
+    "gas": false,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Олександр В.",
+    "phoneMasked": "+380 63 ••• •• 80",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/zdatsya-1-kmn-kvartira-nau-prospekt-lyubomira-guzara-20-a-ID11mByI.html",
+    "images": [
+      "https://ireland.apollo.olxcdn.com:443/v1/files/73kac1s6tpk92-UA/image;s=644x461",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 43,
+    "title": "Деміївська Оренда ГЕНЕРАТОР  1к кімнатної квартири власник Фео...",
+    "district": "Голосіїв",
+    "address": "Київ, Голосіївський",
+    "metro": "Метро Деміївська",
+    "walkMin": 8,
+    "price": 20900,
+    "realtorCommissionSaved": 10450,
+    "area": 50,
+    "floor": 2,
+    "totalFloors": 14,
+    "lat": 50.40049,
+    "lng": 30.49084,
+    "generator": true,
+    "gpon": true,
+    "gas": true,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Сергій Олександрович",
+    "phoneMasked": "+380 67 ••• •• 51",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/demvska-orenda-generator-1k-kmnatno-kvartiri-vlasnik-feodosyska-2l-zdam-demvska-IDSMsQ1.html",
+    "images": [
+      "https://ireland.apollo.olxcdn.com:443/v1/files/u00yix7rh5sz-UA/image;s=644x461",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 44,
+    "title": "Троєщина, вул. Бикова, 6, Спортлайф, Червоної калини, Закревсь...",
+    "district": "Дніпров",
+    "address": "Київ, Дніпровський",
+    "metro": "Метро Лівобережна",
+    "walkMin": 6,
+    "price": 8000,
+    "realtorCommissionSaved": 4000,
+    "area": 68,
+    "floor": 4,
+    "totalFloors": 14,
+    "lat": 50.46575,
+    "lng": 30.61597,
+    "generator": true,
+    "gpon": true,
+    "gas": true,
+    "lowFloor": true,
+    "pets": true,
+    "ownerName": "Андрій Вікторович",
+    "phoneMasked": "+380 67 ••• •• 25",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/troschina-vul-bikova-6-sportlayf-chervono-kalini-zakrevskogo-bez-koms-ID11jvbS.html",
+    "images": [
+      "https://ireland.apollo.olxcdn.com:443/v1/files/4ivg46pdn8qn2-UA/image;s=644x461",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 45,
     "title": "оренда квартири Героїв Дніпра 42б",
     "district": "Оболон",
     "address": "Київ, Оболонський",
@@ -1400,7 +1260,7 @@
     ]
   },
   {
-    "id": 51,
+    "id": 46,
     "title": "Здам 1-кімнатну квартиру з генератором",
     "district": "Деснян",
     "address": "Київ, Деснянський",
@@ -1428,7 +1288,7 @@
     ]
   },
   {
-    "id": 52,
+    "id": 47,
     "title": "* Затишна 1-кімнатна квартира по вул. Верховинна, 35",
     "district": "Святошин",
     "address": "Київ, Святошинський",
@@ -1456,7 +1316,7 @@
     ]
   },
   {
-    "id": 53,
+    "id": 48,
     "title": "Оренда без комісії 1 кімнатна на Харківському шосе 160-А  з вл...",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -1484,7 +1344,7 @@
     ]
   },
   {
-    "id": 54,
+    "id": 49,
     "title": "Оренда здам 2к квартири ЖК Старт 2",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -1512,91 +1372,7 @@
     ]
   },
   {
-    "id": 55,
-    "title": "ТЕРМІНОВО ( 2 спальні ) Оренда 2х кімнатної квартири 63м2 ЖК \"...",
-    "district": "Печер",
-    "address": "Київ, Печерський",
-    "metro": "Метро Печерська",
-    "walkMin": 5,
-    "price": 40000,
-    "realtorCommissionSaved": 20000,
-    "area": 63,
-    "floor": 2,
-    "totalFloors": 14,
-    "lat": 50.42189,
-    "lng": 30.5466,
-    "generator": true,
-    "gpon": true,
-    "gas": true,
-    "lowFloor": true,
-    "pets": false,
-    "ownerName": "Олена Миколаївна",
-    "phoneMasked": "+380 67 ••• •• 14",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/termnovo-2-spaln-orenda-2h-kmnatno-kvartiri-63m2-zhk-frantsuzskiy-kvartal-2-vulitsya-makkeyna-1b-pecherskiy-rayon-tsentr-msta-kiv-IDYqPwA.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 56,
-    "title": "Оренда  4к квартири 140 м2  на Оболоні! Метро Мінська 5 хв.",
-    "district": "Оболон",
-    "address": "Київ, Оболонський",
-    "metro": "Метро Мінська",
-    "walkMin": 7,
-    "price": 27000,
-    "realtorCommissionSaved": 13500,
-    "area": 140,
-    "floor": 7,
-    "totalFloors": 14,
-    "lat": 50.50175,
-    "lng": 30.4937,
-    "generator": false,
-    "gpon": true,
-    "gas": true,
-    "lowFloor": false,
-    "pets": true,
-    "ownerName": "Марія Василівна",
-    "phoneMasked": "+380 50 ••• •• 75",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-4k-kvartiri-140-m2-na-obolon-metro-mnska-5-hv-ID11BAxF.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 57,
-    "title": "Оренда 2-кімнатної квартири, вул. Архітектора Вербицького 9Ж, ...",
-    "district": "Дарницький",
-    "address": "Київ, Дарницький",
-    "metro": "Метро Позняки",
-    "walkMin": 7,
-    "price": 8000,
-    "realtorCommissionSaved": 4000,
-    "area": 42,
-    "floor": 3,
-    "totalFloors": 25,
-    "lat": 50.40894,
-    "lng": 30.63655,
-    "generator": true,
-    "gpon": true,
-    "gas": false,
-    "lowFloor": true,
-    "pets": false,
-    "ownerName": "Марія Василівна",
-    "phoneMasked": "+380 63 ••• •• 25",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-2-kmnatno-kvartiri-vul-arhtektora-verbitskogo-9zh-harkvske-shose-15-hv-pshki-do-metrodarnitskiy-rayon-ID11z1Tz.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 58,
+    "id": 50,
     "title": "Оренда квартири у скандинавському стилі в ЖК Лебединий Ревуцьк...",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -1624,7 +1400,7 @@
     ]
   },
   {
-    "id": 59,
+    "id": 51,
     "title": "Оболонь Йорданська 11 Д Оренда 2 кім. Метро 5  хвил. Без комісії",
     "district": "Оболон",
     "address": "Київ, Оболонський",
@@ -1652,7 +1428,7 @@
     ]
   },
   {
-    "id": 60,
+    "id": 52,
     "title": "Оренда чудовоі  3к  квартири по вул Хорольська, 1А. БЕЗ КОМІСІІ .",
     "district": "Дніпров",
     "address": "Київ, Дніпровський",
@@ -1680,7 +1456,91 @@
     ]
   },
   {
-    "id": 61,
+    "id": 53,
+    "title": "Автономне опалення, водопостачання!!!4 Поверх, Оренда квартири...",
+    "district": "Печер",
+    "address": "Київ, Печерський",
+    "metro": "Метро Печерська",
+    "walkMin": 4,
+    "price": 37000,
+    "realtorCommissionSaved": 18500,
+    "area": 50,
+    "floor": 7,
+    "totalFloors": 16,
+    "lat": 50.41223,
+    "lng": 30.52415,
+    "generator": false,
+    "gpon": true,
+    "gas": false,
+    "lowFloor": false,
+    "pets": true,
+    "ownerName": "Олександр В.",
+    "phoneMasked": "+380 97 ••• •• 65",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/avtonomne-opalennya-vodopostachannya-4-poverh-orenda-kvartiri-na-pechersku-m-libdska-zvrenetska-ID10RYaK.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 54,
+    "title": "Метро \"Голосіївська\" пішки, 1-кімнатна квартира, газ, завжди є...",
+    "district": "Голосіїв",
+    "address": "Київ, Голосіївський",
+    "metro": "Метро Деміївська",
+    "walkMin": 8,
+    "price": 12000,
+    "realtorCommissionSaved": 6000,
+    "area": 36,
+    "floor": 2,
+    "totalFloors": 9,
+    "lat": 50.39747,
+    "lng": 30.49768,
+    "generator": false,
+    "gpon": true,
+    "gas": true,
+    "lowFloor": true,
+    "pets": true,
+    "ownerName": "Марія Василівна",
+    "phoneMasked": "+380 97 ••• •• 59",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/metro-golosvska-pshki-1-kmnatna-kvartira-gaz-zavzhdi-opalennya-ID11B34c.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 55,
+    "title": "Здам квартиру Русанівська Гавань студію без комісіі від власника",
+    "district": "Дніпров",
+    "address": "Київ, Дніпровський",
+    "metro": "Метро Лівобережна",
+    "walkMin": 7,
+    "price": 17000,
+    "realtorCommissionSaved": 8500,
+    "area": 36,
+    "floor": 2,
+    "totalFloors": 25,
+    "lat": 50.44913,
+    "lng": 30.59808,
+    "generator": false,
+    "gpon": false,
+    "gas": false,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Сергій Олександрович",
+    "phoneMasked": "+380 67 ••• •• 50",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/zdam-kvartiru-rusanvska-gavan-studyu-bez-koms-vd-vlasnika-ID11xFjM.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 56,
     "title": "оренда квартири Борщагівка Зодчиз",
     "district": "Святошин",
     "address": "Київ, Святошинський",
@@ -1708,7 +1568,7 @@
     ]
   },
   {
-    "id": 62,
+    "id": 57,
     "title": "Оренда 1-к . Будинок автономний. вул Анни Ахматової 46. м Позн...",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -1736,7 +1596,7 @@
     ]
   },
   {
-    "id": 63,
+    "id": 58,
     "title": "Здається 1-кімнатна квартира на Південній Борщагівці на 4 пове...",
     "district": "Святошин",
     "address": "Київ, Святошинський",
@@ -1764,7 +1624,7 @@
     ]
   },
   {
-    "id": 64,
+    "id": 59,
     "title": "Оренда 1к  квартири 53м  ЖК \"Новий Автограф\"",
     "district": "Дніпров",
     "address": "Київ, Дніпровський",
@@ -1792,7 +1652,7 @@
     ]
   },
   {
-    "id": 65,
+    "id": 60,
     "title": "Оренда 2к квартир метро Академмістечко/ вул.Єфремова 20",
     "district": "Святошин",
     "address": "Київ, Святошинський",
@@ -1820,7 +1680,7 @@
     ]
   },
   {
-    "id": 66,
+    "id": 61,
     "title": "Оренда 1-кімнатної квартири; Бажана 9-г",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -1848,63 +1708,7 @@
     ]
   },
   {
-    "id": 67,
-    "title": "Здам  1 кімнатну Вільна Троещина Є генератор",
-    "district": "Деснян",
-    "address": "Київ, Деснянський",
-    "metro": "Метро Чернігівська",
-    "walkMin": 15,
-    "price": 13000,
-    "realtorCommissionSaved": 6500,
-    "area": 50,
-    "floor": 2,
-    "totalFloors": 16,
-    "lat": 50.50352,
-    "lng": 30.61184,
-    "generator": true,
-    "gpon": false,
-    "gas": true,
-    "lowFloor": true,
-    "pets": true,
-    "ownerName": "Марія Василівна",
-    "phoneMasked": "+380 50 ••• •• 70",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/zdam-1-kmnatnu-vlna-troeschina-generator-ID11bEoS.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 68,
-    "title": "Сдам свою автономную 3х квартиру  м Позняки",
-    "district": "Дарницький",
-    "address": "Київ, Дарницький",
-    "metro": "Метро Позняки",
-    "walkMin": 9,
-    "price": 25000,
-    "realtorCommissionSaved": 12500,
-    "area": 68,
-    "floor": 5,
-    "totalFloors": 9,
-    "lat": 50.39544,
-    "lng": 30.6201,
-    "generator": false,
-    "gpon": false,
-    "gas": false,
-    "lowFloor": true,
-    "pets": false,
-    "ownerName": "Олена Миколаївна",
-    "phoneMasked": "+380 63 ••• •• 20",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/sdam-svoyu-avtonomnuyu-3h-kvartiru-m-poznyaki-ID11EVYn.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 69,
+    "id": 62,
     "title": "Власник!!! Оренда по вул. Драгоманова, 1а",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -1932,7 +1736,7 @@
     ]
   },
   {
-    "id": 70,
+    "id": 63,
     "title": "Оренда квартири, Берестейський проспект 60, 10хв від метро",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -1960,7 +1764,7 @@
     ]
   },
   {
-    "id": 71,
+    "id": 64,
     "title": "Оренда 1кім. квартира. Можна з твариною",
     "district": "Оболон",
     "address": "Київ, Оболонський",
@@ -1988,7 +1792,91 @@
     ]
   },
   {
-    "id": 72,
+    "id": 65,
+    "title": "2-кімн. 57,7 м² | Перша здача | Ремонт | Вишгородська 56/2",
+    "district": "Оболон",
+    "address": "Київ, Оболонський",
+    "metro": "Метро Мінська",
+    "walkMin": 10,
+    "price": 21000,
+    "realtorCommissionSaved": 10500,
+    "area": 42,
+    "floor": 8,
+    "totalFloors": 14,
+    "lat": 50.50969,
+    "lng": 30.50049,
+    "generator": false,
+    "gpon": true,
+    "gas": false,
+    "lowFloor": false,
+    "pets": false,
+    "ownerName": "Олександр В.",
+    "phoneMasked": "+380 63 ••• •• 46",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/2-kmn-57-7-m-persha-zdacha-remont-vishgorodska-56-2-ID11j8Od.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 66,
+    "title": "ЖК «Квартет», В. Липківського, 16-Г, довгострокова оренда 3- к...",
+    "district": "Солом'ян",
+    "address": "Київ, Солом'янський",
+    "metro": "Метро Вокзальна",
+    "walkMin": 12,
+    "price": 38000,
+    "realtorCommissionSaved": 19000,
+    "area": 42,
+    "floor": 7,
+    "totalFloors": 9,
+    "lat": 50.42008,
+    "lng": 30.46073,
+    "generator": true,
+    "gpon": false,
+    "gas": true,
+    "lowFloor": false,
+    "pets": true,
+    "ownerName": "Олександр В.",
+    "phoneMasked": "+380 67 ••• •• 45",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/zhk-kvartet-v-lipkvskogo-16-g-dovgostrokova-orenda-3-kmn-IDZ16Xa.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 67,
+    "title": "Здам в оренду 1к квартиру м. Шулявська, вул. Гетьмана 1",
+    "district": "Шевченків",
+    "address": "Київ, Шевченківський",
+    "metro": "Метро Лук'янівська",
+    "walkMin": 8,
+    "price": 13000,
+    "realtorCommissionSaved": 6500,
+    "area": 50,
+    "floor": 6,
+    "totalFloors": 14,
+    "lat": 50.46206,
+    "lng": 30.49487,
+    "generator": true,
+    "gpon": true,
+    "gas": false,
+    "lowFloor": false,
+    "pets": false,
+    "ownerName": "Сергій Олександрович",
+    "phoneMasked": "+380 97 ••• •• 66",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/zdam-v-orendu-1k-kvartiru-m-shulyavska-vul-getmana-1-ID11ifw5.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 68,
     "title": "Здам в довгострокову оренду 1к квартиру",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -2016,7 +1904,7 @@
     ]
   },
   {
-    "id": 73,
+    "id": 69,
     "title": "Оренда квартири метро Лівобережна, Аболмасова 4-а, є укриття, ...",
     "district": "Дніпров",
     "address": "Київ, Дніпровський",
@@ -2044,7 +1932,7 @@
     ]
   },
   {
-    "id": 74,
+    "id": 70,
     "title": "Оренда 3-х кімнатної квартири",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -2072,7 +1960,7 @@
     ]
   },
   {
-    "id": 75,
+    "id": 71,
     "title": "Оренда 3к жк Dock32, з паркомісцем! Укриття, генератор, 2 пове...",
     "district": "Оболон",
     "address": "Київ, Оболонський",
@@ -2100,7 +1988,7 @@
     ]
   },
   {
-    "id": 76,
+    "id": 72,
     "title": "Квартира з інвертором та батарєєю на 5 Кв  від власника Британ...",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -2128,7 +2016,7 @@
     ]
   },
   {
-    "id": 77,
+    "id": 73,
     "title": "Оренда 2 кімнатної квартири, центр,  поруч з метро Політехнічн...",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -2156,91 +2044,7 @@
     ]
   },
   {
-    "id": 78,
-    "title": "Здам в оренду 1-к квартиру м. Осокорки, Д. Набережна, б. 26",
-    "district": "Дарницький",
-    "address": "Київ, Дарницький",
-    "metro": "Метро Позняки",
-    "walkMin": 5,
-    "price": 16000,
-    "realtorCommissionSaved": 8000,
-    "area": 42,
-    "floor": 6,
-    "totalFloors": 25,
-    "lat": 50.39434,
-    "lng": 30.61978,
-    "generator": false,
-    "gpon": false,
-    "gas": false,
-    "lowFloor": false,
-    "pets": false,
-    "ownerName": "Сергій Олександрович",
-    "phoneMasked": "+380 67 ••• •• 13",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/zdam-v-orendu-1-k-kvartiru-m-osokorki-d-naberezhna-b-26-ID11EHpM.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 79,
-    "title": "1к квартира на вулиці  Бориспольскій",
-    "district": "Дарницький",
-    "address": "Київ, Дарницький",
-    "metro": "Метро Позняки",
-    "walkMin": 9,
-    "price": 7000,
-    "realtorCommissionSaved": 3500,
-    "area": 68,
-    "floor": 7,
-    "totalFloors": 25,
-    "lat": 50.41234,
-    "lng": 30.64898,
-    "generator": true,
-    "gpon": true,
-    "gas": false,
-    "lowFloor": false,
-    "pets": false,
-    "ownerName": "Олена Миколаївна",
-    "phoneMasked": "+380 97 ••• •• 53",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/1k-kvartira-na-vulits-borispolsky-ID11Fumc.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 80,
-    "title": "Оренда 1к.квартири Оболонь метро Мінська, Героїв Дніпра",
-    "district": "Оболон",
-    "address": "Київ, Оболонський",
-    "metro": "Метро Мінська",
-    "walkMin": 7,
-    "price": 13000,
-    "realtorCommissionSaved": 6500,
-    "area": 50,
-    "floor": 5,
-    "totalFloors": 25,
-    "lat": 50.4964,
-    "lng": 30.50819,
-    "generator": false,
-    "gpon": true,
-    "gas": true,
-    "lowFloor": true,
-    "pets": true,
-    "ownerName": "Олександр В.",
-    "phoneMasked": "+380 67 ••• •• 17",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-1k-kvartiri-obolon-metro-mnska-gerov-dnpra-ID11BNQS.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 81,
+    "id": 74,
     "title": "Оренда євродвушки Берестейський пр-кт 22, ТРЦ Смартплаза поруч...",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -2268,7 +2072,7 @@
     ]
   },
   {
-    "id": 82,
+    "id": 75,
     "title": "Здається Квартира 1 кімнатна у Варшавському +",
     "district": "Поділь",
     "address": "Київ, Подільський",
@@ -2296,7 +2100,7 @@
     ]
   },
   {
-    "id": 83,
+    "id": 76,
     "title": "1 кімнатна квартира біля метро, газ і 3 поверх",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -2324,7 +2128,91 @@
     ]
   },
   {
-    "id": 84,
+    "id": 77,
+    "title": "Здається 1-к квартира в центрі Києва вул.Софіїіська 4",
+    "district": "Шевченків",
+    "address": "Київ, Шевченківський",
+    "metro": "Метро Лук'янівська",
+    "walkMin": 8,
+    "price": 23000,
+    "realtorCommissionSaved": 11500,
+    "area": 36,
+    "floor": 2,
+    "totalFloors": 25,
+    "lat": 50.44706,
+    "lng": 30.4971,
+    "generator": true,
+    "gpon": true,
+    "gas": true,
+    "lowFloor": true,
+    "pets": true,
+    "ownerName": "Андрій Вікторович",
+    "phoneMasked": "+380 67 ••• •• 72",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/zdatsya-1-k-kvartira-v-tsentr-kiva-vul-sofska-4-ID112S2f.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 78,
+    "title": "Сдам 1 комн.квартиру по ул.Камянская 127, ЖК Метро Парк, М.Вир...",
+    "district": "Дарницький",
+    "address": "Київ, Дарницький",
+    "metro": "Метро Позняки",
+    "walkMin": 6,
+    "price": 15500,
+    "realtorCommissionSaved": 7750,
+    "area": 42,
+    "floor": 5,
+    "totalFloors": 16,
+    "lat": 50.39807,
+    "lng": 30.65208,
+    "generator": false,
+    "gpon": true,
+    "gas": false,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Сергій Олександрович",
+    "phoneMasked": "+380 97 ••• •• 23",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/sdam-1-komn-kvartiru-po-ul-kamyanskaya-127-zhk-metro-park-m-virlitsya-6-min-peshkom-ID11iWEt.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 79,
+    "title": "3 кімнатна квартира Троєщина від власника",
+    "district": "Деснян",
+    "address": "Київ, Деснянський",
+    "metro": "Метро Чернігівська",
+    "walkMin": 12,
+    "price": 15000,
+    "realtorCommissionSaved": 7500,
+    "area": 58,
+    "floor": 8,
+    "totalFloors": 25,
+    "lat": 50.52488,
+    "lng": 30.60036,
+    "generator": false,
+    "gpon": false,
+    "gas": false,
+    "lowFloor": false,
+    "pets": false,
+    "ownerName": "Андрій Вікторович",
+    "phoneMasked": "+380 67 ••• •• 34",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/3-kmnatna-kvartira-troschina-vd-vlasnika-ID11mjyc.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 80,
     "title": "Оренда 2-х кімнатна, Оболонь",
     "district": "Оболон",
     "address": "Київ, Оболонський",
@@ -2352,7 +2240,7 @@
     ]
   },
   {
-    "id": 85,
+    "id": 81,
     "title": "Хозяин сдает БЕЗ КОМИССИИ 1 К КВ. ЖК \"Мегасити\" Хороший ремонт...",
     "district": "Дніпров",
     "address": "Київ, Дніпровський",
@@ -2380,7 +2268,7 @@
     ]
   },
   {
-    "id": 86,
+    "id": 82,
     "title": "Власник - 2 спальні Бульвар Лесі Українки 16А",
     "district": "Печер",
     "address": "Київ, Печерський",
@@ -2408,7 +2296,7 @@
     ]
   },
   {
-    "id": 87,
+    "id": 83,
     "title": "Оренда квартири, автозаводська 7а, 2 кімнати",
     "district": "Оболон",
     "address": "Київ, Оболонський",
@@ -2436,7 +2324,7 @@
     ]
   },
   {
-    "id": 88,
+    "id": 84,
     "title": "Довгострокова оренда 1-кімнатної квартири ЖК \"Малахіт\" (м. Вок...",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -2464,7 +2352,7 @@
     ]
   },
   {
-    "id": 89,
+    "id": 85,
     "title": "Оренда  однокімнатноі квартири  жк Елізіум",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -2486,13 +2374,13 @@
     "phoneMasked": "+380 50 ••• •• 96",
     "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-odnokmnatno-kvartiri-zhk-elzum-ID11blGi.html",
     "images": [
-      "https://ireland.apollo.olxcdn.com:443/v1/files/6qlcr7tvufy8-UA/image;s=644x461",
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
     ]
   },
   {
-    "id": 90,
+    "id": 86,
     "title": "Ревуцького 40В, метро Харківська 300 метрів",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -2514,97 +2402,69 @@
     "phoneMasked": "+380 63 ••• •• 33",
     "url": "https://www.olx.ua/d/uk/obyavlenie/revutskogo-40v-metro-harkvska-300-metrv-IDVCVRk.html",
     "images": [
-      "https://ireland.apollo.olxcdn.com:443/v1/files/bu5j5o1h8ufk1-UA/image;s=644x461",
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
     ]
   },
   {
-    "id": 91,
-    "title": "Сдається довгостроково квартира на Хорива 7 , звонити і писати...",
-    "district": "Шевченків",
-    "address": "Київ, Шевченківський",
-    "metro": "Метро Лук'янівська",
-    "walkMin": 8,
-    "price": 19999,
-    "realtorCommissionSaved": 9999,
+    "id": 87,
+    "title": "Коновальця 36Е, печерськ, метро 7 хвилин",
+    "district": "Печер",
+    "address": "Київ, Печерський",
+    "metro": "Метро Печерська",
+    "walkMin": 7,
+    "price": 18000,
+    "realtorCommissionSaved": 9000,
     "area": 58,
-    "floor": 7,
-    "totalFloors": 16,
-    "lat": 50.45015,
-    "lng": 30.4715,
+    "floor": 8,
+    "totalFloors": 25,
+    "lat": 50.41878,
+    "lng": 30.53528,
     "generator": false,
     "gpon": true,
     "gas": false,
     "lowFloor": false,
     "pets": false,
     "ownerName": "Олександр В.",
-    "phoneMasked": "+380 67 ••• •• 77",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/sdatsya-dovgostrokovo-kvartira-na-horiva-7-zvoniti-pisati-na-telegram-whatsapp-ta-ID11yvRE.html",
+    "phoneMasked": "+380 50 ••• •• 78",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/konovaltsya-36e-pechersk-metro-7-hvilin-IDVrs1g.html",
     "images": [
-      "https://ireland.apollo.olxcdn.com:443/v1/files/mxdw6vge65wg3-UA/image;s=644x461",
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
     ]
   },
   {
-    "id": 92,
-    "title": "Олеся 8/17 .  Власник Без комісії Варшавський Плюс , Нивки. Ор...",
-    "district": "Поділь",
-    "address": "Київ, Подільський",
-    "metro": "Метро Контрактова площа",
-    "walkMin": 7,
-    "price": 24000,
-    "realtorCommissionSaved": 12000,
-    "area": 68,
-    "floor": 3,
-    "totalFloors": 14,
-    "lat": 50.47375,
-    "lng": 30.5007,
-    "generator": false,
-    "gpon": true,
-    "gas": true,
-    "lowFloor": true,
-    "pets": false,
-    "ownerName": "Олена Миколаївна",
-    "phoneMasked": "+380 50 ••• •• 54",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/olesya-8-17-vlasnik-bez-koms-varshavskiy-plyus-nivki-orenda-1-kmnatna-kvartira-IDXRJmE.html",
-    "images": [
-      "https://ireland.apollo.olxcdn.com:443/v1/files/i04csaw6yf601-UA/image;s=644x461",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 93,
-    "title": "1 кімнатна квартира метро Берестейська- Шулявська- Нивки",
-    "district": "Солом'ян",
-    "address": "Київ, Солом'янський",
-    "metro": "Метро Вокзальна",
-    "walkMin": 12,
-    "price": 14000,
-    "realtorCommissionSaved": 7000,
+    "id": 88,
+    "title": "Здам двокімнатну квартиру, Дарницький р-он, рембаза",
+    "district": "Дарницький",
+    "address": "Київ, Дарницький",
+    "metro": "Метро Позняки",
+    "walkMin": 6,
+    "price": 7500,
+    "realtorCommissionSaved": 3750,
     "area": 68,
     "floor": 5,
-    "totalFloors": 16,
-    "lat": 50.42627,
-    "lng": 30.4767,
-    "generator": true,
-    "gpon": false,
+    "totalFloors": 14,
+    "lat": 50.38627,
+    "lng": 30.6282,
+    "generator": false,
+    "gpon": true,
     "gas": false,
     "lowFloor": true,
     "pets": false,
     "ownerName": "Марія Василівна",
-    "phoneMasked": "+380 50 ••• •• 47",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/1-kmnatna-kvartira-metro-beresteyska-shulyavska-nivki-ID11s4jc.html",
+    "phoneMasked": "+380 67 ••• •• 88",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/zdam-dvokmnatnu-kvartiru-darnitskiy-r-on-rembaza-ID11jWeZ.html",
     "images": [
-      "https://ireland.apollo.olxcdn.com:443/v1/files/lysjdr1juce5-UA/image;s=644x461",
+      "https://ireland.apollo.olxcdn.com:443/v1/files/pujnvhacwbu8-UA/image;s=644x461",
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
     ]
   },
   {
-    "id": 94,
+    "id": 89,
     "title": "Оренда 1к квартири-студії, м. Контрактова площа, вул. Костянти...",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -2626,13 +2486,69 @@
     "phoneMasked": "+380 97 ••• •• 22",
     "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-1k-kvartiri-stud-m-kontraktova-ploscha-vul-kostyantinvska-16-ID11Gy0c.html",
     "images": [
+      "https://ireland.apollo.olxcdn.com:443/v1/files/e5mp65h3v6hg1-UA/image;s=644x461",
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
     ]
   },
   {
-    "id": 95,
+    "id": 90,
+    "title": "ЖК Дельмар (Delmar), Новопечерські Липки. Власник. 1-к. 49 м2",
+    "district": "Печер",
+    "address": "Київ, Печерський",
+    "metro": "Метро Печерська",
+    "walkMin": 5,
+    "price": 27500,
+    "realtorCommissionSaved": 13750,
+    "area": 49,
+    "floor": 5,
+    "totalFloors": 9,
+    "lat": 50.43229,
+    "lng": 30.54137,
+    "generator": false,
+    "gpon": false,
+    "gas": false,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Андрій Вікторович",
+    "phoneMasked": "+380 97 ••• •• 28",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/zhk-delmar-delmar-novopechersk-lipki-vlasnik-1-k-49-m2-ID10kufN.html",
+    "images": [
+      "https://ireland.apollo.olxcdn.com:443/v1/files/mh8twg03y3w92-UA/image;s=644x461",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 91,
+    "title": "Студія біля Русанівського каналу. Укриття. Опалення та вода бе...",
+    "district": "Дніпров",
+    "address": "Київ, Дніпровський",
+    "metro": "Метро Лівобережна",
+    "walkMin": 5,
+    "price": 12500,
+    "realtorCommissionSaved": 6250,
+    "area": 36,
+    "floor": 4,
+    "totalFloors": 14,
+    "lat": 50.44572,
+    "lng": 30.58466,
+    "generator": false,
+    "gpon": true,
+    "gas": true,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Сергій Олександрович",
+    "phoneMasked": "+380 63 ••• •• 85",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/studya-blya-rusanvskogo-kanalu-ukrittya-opalennya-ta-voda-bez-svtla-vlasnik-ID11xAKm.html",
+    "images": [
+      "https://ireland.apollo.olxcdn.com:443/v1/files/88w02c5fja4d-UA/image;s=644x461",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 92,
     "title": "Аренда 1-комнатной квартиры м. Святошино БЕЗ КОМИССИИ",
     "district": "Святошин",
     "address": "Київ, Святошинський",
@@ -2660,7 +2576,7 @@
     ]
   },
   {
-    "id": 96,
+    "id": 93,
     "title": "Оренда трикімнатної квартири вул. Бориспільська",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -2688,7 +2604,7 @@
     ]
   },
   {
-    "id": 97,
+    "id": 94,
     "title": "Без комиссии Аренда 1к.квартиры Центр Печерск Ионна Павла.",
     "district": "Печер",
     "address": "Київ, Печерський",
@@ -2716,7 +2632,7 @@
     ]
   },
   {
-    "id": 98,
+    "id": 95,
     "title": "Власник! 1 к. квартира на Шулявці",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -2744,7 +2660,7 @@
     ]
   },
   {
-    "id": 99,
+    "id": 96,
     "title": "БЕЗ КОМІСІЙ метро Шулявка. Однокімнатна квартира",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -2772,7 +2688,7 @@
     ]
   },
   {
-    "id": 100,
+    "id": 97,
     "title": "Оренда 1-кім. квартири ЖК SMART Haus  по вул. Машинобудівна 41.",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -2800,7 +2716,7 @@
     ]
   },
   {
-    "id": 101,
+    "id": 98,
     "title": "Оренди квартири для вашого бізнесу ЖК Рівʼєра",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -2828,7 +2744,7 @@
     ]
   },
   {
-    "id": 102,
+    "id": 99,
     "title": "Власник - без %! 1-к квартира, 4й поверх ЖК \"Лебединий\" Ревуць...",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -2856,7 +2772,7 @@
     ]
   },
   {
-    "id": 103,
+    "id": 100,
     "title": "Евро двушка, з коморою та підземним паркінгом",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -2884,91 +2800,7 @@
     ]
   },
   {
-    "id": 104,
-    "title": "Оренда квартири Ризька 73Г  Оренда квартири Рижская 73Г ЖК Сир...",
-    "district": "Шевченків",
-    "address": "Київ, Шевченківський",
-    "metro": "Метро Лук'янівська",
-    "walkMin": 8,
-    "price": 23000,
-    "realtorCommissionSaved": 11500,
-    "area": 36,
-    "floor": 2,
-    "totalFloors": 14,
-    "lat": 50.45029,
-    "lng": 30.48687,
-    "generator": false,
-    "gpon": true,
-    "gas": false,
-    "lowFloor": true,
-    "pets": false,
-    "ownerName": "Марія Василівна",
-    "phoneMasked": "+380 63 ••• •• 47",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-kvartiri-rizka-73g-orenda-kvartiri-rizhskaya-73g-zhk-siretskiy-boyar-zhk-syretskiy-boyar-ID11trqJ.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 105,
-    "title": "* 1 к. кв. Лукʼянівська Дегтярівська 11в",
-    "district": "Шевченків",
-    "address": "Київ, Шевченківський",
-    "metro": "Метро Лук'янівська",
-    "walkMin": 8,
-    "price": 15000,
-    "realtorCommissionSaved": 7500,
-    "area": 36,
-    "floor": 2,
-    "totalFloors": 16,
-    "lat": 50.44636,
-    "lng": 30.48353,
-    "generator": true,
-    "gpon": false,
-    "gas": false,
-    "lowFloor": true,
-    "pets": true,
-    "ownerName": "Андрій Вікторович",
-    "phoneMasked": "+380 97 ••• •• 30",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/1-k-kv-lukyanvska-degtyarvska-11v-ID105GZQ.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 106,
-    "title": "ВЛАСНИК. Здам 1-у квартиру, вул.Бульвар Кольцова 9(нині Миколи...",
-    "district": "Святошин",
-    "address": "Київ, Святошинський",
-    "metro": "Метро Житомирська",
-    "walkMin": 9,
-    "price": 13800,
-    "realtorCommissionSaved": 6900,
-    "area": 58,
-    "floor": 2,
-    "totalFloors": 16,
-    "lat": 50.45849,
-    "lng": 30.37714,
-    "generator": true,
-    "gpon": false,
-    "gas": false,
-    "lowFloor": true,
-    "pets": false,
-    "ownerName": "Олена Миколаївна",
-    "phoneMasked": "+380 67 ••• •• 84",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/vlasnik-zdam-1-u-kvartiru-vul-bulvar-koltsova-9nin-mikoli-rudenka-9-bez-vd-gospodarya-lft-pratsyu-bez-svtla-vstanovleniy-nventor-ID10mq8t.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 107,
+    "id": 101,
     "title": "Здаємо квартиру! (Дніпровський район)",
     "district": "Дніпров",
     "address": "Київ, Дніпровський",
@@ -2996,7 +2828,91 @@
     ]
   },
   {
-    "id": 108,
+    "id": 102,
+    "title": "Оренда 2-х кімнатної квартири, вулиця Урлівська - Позняки, Осо...",
+    "district": "Дарницький",
+    "address": "Київ, Дарницький",
+    "metro": "Метро Позняки",
+    "walkMin": 6,
+    "price": 13500,
+    "realtorCommissionSaved": 6750,
+    "area": 68,
+    "floor": 7,
+    "totalFloors": 14,
+    "lat": 50.41021,
+    "lng": 30.61862,
+    "generator": true,
+    "gpon": false,
+    "gas": true,
+    "lowFloor": false,
+    "pets": true,
+    "ownerName": "Андрій Вікторович",
+    "phoneMasked": "+380 67 ••• •• 38",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-2-h-kmnatno-kvartiri-vulitsya-urlvska-poznyaki-osokorki-ID10io8H.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 103,
+    "title": "Сдам смартквартиру без комиссии ЖК Новигатор",
+    "district": "Поділь",
+    "address": "Київ, Подільський",
+    "metro": "Метро Контрактова площа",
+    "walkMin": 6,
+    "price": 12000,
+    "realtorCommissionSaved": 6000,
+    "area": 58,
+    "floor": 8,
+    "totalFloors": 9,
+    "lat": 50.47983,
+    "lng": 30.50146,
+    "generator": true,
+    "gpon": false,
+    "gas": false,
+    "lowFloor": false,
+    "pets": false,
+    "ownerName": "Олена Миколаївна",
+    "phoneMasked": "+380 50 ••• •• 40",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/sdam-smartkvartiru-bez-komissii-zhk-novigator-IDYnGu2.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 104,
+    "title": "сдам 1 к Крушельницької Позняки Харківська",
+    "district": "Дарницький",
+    "address": "Київ, Дарницький",
+    "metro": "Метро Позняки",
+    "walkMin": 7,
+    "price": 9500,
+    "realtorCommissionSaved": 4750,
+    "area": 50,
+    "floor": 4,
+    "totalFloors": 16,
+    "lat": 50.39741,
+    "lng": 30.64041,
+    "generator": true,
+    "gpon": true,
+    "gas": true,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Марія Василівна",
+    "phoneMasked": "+380 50 ••• •• 14",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/sdam-1-k-krushelnitsko-poznyaki-harkvska-ID11vx5Z.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 105,
     "title": "Оренда 1 к квартири метро Харківська Ревуцького 40Б",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -3024,7 +2940,7 @@
     ]
   },
   {
-    "id": 109,
+    "id": 106,
     "title": "Оренда  2к квартири на Поліській 14 , Дарницький р-н.",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -3052,7 +2968,7 @@
     ]
   },
   {
-    "id": 110,
+    "id": 107,
     "title": "Здається квартира у Києві 1-кімнатна",
     "district": "Деснян",
     "address": "Київ, Деснянський",
@@ -3080,7 +2996,7 @@
     ]
   },
   {
-    "id": 111,
+    "id": 108,
     "title": "Оренда квартири Дарницький район",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -3108,7 +3024,7 @@
     ]
   },
   {
-    "id": 112,
+    "id": 109,
     "title": "Оренда 1-кім.квартири Палладіна 25А,8 поверх,метро Академмістечко",
     "district": "Святошин",
     "address": "Київ, Святошинський",
@@ -3136,7 +3052,7 @@
     ]
   },
   {
-    "id": 113,
+    "id": 110,
     "title": "Оренда 1к 56 м.кв вул. Ахматової 34 Позняки Осокорки Без комісії",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -3164,7 +3080,7 @@
     ]
   },
   {
-    "id": 114,
+    "id": 111,
     "title": "Оренда квартири  біля метро Васильківська ЖК Парк Ленд  , студія",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -3192,7 +3108,7 @@
     ]
   },
   {
-    "id": 115,
+    "id": 112,
     "title": "Новобудова метро Видубичі ЖК Світло Парк Столичне Шосе 1а ІНВЕ...",
     "district": "Голосіїв",
     "address": "Київ, Голосіївський",
@@ -3220,91 +3136,7 @@
     ]
   },
   {
-    "id": 116,
-    "title": "Власник! 2 поверх! Сдам 2 к. кв. у ЖК L-квартал (м Берестейська)",
-    "district": "Солом'ян",
-    "address": "Київ, Солом'янський",
-    "metro": "Метро Вокзальна",
-    "walkMin": 10,
-    "price": 19000,
-    "realtorCommissionSaved": 9500,
-    "area": 50,
-    "floor": 7,
-    "totalFloors": 14,
-    "lat": 50.44051,
-    "lng": 30.47385,
-    "generator": false,
-    "gpon": false,
-    "gas": true,
-    "lowFloor": false,
-    "pets": false,
-    "ownerName": "Андрій Вікторович",
-    "phoneMasked": "+380 97 ••• •• 58",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/vlasnik-2-poverh-sdam-2-k-kv-u-zhk-l-kvartal-m-beresteyska-IDYmChS.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 117,
-    "title": "ВЛАСНИК! м. Шулявська ПІШКИ 10хв.!",
-    "district": "Солом'ян",
-    "address": "Київ, Солом'янський",
-    "metro": "Метро Вокзальна",
-    "walkMin": 10,
-    "price": 11500,
-    "realtorCommissionSaved": 5750,
-    "area": 42,
-    "floor": 8,
-    "totalFloors": 14,
-    "lat": 50.44876,
-    "lng": 30.44888,
-    "generator": true,
-    "gpon": true,
-    "gas": false,
-    "lowFloor": false,
-    "pets": false,
-    "ownerName": "Андрій Вікторович",
-    "phoneMasked": "+380 63 ••• •• 19",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/vlasnik-m-shulyavska-pshki-10hv-ID11EPC5.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 118,
-    "title": "Довгострокова оренда квартири. м. Київ вул. Драгоманова ЖК  «Т...",
-    "district": "Дарницький",
-    "address": "Київ, Дарницький",
-    "metro": "Метро Позняки",
-    "walkMin": 5,
-    "price": 17000,
-    "realtorCommissionSaved": 8500,
-    "area": 68,
-    "floor": 6,
-    "totalFloors": 14,
-    "lat": 50.38523,
-    "lng": 30.64942,
-    "generator": false,
-    "gpon": true,
-    "gas": false,
-    "lowFloor": false,
-    "pets": true,
-    "ownerName": "Олена Миколаївна",
-    "phoneMasked": "+380 50 ••• •• 54",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/dovgostrokova-orenda-kvartiri-m-kiv-vul-dragomanova-zhk-teleskop-10-ID10Pf9a.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 119,
+    "id": 113,
     "title": "Оренда  3х кімнатної кв, Оболонь, М, Мінська",
     "district": "Оболон",
     "address": "Київ, Оболонський",
@@ -3332,7 +3164,91 @@
     ]
   },
   {
-    "id": 120,
+    "id": 114,
+    "title": "Оренда ЖК Старт, вул. Шолуденка, 30, комфортна  2 к. кв. 67,5 ...",
+    "district": "Шевченків",
+    "address": "Київ, Шевченківський",
+    "metro": "Метро Лук'янівська",
+    "walkMin": 11,
+    "price": 30000,
+    "realtorCommissionSaved": 15000,
+    "area": 50,
+    "floor": 4,
+    "totalFloors": 14,
+    "lat": 50.4663,
+    "lng": 30.50123,
+    "generator": false,
+    "gpon": true,
+    "gas": true,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Олександр В.",
+    "phoneMasked": "+380 63 ••• •• 21",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-zhk-start-vul-sholudenka-30-komfortna-2-k-kv-67-5-kv-m-IDVatjy.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 115,
+    "title": "Квартира  на 2 поверсі !600 метрів метро Осокорки.Власник!Авто...",
+    "district": "Дарницький",
+    "address": "Київ, Дарницький",
+    "metro": "Метро Позняки",
+    "walkMin": 9,
+    "price": 11000,
+    "realtorCommissionSaved": 5500,
+    "area": 58,
+    "floor": 6,
+    "totalFloors": 14,
+    "lat": 50.39637,
+    "lng": 30.65285,
+    "generator": true,
+    "gpon": true,
+    "gas": true,
+    "lowFloor": false,
+    "pets": false,
+    "ownerName": "Андрій Вікторович",
+    "phoneMasked": "+380 63 ••• •• 33",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/kvartira-na-2-povers-600-metrv-metro-osokorki-vlasnik-avtonomniy-gaz-generator-nvertor-ID10w70y.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 116,
+    "title": "ЖК\" Голосеево\" ул.Голосеевская 13 м.Демеевская , генератор.",
+    "district": "Голосіїв",
+    "address": "Київ, Голосіївський",
+    "metro": "Метро Деміївська",
+    "walkMin": 8,
+    "price": 18500,
+    "realtorCommissionSaved": 9250,
+    "area": 50,
+    "floor": 7,
+    "totalFloors": 14,
+    "lat": 50.40279,
+    "lng": 30.48401,
+    "generator": true,
+    "gpon": true,
+    "gas": false,
+    "lowFloor": false,
+    "pets": false,
+    "ownerName": "Сергій Олександрович",
+    "phoneMasked": "+380 67 ••• •• 60",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/zhk-goloseevo-ul-goloseevskaya-13-m-demeevskaya-generator-IDYdbNI.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 117,
     "title": "ОБОЛОНЬ. ст. метро Мінська проспект Оболонський, 14 Б",
     "district": "Оболон",
     "address": "Київ, Оболонський",
@@ -3360,7 +3276,7 @@
     ]
   },
   {
-    "id": 121,
+    "id": 118,
     "title": "Жк Зарічний метро Славутич",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -3388,7 +3304,7 @@
     ]
   },
   {
-    "id": 122,
+    "id": 119,
     "title": "Сдам двокiмнатну, Куренiвка, вул.Попова",
     "district": "Оболон",
     "address": "Київ, Оболонський",
@@ -3416,7 +3332,7 @@
     ]
   },
   {
-    "id": 123,
+    "id": 120,
     "title": "Оренда 1к квартири ЖК Східна Брама",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -3444,7 +3360,7 @@
     ]
   },
   {
-    "id": 124,
+    "id": 121,
     "title": "Здам 1 кім. квартиру, Василя Порика 9-В, гарний стан, 50м²",
     "district": "Поділь",
     "address": "Київ, Подільський",
@@ -3472,7 +3388,7 @@
     ]
   },
   {
-    "id": 125,
+    "id": 122,
     "title": "Довгострокова оренда однокімнатної квартири Караваєві дачі у н...",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -3500,7 +3416,7 @@
     ]
   },
   {
-    "id": 126,
+    "id": 123,
     "title": "Здам в аренду квартиру від власника без відсотків  на Серці тр...",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -3528,27 +3444,27 @@
     ]
   },
   {
-    "id": 127,
-    "title": "Оренда 1к квартири ЖК «Родинний затишок»",
-    "district": "Дніпров",
-    "address": "Київ, Дніпровський",
-    "metro": "Метро Лівобережна",
-    "walkMin": 4,
-    "price": 12000,
-    "realtorCommissionSaved": 6000,
-    "area": 68,
-    "floor": 4,
-    "totalFloors": 25,
-    "lat": 50.4562,
-    "lng": 30.60479,
+    "id": 124,
+    "title": "Сдам 2к Шевченківський р-н м Нивки вул Щербаківського буд 51-А",
+    "district": "Шевченків",
+    "address": "Київ, Шевченківський",
+    "metro": "Метро Лук'янівська",
+    "walkMin": 8,
+    "price": 9000,
+    "realtorCommissionSaved": 4500,
+    "area": 36,
+    "floor": 5,
+    "totalFloors": 16,
+    "lat": 50.45179,
+    "lng": 30.4898,
     "generator": false,
     "gpon": false,
-    "gas": false,
+    "gas": true,
     "lowFloor": true,
-    "pets": true,
-    "ownerName": "Андрій Вікторович",
-    "phoneMasked": "+380 97 ••• •• 98",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-1k-kvartiri-zhk-rodinniy-zatishok-ID11rdh2.html",
+    "pets": false,
+    "ownerName": "Марія Василівна",
+    "phoneMasked": "+380 63 ••• •• 31",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/sdam-2k-shevchenkvskiy-r-n-m-nivki-vul-scherbakvskogo-bud-51-a-ID11Au6O.html",
     "images": [
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
@@ -3556,27 +3472,27 @@
     ]
   },
   {
-    "id": 128,
-    "title": "Оренда 2К бул. Дружби Народів/Міхновського, б.8 м.Звіринецька ...",
-    "district": "Печер",
-    "address": "Київ, Печерський",
-    "metro": "Метро Печерська",
-    "walkMin": 4,
-    "price": 17200,
-    "realtorCommissionSaved": 8600,
-    "area": 42,
+    "id": 125,
+    "title": "Здам 2-кімнатну квартиру з кухнею-студією, Жуляни, приватний б...",
+    "district": "Солом'ян",
+    "address": "Київ, Солом'янський",
+    "metro": "Метро Вокзальна",
+    "walkMin": 11,
+    "price": 13500,
+    "realtorCommissionSaved": 6750,
+    "area": 68,
     "floor": 2,
-    "totalFloors": 25,
-    "lat": 50.43642,
-    "lng": 30.53638,
-    "generator": false,
+    "totalFloors": 16,
+    "lat": 50.42788,
+    "lng": 30.47691,
+    "generator": true,
     "gpon": false,
     "gas": false,
     "lowFloor": true,
     "pets": false,
-    "ownerName": "Андрій Вікторович",
-    "phoneMasked": "+380 50 ••• •• 43",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-2k-bul-druzhbi-narodv-mhnovskogo-b-8-m-zvrinetska-pechersk-IDUOetb.html",
+    "ownerName": "Марія Василівна",
+    "phoneMasked": "+380 63 ••• •• 68",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/zdam-2-kmnatnu-kvartiru-z-kuhneyu-studyu-zhulyani-privatniy-budinok-IDYf6MJ.html",
     "images": [
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
@@ -3584,27 +3500,27 @@
     ]
   },
   {
-    "id": 129,
-    "title": "Метро Берестейська, 1-к квартира - студія   в ЖК Smart House",
-    "district": "Солом'ян",
-    "address": "Київ, Солом'янський",
-    "metro": "Метро Вокзальна",
-    "walkMin": 10,
-    "price": 10000,
-    "realtorCommissionSaved": 5000,
+    "id": 126,
+    "title": "Оренда Просторої 3к квартири Харківське шоссе 56",
+    "district": "Дарницький",
+    "address": "Київ, Дарницький",
+    "metro": "Метро Позняки",
+    "walkMin": 9,
+    "price": 16000,
+    "realtorCommissionSaved": 8000,
     "area": 58,
     "floor": 4,
-    "totalFloors": 16,
-    "lat": 50.42708,
-    "lng": 30.46812,
+    "totalFloors": 14,
+    "lat": 50.41083,
+    "lng": 30.62843,
     "generator": false,
     "gpon": true,
     "gas": false,
     "lowFloor": true,
     "pets": false,
     "ownerName": "Олена Миколаївна",
-    "phoneMasked": "+380 67 ••• •• 27",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/metro-beresteyska-1-k-kvartira-studya-v-zhk-smart-house-IDVlSQe.html",
+    "phoneMasked": "+380 97 ••• •• 38",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-prostoro-3k-kvartiri-harkvske-shosse-56-ID10VXos.html",
     "images": [
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
@@ -3612,7 +3528,7 @@
     ]
   },
   {
-    "id": 130,
+    "id": 127,
     "title": "Оренда 1к квартири, ЖК Альпійське містечко, вул. Протасів Яр, 8",
     "district": "Печер",
     "address": "Київ, Печерський",
@@ -3640,7 +3556,7 @@
     ]
   },
   {
-    "id": 131,
+    "id": 128,
     "title": "Здаю чудову 3к квартиру на Борщагівці, вул. Якуба Коласа",
     "district": "Святошин",
     "address": "Київ, Святошинський",
@@ -3668,7 +3584,7 @@
     ]
   },
   {
-    "id": 132,
+    "id": 129,
     "title": "Нерухомість, оренда квартири",
     "district": "Святошин",
     "address": "Київ, Святошинський",
@@ -3696,7 +3612,7 @@
     ]
   },
   {
-    "id": 133,
+    "id": 130,
     "title": "Оренда 1 кім.кв.ЖК Нова Англія",
     "district": "Голосіїв",
     "address": "Київ, Голосіївський",
@@ -3724,7 +3640,7 @@
     ]
   },
   {
-    "id": 134,
+    "id": 131,
     "title": "Оренда 3х-кімнатної квартири Печенізька 4 (Татарка) (БЕЗ% !, в...",
     "district": "Шевченків",
     "address": "Київ, Шевченківський",
@@ -3752,7 +3668,7 @@
     ]
   },
   {
-    "id": 135,
+    "id": 132,
     "title": "Оренда 1-кімнатної квартири в новому ЖК Голосіівський | Від вл...",
     "district": "Голосіїв",
     "address": "Київ, Голосіївський",
@@ -3780,7 +3696,7 @@
     ]
   },
   {
-    "id": 136,
+    "id": 133,
     "title": "оренда двокімнатної квартири  Печерський район",
     "district": "Печер",
     "address": "Київ, Печерський",
@@ -3802,13 +3718,13 @@
     "phoneMasked": "+380 67 ••• •• 69",
     "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-dvokmnatno-kvartiri-pecherskiy-rayon-ID11GA8O.html",
     "images": [
-      "https://ireland.apollo.olxcdn.com:443/v1/files/nfmypbp826uc1-UA/image;s=644x461",
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
     ]
   },
   {
-    "id": 137,
+    "id": 134,
     "title": "Оренда двохкомнатной квартиры по бул. Леси  Украинки 11",
     "district": "Печер",
     "address": "Київ, Печерський",
@@ -3836,35 +3752,7 @@
     ]
   },
   {
-    "id": 138,
-    "title": "Оренда 1-кімнатної квартири",
-    "district": "Дарницький",
-    "address": "Київ, Дарницький",
-    "metro": "Метро Позняки",
-    "walkMin": 5,
-    "price": 10000,
-    "realtorCommissionSaved": 5000,
-    "area": 36,
-    "floor": 6,
-    "totalFloors": 16,
-    "lat": 50.38513,
-    "lng": 30.61784,
-    "generator": false,
-    "gpon": true,
-    "gas": false,
-    "lowFloor": false,
-    "pets": false,
-    "ownerName": "Андрій Вікторович",
-    "phoneMasked": "+380 97 ••• •• 22",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-1-kmnatno-kvartiri-ID10AXa0.html",
-    "images": [
-      "https://ireland.apollo.olxcdn.com:443/v1/files/g4w0u0sdelgf2-UA/image;s=644x461",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 139,
+    "id": 135,
     "title": "Сдам в оренду 2-к квартира ЖК Місто квітів",
     "district": "Поділь",
     "address": "Київ, Подільський",
@@ -3886,13 +3774,97 @@
     "phoneMasked": "+380 97 ••• •• 96",
     "url": "https://www.olx.ua/d/uk/obyavlenie/sdam-v-orendu-2-k-kvartira-zhk-msto-kvtv-ID11i5hg.html",
     "images": [
+      "https://ireland.apollo.olxcdn.com:443/v1/files/f078r9m8o6g01-UA/image;s=644x461",
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
     ]
   },
   {
-    "id": 140,
+    "id": 136,
+    "title": "Оренда 3-кімнатної квартири по вул.Урлівська 8а",
+    "district": "Дарницький",
+    "address": "Київ, Дарницький",
+    "metro": "Метро Позняки",
+    "walkMin": 8,
+    "price": 22000,
+    "realtorCommissionSaved": 11000,
+    "area": 42,
+    "floor": 2,
+    "totalFloors": 9,
+    "lat": 50.41241,
+    "lng": 30.63275,
+    "generator": true,
+    "gpon": false,
+    "gas": true,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Олена Миколаївна",
+    "phoneMasked": "+380 97 ••• •• 25",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-3-kmnatno-kvartiri-po-vul-urlvska-8a-ID11rQGx.html",
+    "images": [
+      "https://ireland.apollo.olxcdn.com:443/v1/files/vukud0z7tgd82-UA/image;s=644x461",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 137,
+    "title": "Затишна інстаграмна 1-к квартира в ЖК Теремки, вул. Заболотног...",
+    "district": "Голосіїв",
+    "address": "Київ, Голосіївський",
+    "metro": "Метро Деміївська",
+    "walkMin": 4,
+    "price": 24000,
+    "realtorCommissionSaved": 12000,
+    "area": 50,
+    "floor": 2,
+    "totalFloors": 9,
+    "lat": 50.39328,
+    "lng": 30.49241,
+    "generator": false,
+    "gpon": true,
+    "gas": true,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Олена Миколаївна",
+    "phoneMasked": "+380 67 ••• •• 33",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/zatishna-nstagramna-1-k-kvartira-v-zhk-teremki-vul-zabolotnogo-15-g-poruch-respublka-odeska-pl-ID11vaZF.html",
+    "images": [
+      "https://ireland.apollo.olxcdn.com:443/v1/files/ebmybgmdxi5l3-UA/image;s=644x461",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 138,
+    "title": "Оренда Чудової 3К . М. Позняки 3 хв. 3 поверх. Бажана 24",
+    "district": "Дарницький",
+    "address": "Київ, Дарницький",
+    "metro": "Метро Позняки",
+    "walkMin": 9,
+    "price": 19990,
+    "realtorCommissionSaved": 9995,
+    "area": 36,
+    "floor": 3,
+    "totalFloors": 16,
+    "lat": 50.39826,
+    "lng": 30.64752,
+    "generator": false,
+    "gpon": false,
+    "gas": true,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Андрій Вікторович",
+    "phoneMasked": "+380 63 ••• •• 90",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-chudovo-3k-m-poznyaki-3-hv-3-poverh-bazhana-24-ID10JOvR.html",
+    "images": [
+      "https://ireland.apollo.olxcdn.com:443/v1/files/fevg4x1znqsr3-UA/image;s=644x461",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 139,
     "title": "Здам 1 кім квартиру бул. Вацлава Гавела 28,жк Рідне місто",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -3920,7 +3892,7 @@
     ]
   },
   {
-    "id": 141,
+    "id": 140,
     "title": "Здам квартиру. Власник.",
     "district": "Голосіїв",
     "address": "Київ, Голосіївський",
@@ -3948,7 +3920,7 @@
     ]
   },
   {
-    "id": 142,
+    "id": 141,
     "title": "Здається 2-х кімнатна квартира Оболонський район, вул. Вишгоро...",
     "district": "Оболон",
     "address": "Київ, Подільський",
@@ -3976,7 +3948,7 @@
     ]
   },
   {
-    "id": 143,
+    "id": 142,
     "title": "Сдам 2к окремі кімнати  Солом'янський р-н р-н вул Донця 2-Б",
     "district": "Солом'ян",
     "address": "Київ, Солом'янський",
@@ -4004,7 +3976,7 @@
     ]
   },
   {
-    "id": 144,
+    "id": 143,
     "title": "Оренда 2-кімнатної квартири в мальовничій Пущі-Водиці!",
     "district": "Оболон",
     "address": "Київ, Оболонський",
@@ -4032,91 +4004,7 @@
     ]
   },
   {
-    "id": 145,
-    "title": "Оренда 2 км кв, Срібнокільська 8, 5 пов, без комісії",
-    "district": "Дарницький",
-    "address": "Київ, Дарницький",
-    "metro": "Метро Позняки",
-    "walkMin": 9,
-    "price": 15000,
-    "realtorCommissionSaved": 7500,
-    "area": 42,
-    "floor": 8,
-    "totalFloors": 14,
-    "lat": 50.40263,
-    "lng": 30.64536,
-    "generator": false,
-    "gpon": false,
-    "gas": true,
-    "lowFloor": false,
-    "pets": false,
-    "ownerName": "Олена Миколаївна",
-    "phoneMasked": "+380 67 ••• •• 36",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-2-km-kv-srbnoklska-8-5-pov-bez-koms-ID11AR8X.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 146,
-    "title": "Здається 1 кімн. квартира. НАУ. проспект Любомира Гузара, 20-А",
-    "district": "Солом'ян",
-    "address": "Київ, Солом'янський",
-    "metro": "Метро Вокзальна",
-    "walkMin": 12,
-    "price": 14000,
-    "realtorCommissionSaved": 7000,
-    "area": 36,
-    "floor": 3,
-    "totalFloors": 16,
-    "lat": 50.42293,
-    "lng": 30.4623,
-    "generator": false,
-    "gpon": true,
-    "gas": false,
-    "lowFloor": true,
-    "pets": false,
-    "ownerName": "Олександр В.",
-    "phoneMasked": "+380 63 ••• •• 80",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/zdatsya-1-kmn-kvartira-nau-prospekt-lyubomira-guzara-20-a-ID11mByI.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 147,
-    "title": "* 1 к. кв. проспект Берестейський, 29 Політехнічний інститут",
-    "district": "Шевченків",
-    "address": "Київ, Шевченківський",
-    "metro": "Метро Лук'янівська",
-    "walkMin": 8,
-    "price": 13700,
-    "realtorCommissionSaved": 6850,
-    "area": 50,
-    "floor": 6,
-    "totalFloors": 14,
-    "lat": 50.46758,
-    "lng": 30.47509,
-    "generator": false,
-    "gpon": true,
-    "gas": false,
-    "lowFloor": false,
-    "pets": false,
-    "ownerName": "Олена Миколаївна",
-    "phoneMasked": "+380 50 ••• •• 97",
-    "url": "https://www.olx.ua/d/uk/obyavlenie/1-k-kv-prospekt-beresteyskiy-29-poltehnchniy-nstitut-ID11Cqqa.html",
-    "images": [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
-    ]
-  },
-  {
-    "id": 148,
+    "id": 144,
     "title": "Генератор є!2кімн.  Патріотіка, Позняки, Осокорки.",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -4144,7 +4032,7 @@
     ]
   },
   {
-    "id": 149,
+    "id": 145,
     "title": "Оренда євродвушки ЖК Харківський Харківське шосе 190",
     "district": "Дарницький",
     "address": "Київ, Дарницький",
@@ -4172,7 +4060,7 @@
     ]
   },
   {
-    "id": 150,
+    "id": 146,
     "title": "Оренда квартири 1кімн., ЖК Бонапарт Щекавицька вул., 53",
     "district": "Поділь",
     "address": "Київ, Подільський",
@@ -4193,6 +4081,118 @@
     "ownerName": "Олександр В.",
     "phoneMasked": "+380 97 ••• •• 87",
     "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-kvartiri-1kmn-zhk-bonapart-schekavitska-vul-53-ID10MEe8.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 147,
+    "title": "Центр. Поділ. Метро Контрактова площа- 10 хв. Межигірська  59",
+    "district": "Поділь",
+    "address": "Київ, Подільський",
+    "metro": "Метро Контрактова площа",
+    "walkMin": 6,
+    "price": 17000,
+    "realtorCommissionSaved": 8500,
+    "area": 68,
+    "floor": 5,
+    "totalFloors": 14,
+    "lat": 50.47592,
+    "lng": 30.50684,
+    "generator": false,
+    "gpon": true,
+    "gas": false,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Марія Василівна",
+    "phoneMasked": "+380 50 ••• •• 62",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/tsentr-podl-metro-kontraktova-ploscha-10-hv-mezhigrska-59-ID11FovU.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 148,
+    "title": "Здам однокімнатну Оболонський просп. 15 ст.м.Мінська-2хв. Обол...",
+    "district": "Оболон",
+    "address": "Київ, Оболонський",
+    "metro": "Метро Мінська",
+    "walkMin": 8,
+    "price": 17700,
+    "realtorCommissionSaved": 8850,
+    "area": 36,
+    "floor": 4,
+    "totalFloors": 9,
+    "lat": 50.51628,
+    "lng": 30.52395,
+    "generator": true,
+    "gpon": true,
+    "gas": true,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Андрій Вікторович",
+    "phoneMasked": "+380 63 ••• •• 95",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/zdam-odnokmnatnu-obolonskiy-prosp-15-st-m-mnska-2hv-obolonskiy-ID10L4oS.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 149,
+    "title": "Варшавский жк квартира",
+    "district": "Поділь",
+    "address": "Київ, Подільський",
+    "metro": "Метро Контрактова площа",
+    "walkMin": 6,
+    "price": 39000,
+    "realtorCommissionSaved": 19500,
+    "area": 58,
+    "floor": 4,
+    "totalFloors": 25,
+    "lat": 50.45797,
+    "lng": 30.51885,
+    "generator": false,
+    "gpon": true,
+    "gas": false,
+    "lowFloor": true,
+    "pets": false,
+    "ownerName": "Андрій Вікторович",
+    "phoneMasked": "+380 97 ••• •• 52",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/varshavskiy-zhk-kvartira-ID10vSgY.html",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80"
+    ]
+  },
+  {
+    "id": 150,
+    "title": "Оренда квартири | Академмістечко | три кімнати | Ушакова 16а |...",
+    "district": "Святошин",
+    "address": "Київ, Святошинський",
+    "metro": "Метро Житомирська",
+    "walkMin": 7,
+    "price": 18000,
+    "realtorCommissionSaved": 9000,
+    "area": 42,
+    "floor": 4,
+    "totalFloors": 9,
+    "lat": 50.46093,
+    "lng": 30.3686,
+    "generator": true,
+    "gpon": false,
+    "gas": true,
+    "lowFloor": true,
+    "pets": true,
+    "ownerName": "Олена Миколаївна",
+    "phoneMasked": "+380 63 ••• •• 34",
+    "url": "https://www.olx.ua/d/uk/obyavlenie/orenda-kvartiri-akademmstechko-tri-kmnati-ushakova-16a-gaz-bez-tvarin-ID11AuQH.html",
     "images": [
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80",
