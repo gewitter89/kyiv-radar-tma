@@ -581,7 +581,8 @@ async def send_landlord_photo_previews(photo_ids: List[str], submission_id: int)
             return False
         key = "photo" + str(index)
         form.add_field(key, jpeg_bytes, filename=key + ".jpg", content_type="image/jpeg")
-        media.append({"type": "photo", "media": "attach://" + key})
+        media.append({"type": "photo", "media": "attach://" + key,
+                      **({"caption": f"Заявка #{submission_id}: фото для модерації"} if index == 0 else {})})
     if len(media) == 1:
         # Telegram sendMediaGroup requires at least two items.
         single_photo_id = photo_ids[0]
@@ -593,6 +594,7 @@ async def send_landlord_photo_previews(photo_ids: List[str], submission_id: int)
         form = aiohttp.FormData()
         form.add_field("chat_id", str(ADMIN_CHAT_ID))
         form.add_field("photo", only_photo, filename="preview.jpg", content_type="image/jpeg")
+        form.add_field("caption", f"Заявка #{submission_id}: фото для модерації")
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
     else:
         form.add_field("media", json.dumps(media))
@@ -754,7 +756,7 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
     photos_desc = f"📸 <b>Фото:</b> {photos_count} шт." if photos_count > 0 else "📸 <b>Фото:</b> без фото"
 
     admin_lines = [
-        f"🏢 <b>НОВА КВАРТИРА ВІД ВЛАСНИКА #{sub_id}</b>",
+        f"🏢 <b>НОВА ЗАЯВКА НА ОРЕНДУ #{sub_id}</b>",
         "━━━━━━━━━━━━━━━━━━",
         f"📍 <b>Адреса:</b> {safe_addr}",
         f"💰 <b>Ціна:</b> {safe_price} ₴/міс",
@@ -833,7 +835,7 @@ async def send_contact(req: SendContactRequest):
 
     commission_label = "0% комісії (підтверджено)" if deal.get("commissionVerified") else "Комісія уточнюється"
     msg_lines = [
-        f"📞 <b>Контакт орендодавця (Лот #{req.dealId})</b>",
+        f"📞 <b>Контакт з оголошення (Лот #{req.dealId})</b>",
         "━━━━━━━━━━━━━━━━━━",
         f"🏢 <b>{safe_title}</b>",
         f"📍 {safe_address}",
@@ -841,7 +843,7 @@ async def send_contact(req: SendContactRequest):
         "",
         f"📱 <b>Телефон орендодавця:</b> <code>{safe_phone}</code>",
         "",
-        "<i>Зв'яжіться з орендодавцем безпосередньо. Вдалих переглядів!</i>"
+        "<i>Перед дзвінком уточніть актуальність, чи це власник, та умови комісії.</i>"
     ]
     sent = await send_telegram_alert("\n".join(msg_lines), target_chat=user_id)
     if not sent:
