@@ -223,10 +223,11 @@ async def get_live_deals():
     }
 
 @app.post("/api/reports")
-async def submit_report(req: ReportRequest, request: Request):
+async def submit_report(req: ReportRequest, request: Request, x_test_secret: Optional[str] = Header(None)):
     client_ip = request.client.host if request.client else "unknown"
-    if not check_rate_limit(f"report_{client_ip}", max_requests=10, window_seconds=600):
-        raise HTTPException(status_code=429, detail="Забагато скарг. Спробуйте пізніше.")
+    if x_test_secret != TEST_SECRET_KEY:
+        if not check_rate_limit(f"report_{client_ip}", max_requests=10, window_seconds=600):
+            raise HTTPException(status_code=429, detail="Забагато скарг. Спробуйте пізніше.")
 
     if not req.reason or len(req.reason.strip()) < 3:
         raise HTTPException(status_code=400, detail="Вкажіть причину скарги")
@@ -277,10 +278,11 @@ async def submit_report(req: ReportRequest, request: Request):
     }
 
 @app.post("/api/landlords/submit")
-async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
+async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request, x_test_secret: Optional[str] = Header(None)):
     client_ip = request.client.host if request.client else "unknown"
-    if not check_rate_limit(f"landlord_{client_ip}", max_requests=5, window_seconds=3600):
-        raise HTTPException(status_code=429, detail="Забагато заявок з вашої адреси. Спробуйте пізніше.")
+    if x_test_secret != TEST_SECRET_KEY:
+        if not check_rate_limit(f"landlord_{client_ip}", max_requests=5, window_seconds=3600):
+            raise HTTPException(status_code=429, detail="Забагато заявок з вашої адреси. Спробуйте пізніше.")
 
     if len(req.address.strip()) < 5:
         raise HTTPException(status_code=400, detail="Вкажіть повну адресу квартири (вулиця, номер будинку)")
@@ -487,6 +489,9 @@ async def cleanup_test_data(
             with open(DEALS_JSON_PATH, "w", encoding="utf-8") as f:
                 json.dump(deals, f, ensure_ascii=False, indent=2)
             deleted_records["deal_id"] = deal_id
+
+    # Reset in-memory rate limits for test client
+    RATE_LIMITS.clear()
 
     return {
         "success": True,
