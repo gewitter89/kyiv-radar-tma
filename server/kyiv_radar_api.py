@@ -302,7 +302,7 @@ class SendContactRequest(BaseModel):
 # API ROUTES
 # ==========================================
 
-@app.get("/api/health")
+@app.api_route("/api/health", methods=["GET", "HEAD"])
 async def health():
     deals = load_trusted_deals()
     return {
@@ -316,7 +316,7 @@ async def health():
         "timestamp": int(time.time())
     }
 
-@app.get("/api/deals")
+@app.api_route("/api/deals", methods=["GET", "HEAD"])
 async def get_live_deals():
     """
     Live catalog endpoint.

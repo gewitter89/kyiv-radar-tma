@@ -48,7 +48,10 @@ class TestModerationPipelineIsolated(unittest.TestCase):
                 generator INTEGER DEFAULT 0,
                 status TEXT DEFAULT 'pending_review',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                moderator_notes TEXT
+                moderator_notes TEXT,
+                contact_verified INTEGER DEFAULT 0,
+                verified_at TEXT,
+                verification_method TEXT
             )
         """)
         conn.commit()

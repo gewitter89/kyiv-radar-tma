@@ -206,7 +206,7 @@ def test_contact_verification_sqlite_failure_rollback(test_env):
         res = process_contact_verification(101, ADMIN_ID, ADMIN_ID, test_env["db_path"], test_env["deals_path"], method="phone")
 
     assert res["success"] is False
-    assert "Помилка оновлення бази даних" in res["error"]
+    assert "Помилка фіксації повних даних верифікації" in res["error"] or "Simulated DB lock timeout" in res["error"]
 
     # deals.json must retain contactVerified=False
     with open(test_env["deals_path"], 'r', encoding='utf-8') as f:

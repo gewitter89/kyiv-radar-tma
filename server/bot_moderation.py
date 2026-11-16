@@ -290,7 +290,7 @@ def process_contact_verification(
                     pass
             return {"success": False, "error": f"Помилка збереження каталогу: {e}"}
 
-        # Phase 2: Update SQLite with compensating rollback
+        # Phase 2: Update SQLite with strict full verification metadata and compensating rollback
         try:
             cur.execute(
                 """UPDATE landlord_submissions 
@@ -301,40 +301,20 @@ def process_contact_verification(
                    WHERE id = ?""",
                 (moderator_notes, now_iso, method, sub_id)
             )
+            if cur.rowcount == 0:
+                raise sqlite3.OperationalError(f"Заявку #{sub_id} не оновлено в SQLite (rowcount=0)")
             conn.commit()
-        except sqlite3.OperationalError as op_err:
-            if "no such column" in str(op_err).lower():
-                # Fallback if specific columns don't exist yet
-                try:
-                    cur.execute(
-                        "UPDATE landlord_submissions SET moderator_notes = ? WHERE id = ?",
-                        (moderator_notes, sub_id)
-                    )
-                    conn.commit()
-                except Exception as e2:
-                    logger.error(f"Fallback DB update error: {e2}. Rolling back catalog...")
-                    conn.rollback()
-                    if pre_deals_bytes is not None:
-                        with open(tmp_path, 'wb') as df_rb:
-                            df_rb.write(pre_deals_bytes)
-                        os.replace(tmp_path, deals_path)
-                    return {"success": False, "error": f"Помилка оновлення бази даних: {e2}. Каталог відновлено."}
-            else:
-                logger.error(f"DB operational error: {op_err}. Rolling back catalog...")
-                conn.rollback()
-                if pre_deals_bytes is not None:
-                    with open(tmp_path, 'wb') as df_rb:
-                        df_rb.write(pre_deals_bytes)
-                    os.replace(tmp_path, deals_path)
-                return {"success": False, "error": f"Помилка оновлення бази даних: {op_err}. Каталог відновлено."}
         except Exception as e:
-            logger.error(f"Error updating landlord_submissions verification: {e}. Rolling back catalog...")
+            logger.error(f"Error updating landlord_submissions verification in SQLite: {e}. Rolling back catalog...")
             conn.rollback()
             if pre_deals_bytes is not None:
                 with open(tmp_path, 'wb') as df_rb:
                     df_rb.write(pre_deals_bytes)
                 os.replace(tmp_path, deals_path)
-            return {"success": False, "error": f"Помилка оновлення бази даних: {e}. Каталог відновлено."}
+            return {
+                "success": False,
+                "error": f"Помилка фіксації повних даних верифікації в базі даних: {e}. Каталог відновлено."
+            }
         finally:
             try:
                 conn.close()
