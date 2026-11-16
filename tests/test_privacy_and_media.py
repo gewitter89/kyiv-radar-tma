@@ -124,16 +124,18 @@ def test_photo_upload_valid_exif_stripped(privacy_test_env):
     files = [
         ("photos", ("living_room.jpg", io.BytesIO(jpeg_bytes), "image/jpeg"))
     ]
-    resp = client.post("/api/landlords/upload_photos", files=files)
+    auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=123456)
+    resp = client.post("/api/landlords/upload_photos", data={"initData": auth}, files=files)
     assert resp.status_code == 200
     data = resp.json()
     assert data["success"] is True
     assert data["count"] == 1
-    photo_url = data["photos"][0]
-    assert photo_url.endswith(".webp")
+    photo_id = data["photos"][0]
+    assert len(photo_id) == 32 and all(ch in "0123456789abcdef" for ch in photo_id)
+    assert client.get(f"/api/media/{photo_id}").status_code == 404
 
     # Verify that stored file on disk has zero EXIF metadata
-    filename = os.path.basename(photo_url)
+    filename = photo_id + ".webp"
     disk_path = os.path.join(privacy_test_env["uploads_dir"], filename)
     assert os.path.exists(disk_path)
     with Image.open(disk_path) as saved_img:
@@ -148,9 +150,10 @@ def test_photo_upload_rejects_non_images(privacy_test_env):
     files = [
         ("photos", ("malicious.jpg", io.BytesIO(fake_file), "image/jpeg"))
     ]
-    resp = client.post("/api/landlords/upload_photos", files=files)
+    auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=123456)
+    resp = client.post("/api/landlords/upload_photos", data={"initData": auth}, files=files)
     assert resp.status_code == 400
-    assert "Непідтримуваний формат" in resp.json()["detail"] or "пошкоджений" in resp.json()["detail"]
+    assert "Пошкоджене" in resp.json()["detail"] or "непідтримуване" in resp.json()["detail"]
 
 def test_photo_upload_rejects_too_many(privacy_test_env):
     """POST /api/landlords/upload_photos rejects more than 10 photos in a single batch."""
@@ -162,7 +165,7 @@ def test_photo_upload_rejects_too_many(privacy_test_env):
     ]
     resp = client.post("/api/landlords/upload_photos", files=files)
     assert resp.status_code == 400
-    assert "Максимум 10 фотографій" in resp.json()["detail"]
+    assert "1 до 10 фотографій" in resp.json()["detail"]
 
 def test_send_contact_rate_limiting(privacy_test_env):
     """POST /api/send_contact limits contact requests to 10/hour per user ID."""
