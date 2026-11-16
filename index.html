@@ -2,7 +2,7 @@
 <html lang="uk" class="h-full w-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -290,6 +290,12 @@
 
         .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+        /* Allow vertical sheet scrolling while the gallery handles horizontal swipes. */
+        #modalPhotoContainer { touch-action: pan-y pinch-zoom; overscroll-behavior-x: contain; }
+        #modalPhotoContainer img { -webkit-user-drag: none; user-select: none; }
+        @media (hover: none), (pointer: coarse) {
+            #modalPhotoPrev, #modalPhotoNext { display: none !important; }
+        }
     </style>
 </head>
 <body class="flex flex-col h-full w-full select-none">
@@ -465,20 +471,15 @@
 
             <!-- Modal Content (Scrollable Inset Grouped layout) -->
             <div class="p-3.5 overflow-y-auto space-y-3 custom-scroll text-xs">
-                <!-- Gallery Image -->
-                <!-- Apple Photos Style Gallery Viewer -->
-                <div class="relative h-60 sm:h-64 rounded-[22px] overflow-hidden bg-black select-none group" id="modalPhotoContainer">
-                    <img id="modalImage" src="" alt="Квартира" class="w-full h-full object-cover transition-opacity duration-200">
+                <!-- Apartment photo gallery -->
+                <div class="relative h-60 sm:h-64 rounded-[22px] overflow-hidden bg-black select-none group" id="modalPhotoContainer" role="region" aria-label="Фотографії квартири">
+                    <img id="modalImage" src="" alt="Фото квартири" draggable="false" class="w-full h-full object-cover transition-opacity duration-200">
                     
-                    <!-- Left / Right Tap Zones (40% each) -->
-                    <div onclick="switchModalPhoto(-1)" class="absolute inset-y-0 left-0 w-[40%] z-10 cursor-pointer" title="Попереднє фото"></div>
-                    <div onclick="switchModalPhoto(1)" class="absolute inset-y-0 right-0 w-[40%] z-10 cursor-pointer" title="Наступне фото"></div>
-
-                    <!-- Apple Discreet Edge Chevrons (Only shown when > 1 photo) -->
-                    <button id="modalPhotoPrev" onclick="switchModalPhoto(-1)" class="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white/90 flex items-center justify-center transition-all active:scale-90" title="Попередня">
+                    <!-- Desktop controls; touch devices use horizontal swipe. -->
+                    <button id="modalPhotoPrev" type="button" aria-label="Попереднє фото" onclick="switchModalPhoto(-1)" class="photo-desktop-arrow absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white/90 flex items-center justify-center transition-all active:scale-90" title="Попередня">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
                     </button>
-                    <button id="modalPhotoNext" onclick="switchModalPhoto(1)" class="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white/90 flex items-center justify-center transition-all active:scale-90" title="Наступна">
+                    <button id="modalPhotoNext" type="button" aria-label="Наступне фото" onclick="switchModalPhoto(1)" class="photo-desktop-arrow absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white/90 flex items-center justify-center transition-all active:scale-90" title="Наступна">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
                     </button>
 
@@ -488,7 +489,7 @@
                     </div>
 
                     <!-- Counter Badge (Bottom Right) -->
-                    <div id="modalPhotoIndex" class="absolute bottom-2.5 right-2.5 z-20 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] text-white/90 font-mono tracking-wider">1/3</div>
+                    <div id="modalPhotoIndex" role="status" aria-live="polite" class="absolute bottom-2.5 right-2.5 z-20 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] text-white/90 font-mono tracking-wider">1/3</div>
                 </div>
 
                 <!-- Price & Savings Summary -->
@@ -1992,7 +1993,7 @@
                     placeholder.innerHTML = `
                         <svg class="w-12 h-12 mb-2 opacity-30 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
                         <p class="text-xs font-medium text-white/80">Фотографії очікуються</p>
-                        <p class="text-[10px] text-white/50 mt-0.5">Власник ще не завантажив фотографії квартири</p>
+                        <p class="text-[10px] text-white/50 mt-0.5">Фото до цього оголошення поки немає</p>
                     `;
                     document.getElementById('modalPhotoContainer').appendChild(placeholder);
                 } else {
@@ -2008,6 +2009,7 @@
             if (placeholder) placeholder.classList.add('hidden');
             imgEl.classList.remove('hidden');
             imgEl.src = photos[currentModalPhotoIdx];
+            imgEl.alt = `Фото квартири ${currentModalPhotoIdx + 1} з ${photos.length}`;
 
             if (photos.length <= 1) {
                 if (prevBtn) prevBtn.classList.add('hidden');
@@ -2038,6 +2040,41 @@
             currentModalPhotoIdx = (currentModalPhotoIdx + dir + photos.length) % photos.length;
             updateModalPhoto();
         }
+
+        function setupPhotoSwipe() {
+            const gallery = document.getElementById('modalPhotoContainer');
+            if (!gallery || gallery.dataset.swipeReady) return;
+            gallery.dataset.swipeReady = '1';
+
+            let start = null;
+            gallery.addEventListener('touchstart', event => {
+                const images = currentModalDeal?.images;
+                if (event.touches.length !== 1 || !Array.isArray(images) || images.length < 2) {
+                    start = null;
+                    return;
+                }
+                const touch = event.touches[0];
+                start = { x: touch.clientX, y: touch.clientY };
+            }, { passive: true });
+
+            gallery.addEventListener('touchend', event => {
+                if (!start || event.changedTouches.length !== 1) {
+                    start = null;
+                    return;
+                }
+                const touch = event.changedTouches[0];
+                const deltaX = touch.clientX - start.x;
+                const deltaY = touch.clientY - start.y;
+                start = null;
+
+                // Vertical movement is page scrolling, not a photo navigation gesture.
+                if (Math.abs(deltaX) < 45 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
+                switchModalPhoto(deltaX < 0 ? 1 : -1);
+            }, { passive: true });
+
+            gallery.addEventListener('touchcancel', () => { start = null; }, { passive: true });
+        }
+        setupPhotoSwipe();
 
         // 8. FAVORITES
         function toggleFavorite(e, id) {
