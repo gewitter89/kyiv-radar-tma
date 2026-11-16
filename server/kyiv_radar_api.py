@@ -294,8 +294,9 @@ def init_db():
 if APP_ENV != "test":
     try:
         init_db()
-    except Exception as e:
-        logger.error(f"init_db notice: {e}")
+    except Exception as exc:
+        logger.critical("Database initialization failed: %s", type(exc).__name__)
+        raise RuntimeError("Unable to initialize Kyiv Radar database") from exc
 
 # Image Processing & EXIF / GPS Metadata Stripping
 def sanitize_and_save_photo(photo_bytes: bytes, dest_filename: str) -> str:
@@ -448,9 +449,14 @@ async def get_live_deals():
     """
     deals = load_trusted_deals()
     sanitized = []
+    public_fields = frozenset(["id","title","district","address","metro","walkMin","price","realtorCommissionSaved","area","floor","totalFloors","lat","lng","generator","gpon","gas","lowFloor","pets","url","images","desc","rooms","source","status","verifiedAt","isOwnerVerified","cleanAddress","verificationStatus","statusLabel","contactVerified","actualityConfirmed","commissionVerified","commissionNote","phoneMasked"])
     for d in deals:
-        c = dict(d)
-        c["phone"] = None  # Ensure raw phone is NEVER exposed in the public catalog
+        if not isinstance(d, dict):
+            continue
+        # Explicit public response shape prevents accidental future leaks.
+        c = {field: d[field] for field in public_fields if field in d}
+        c["phone"] = None
+        # Owners have not opted in to publishing their names through this API.
         sanitized.append(c)
     return {
         "success": True,
