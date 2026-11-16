@@ -232,7 +232,7 @@
         .carousel-card {
             scroll-snap-align: start;
             flex-shrink: 0;
-            width: 295px;
+            width: 304px;
             height: 136px;
             background: #1c1c1e;
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -240,18 +240,17 @@
             display: flex;
             overflow: hidden;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .carousel-card:hover {
-            border-color: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
         }
         .carousel-card.active-deal {
             border-color: #0a84ff;
             background: #242426;
-            box-shadow: 0 8px 28px rgba(10, 132, 255, 0.3), 0 0 0 1px #0a84ff;
+            box-shadow: 0 4px 18px rgba(10, 132, 255, 0.25);
         }
 
         /* Desktop Carousel Navigation Arrows */
@@ -409,13 +408,7 @@
         </div>
 
         <!-- Carousel Track -->
-        <!-- Floating Left/Right PC Side Arrows -->
-        <button onclick="scrollCarousel(-1)" class="absolute left-1.5 top-[60%] -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-[#1c1c1e]/90 hover:bg-[#2c2c2e] border border-white/10 text-white flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl backdrop-blur-md" title="Попередня квартира">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
-        <button onclick="scrollCarousel(1)" class="absolute right-1.5 top-[60%] -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-[#1c1c1e]/90 hover:bg-[#2c2c2e] border border-white/10 text-white flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl backdrop-blur-md" title="Наступна квартира">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-        </button>
+
 
         <div id="carousel-track" class="relative">
             <!-- Cards populated dynamically by JS -->
@@ -1097,9 +1090,7 @@
             renderCarousel(items);
             updateFavCount();
 
-            if (items.length > 0 && !currentActiveId) {
-                focusDeal(items[0].id, false, false);
-            }
+            // Do not force active-deal on initial load (clean state without forced blue ring)
         }
 
         function renderMarkers(items) {
@@ -1172,40 +1163,46 @@
                 let distancePill = '';
                 if (item._dist !== undefined) {
                     const distLabel = item._dist < 1 ? `${Math.round(item._dist * 1000)} м` : `${item._dist.toFixed(1)} км`;
-                    distancePill = `<span class="px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 font-bold text-[9px] border border-blue-500/30">${distLabel} від вас</span>`;
+                    distancePill = `<span class="px-2 py-0.5 rounded-full bg-[#0a84ff]/15 text-[#0a84ff] font-medium text-[10px] shrink-0 whitespace-nowrap">📍 ${distLabel}</span>`;
                 }
 
                 return `
                     <div class="carousel-card ${item.id === currentActiveId ? 'active-deal' : ''}" id="card-${item.id}" onclick="if (dragMovedDistance < 10) openDealModalById(${item.id})">
                         <!-- Left Thumbnail with Apple rounded corners -->
-                        <div class="w-[112px] h-full relative shrink-0 overflow-hidden bg-black">
+                        <div class="w-[100px] h-full relative shrink-0 overflow-hidden bg-black">
                             <img src="${mainPhoto}" alt="${item.title}" class="w-full h-full object-cover">
                             <span class="absolute bottom-2 left-2 px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[9px] text-white/90 font-mono tracking-wider">1/${photos.length}</span>
                         </div>
 
                         <!-- Right Content -->
-                        <div class="flex-1 p-3 flex flex-col justify-between overflow-hidden">
-                            <!-- Top: Metro & District -->
+                        <div class="flex-1 p-2.5 flex flex-col justify-between overflow-hidden">
+                            <!-- Row 1: Metro & Favorite -->
                             <div class="flex items-center justify-between gap-1">
                                 <div class="text-[11px] font-medium text-[#8e8e93] truncate">
                                     ${item.metro ? `${item.metro} · ${item.walkMin || 5} хв` : item.district}
                                 </div>
-                                <button onclick="toggleFavorite(event, ${item.id})" class="p-0.5 text-[#8e8e93] hover:text-[#ff453a] transition-colors">
+                                <button onclick="toggleFavorite(event, ${item.id})" class="p-0.5 text-[#8e8e93] hover:text-[#ff453a] transition-colors shrink-0">
                                     <svg class="w-3.5 h-3.5 ${isFav ? 'text-[#ff453a] fill-[#ff453a]' : 'text-[#8e8e93]'}" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                                 </button>
                             </div>
 
-                            <!-- Middle: Price & Savings -->
-                            <div>
-                                <div class="text-[16px] font-bold text-white tracking-tight tabular-nums">${item.price.toLocaleString()} ₴<span class="text-xs font-normal text-[#8e8e93]">/міс</span></div>
-                                <div class="text-[11px] text-[#30d158] font-medium">Економія ${savedAmount.toLocaleString()} ₴ (0%)</div>
+                            <!-- Row 2: Price & Distance Pill -->
+                            <div class="flex items-baseline justify-between gap-1">
+                                <div class="text-[16px] font-bold text-white tracking-tight tabular-nums">
+                                    ${item.price.toLocaleString()} ₴<span class="text-xs font-normal text-[#8e8e93]">/міс</span>
+                                </div>
+                                ${distancePill}
                             </div>
 
-                            <!-- Bottom: Tags -->
-                            <div class="flex items-center gap-1.5 text-[10px] text-[#8e8e93]">
-                                <span>${item.rooms || 1}к · ${item.area || 45} м²</span>
-                                ${hasPower ? '<span class="px-1.5 py-0.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-[9px] font-semibold">Світло</span>' : ''}
-                                ${distancePill}
+                            <!-- Row 3: Savings -->
+                            <div class="text-[11px] text-[#30d158] font-medium leading-none">
+                                Економія ${savedAmount.toLocaleString()} ₴ (0%)
+                            </div>
+
+                            <!-- Row 4: Rooms, Area & Power Badge (Single clean line) -->
+                            <div class="flex items-center gap-2 text-[11px] text-[#8e8e93] whitespace-nowrap">
+                                <span class="font-medium text-white/90">${item.rooms || 1} кімн · ${item.area || 45} м²</span>
+                                ${hasPower ? '<span class="px-1.5 py-0.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-[9px] font-semibold flex items-center gap-0.5 shrink-0">⚡ Світло</span>' : ''}
                             </div>
                         </div>
                     </div>
