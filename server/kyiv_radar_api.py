@@ -1,26 +1,33 @@
 # -*- coding: utf-8 -*-
 """
 Kyiv Radar Production HTTPS API
-Version: 1.3.0 (Security Hardened)
+Version: 1.4.0 (Enterprise Privacy & Media Hardened)
 Production backend service for Kyiv Radar Telegram Mini App and Web Platform.
 
 Endpoints:
 - GET  /api/health            - Health check, version & uptime
-- GET  /api/deals             - Live verified catalog (serves synchronized listings)
+- GET  /api/deals             - Live verified catalog (strictly sanitized, zero raw phone leaks)
 - POST /api/reports           - User complaints with sliding rate limiting & TG alerts
-- POST /api/landlords/submit  - Landlord apartment submission for moderation
+- POST /api/landlords/upload_photos - Secure landlord photos upload with EXIF/GPS stripping
+- POST /api/landlords/submit  - Landlord apartment submission for moderation with photo URLs
 - POST /api/send_contact      - Secure server-side lookup & dispatch of landlord contact to Telegram user
 
 Security Measures:
 - ZERO hardcoded secrets: BOT_TOKEN strictly required via environment.
+- Strict separation of public catalog (masked) and private landlord contacts (server-side vault).
+- Zero EXIF/GPS leaks: All uploaded photos stripped of metadata and normalized to clean WebP.
 - ZERO admin/staging manipulation endpoints exposed in production.
 - Cryptographically validated initData with auth_date freshness & hmac.compare_digest.
+- Per-user rate limiting on contact dispatch (max 10/hour) to stop scrapers.
 - Strict CORS restricted exclusively to official origins (no wildcard '*').
 - Non-root unprivileged process execution (kyivradar:kyivradar).
 """
 
 import os
+import io
 import hmac
+import html
+import uuid
 import hashlib
 import json
 import time
@@ -30,8 +37,10 @@ from typing import Optional, List, Dict, Any
 
 import sqlite3
 import aiohttp
-from fastapi import FastAPI, Request, HTTPException, Depends, Header
+from PIL import Image, ImageOps, UnidentifiedImageError
+from fastapi import FastAPI, Request, HTTPException, Depends, Header, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 # Configure structured logging
@@ -67,6 +76,15 @@ _load_env_file()
 APP_ENV = os.getenv("APP_ENV", "production")
 DB_PATH = os.getenv("KYIV_RADAR_DB_PATH", "/opt/resell-radar-ukraine/data/rent_deals.db")
 DEALS_JSON_PATH = os.getenv("KYIV_RADAR_DEALS_PATH", "/opt/kyiv-radar-tma/data/deals.json")
+PRIVATE_CONTACTS_PATH = os.getenv(
+    "KYIV_RADAR_PRIVATE_CONTACTS_PATH",
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "data", "private_contacts.json"))
+)
+UPLOADS_BASE_DIR = os.getenv(
+    "KYIV_RADAR_UPLOADS_DIR",
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads", "landlords"))
+)
+os.makedirs(UPLOADS_BASE_DIR, exist_ok=True)
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID", "8531839081"))
 
 # MANDATORY SECURITY CHECK: BOT_TOKEN or TELEGRAM_BOT_TOKEN MUST BE SUPPLIED IN ENVIRONMENT
@@ -77,8 +95,13 @@ if not BOT_TOKEN and APP_ENV != "test":
 app = FastAPI(
     title="Kyiv Radar Production API",
     description="Secure Production HTTPS Backend for Kyiv Radar Rent Aggregator",
-    version="1.3.1"
+    version="1.4.0"
 )
+
+# Mount /uploads for serving verified landlord photos
+STATIC_UPLOADS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads"))
+if os.path.exists(STATIC_UPLOADS_ROOT):
+    app.mount("/uploads", StaticFiles(directory=STATIC_UPLOADS_ROOT), name="uploads")
 
 # STRICT CORS CONFIGURATION: Wildcard '*' is strictly forbidden
 ALLOWED_ORIGINS = [
@@ -99,7 +122,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Shared SQLite Rate Limiter (consistent across multiple Uvicorn workers, zero in-memory desync)
+# Shared SQLite Rate Limiter
 def check_rate_limit(key: str, max_requests: int, window_seconds: int) -> bool:
     now = time.time()
     cutoff = now - window_seconds
@@ -119,7 +142,6 @@ def check_rate_limit(key: str, max_requests: int, window_seconds: int) -> bool:
         logger.error(f"Rate limiter database error for key '{key}': {e}")
         API_METRICS["db_errors"] += 1
         API_METRICS["last_error"] = f"DB Rate Limit Error: {str(e)}"
-        # Safe fail-closed: reject requests rather than unmetered bypass across workers
         return False
     finally:
         if conn:
@@ -135,12 +157,10 @@ def validate_telegram_init_data(init_data: str, max_age_seconds: int = 86400) ->
     try:
         parsed = dict(urllib.parse.parse_qsl(init_data, keep_blank_values=True))
         if "hash" not in parsed or "auth_date" not in parsed:
-            # auth_date is strictly required
             return None
 
         received_hash = parsed.pop("hash")
 
-        # Parse and validate auth_date strictly
         try:
             auth_date = int(parsed["auth_date"])
         except (ValueError, TypeError):
@@ -149,21 +169,15 @@ def validate_telegram_init_data(init_data: str, max_age_seconds: int = 86400) ->
         now = time.time()
         if auth_date <= 0:
             return None
-        # Reject future timestamps (+60s tolerance for network/NTP clock drift)
         if auth_date > now + 60:
             return None
-        # Reject expired signatures
         if now - auth_date > max_age_seconds:
             return None
 
-        # Sort parameters alphabetically
         data_check_string = "\n".join(f"{k}={parsed[k]}" for k in sorted(parsed.keys()))
-
-        # Secret key = HMAC_SHA256("WebAppData", bot_token)
         secret_key = hmac.new(b"WebAppData", BOT_TOKEN.encode("utf-8"), hashlib.sha256).digest()
         calculated_hash = hmac.new(secret_key, data_check_string.encode("utf-8"), hashlib.sha256).hexdigest()
 
-        # Constant-time comparison to prevent timing attacks
         if not hmac.compare_digest(calculated_hash, received_hash):
             return None
 
@@ -201,11 +215,21 @@ def init_db():
             price TEXT NOT NULL,
             rooms INTEGER NOT NULL,
             phone TEXT NOT NULL,
+            photos TEXT DEFAULT '[]',
             gpon INTEGER DEFAULT 0,
             generator INTEGER DEFAULT 0,
             status TEXT DEFAULT 'pending_review',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             moderator_notes TEXT
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS private_deal_contacts (
+            deal_id INTEGER PRIMARY KEY,
+            phone TEXT NOT NULL,
+            owner_name TEXT,
+            phone_masked TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
     cur.execute("""
@@ -216,8 +240,9 @@ def init_db():
     """)
     cur.execute("CREATE INDEX IF NOT EXISTS idx_rate_limits_key_time ON rate_limits(key, timestamp)")
 
-    # Ensure verification metadata columns exist in landlord_submissions
+    # Ensure schema migrations
     for col_def in [
+        ("photos", "TEXT DEFAULT '[]'"),
         ("contact_verified", "INTEGER DEFAULT 0"),
         ("verified_at", "TEXT"),
         ("verification_method", "TEXT")
@@ -225,7 +250,21 @@ def init_db():
         try:
             cur.execute(f"ALTER TABLE landlord_submissions ADD COLUMN {col_def[0]} {col_def[1]}")
         except sqlite3.OperationalError:
-            pass # already exists
+            pass
+
+    # Pre-populate private_deal_contacts table from private_contacts.json if empty
+    try:
+        cur.execute("SELECT COUNT(*) FROM private_deal_contacts")
+        if cur.fetchone()[0] == 0 and os.path.exists(PRIVATE_CONTACTS_PATH):
+            with open(PRIVATE_CONTACTS_PATH, "r", encoding="utf-8") as pf:
+                priv_dict = json.load(pf)
+                for did_str, pinfo in priv_dict.items():
+                    cur.execute(
+                        "INSERT OR IGNORE INTO private_deal_contacts (deal_id, phone, owner_name, phone_masked) VALUES (?, ?, ?, ?)",
+                        (int(did_str), pinfo.get("phone", ""), pinfo.get("ownerName", ""), pinfo.get("phoneMasked", ""))
+                    )
+    except Exception as mig_err:
+        logger.warning(f"private_deal_contacts seed notice: {mig_err}")
 
     conn.commit()
     conn.close()
@@ -235,6 +274,78 @@ if APP_ENV != "test":
         init_db()
     except Exception as e:
         logger.error(f"init_db notice: {e}")
+
+# Image Processing & EXIF / GPS Metadata Stripping
+def sanitize_and_save_photo(photo_bytes: bytes, dest_filename: str) -> str:
+    """
+    Validates image, strips all EXIF metadata (GPS coords, camera model, etc.),
+    auto-orients, limits dimensions to 1600px, and saves as clean WebP.
+    """
+    if len(photo_bytes) < 32:
+        raise ValueError("Файл занадто малий для зображення")
+    if len(photo_bytes) > 10 * 1024 * 1024:
+        raise ValueError("Розмір фотографії перевищує 10 МБ")
+
+    in_io = io.BytesIO(photo_bytes)
+    with Image.open(in_io) as img:
+        fmt = (img.format or "").upper()
+        if fmt not in ("JPEG", "JPG", "PNG", "WEBP"):
+            raise ValueError(f"Непідтримуваний формат: {fmt}. Дозволено лише JPG, PNG, WEBP.")
+
+        try:
+            img = ImageOps.exif_transpose(img)
+        except Exception:
+            pass
+
+        if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
+            converted = img.convert("RGBA")
+        else:
+            converted = img.convert("RGB")
+
+        w, h = converted.size
+        max_dim = 1600
+        if max(w, h) > max_dim:
+            scale = max_dim / float(max(w, h))
+            converted = converted.resize((int(w * scale), int(h * scale)), Image.Resampling.LANCZOS)
+
+        dest_path = os.path.join(UPLOADS_BASE_DIR, dest_filename)
+        converted.save(dest_path, format="WEBP", quality=82, method=4)
+        return f"/uploads/landlords/{dest_filename}"
+
+# Helper: Load trusted catalog
+def load_trusted_deals() -> List[Dict[str, Any]]:
+    if os.path.exists(DEALS_JSON_PATH):
+        try:
+            with open(DEALS_JSON_PATH, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            logger.error(f"Error loading deals.json: {e}")
+            API_METRICS["db_errors"] += 1
+    return []
+
+# Helper: Look up private landlord contact from secure vault
+def get_private_contact(deal_id: int) -> Optional[dict]:
+    # 1. Check SQLite private_deal_contacts table
+    try:
+        conn = sqlite3.connect(DB_PATH, timeout=5.0)
+        cur = conn.cursor()
+        cur.execute("SELECT phone, owner_name, phone_masked FROM private_deal_contacts WHERE deal_id = ?", (deal_id,))
+        row = cur.fetchone()
+        conn.close()
+        if row and row[0]:
+            return {"phone": row[0], "ownerName": row[1], "phoneMasked": row[2]}
+    except Exception:
+        pass
+
+    # 2. Check server-side private_contacts.json file
+    if os.path.exists(PRIVATE_CONTACTS_PATH):
+        try:
+            with open(PRIVATE_CONTACTS_PATH, "r", encoding="utf-8") as f:
+                contacts = json.load(f)
+                return contacts.get(str(deal_id))
+        except Exception as e:
+            logger.error(f"Error reading private_contacts.json: {e}")
+    return None
 
 # Telegram Bot Message Dispatcher
 async def send_telegram_alert(text: str, reply_markup: Optional[dict] = None, target_chat: int = ADMIN_CHAT_ID) -> bool:
@@ -249,12 +360,12 @@ async def send_telegram_alert(text: str, reply_markup: Optional[dict] = None, ta
     }
     if reply_markup:
         payload["reply_markup"] = reply_markup
+
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.post(api_url, json=payload, timeout=aiohttp.ClientTimeout(total=5)) as resp:
+            async with session.post(api_url, json=payload, timeout=aiohttp.ClientTimeout(total=8)) as resp:
                 if resp.status == 200:
-                    data = await resp.json()
-                    return bool(data.get("ok"))
+                    return True
                 else:
                     err_txt = await resp.text()
                     logger.warning(f"Telegram alert error (status {resp.status}) to chat {target_chat}: {err_txt}")
@@ -266,17 +377,6 @@ async def send_telegram_alert(text: str, reply_markup: Optional[dict] = None, ta
         API_METRICS["telegram_errors"] += 1
         API_METRICS["last_error"] = f"Telegram exception: {str(e)}"
         return False
-
-# Helper: Load trusted catalog
-def load_trusted_deals() -> List[Dict[str, Any]]:
-    if os.path.exists(DEALS_JSON_PATH):
-        try:
-            with open(DEALS_JSON_PATH, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception as e:
-            logger.error(f"Error loading deals.json: {e}")
-            API_METRICS["db_errors"] += 1
-    return []
 
 # Pydantic Schemas
 class ReportRequest(BaseModel):
@@ -290,6 +390,7 @@ class LandlordSubmitRequest(BaseModel):
     price: str
     rooms: int
     phone: str
+    photos: Optional[List[str]] = Field(default_factory=list)
     gpon: bool = False
     generator: bool = False
     initData: Optional[str] = None
@@ -309,7 +410,7 @@ async def health():
         "status": "healthy",
         "service": "kyiv-radar-api",
         "env": APP_ENV,
-        "version": "1.3.1",
+        "version": "1.4.0",
         "deals_count": len(deals),
         "bot_token_configured": bool(BOT_TOKEN),
         "metrics": API_METRICS,
@@ -321,12 +422,18 @@ async def get_live_deals():
     """
     Live catalog endpoint.
     Serves synchronized listings from the verified catalog.
+    Raw landlord phone numbers are strictly stripped for privacy protection.
     """
     deals = load_trusted_deals()
+    sanitized = []
+    for d in deals:
+        c = dict(d)
+        c["phone"] = None  # Ensure raw phone is NEVER exposed in the public catalog
+        sanitized.append(c)
     return {
         "success": True,
-        "count": len(deals),
-        "deals": deals,
+        "count": len(sanitized),
+        "deals": sanitized,
         "timestamp": int(time.time())
     }
 
@@ -340,43 +447,38 @@ async def submit_report(req: ReportRequest, request: Request):
         raise HTTPException(status_code=400, detail="Вкажіть причину скарги")
 
     user_data = validate_telegram_init_data(req.initData) if req.initData else None
-    if user_data:
-        reporter = f"@{user_data.get('username', 'anon')} (TG ID: {user_data.get('id')})"
-    else:
-        reporter = f"Веб-користувач (IP: {client_ip})"
+    user_label = f"@{user_data.get('username', 'anon')} (TG ID: {user_data.get('id')})" if user_data else f"Веб (IP: {client_ip})"
 
     comp_id = 0
     try:
         conn = sqlite3.connect(DB_PATH)
         cur = conn.cursor()
         cur.execute("""
-            INSERT INTO complaints (deal_id, reason, details, reporter_info, status)
-            VALUES (?, ?, ?, ?, 'pending_review')
-        """, (req.dealId, req.reason.strip(), req.details or "", reporter))
+            INSERT INTO complaints (deal_id, reason, details, reporter_info)
+            VALUES (?, ?, ?, ?)
+        """, (req.dealId, req.reason.strip(), req.details.strip() if req.details else "", user_label))
         comp_id = cur.lastrowid
         conn.commit()
         conn.close()
     except Exception as e:
-        print(f"DB Error saving complaint: {e}")
-        raise HTTPException(status_code=500, detail="Помилка збереження у базі даних")
+        logger.error(f"DB Error saving complaint: {e}")
+        raise HTTPException(status_code=500, detail="Помилка збереження скарги на сервері")
 
-    # Notify Admin via Telegram Bot (with HTML escaping)
-    import html
     safe_reason = html.escape(req.reason.strip())
-    safe_details = html.escape(req.details.strip()) if req.details else "немає"
-    safe_reporter = html.escape(reporter)
+    safe_details = html.escape(req.details.strip()) if req.details else "не вказано"
+    safe_user = html.escape(user_label)
 
     admin_msg = (
-        f"🚩 <b>СКАРГА НА ОГОЛОШЕННЯ #{req.dealId} (ID Скарги: #{comp_id})</b>\n"
+        f"🚨 <b>НОВА СКАРГА #{comp_id} НА ЛОТ #{req.dealId}</b>\n"
         f"━━━━━━━━━━━━━━━━━━\n"
-        f"Причина: <b>{safe_reason}</b>\n"
-        f"Деталі: {safe_details}\n"
-        f"Відправник: {safe_reporter}"
+        f"⚠️ <b>Причина:</b> {safe_reason}\n"
+        f"📝 <b>Деталі:</b> {safe_details}\n"
+        f"👤 <b>Відправник:</b> {safe_user}\n"
     )
     admin_kb = {
         "inline_keyboard": [
             [
-                {"text": f"🔍 Переглянути лот #{req.dealId}", "url": f"https://gewitter89.github.io/kyiv-radar-tma/?deal={req.dealId}"},
+                {"text": "🗑 Приховати лот з каталогу", "callback_data": f"rep_hide_{req.dealId}_{comp_id}"},
                 {"text": "❌ Відхилити", "callback_data": f"rep_dismiss_{comp_id}"}
             ]
         ]
@@ -388,6 +490,48 @@ async def submit_report(req: ReportRequest, request: Request):
         "id": comp_id,
         "alert_delivered": alert_sent,
         "message": f"Скаргу #{comp_id} прийнято на розгляд модератором"
+    }
+
+@app.post("/api/landlords/upload_photos")
+async def upload_landlord_photos(
+    request: Request,
+    photos: List[UploadFile] = File(...)
+):
+    """
+    Secure Landlord Photo Upload Endpoint:
+    - Validates file format (JPG, PNG, WEBP).
+    - Checks file size (max 10MB per photo).
+    - Completely strips all EXIF metadata (GPS coordinates, camera serials).
+    - Converts to high-performance WebP (max 1600px).
+    - Rate-limited per IP.
+    """
+    client_ip = request.client.host if request.client else "unknown"
+    if not check_rate_limit(f"upload_{client_ip}", max_requests=25, window_seconds=600):
+        raise HTTPException(status_code=429, detail="Забагато завантажень. Зачекайте декілька хвилин.")
+
+    if not photos or len(photos) == 0:
+        raise HTTPException(status_code=400, detail="Будь ласка, оберіть хоча б одне фото")
+    if len(photos) > 10:
+        raise HTTPException(status_code=400, detail="Максимум 10 фотографій для одного оголошення")
+
+    saved_urls = []
+    session_id = uuid.uuid4().hex[:12]
+    for idx, photo in enumerate(photos):
+        try:
+            contents = await photo.read()
+            clean_filename = f"{session_id}_{idx+1}.webp"
+            url = sanitize_and_save_photo(contents, clean_filename)
+            saved_urls.append(url)
+        except (ValueError, UnidentifiedImageError):
+            raise HTTPException(status_code=400, detail="Файл пошкоджений або має непідтримуваний формат зображення")
+        except Exception as e:
+            logger.error(f"Error processing upload: {e}")
+            raise HTTPException(status_code=500, detail="Помилка збереження фотографії")
+
+    return {
+        "success": True,
+        "count": len(saved_urls),
+        "photos": saved_urls
     }
 
 @app.post("/api/landlords/submit")
@@ -404,27 +548,28 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
     user_data = validate_telegram_init_data(req.initData) if req.initData else None
     user_label = f"@{user_data.get('username', 'anon')} (TG ID: {user_data.get('id')})" if user_data else f"Веб (IP: {client_ip})"
 
+    photos_json = json.dumps(req.photos or [])
     sub_id = 0
     try:
         conn = sqlite3.connect(DB_PATH)
         cur = conn.cursor()
         cur.execute("""
-            INSERT INTO landlord_submissions (address, price, rooms, phone, gpon, generator, status, moderator_notes)
-            VALUES (?, ?, ?, ?, ?, ?, 'pending_review', ?)
-        """, (req.address.strip(), req.price.strip(), req.rooms, req.phone.strip(), 1 if req.gpon else 0, 1 if req.generator else 0, f"Подав: {user_label}"))
+            INSERT INTO landlord_submissions (address, price, rooms, phone, photos, gpon, generator, status, moderator_notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'pending_review', ?)
+        """, (req.address.strip(), req.price.strip(), req.rooms, req.phone.strip(), photos_json, 1 if req.gpon else 0, 1 if req.generator else 0, f"Подав: {user_label}"))
         sub_id = cur.lastrowid
         conn.commit()
         conn.close()
     except Exception as e:
-        print(f"DB Error saving submission: {e}")
+        logger.error(f"DB Error saving submission: {e}")
         raise HTTPException(status_code=500, detail="Помилка збереження заявки")
 
-    # Notify Admin with Action Buttons (with HTML escaping)
-    import html
     safe_addr = html.escape(req.address.strip())
     safe_price = html.escape(req.price.strip())
     safe_phone = html.escape(req.phone.strip())
     safe_user = html.escape(user_label)
+    photos_count = len(req.photos) if req.photos else 0
+    photos_desc = f"📸 <b>Фото:</b> {photos_count} шт." if photos_count > 0 else "📸 <b>Фото:</b> без фото"
 
     admin_lines = [
         f"🏢 <b>НОВА КВАРТИРА ВІД ВЛАСНИКА #{sub_id}</b>",
@@ -433,6 +578,7 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
         f"💰 <b>Ціна:</b> {safe_price} ₴/міс",
         f"🚪 <b>Кімнат:</b> {req.rooms}",
         f"📞 <b>Контакт:</b> <code>{safe_phone}</code>",
+        f"{photos_desc}",
         f"⚡ <b>Генератор:</b> {'Так' if req.generator else 'Ні'} | 🌐 <b>GPON:</b> {'Так' if req.gpon else 'Ні'}",
         "",
         f"👤 <b>Джерело:</b> {safe_user}"
@@ -458,8 +604,10 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
 async def send_contact(req: SendContactRequest):
     """
     CRITICAL SECURITY HARDENING:
-    The server fetches all deal parameters (title, price, phone, address) from the trusted server database.
-    It NEVER accepts or trusts client-supplied phone/price/address values!
+    - Cryptographic authentication of Telegram user.
+    - Sliding window rate limiting per user ID (max 10 requests/hour) to defeat scraping.
+    - Resolves raw phone from secure private store (never returns raw phone to client payload).
+    - Sends direct Telegram message with verified landlord details.
     """
     user_data = validate_telegram_init_data(req.initData)
     if not user_data or "id" not in user_data:
@@ -468,27 +616,39 @@ async def send_contact(req: SendContactRequest):
             detail="Помилка авторизації Telegram. Відкрийте додаток у Telegram для надсилання номеру в чат."
         )
 
+    user_id = user_data["id"]
+
+    # Rate limiting on contact requests per Telegram user ID
+    if not check_rate_limit(f"send_contact_{user_id}", max_requests=10, window_seconds=3600):
+        raise HTTPException(
+            status_code=429,
+            detail="Перевищено ліміт запитів контактів (максимум 10 на годину). Будь ласка, спробуйте пізніше."
+        )
+
     # Server-side lookup of deal by dealId
     deals = load_trusted_deals()
     deal = next((d for d in deals if d.get("id") == req.dealId), None)
     if not deal:
         raise HTTPException(status_code=404, detail=f"Оголошення #{req.dealId} не знайдено у базі даних.")
 
-    trusted_title = deal.get("title", "Квартира")
-    trusted_address = deal.get("address", "Київ")
-    trusted_price = deal.get("price", 0)
-    trusted_phone = deal.get("phone", "Не вказано")
+    priv = get_private_contact(req.dealId)
+    raw_phone = priv.get("phone") if priv else deal.get("phone")
+    trusted_phone = raw_phone if (raw_phone and str(raw_phone).strip()) else "Номер уточнюється"
 
-    user_id = user_data["id"]
+    safe_title = html.escape(deal.get("title", "Квартира"))
+    safe_address = html.escape(deal.get("address", "Київ"))
+    safe_phone = html.escape(trusted_phone)
+    trusted_price = deal.get("price", 0)
+
     commission_label = "0% комісії (підтверджено)" if deal.get("commissionVerified") else "Комісія уточнюється"
     msg_lines = [
         f"📞 <b>Контакт орендодавця (Лот #{req.dealId})</b>",
         "━━━━━━━━━━━━━━━━━━",
-        f"🏢 <b>{trusted_title}</b>",
-        f"📍 {trusted_address}",
+        f"🏢 <b>{safe_title}</b>",
+        f"📍 {safe_address}",
         f"💰 <b>Ціна:</b> {trusted_price:,} ₴/міс ({commission_label})",
         "",
-        f"📱 <b>Телефон орендодавця:</b> <code>{trusted_phone}</code>",
+        f"📱 <b>Телефон орендодавця:</b> <code>{safe_phone}</code>",
         "",
         "<i>Зв'яжіться з орендодавцем безпосередньо. Вдалих переглядів!</i>"
     ]
@@ -502,5 +662,6 @@ async def send_contact(req: SendContactRequest):
     return {
         "success": True,
         "dealId": req.dealId,
+        "phoneMasked": deal.get("phoneMasked"),
         "message": "Контакт орендодавця успішно надіслано у ваш чат Telegram!"
     }

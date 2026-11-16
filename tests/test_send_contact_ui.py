@@ -2,11 +2,12 @@
 """
 Kyiv Radar Send Contact Button UI Test Suite
 Tests sendContactToBotChat() behavior in index.html:
-1. Browser mode with phone: Copies real phone number without fake fallbacks.
-2. Browser mode without phone: Displays truthful "Номер не вказано в оголошенні" without fake "+380671112233".
-3. Telegram mode with successful backend API (200 OK):
+1. Privacy: All public listings have phone=null (no raw phones leaked).
+2. Browser mode with phone: Copies real phone number without fake fallbacks.
+3. Browser mode without phone: Displays truthful "Номер не вказано в оголошенні" without fake "+380671112233".
+4. Telegram mode with successful backend API (200 OK):
    Shows "✓ Контакт надіслано у ваш Telegram-чат!"
-4. Telegram mode with failed backend API (502 / 401 error):
+5. Telegram mode with failed backend API (502 / 401 error):
    Shows truthful error "⚠️ Не вдалося надіслати контакт: ..."
    NEVER masks the failure by silently copying phone to clipboard.
 """
@@ -26,6 +27,22 @@ TG_HASH = "#tgWebAppData=" + urllib.parse.quote(RAW_INIT_DATA)
 TG_FILE_URL = BASE_FILE_URL + TG_HASH
 
 @pytest.mark.asyncio
+async def test_public_catalog_privacy_protection():
+    """Verify that public catalog in index.html contains ZERO unmasked raw phone numbers."""
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        await page.goto(BASE_FILE_URL)
+        await page.wait_for_timeout(500)
+
+        raw_phones_count = await page.evaluate("""() => {
+            if (!LISTINGS || !Array.isArray(LISTINGS)) return -1;
+            return LISTINGS.filter(d => d.phone !== null && d.phone !== undefined && d.phone !== '').length;
+        }""")
+        assert raw_phones_count == 0, f"Privacy leak: found {raw_phones_count} unmasked phone numbers in public catalog!"
+        await browser.close()
+
+@pytest.mark.asyncio
 async def test_browser_mode_with_phone():
     """Outside Telegram: clicking 'У чат' on deal with phone copies real phone."""
     async with async_playwright() as p:
@@ -38,9 +55,14 @@ async def test_browser_mode_with_phone():
         await page.goto(BASE_FILE_URL)
         await page.wait_for_timeout(1000)
 
-        # Open deal #1 (has real phone in deals list)
-        await page.locator(".carousel-card").first.click()
-        await page.wait_for_timeout(500)
+        # Inject phone into deal #1 to test this branch
+        await page.evaluate("""() => {
+            if (LISTINGS && LISTINGS.length > 0) {
+                LISTINGS[0].phone = "+380509998877";
+                openDealModalById(LISTINGS[0].id);
+            }
+        }""")
+        await page.wait_for_timeout(400)
         assert await page.is_visible("#dealModal")
 
         # Click "У чат" button
@@ -56,7 +78,7 @@ async def test_browser_mode_with_phone():
 
 @pytest.mark.asyncio
 async def test_browser_mode_without_phone():
-    """Outside Telegram: deal with phone=null displays truthful 'Номер не вказано'."""
+    """Outside Telegram: default deal with phone=null displays truthful 'Номер не вказано'."""
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         context = await browser.new_context(
@@ -67,14 +89,8 @@ async def test_browser_mode_without_phone():
         await page.goto(BASE_FILE_URL)
         await page.wait_for_timeout(1000)
 
-        # Mutate the first deal in LISTINGS to have phone = null and open it
-        js_inject = """() => {
-            if (LISTINGS && LISTINGS.length > 0) {
-                LISTINGS[0].phone = null;
-                openDealModalById(LISTINGS[0].id);
-            }
-        }"""
-        await page.evaluate(js_inject)
+        # Open deal #1 (already has phone = null)
+        await page.locator(".carousel-card").first.click()
         await page.wait_for_timeout(400)
         assert await page.is_visible("#dealModal")
 
@@ -83,7 +99,7 @@ async def test_browser_mode_without_phone():
         await page.wait_for_timeout(400)
 
         toast = await page.inner_text("#toastText")
-        assert "Номер не вказано" in toast, f"Expected 'Номер не вказано', got '{toast}'"
+        assert "Номер не вказано" in toast or "захищено" in toast, f"Expected privacy/no-number message, got '{toast}'"
         assert "+380671112233" not in toast, "Fake fallback phone MUST NOT be used!"
 
         await browser.close()

@@ -102,11 +102,14 @@ def isolated_app():
         # Patch environment and global paths in kyiv_radar_api
         orig_db = kyiv_radar_api.DB_PATH
         orig_deals = kyiv_radar_api.DEALS_JSON_PATH
+        orig_priv = getattr(kyiv_radar_api, "PRIVATE_CONTACTS_PATH", None)
         orig_token = kyiv_radar_api.BOT_TOKEN
         orig_env = kyiv_radar_api.APP_ENV
 
         kyiv_radar_api.DB_PATH = test_db_path
         kyiv_radar_api.DEALS_JSON_PATH = test_deals_path
+        if hasattr(kyiv_radar_api, "PRIVATE_CONTACTS_PATH"):
+            kyiv_radar_api.PRIVATE_CONTACTS_PATH = os.path.join(tmpdir, "nonexistent_priv.json")
         kyiv_radar_api.BOT_TOKEN = TEST_BOT_TOKEN
         kyiv_radar_api.APP_ENV = "test"
 
@@ -124,6 +127,8 @@ def isolated_app():
         # Restore
         kyiv_radar_api.DB_PATH = orig_db
         kyiv_radar_api.DEALS_JSON_PATH = orig_deals
+        if orig_priv:
+            kyiv_radar_api.PRIVATE_CONTACTS_PATH = orig_priv
         kyiv_radar_api.BOT_TOKEN = orig_token
         kyiv_radar_api.APP_ENV = orig_env
 

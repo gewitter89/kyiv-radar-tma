@@ -15,3 +15,6 @@ __pycache__/
 .env
 .env.*
 !.env.example
+server/data/
+uploads/
+scripts_verify_privacy.py

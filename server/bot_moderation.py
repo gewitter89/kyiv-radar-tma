@@ -54,10 +54,19 @@ def process_landlord_approval(
         try:
             conn = sqlite3.connect(db_path, timeout=10.0)
             cur = conn.cursor()
-            cur.execute(
-                "SELECT status, address, price, rooms, phone, gpon, generator FROM landlord_submissions WHERE id = ?",
-                (sub_id,)
-            )
+            cur.execute("PRAGMA table_info(landlord_submissions)")
+            sub_cols = [c[1] for c in cur.fetchall()]
+            has_photos = "photos" in sub_cols
+            if has_photos:
+                cur.execute(
+                    "SELECT status, address, price, rooms, phone, gpon, generator, photos FROM landlord_submissions WHERE id = ?",
+                    (sub_id,)
+                )
+            else:
+                cur.execute(
+                    "SELECT status, address, price, rooms, phone, gpon, generator FROM landlord_submissions WHERE id = ?",
+                    (sub_id,)
+                )
             row = cur.fetchone()
         except Exception as db_init_err:
             return {
@@ -72,7 +81,19 @@ def process_landlord_approval(
                 "error": f"Заявку #{sub_id} не знайдено в базі даних."
             }
 
-        current_status, address, price_raw, rooms_val, phone_val, gpon_val, gen_val = row
+        current_status = row[0]
+        address = row[1]
+        price_raw = row[2]
+        rooms_val = row[3]
+        phone_val = row[4]
+        gpon_val = row[5]
+        gen_val = row[6]
+        photos_val = []
+        if has_photos and len(row) > 7 and row[7]:
+            try:
+                photos_val = json.loads(row[7])
+            except Exception:
+                photos_val = []
 
         # 3. Read current deals catalog and take pre-update byte snapshot for rollback
         deals_list = []
@@ -132,9 +153,9 @@ def process_landlord_approval(
                 "lowFloor": None,
                 "pets": None,
                 "ownerName": "Орендодавець",
-                "phone": phone_val,
+                "phone": None,  # PRIVACY: Raw phone stripped from public catalog
                 "phoneMasked": phone_val[:6] + "***" if len(phone_val) >= 6 else phone_val,
-                "images": [],
+                "images": photos_val if isinstance(photos_val, list) else [],
                 "desc": "Оголошення додано орендодавцем через Київ Радар.",
                 "source": "Київ Радар (Пряма заявка)",
                 "status": "Опубліковано",
@@ -174,6 +195,20 @@ def process_landlord_approval(
         # 6. Phase 2: Commit SQLite status.
         # CRITICAL FIX: If commit fails, execute compensating rollback of deals.json!
         try:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS private_deal_contacts (
+                    deal_id INTEGER PRIMARY KEY,
+                    phone TEXT NOT NULL,
+                    owner_name TEXT,
+                    phone_masked TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            masked_phone = phone_val[:6] + "***" if len(phone_val) >= 6 else phone_val
+            cur.execute(
+                "INSERT OR REPLACE INTO private_deal_contacts (deal_id, phone, owner_name, phone_masked) VALUES (?, ?, ?, ?)",
+                (new_deal["id"], phone_val, "Орендодавець", masked_phone)
+            )
             cur.execute(
                 "UPDATE landlord_submissions SET status = 'published', moderator_notes = ? WHERE id = ?",
                 (moderator_notes, sub_id)
