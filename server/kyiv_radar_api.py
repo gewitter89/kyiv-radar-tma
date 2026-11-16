@@ -84,16 +84,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Sliding Window Rate Limiter
+# Shared SQLite Rate Limiter (consistent across multiple Uvicorn workers)
 RATE_LIMITS = defaultdict(list)
 
 def check_rate_limit(key: str, max_requests: int, window_seconds: int) -> bool:
     now = time.time()
-    RATE_LIMITS[key] = [t for t in RATE_LIMITS[key] if now - t < window_seconds]
-    if len(RATE_LIMITS[key]) >= max_requests:
-        return False
-    RATE_LIMITS[key].append(now)
-    return True
+    cutoff = now - window_seconds
+    try:
+        conn = sqlite3.connect(DB_PATH, timeout=5)
+        cur = conn.cursor()
+        cur.execute("DELETE FROM rate_limits WHERE key = ? AND timestamp < ?", (key, cutoff))
+        cur.execute("SELECT COUNT(*) FROM rate_limits WHERE key = ? AND timestamp >= ?", (key, cutoff))
+        count = cur.fetchone()[0]
+        if count >= max_requests:
+            conn.close()
+            return False
+        cur.execute("INSERT INTO rate_limits (key, timestamp) VALUES (?, ?)", (key, now))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        RATE_LIMITS[key] = [t for t in RATE_LIMITS[key] if now - t < window_seconds]
+        if len(RATE_LIMITS[key]) >= max_requests:
+            return False
+        RATE_LIMITS[key].append(now)
+        return True
 
 # Telegram initData Cryptographic Signature & Expiry Validation
 def validate_telegram_init_data(init_data: str, max_age_seconds: int = 86400) -> Optional[dict]:
@@ -173,6 +188,13 @@ def init_db():
             moderator_notes TEXT
         )
     """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS rate_limits (
+            key TEXT NOT NULL,
+            timestamp REAL NOT NULL
+        )
+    """)
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_rate_limits_key_time ON rate_limits(key, timestamp)")
     conn.commit()
     conn.close()
 
@@ -183,9 +205,9 @@ if APP_ENV != "test":
         print(f"init_db notice: {e}")
 
 # Telegram Bot Message Dispatcher
-async def send_telegram_alert(text: str, reply_markup: Optional[dict] = None, target_chat: int = ADMIN_CHAT_ID):
+async def send_telegram_alert(text: str, reply_markup: Optional[dict] = None, target_chat: int = ADMIN_CHAT_ID) -> bool:
     if not BOT_TOKEN:
-        return
+        return False
     api_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     payload = {
         "chat_id": target_chat,
@@ -197,11 +219,16 @@ async def send_telegram_alert(text: str, reply_markup: Optional[dict] = None, ta
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(api_url, json=payload, timeout=aiohttp.ClientTimeout(total=5)) as resp:
-                if resp.status != 200:
+                if resp.status == 200:
+                    data = await resp.json()
+                    return bool(data.get("ok"))
+                else:
                     err_txt = await resp.text()
                     print(f"Telegram alert error ({resp.status}): {err_txt}")
+                    return False
     except Exception as e:
         print(f"Failed to dispatch Telegram message: {e}")
+        return False
 
 # Helper: Load trusted catalog
 def load_trusted_deals() -> List[Dict[str, Any]]:
@@ -293,13 +320,18 @@ async def submit_report(req: ReportRequest, request: Request):
         print(f"DB Error saving complaint: {e}")
         raise HTTPException(status_code=500, detail="Помилка збереження у базі даних")
 
-    # Notify Admin via Telegram Bot
+    # Notify Admin via Telegram Bot (with HTML escaping)
+    import html
+    safe_reason = html.escape(req.reason.strip())
+    safe_details = html.escape(req.details.strip()) if req.details else "немає"
+    safe_reporter = html.escape(reporter)
+
     admin_msg = (
         f"🚩 <b>СКАРГА НА ОГОЛОШЕННЯ #{req.dealId} (ID Скарги: #{comp_id})</b>\n"
         f"━━━━━━━━━━━━━━━━━━\n"
-        f"Причина: <b>{req.reason}</b>\n"
-        f"Деталі: {req.details or 'немає'}\n"
-        f"Відправник: {reporter}"
+        f"Причина: <b>{safe_reason}</b>\n"
+        f"Деталі: {safe_details}\n"
+        f"Відправник: {safe_reporter}"
     )
     admin_kb = {
         "inline_keyboard": [
@@ -309,11 +341,12 @@ async def submit_report(req: ReportRequest, request: Request):
             ]
         ]
     }
-    await send_telegram_alert(admin_msg, reply_markup=admin_kb)
+    alert_sent = await send_telegram_alert(admin_msg, reply_markup=admin_kb)
 
     return {
         "success": True,
         "id": comp_id,
+        "alert_delivered": alert_sent,
         "message": f"Скаргу #{comp_id} прийнято на розгляд модератором"
     }
 
@@ -346,17 +379,23 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
         print(f"DB Error saving submission: {e}")
         raise HTTPException(status_code=500, detail="Помилка збереження заявки")
 
-    # Notify Admin with Action Buttons
+    # Notify Admin with Action Buttons (with HTML escaping)
+    import html
+    safe_addr = html.escape(req.address.strip())
+    safe_price = html.escape(req.price.strip())
+    safe_phone = html.escape(req.phone.strip())
+    safe_user = html.escape(user_label)
+
     admin_lines = [
         f"🏢 <b>НОВА КВАРТИРА ВІД ВЛАСНИКА #{sub_id}</b>",
         "━━━━━━━━━━━━━━━━━━",
-        f"📍 <b>Адреса:</b> {req.address.strip()}",
-        f"💰 <b>Ціна:</b> {req.price.strip()} ₴/міс",
+        f"📍 <b>Адреса:</b> {safe_addr}",
+        f"💰 <b>Ціна:</b> {safe_price} ₴/міс",
         f"🚪 <b>Кімнат:</b> {req.rooms}",
-        f"📞 <b>Контакт:</b> <code>{req.phone.strip()}</code>",
+        f"📞 <b>Контакт:</b> <code>{safe_phone}</code>",
         f"⚡ <b>Генератор:</b> {'Так' if req.generator else 'Ні'} | 🌐 <b>GPON:</b> {'Так' if req.gpon else 'Ні'}",
         "",
-        f"👤 <b>Джерело:</b> {user_label}"
+        f"👤 <b>Джерело:</b> {safe_user}"
     ]
     admin_kb = {
         "inline_keyboard": [
@@ -366,11 +405,12 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
             ]
         ]
     }
-    await send_telegram_alert("\n".join(admin_lines), reply_markup=admin_kb)
+    alert_sent = await send_telegram_alert("\n".join(admin_lines), reply_markup=admin_kb)
 
     return {
         "success": True,
         "id": sub_id,
+        "alert_delivered": alert_sent,
         "message": f"Вашу квартиру #{sub_id} прийнято на модерацію. Дякуємо!"
     }
 
@@ -411,7 +451,12 @@ async def send_contact(req: SendContactRequest):
         "",
         "<i>Зв'яжіться з орендодавцем безпосередньо. Вдалих переглядів!</i>"
     ]
-    await send_telegram_alert("\n".join(msg_lines), target_chat=user_id)
+    sent = await send_telegram_alert("\n".join(msg_lines), target_chat=user_id)
+    if not sent:
+        raise HTTPException(
+            status_code=502,
+            detail="Не вдалося доставити контакт у ваш Telegram-чат. Будь ласка, відкрийте діалог з нашим ботом (@prostov_shrink_bot) та натисніть /start."
+        )
 
     return {
         "success": True,

@@ -1303,21 +1303,39 @@
             }
 
             listEl.innerHTML = items.map(item => {
-                const photos = item.images && item.images.length > 0 ? item.images : [
-                    "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80"
-                ];
-                const cover = photos[0];
+                const hasPhotos = Array.isArray(item.images) && item.images.length > 0;
+                const cover = hasPhotos ? item.images[0] : '';
+                const photosCount = hasPhotos ? item.images.length : 0;
                 const hasPower = item.generator || item.gpon;
                 const isFav = FAVORITES.has(item.id);
+
+                const roomStr = item.rooms ? `${item.rooms} кімн` : 'Кімнати не вказано';
+                const areaStr = item.area ? `${item.area} м²` : 'Площа не вказана';
+                const floorStr = item.floor ? `${item.floor}${item.totalFloors ? '/' + item.totalFloors : ''} пов.` : '';
+                const specLine = [roomStr, areaStr, floorStr].filter(Boolean).join(' · ');
+
+                const savingsStr = item.realtorCommissionSaved && item.realtorCommissionSaved > 0
+                    ? `Економія на рієлторі: ~${item.realtorCommissionSaved.toLocaleString()} ₴`
+                    : `0% комісії рієлторам (прямий контакт)`;
+
+                const photoBlock = hasPhotos ? `
+                    <img src="${cover}" alt="${escapeHtml(item.title || 'Квартира')}" class="w-full h-full object-cover">
+                    <span class="absolute bottom-2.5 right-3 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-[10px] text-white/90 font-mono">📷 ${photosCount} фото</span>
+                ` : `
+                    <div class="w-full h-full flex flex-col items-center justify-center bg-[#242426] text-[#8e8e93] p-4 text-center">
+                        <svg class="w-8 h-8 mb-1.5 opacity-30 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                        <span class="text-[11px] text-white/60">Фото очікується від власника</span>
+                    </div>
+                `;
 
                 return `
                     <div onclick="openDealModalById(${item.id})" class="bg-[#1c1c1e] border border-white/[0.08] hover:border-white/20 rounded-[20px] overflow-hidden cursor-pointer transition-all active:scale-[0.99] shadow-lg">
                         <div class="relative h-48 w-full bg-black">
-                            <img src="${cover}" alt="${escapeHtml(item.title)}" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20"></div>
+                            ${photoBlock}
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none"></div>
                             
                             <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5 z-10">
-                                <span class="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] text-white/90 font-mono">${escapeHtml(item.source || "OLX")}</span>
+                                <span class="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] text-white/90 font-mono">${escapeHtml(item.source || "Київ Радар")}</span>
                                 ${item.generator ? '<span class="px-2 py-0.5 rounded-full bg-[#ff9f0a]/90 text-black text-[10px] font-bold">⚡ Генератор</span>' : ''}
                                 ${item.gpon ? '<span class="px-2 py-0.5 rounded-full bg-[#30d158]/90 text-black text-[10px] font-bold">🌐 GPON</span>' : ''}
                             </div>
@@ -1328,19 +1346,18 @@
 
                             <div class="absolute bottom-2.5 left-3 right-3 flex items-end justify-between z-10">
                                 <div>
-                                    <div class="text-lg font-bold text-white leading-tight">${item.price.toLocaleString()} ₴<span class="text-xs font-normal text-white/70">/міс</span></div>
-                                    <div class="text-[11px] text-[#30d158] font-medium">Економія на рієлторі: ~${(item.realtorCommissionSaved || Math.round(item.price/2)).toLocaleString()} ₴</div>
+                                    <div class="text-lg font-bold text-white leading-tight">${item.price ? item.price.toLocaleString() + ' ₴' : 'Ціна уточнюється'}<span class="text-xs font-normal text-white/70">/міс</span></div>
+                                    <div class="text-[11px] text-[#30d158] font-medium">${savingsStr}</div>
                                 </div>
-                                <span class="px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-[10px] text-white/90 font-mono">📷 ${photos.length} фото</span>
                             </div>
                         </div>
 
                         <div class="p-3 text-xs">
-                            <h4 class="font-semibold text-white truncate text-[13px] mb-1">${escapeHtml(item.title)}</h4>
+                            <h4 class="font-semibold text-white truncate text-[13px] mb-1">${escapeHtml(item.title || item.address || 'Квартира в оренду')}</h4>
                             <p class="text-[#8e8e93] text-[11px] flex items-center gap-1.5 mb-2">
-                                <span>📍 ${item.metro ? `${escapeHtml(item.metro)} · ${escapeHtml(item.district)}` : item.district}</span>
+                                <span>📍 ${item.metro ? `${escapeHtml(item.metro)} · ${escapeHtml(item.district || 'Київ')}` : escapeHtml(item.district || 'Київ')}</span>
                                 <span>•</span>
-                                <span>${item.rooms || 1}-кімн · ${item.area} м² · ${item.floor} пов</span>
+                                <span>${specLine}</span>
                             </p>
                             <div class="flex items-center justify-between text-[11px] text-[#8e8e93] pt-2 border-t border-white/[0.06]">
                                 <span>0% комісії · Прямий номер</span>
@@ -1376,6 +1393,11 @@
 
             const clusterItems = [];
             items.forEach((item) => {
+                // Safeguard against missing or non-numeric coordinates (e.g. newly published deals)
+                if (typeof item.lat !== 'number' || typeof item.lng !== 'number' || isNaN(item.lat) || isNaN(item.lng) || item.lat === 0 || item.lng === 0) {
+                    return;
+                }
+
                 const shortLabel = Math.round(item.price / 1000) + 'k ₴';
                 const hasPower = item.generator || item.gpon;
                 const isActive = item.id === currentActiveId;
@@ -1427,11 +1449,29 @@
             track.innerHTML = items.map((item) => {
                 const isFav = FAVORITES.has(item.id);
                 const hasPower = item.generator || item.gpon;
-                const photos = item.images && item.images.length > 0 ? item.images : [
-                    "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80"
-                ];
-                const mainPhoto = photos[0];
-                const savedAmount = item.realtorCommissionSaved || Math.round(item.price / 2);
+                const hasPhotos = Array.isArray(item.images) && item.images.length > 0;
+                const mainPhoto = hasPhotos ? item.images[0] : '';
+                const photosCount = hasPhotos ? item.images.length : 0;
+
+                const photoBlock = hasPhotos ? `
+                    <div class="w-[100px] h-full relative shrink-0 overflow-hidden bg-black">
+                        <img src="${mainPhoto}" alt="${escapeHtml(item.title || 'Квартира')}" class="w-full h-full object-cover">
+                        <span class="absolute bottom-2 left-2 px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[9px] text-white/90 font-mono tracking-wider">1/${photosCount}</span>
+                    </div>
+                ` : `
+                    <div class="w-[100px] h-full relative shrink-0 overflow-hidden bg-[#242426] flex flex-col items-center justify-center text-[#8e8e93] p-1 text-center">
+                        <svg class="w-6 h-6 mb-1 opacity-30 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                        <span class="text-[8px] text-white/60 leading-tight">Без фото</span>
+                    </div>
+                `;
+
+                const savedAmount = item.realtorCommissionSaved && item.realtorCommissionSaved > 0
+                    ? `Економія ${item.realtorCommissionSaved.toLocaleString()} ₴ (0%)`
+                    : `0% комісії рієлторам`;
+
+                const roomStr = item.rooms ? `${item.rooms} кімн` : 'Кімнати не вказано';
+                const areaStr = item.area ? `${item.area} м²` : '';
+                const specLine = [roomStr, areaStr].filter(Boolean).join(' · ');
 
                 let distancePill = '';
                 if (item._dist !== undefined) {
@@ -1441,18 +1481,15 @@
 
                 return `
                     <div class="carousel-card ${item.id === currentActiveId ? 'active-deal' : ''}" id="card-${item.id}" onclick="if (dragMovedDistance < 10) openDealModalById(${item.id})">
-                        <!-- Left Thumbnail with Apple rounded corners -->
-                        <div class="w-[100px] h-full relative shrink-0 overflow-hidden bg-black">
-                            <img src="${mainPhoto}" alt="${escapeHtml(item.title)}" class="w-full h-full object-cover">
-                            <span class="absolute bottom-2 left-2 px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[9px] text-white/90 font-mono tracking-wider">1/${photos.length}</span>
-                        </div>
+                        <!-- Left Thumbnail / Placeholder -->
+                        ${photoBlock}
 
                         <!-- Right Content -->
                         <div class="flex-1 p-2.5 flex flex-col justify-between overflow-hidden">
                             <!-- Row 1: Metro & Favorite -->
                             <div class="flex items-center justify-between gap-1">
                                 <div class="text-[11px] font-medium text-[#8e8e93] truncate">
-                                    ${item.metro ? `${escapeHtml(item.metro)} · ${item.walkMin || 5} хв` : item.district}
+                                    ${item.metro ? `${escapeHtml(item.metro)} · ${item.walkMin || 5} хв` : escapeHtml(item.district || 'Київ')}
                                 </div>
                                 <button onclick="toggleFavorite(event, ${item.id})" class="p-0.5 text-[#8e8e93] hover:text-[#ff453a] transition-colors shrink-0">
                                     <svg class="w-3.5 h-3.5 ${isFav ? 'text-[#ff453a] fill-[#ff453a]' : 'text-[#8e8e93]'}" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
@@ -1462,19 +1499,19 @@
                             <!-- Row 2: Price & Distance Pill -->
                             <div class="flex items-baseline justify-between gap-1">
                                 <div class="text-[16px] font-bold text-white tracking-tight tabular-nums">
-                                    ${item.price.toLocaleString()} ₴<span class="text-xs font-normal text-[#8e8e93]">/міс</span>
+                                    ${item.price ? item.price.toLocaleString() + ' ₴' : 'Ціна уточнюється'}<span class="text-xs font-normal text-[#8e8e93]">/міс</span>
                                 </div>
                                 ${distancePill}
                             </div>
 
                             <!-- Row 3: Savings -->
                             <div class="text-[11px] text-[#30d158] font-medium leading-none">
-                                Економія ${savedAmount.toLocaleString()} ₴ (0%)
+                                ${savedAmount}
                             </div>
 
                             <!-- Row 4: Rooms, Area & Power Badge (Single clean line) -->
                             <div class="flex items-center gap-2 text-[11px] text-[#8e8e93] whitespace-nowrap">
-                                <span class="font-medium text-white/90">${item.rooms || 1} кімн · ${item.area || 45} м²</span>
+                                <span class="font-medium text-white/90">${specLine}</span>
                                 ${hasPower ? '<span class="px-1.5 py-0.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-[9px] font-semibold flex items-center gap-0.5 shrink-0">⚡ Світло</span>' : ''}
                             </div>
                         </div>
@@ -1504,7 +1541,7 @@
 
             if (shouldPanMap && map) {
                 const deal = LISTINGS.find(x => x.id === dealId);
-                if (deal) {
+                if (deal && typeof deal.lat === 'number' && typeof deal.lng === 'number' && !isNaN(deal.lat) && !isNaN(deal.lng) && deal.lat !== 0 && deal.lng !== 0) {
                     map.panTo([deal.lat, deal.lng], { animate: true, duration: 0.6 });
                 }
             }
@@ -1733,10 +1770,12 @@
             currentModalDeal = deal;
             currentModalPhotoIdx = 0;
 
-            document.getElementById('modalMetro').innerText = deal.metro ? `${deal.metro} · ${deal.district}` : deal.district;
-            document.getElementById('modalPrice').innerText = `${deal.price.toLocaleString()} ₴/міс`;
-            const saved = deal.realtorCommissionSaved || Math.round(deal.price / 2);
-            document.getElementById('modalSavings').innerText = `Економія на рієлторі: ${saved.toLocaleString()} ₴`;
+            document.getElementById('modalMetro').innerText = deal.metro ? `${deal.metro} · ${deal.district}` : (deal.district || 'Київ');
+            document.getElementById('modalPrice').innerText = deal.price ? `${deal.price.toLocaleString()} ₴/міс` : 'Ціна уточнюється';
+            const saved = deal.realtorCommissionSaved && deal.realtorCommissionSaved > 0 
+                ? deal.realtorCommissionSaved 
+                : (deal.price ? Math.round(deal.price / 2) : 0);
+            document.getElementById('modalSavings').innerText = saved > 0 ? `Економія на рієлторі: ${saved.toLocaleString()} ₴` : `0% комісії рієлторам`;
 
             // Telegram button visibility: only show if genuine owner Telegram handle exists
             const tgBtn = document.getElementById('modalTgBtn');
@@ -1760,32 +1799,38 @@
                             <span class="font-medium">${escapeHtml(deal.ownerName || 'Власник житла')}</span>
                             <span class="text-[#30d158] text-[11px] font-semibold">Перевірено модератором</span>
                         </div>
-                        <p class="text-[#8e8e93] text-[11px] leading-relaxed">Оголошення подано власником через Київ Радар. Контакт перевірено.</p>
+                        <p class="text-[#8e8e93] text-[11px] leading-relaxed">Оголошення подано власником через Київ Радар. Документи перевірено.</p>
                     `;
                 } else {
-                    if (verTag) verTag.innerHTML = `<span class="text-[#8e8e93]">${escapeHtml(deal.source || 'OLX')} (Відкриті дані)</span>`;
+                    const sourceName = escapeHtml(deal.source || 'Київ Радар (Власник)');
+                    if (verTag) verTag.innerHTML = `<span class="text-[#8e8e93]">${sourceName} (Контакт)</span>`;
                     sourceDetails.innerHTML = `
                         <div class="flex items-center justify-between text-white/90">
-                            <span class="font-medium">Джерело: ${escapeHtml(deal.source || 'OLX')}</span>
-                            <span class="text-[#8e8e93] text-[11px] font-mono">${escapeHtml(deal.verifiedAt || 'Імпортовано')}</span>
+                            <span class="font-medium">Джерело: ${sourceName}</span>
+                            <span class="text-[#8e8e93] text-[11px] font-mono">${escapeHtml(deal.verifiedAt || 'Опубліковано')}</span>
                         </div>
-                        <p class="text-[#8e8e93] text-[11px] leading-relaxed">Оголошення зібрано з відкритого джерела. Документи на право власності не перевірялися платформою Київ Радар. Зв'язуйтесь безпосередньо за вказаним телефоном.</p>
+                        <p class="text-[#8e8e93] text-[11px] leading-relaxed">Оголошення розміщено безпосередньо. Документи на право власності не перевірялися платформою Київ Радар. Зв'язуйтесь з орендодавцем за вказаним телефоном.</p>
                     `;
                 }
             }
 
-            document.getElementById('modalSpecs').innerText = `${deal.rooms || 1} кімн · ${deal.area || 45} м² · ${deal.floor || 4}/${deal.totalFloors || 9} пов.`;
-            document.getElementById('modalAddress').innerText = deal.address || deal.title;
-            document.getElementById('modalDesc').innerText = deal.desc || "Затишна квартира від перевіреного власника.";
+            const specList = [];
+            if (deal.rooms) specList.push(`${deal.rooms} кімн`);
+            if (deal.area) specList.push(`${deal.area} м²`);
+            if (deal.floor) specList.push(`${deal.floor}${deal.totalFloors ? '/' + deal.totalFloors : ''} пов.`);
+            document.getElementById('modalSpecs').innerText = specList.length > 0 ? specList.join(' · ') : 'Характеристики уточнюються';
+
+            document.getElementById('modalAddress').innerText = deal.address || deal.title || 'Адреса уточнюється';
+            document.getElementById('modalDesc').innerText = deal.desc || "Затишна квартира від орендодавця без посередників.";
 
             // Phone Box
-            const phone = deal.phone || "+380671112233";
+            const phone = deal.phone || "Номер уточнюється";
             const phoneEl = document.getElementById('modalPhoneText');
             if (phoneEl) phoneEl.innerText = phone;
             const ownerEl = document.getElementById('modalOwnerName');
             if (ownerEl) ownerEl.innerText = deal.ownerName || "Орендодавець";
             const savingsEl = document.getElementById('modalRealtorSavings');
-            if (savingsEl) savingsEl.innerText = `Економія: ${saved.toLocaleString()} ₴`;
+            if (savingsEl) savingsEl.innerText = saved > 0 ? `Економія: ${saved.toLocaleString()} ₴` : `0% комісії`;
 
             // Equipment list (Apple Inset Grouped items)
             const eqContainer = document.getElementById('modalEquipment');
@@ -1820,15 +1865,42 @@
 
         function updateModalPhoto() {
             if (!currentModalDeal) return;
-            const photos = currentModalDeal.images && currentModalDeal.images.length > 0 ? currentModalDeal.images : [
-                "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80"
-            ];
-            document.getElementById('modalImage').src = photos[currentModalPhotoIdx];
-            
+            const hasPhotos = Array.isArray(currentModalDeal.images) && currentModalDeal.images.length > 0;
+            const photos = hasPhotos ? currentModalDeal.images : [];
+            const imgEl = document.getElementById('modalImage');
             const prevBtn = document.getElementById('modalPhotoPrev');
             const nextBtn = document.getElementById('modalPhotoNext');
             const dotsContainer = document.getElementById('modalPhotoDots');
             const indexBadge = document.getElementById('modalPhotoIndex');
+
+            let placeholder = document.getElementById('modalPhotoPlaceholder');
+
+            if (!hasPhotos) {
+                imgEl.src = '';
+                imgEl.classList.add('hidden');
+                if (!placeholder) {
+                    placeholder = document.createElement('div');
+                    placeholder.id = 'modalPhotoPlaceholder';
+                    placeholder.className = 'w-full h-full flex flex-col items-center justify-center bg-[#242426] text-[#8e8e93] p-4 text-center select-none';
+                    placeholder.innerHTML = `
+                        <svg class="w-12 h-12 mb-2 opacity-30 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                        <p class="text-xs font-medium text-white/80">Фотографії очікуються</p>
+                        <p class="text-[10px] text-white/50 mt-0.5">Власник ще не завантажив фотографії квартири</p>
+                    `;
+                    document.getElementById('modalPhotoContainer').appendChild(placeholder);
+                } else {
+                    placeholder.classList.remove('hidden');
+                }
+                if (prevBtn) prevBtn.classList.add('hidden');
+                if (nextBtn) nextBtn.classList.add('hidden');
+                if (dotsContainer) dotsContainer.classList.add('hidden');
+                if (indexBadge) indexBadge.classList.add('hidden');
+                return;
+            }
+
+            if (placeholder) placeholder.classList.add('hidden');
+            imgEl.classList.remove('hidden');
+            imgEl.src = photos[currentModalPhotoIdx];
 
             if (photos.length <= 1) {
                 if (prevBtn) prevBtn.classList.add('hidden');

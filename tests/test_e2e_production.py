@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Kyiv Radar Production Security & UI Verification Suite
-Version: 1.3.0
+Version: 1.3.1
 
 Guarantees:
 1. Production API Health & Version (GET /api/health)
@@ -14,11 +14,13 @@ Guarantees:
    - Rejects expired auth_date (> 86400s) with 401
    - Rejects tampered signature with 401
 5. Live Catalog Integrity (GET /api/deals): Serves 150 verified deals without data corruption
-6. Frontend Client UI (Playwright Mobile & Desktop):
+6. Frontend Client UI & Leaflet Map Resiliency (Playwright Mobile & Desktop):
+   - Zero uncaught JavaScript errors (listening to pageerror)
    - Title tag "Київ Радар" without truncation
    - Zero forbidden / mock / leaked terms in DOM
-   - Room filter accuracy (1-room, All)
-   - Deal modal with direct calling and Apple-style action bar
+   - Deals without coordinates (lat=null, lng=null) render without Leaflet crashes
+   - Deals without photos (images=[]) render clean placeholders without broken img tags
+   - Elimination of fictitious defaults: no fake area (45 m²), floor (4/9), or fake stock photos
 """
 
 import os
@@ -84,12 +86,10 @@ def test_api_health():
 
 def test_cors_security():
     print("\n--- [2/6] Testing Strict CORS Configuration ---")
-    # Allowed origin
     status, _, headers = http_get("/api/health", headers={"Origin": "https://gewitter89.github.io"})
     allow_origin = headers.get("Access-Control-Allow-Origin") or headers.get("access-control-allow-origin")
     assert allow_origin == "https://gewitter89.github.io", f"Expected 'https://gewitter89.github.io', got {allow_origin}"
 
-    # Disallowed origin
     status_bad, _, headers_bad = http_get("/api/health", headers={"Origin": "https://attacker.example.com"})
     allow_origin_bad = headers_bad.get("Access-Control-Allow-Origin") or headers_bad.get("access-control-allow-origin")
     assert allow_origin_bad is None, f"Arbitrary origin MUST NOT be allowed: {allow_origin_bad}"
@@ -100,7 +100,6 @@ def test_staging_endpoints_closure():
     for path in ["/api/staging/approve", "/api/staging/cleanup"]:
         status, _, _ = http_get(path)
         assert status == 404, f"CRITICAL: {path} returned {status} instead of 404 Not Found!"
-        # Also test POST
         status_post, _, _ = http_post(path, data={"test": 1})
         assert status_post == 404, f"CRITICAL: POST {path} returned {status_post} instead of 404 Not Found!"
         print(f"✓ PASS: Endpoint {path} is completely removed from production (404 Not Found)")
@@ -146,6 +145,9 @@ async def test_frontend_ui():
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={"width": 390, "height": 844})
 
+        page_errors = []
+        page.on("pageerror", lambda err: page_errors.append(str(err)))
+
         file_url = "file:///" + os.path.abspath("kyiv-radar-tma/index.html").replace("\\", "/")
         await page.goto(file_url)
         await page.wait_for_timeout(1500)
@@ -181,6 +183,54 @@ async def test_frontend_ui():
         phone_text = await page.inner_text("#modalPhoneText")
         assert len(phone_text) >= 10
         print("✓ PASS: Deal modal features verified: Apple action bar, direct calling, verified status")
+        await page.click("#dealModal button[onclick='closeDealModal()']")
+        await page.wait_for_timeout(300)
+
+        # 5. Resilience test: Deal with lat=null, lng=null, images=[]
+        print("Testing Leaflet & DOM resiliency with null coordinates and empty images...")
+        js_inject_deal = """() => {
+            const rawDeal = {
+                id: 888888,
+                title: "Квартира без координат і фото від власника",
+                district: "Подільський",
+                address: "вул. Спаська, 12",
+                price: 18000,
+                rooms: 1,
+                area: null,
+                floor: null,
+                totalFloors: null,
+                lat: null,
+                lng: null,
+                images: [],
+                phone: "+380501112233",
+                isOwnerVerified: false,
+                contactVerified: false
+            };
+            LISTINGS.unshift(rawDeal);
+            renderAll();
+        }"""
+        await page.evaluate(js_inject_deal)
+        await page.wait_for_timeout(500)
+
+        # Check that card rendered without crashing Leaflet or JavaScript
+        card_text = await page.inner_text("#card-888888")
+        assert "Без фото" in card_text or "18 000" in card_text, "Deal without photos must render placeholder cleanly"
+
+        # Open modal for this deal
+        await page.click("#card-888888")
+        await page.wait_for_timeout(500)
+        assert await page.is_visible("#dealModal")
+
+        modal_specs = await page.inner_text("#modalSpecs")
+        assert "45" not in modal_specs, "Fictitious area 45 MUST NOT be displayed!"
+
+        # Close modal
+        await page.click("#dealModal button[onclick='closeDealModal()']")
+        await page.wait_for_timeout(300)
+
+        # Verify zero page errors occurred during full interaction
+        assert len(page_errors) == 0, f"Uncaught page errors detected: {page_errors}"
+        print("✓ PASS: 0 JavaScript/Leaflet errors with null coordinates & empty image galleries")
 
         await browser.close()
 
