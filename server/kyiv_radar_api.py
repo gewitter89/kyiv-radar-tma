@@ -415,6 +415,7 @@ class LandlordSubmitRequest(BaseModel):
     rooms: int = Field(ge=1, le=15)
     phone: str = Field(min_length=9, max_length=64)
     photos: List[str] = Field(default_factory=list, max_length=10)
+    rightsConfirmed: bool = False
     gpon: bool = False
     generator: bool = False
     initData: Optional[str] = None
@@ -691,6 +692,11 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
         raise HTTPException(status_code=400, detail="Вкажіть повну адресу квартири (вулиця, номер будинку)")
     if not req.phone or len(req.phone.strip()) < 9:
         raise HTTPException(status_code=400, detail="Вкажіть коректний номер телефону")
+    if not req.rightsConfirmed:
+        raise HTTPException(
+            status_code=400,
+            detail="Підтвердьте право розміщувати оголошення, фотографії та контакт"
+        )
 
     user_data = validate_telegram_init_data(req.initData) if req.initData else None
     if not user_data or not isinstance(user_data.get("id"), int):
