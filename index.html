@@ -541,9 +541,6 @@
                         </div>
                         <span class="text-[11px] leading-snug text-right text-[#b2b7c3] max-w-[120px]">Контакт надійде у ваш Telegram після запиту</span>
                     </div>
-                    <div id="phoneUnlockedBox" class="hidden" aria-hidden="true">
-                        <span id="modalPhoneText"></span>
-                    </div>
                 </div>
 
                 <!-- Address (Apple Inset Row) -->
@@ -1617,15 +1614,7 @@
         let dragMovedDistance = 0;
 
         
-        // PAYWALL & UNLOCK ENGINE
-        let UNLOCKED_DEALS = new Set(JSON.parse(localStorage.getItem('kr_unlocked_deals') || '[]'));
-        let HAS_RADAR_PASS = localStorage.getItem('kr_has_radar_pass') === '1';
-        let selectedPayPlan = 'single';
-
-        function isDealUnlocked(dealId) {
-            // 100% Free Direct Owner Contacts in Launch Growth Mode (Zero Paywall Confusion)
-            return true;
-        }
+        // Free contact requests are verified server-side via Telegram.
 
         function handleCallClick(e) {
             if (e) e.stopPropagation();
@@ -1989,10 +1978,7 @@
                     : 'Актуальність не перевірено';
             }
 
-            // Phone Box
-            const phone = deal.phone || "Номер уточнюється";
-            const phoneEl = document.getElementById('modalPhoneText');
-            if (phoneEl) phoneEl.innerText = phone;
+            // Public data never exposes unmasked contact numbers.
             const ownerEl = document.getElementById('modalOwnerName');
             if (ownerEl) ownerEl.innerText = deal.ownerName || "Контактна особа";
             const realtorSavingsEl = document.getElementById('modalRealtorSavings');
