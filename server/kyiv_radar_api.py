@@ -851,7 +851,7 @@ async def send_contact(req: SendContactRequest):
         "━━━━━━━━━━━━━━━━━━",
         f"🏢 <b>{safe_title}</b>",
         f"📍 {safe_address}",
-        f"💰 <b>Ціна:</b> {trusted_price:,} ₴/міс ({commission_label})",
+        f"💰 <b>Ціна:</b> {format(trusted_price, ',').replace(',', ' ')} ₴/міс ({commission_label})",
         "",
         f"📱 <b>Телефон орендодавця:</b> <code>{safe_phone}</code>",
         "",
