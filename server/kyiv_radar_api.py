@@ -413,11 +413,11 @@ class ReportRequest(BaseModel):
     initData: Optional[str] = None
 
 class LandlordSubmitRequest(BaseModel):
-    address: str
-    price: str
-    rooms: int
-    phone: str
-    photos: Optional[List[str]] = Field(default_factory=list)
+    address: str = Field(min_length=5, max_length=220)
+    price: str = Field(min_length=2, max_length=24)
+    rooms: int = Field(ge=1, le=15)
+    phone: str = Field(min_length=9, max_length=64)
+    photos: List[str] = Field(default_factory=list, max_length=10)
     gpon: bool = False
     generator: bool = False
     initData: Optional[str] = None
@@ -651,23 +651,60 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
         raise HTTPException(status_code=400, detail="Вкажіть коректний номер телефону")
 
     user_data = validate_telegram_init_data(req.initData) if req.initData else None
-    user_label = f"@{user_data.get('username', 'anon')} (TG ID: {user_data.get('id')})" if user_data else f"Веб (IP: {client_ip})"
+    if not user_data or not isinstance(user_data.get("id"), int):
+        raise HTTPException(status_code=401, detail="Для подання заявки відкрийте додаток у Telegram")
+    user_id = user_data["id"]
+    if not check_rate_limit(f"submit_user_{user_id}", max_requests=5, window_seconds=3600):
+        raise HTTPException(status_code=429, detail="Забагато заявок. Спробуйте пізніше")
+    user_label = f"@{user_data.get('username', 'anon')} (TG ID: {user_id})"
 
-    photos_json = json.dumps(req.photos or [])
+    photo_ids = req.photos or []
+    if len(set(photo_ids)) != len(photo_ids) or any(
+        not isinstance(photo_id, str) or not PHOTO_ID_PATTERN.fullmatch(photo_id)
+        for photo_id in photo_ids
+    ):
+        raise HTTPException(status_code=400, detail="Некоректні ідентифікатори фотографій")
+    photos_json = json.dumps(photo_ids)
     sub_id = 0
+    conn = None
     try:
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, timeout=10.0)
         cur = conn.cursor()
+        cur.execute("BEGIN IMMEDIATE")
+        if photo_ids:
+            markers = ",".join("?" for _ in photo_ids)
+            verified = cur.execute(
+                f"SELECT photo_id FROM landlord_uploads WHERE photo_id IN ({markers}) "
+                "AND owner_telegram_id = ? AND submission_id IS NULL AND status = 'pending'",
+                (*photo_ids, user_id)
+            ).fetchall()
+            if len(verified) != len(photo_ids):
+                raise HTTPException(status_code=403, detail="Фото не належать цій заявці або вже використані")
         cur.execute("""
-            INSERT INTO landlord_submissions (address, price, rooms, phone, photos, gpon, generator, status, moderator_notes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'pending_review', ?)
-        """, (req.address.strip(), req.price.strip(), req.rooms, req.phone.strip(), photos_json, 1 if req.gpon else 0, 1 if req.generator else 0, f"Подав: {user_label}"))
+            INSERT INTO landlord_submissions
+            (address, price, rooms, phone, photos, submitter_id, gpon, generator, status, moderator_notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending_review', ?)
+        """, (req.address.strip(), req.price.strip(), req.rooms, req.phone.strip(), photos_json,
+              user_id, 1 if req.gpon else 0, 1 if req.generator else 0, f"Подав: {user_label}"))
         sub_id = cur.lastrowid
+        if photo_ids:
+            cur.execute(
+                f"UPDATE landlord_uploads SET submission_id = ? WHERE photo_id IN ({markers}) "
+                "AND owner_telegram_id = ? AND submission_id IS NULL AND status = 'pending'",
+                (sub_id, *photo_ids, user_id)
+            )
+            if cur.rowcount != len(photo_ids):
+                raise HTTPException(status_code=409, detail="Не вдалося закріпити фотографії за заявкою")
         conn.commit()
-        conn.close()
-    except Exception as e:
-        logger.error(f"DB Error saving submission: {e}")
+    except HTTPException:
+        if conn: conn.rollback()
+        raise
+    except sqlite3.Error as exc:
+        if conn: conn.rollback()
+        logger.error("Failed to save submission: %s", type(exc).__name__)
         raise HTTPException(status_code=500, detail="Помилка збереження заявки")
+    finally:
+        if conn: conn.close()
 
     safe_addr = html.escape(req.address.strip())
     safe_price = html.escape(req.price.strip())
@@ -696,12 +733,19 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
             ]
         ]
     }
-    alert_sent = await send_telegram_alert("\n".join(admin_lines), reply_markup=admin_kb)
+    previews_sent = await send_landlord_photo_previews(photo_ids, sub_id)
+    if not previews_sent:
+        admin_lines.append("⚠️ Фото не доставлено модератору. Не публікувати без перегляду.")
+    alert_sent = await send_telegram_alert(
+        "\n".join(admin_lines),
+        reply_markup=admin_kb if previews_sent else None
+    )
 
     return {
         "success": True,
         "id": sub_id,
         "alert_delivered": alert_sent,
+        "photos_preview_delivered": previews_sent,
         "message": f"Вашу квартиру #{sub_id} прийнято на модерацію. Дякуємо!"
     }
 
