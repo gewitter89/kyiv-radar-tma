@@ -6,7 +6,7 @@ from playwright.async_api import async_playwright
 
 INDEX = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "index.html"))
 FILE_URL = "file:///" + INDEX.replace("\\", "/")
-IMAGE = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+IMAGE = "https://example.com/apartment-test.jpg"
 
 
 async def prepare_gallery(page, number=3):
