@@ -957,3 +957,126 @@ html.kr-focused-filter-ui.kr-simple[data-kr-theme] #krResultsBar {
 @media(prefers-reduced-motion:reduce) {
   .kr-filters-sheet *, .kr-filters-sheet *::before {transition:none !important;}
 }
+
+
+/* v1.15: apartment decision view — readable, scrollable and trustworthy.
+   Reuse the same Graphite / Kyiv Signal tokens; blue is an action, not a
+   misleading "verified" status. Everything stays inside the existing sheet. */
+html.kr-unified-111.kr-simple[data-kr-theme] #dealModal:not(.hidden) {
+  overflow:hidden;
+  overscroll-behavior:contain;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #dealModal > div {
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  max-height:min(calc(var(--kr-landlord-vh,100dvh) - 10px),840px) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krDealScroll {
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto !important;
+  overscroll-behavior-y:contain;
+  touch-action:pan-y;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:20px;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krDealActionBar {
+  background:var(--kr-panel) !important;
+  border-top:1px solid var(--kr-border) !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  padding:10px 12px max(12px,env(safe-area-inset-bottom)) !important;
+  gap:8px;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalCallBtn {
+  background:var(--kr-blue) !important;
+  color:#fff !important;
+  box-shadow:none !important;
+  border-radius:13px !important;
+  padding-inline:11px !important;
+  min-width:0;
+  font-size:13px !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalCallBtn svg {
+  color:inherit !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krDealActionBar :is(#modalChatBtn,#krShareListing) {
+  border-radius:13px !important;
+  border:1px solid var(--kr-border) !important;
+  background:var(--kr-raised) !important;
+  color:var(--kr-ink) !important;
+  min-height:44px;
+  padding-inline:10px !important;
+  box-shadow:none !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krDealActionBar button:disabled {
+  opacity:.58 !important;
+  cursor:wait;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalPhoneContainer {
+  background:var(--kr-raised) !important;
+  border-color:var(--kr-border) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #phoneLockedBox {
+  background:var(--kr-quiet) !important;
+  border-color:var(--kr-border) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalMaskedPhone {
+  color:var(--kr-ink) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krDealScroll :is(#modalAddress,#modalDesc,#modalSpecs,#modalPrice) {
+  color:var(--kr-ink) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krDealScroll :is(#modalSavings,#modalVerifiedDate,#modalRealtorSavings) {
+  color:var(--kr-muted) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme="light"] #krDealScroll :is(.text-white\/80,.text-white\/90,.text-\[\#b2b7c3\],.text-\[\#8e8e93\]) {
+  color:var(--kr-muted) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krContactStatus[hidden] {
+  display:none !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krContactStatus {
+  margin:0;
+  padding:10px 12px;
+  border-radius:11px;
+  background:var(--kr-quiet);
+  border:1px solid var(--kr-border);
+  color:var(--kr-muted);
+  font-size:12px;
+  font-weight:550;
+  line-height:1.5;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krContactStatus[data-state="pending"] {
+  color:var(--kr-ink);
+  border-color:var(--kr-blue);
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krContactStatus[data-state="success"] {
+  border-color:var(--kr-border);
+  color:var(--kr-ink);
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krContactStatus[data-state="error"] {
+  border-color:#A85859;
+  color:var(--kr-ink);
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #dealModal button[onclick="closeDealModal()"] {
+  min-width:44px !important;
+  min-height:44px !important;
+  color:var(--kr-ink) !important;
+  background:var(--kr-raised) !important;
+  border-radius:12px !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #dealModal button:focus-visible {
+  outline:2px solid var(--kr-focus);
+  outline-offset:2px;
+}
+@media(max-width:360px) {
+  html.kr-unified-111.kr-simple[data-kr-theme] #krDealActionBar #modalChatBtn {
+    display:none !important;
+  }
+  html.kr-unified-111.kr-simple[data-kr-theme] #krDealActionBar #krShareListing {
+    font-size:11px;
+    padding-inline:8px !important;
+  }
+}
