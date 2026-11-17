@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta name="theme-color" content="#10151D">
+    <meta name="theme-color" content="#161E29">
     <link rel="icon" href="./kyiv-radar-mark.svg" type="image/svg+xml">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="color-scheme" content="dark">
@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="./trust-experience.css?v=1.8.0">
     <link rel="stylesheet" href="./premium-polish.css?v=1.12.0">
     <link rel="stylesheet" href="./compact-masthead.css?v=1.12.0">
-    <link rel="stylesheet" href="./unified-toolbar.css?v=1.13.0">
+    <link rel="stylesheet" href="./unified-toolbar.css?v=1.14.0">
     <meta name="description" content="Київ Радар — мапа та каталог оренди квартир у Києві. Пошук за районом, бюджетом і заявленими можливостями автономності. Джерела та рівень перевірки вказані в оголошеннях.">
     <!-- Open Graph / Telegram Card -->
     <meta property="og:title" content="Київ Радар 🇺🇦 — Каталог та мапа оренди квартир у Києві">
@@ -334,8 +334,6 @@
     </style>
 </head>
 <body class="flex flex-col h-full w-full select-none">
-    <!-- Ukrainian Flag Micro-Ribbon (Apple Aesthetic 2px Accent) -->
-    <div class="h-[2.5px] w-full shrink-0 bg-gradient-to-r from-[#0057B7] via-[#0057B7] to-[#FFD700] z-40"></div>
 
     <!-- ==========================================
          TOP NOTIFICATION TOAST
@@ -350,7 +348,7 @@
     <!-- ==========================================
          TOP NAVBAR: Apple Frosted Glass Header
     ========================================== -->
-    <header class="h-12 shrink-0 bg-[#000000]/70 backdrop-blur-2xl border-b border-white/[0.08] px-2.5 md:px-4 flex items-center justify-between gap-2 z-30">
+    <header class="h-12 shrink-0 bg-[#161E29] px-2.5 md:px-4 flex items-center justify-between gap-2 z-30">
         <!-- City Switcher (Apple Inset Button - Clean & Compact) -->
         <button onclick="openCityModal()" class="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] border border-white/[0.08] text-xs font-semibold text-white transition-all active:scale-95 shadow-sm" title="Змінити місто">
             <span class="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span>
@@ -2496,7 +2494,7 @@
                 try {
                     tg.ready();
                     tg.expand();
-                    if (typeof tg.setHeaderColor === 'function') tg.setHeaderColor(window.KyivRadarTheme?.nativeColors().header || '#10151D');
+                    if (typeof tg.setHeaderColor === 'function') tg.setHeaderColor(window.KyivRadarTheme?.nativeColors().header || '#161E29');
                     if (typeof tg.setBackgroundColor === 'function') tg.setBackgroundColor(window.KyivRadarTheme?.nativeColors().background || '#10151D');
                 } catch (e) {
                     console.log("Telegram header styling error:", e);
@@ -2526,7 +2524,7 @@
     <script src="./premium-polish.js?v=1.12.0"></script>
     <script src="./compact-masthead.js?v=1.10.0"></script>
     <script src="./unified-toolbar.js?v=1.12.0"></script>
-    <script src="./kyiv-signal-theme.js?v=1.12.0"></script>
+    <script src="./kyiv-signal-theme.js?v=1.14.0"></script>
     <script src="./kyiv-smart-filters.js?v=1.13.0"></script>
 
     <!-- ==========================================
