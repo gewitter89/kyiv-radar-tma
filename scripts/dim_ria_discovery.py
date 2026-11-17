@@ -52,9 +52,12 @@ def positive(value: int, field: str) -> int:
 
 
 def db_connect(path: Path):
-    target = path.expanduser().resolve()
-    if path_is_public(target) or target.is_symlink() or not target.parent.is_dir():
-        raise ValueError("Only a private non-symlink SQLite destination is permitted")
+    original = path.expanduser()
+    if original.is_symlink():
+        raise ValueError("Symlink destination is forbidden")
+    target = original.resolve()
+    if path_is_public(target) or not target.parent.is_dir():
+        raise ValueError("Only a private SQLite destination is permitted")
     umask = os.umask(0o077)
     try:
         conn = sqlite3.connect(target, timeout=30)
