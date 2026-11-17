@@ -49,7 +49,7 @@ async def test_filter_count_reset_and_source_uncertainty():
         page = await browser.new_page(viewport={"width": 390, "height": 844})
         await open_app(page)
         await page.locator("#filterRooms1").click()
-        assert "Знайдено" in await page.inner_text("#krResultsCount")
+        assert "оголошень" in await page.inner_text("#krResultsCount")
         assert await page.locator("#krReset").is_visible()
         assert await page.evaluate("ACTIVE_FILTERS.rooms") == 1
         await page.locator("#krReset").click()
