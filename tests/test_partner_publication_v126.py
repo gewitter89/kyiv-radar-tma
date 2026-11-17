@@ -186,6 +186,10 @@ def test_tampered_private_export_fails_closed(tmp_path):
         lambda item: item.update({"phone": "+380123456789"}),
         lambda item: item.update({"images": ["https://unapproved.test/photo.jpg"]}),
         lambda item: item.update({"actualityConfirmed": True}),
+        lambda item: item.update({"id": 711}),
+        lambda item: item.update({"title": "Перевірена супер-квартира без комісії"}),
+        lambda item: item.update({"status": "Власник підтверджений"}),
+
     ):
         payload = json.loads(json.dumps(original))
         mutation(payload["items"][0])
@@ -232,6 +236,24 @@ def test_api_opt_in_publishes_only_safely_reviewed_private_partner(tmp_path, mon
     revoke_source(db, "agency_one", "partner_request")
     assert client.get("/api/deals").json()["deals"] == []
     assert client.get("/api/health").json()["deals_count"] == 0
+
+
+
+
+def test_runtime_metadata_cannot_disagree_with_private_inventory(tmp_path):
+    db = setup_source(tmp_path)
+    receipt = make_authorization(tmp_path)
+    reviews = make_reviews(tmp_path)
+    from server.listing_trust import load_private_register, public_listing_view
+    original = prepare_private_export(db, receipt, reviews, now=NOW)["items"]
+    checked = public_listing_view(original, load_private_register(str(reviews)), now=NOW)
+    assert len(enforce_partner_visibility(checked, str(db), now=NOW)) == 1
+    for field, value in (
+        ("district", "Шевченківський"), ("rooms", 9),
+        ("area", 92.0), ("price", 1)
+    ):
+        tampered = {**checked[0], field: value}
+        assert enforce_partner_visibility([tampered], str(db), now=NOW) == []
 
 
 def test_no_private_export_env_keeps_legacy_path_unchanged(tmp_path, monkeypatch):
