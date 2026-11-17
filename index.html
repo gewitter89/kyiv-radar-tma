@@ -2058,9 +2058,11 @@
                 const url = safePhotoUrl(rawSource);
                 let allowedSource = false;
                 if (url) {
-                    const host = new URL(url).hostname.toLowerCase();
-                    allowedSource = host === 'olx.ua' || host.endsWith('.olx.ua')
-                        || host === 'dom.ria.com' || host.endsWith('.dom.ria.com');
+                    const parsed = new URL(url);
+                    const host = parsed.hostname.toLowerCase();
+                    allowedSource = parsed.protocol === 'https:' &&
+                        (host === 'olx.ua' || host.endsWith('.olx.ua')
+                        || host === 'dom.ria.com' || host.endsWith('.dom.ria.com'));
                 }
                 originalLink.classList.toggle('hidden', !allowedSource);
                 if (allowedSource) originalLink.href = url;
