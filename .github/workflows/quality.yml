@@ -53,6 +53,7 @@ jobs:
             tests/test_simple_first_view.py \
             tests/test_catalog_claims.py \
             tests/test_listing_trust_v18.py \
+            tests/test_trust_experience_v18.py \
             tests/test_vps_release_snapshot.py \
             tests/test_public_catalog_privacy.py \
             tests/test_photo_swipe.py \
