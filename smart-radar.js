@@ -44,6 +44,8 @@
     const haystack = [deal.title, deal.district, deal.address, deal.metro]
       .map(v => String(v || "")).join(" ").toLocaleLowerCase("uk-UA");
     if (query && !haystack.includes(query)) return false;
+    // Imported room-count conflicts are unknown, not safe filter matches.
+    if (f.rooms != null && deal.roomConflict === true) return false;
     const rooms = Number(deal.rooms || (typeof getDealRooms === "function" ? getDealRooms(deal) : 0));
     if (f.rooms != null && !(f.rooms === 3 ? rooms >= 3 : rooms === f.rooms)) return false;
     if (f.maxPrice != null && !(Number(deal.price) <= f.maxPrice)) return false;
