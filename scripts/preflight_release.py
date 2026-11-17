@@ -9,6 +9,7 @@ exits 2 with non-sensitive diagnostics otherwise.
 import argparse
 import json
 import os
+import shutil
 import sqlite3
 import sys
 from pathlib import Path
@@ -110,8 +111,8 @@ def inspect_release(db_path: str, deals_path: str, uploads_path: str) -> dict:
         errors.append("Media storage directory cannot be read")
     else:
         try:
-            fs = os.statvfs(photo_dir)
-            free_mb = fs.f_bavail * fs.f_frsize // (1024 * 1024)
+            usage = shutil.disk_usage(photo_dir)
+            free_mb = usage.free // (1024 * 1024)
             counts["media_disk_free_mb"] = free_mb
             if free_mb < 512:
                 warnings.append("Media storage has less than 512 MB free")

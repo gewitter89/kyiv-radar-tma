@@ -6,6 +6,7 @@ import sqlite3
 import subprocess
 import sys
 from pathlib import Path
+import pytest
 
 from tests.test_privacy_and_media import privacy_test_env
 
@@ -45,8 +46,9 @@ def test_vps_release_preparation_backs_up_and_migrates_only_copy(privacy_test_en
     assert (snapshot / "restore" / "deals.json").read_bytes() == original_catalog
     assert catalog.read_bytes() == original_catalog
     assert (snapshot / "restore" / "uploads" / photo.name).read_bytes() == photo.read_bytes()
-    assert os.stat(snapshot).st_mode & 0o077 == 0
-    assert os.stat(snapshot / "restore" / "rent_deals.db").st_mode & 0o077 == 0
+    if os.name != "nt":
+        assert os.stat(snapshot).st_mode & 0o077 == 0
+        assert os.stat(snapshot / "restore" / "rent_deals.db").st_mode & 0o077 == 0
 
     with sqlite3.connect(snapshot / "restore" / "rent_deals.db") as conn:
         assert conn.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
@@ -55,6 +57,7 @@ def test_vps_release_preparation_backs_up_and_migrates_only_copy(privacy_test_en
         assert {"submitter_id", "contact_verified", "verified_at"}.issubset(cols)
 
 
+@pytest.mark.skipif(os.name == "nt", reason="POSIX mode bits not enforced on Windows NTFS")
 def test_release_preparation_rejects_public_backup_directory(privacy_test_env, tmp_path):
     directory = tmp_path / "public"
     directory.mkdir(mode=0o755)

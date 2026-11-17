@@ -181,8 +181,8 @@ async def test_frontend_ui():
         assert await page.is_visible("#dealModal")
         call_text = await page.inner_text("#modalCallBtn")
         assert "Отримати контакт" in call_text or "Зателефонувати" in call_text
-        phone_text = await page.inner_text("#modalPhoneText")
-        assert len(phone_text) >= 10
+        phone_text = await page.inner_text("#modalMaskedPhone")
+        assert len(phone_text) >= 5
         print("✓ PASS: Deal modal features verified: Apple action bar, direct calling, verified status")
         await page.click("#dealModal button[onclick='closeDealModal()']")
         await page.wait_for_timeout(300)

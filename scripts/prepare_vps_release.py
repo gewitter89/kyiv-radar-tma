@@ -81,7 +81,7 @@ def main():
     if not db.is_file() or not deals.is_file() or db.is_symlink() or deals.is_symlink():
         parser.error("Source database and public catalog must be regular files")
     if backup_root.exists() and (backup_root.is_symlink() or
-                                 stat.S_IMODE(backup_root.stat().st_mode) & 0o077):
+                                 (os.name != "nt" and stat.S_IMODE(backup_root.stat().st_mode) & 0o077)):
         parser.error("Backup root must be a private directory (mode 0700)")
     backup_root.mkdir(parents=True, mode=0o700, exist_ok=True)
     if not backup_root.is_dir():
