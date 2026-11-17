@@ -31,17 +31,17 @@
   function scrub(list) {
     if (!Array.isArray(list)) return [];
     return list.filter(x => x && typeof x === "object").map(item => {
-      const badAddress = junk.test(String(item.address || ""));
+      const badAddress = item.addressConflict === true || junk.test(String(item.address || ""));
       const roomFromTitle = roomCountFromTitle(item.title);
-      const roomsConflict = Number.isInteger(roomFromTitle) &&
+      const roomsConflict = item.roomConflict === true || (Number.isInteger(roomFromTitle) &&
         Number.isInteger(Number(item.rooms)) &&
         Number(item.rooms) > 0 && roomFromTitle !== Number(item.rooms) &&
-        item.isOwnerVerified !== true;
+        item.isOwnerVerified !== true);
       const titleStation = titleMetro(item.title);
-      const metroConflict = titleStation &&
+      const metroConflict = item.metroConflict === true || (titleStation &&
         !String(item.metro || "").toLocaleLowerCase("uk-UA")
           .includes(titleStation.toLocaleLowerCase("uk-UA")) &&
-        item.isOwnerVerified !== true;
+        item.isOwnerVerified !== true);
       // Only independently verified location may become a precise map marker.
       const locationVerified = item.locationVerified === true && !badAddress;
       return {
