@@ -89,7 +89,7 @@ async def test_graphite_and_light_have_readable_main_header_and_status():
             )
             assert contrast_ratio(status_fg, bar_bg) >= 4.5
             assert await page.locator("meta[name='theme-color']").get_attribute("content") == (
-                "#10151D" if theme == "dark" else "#EDF2F7"
+                "#161E29" if theme == "dark" else "#EDF2F7"
             )
             assert await page.locator(".kr-brand-mark img").evaluate("(img) => img.naturalWidth > 0")
         await browser.close()
@@ -159,4 +159,61 @@ async def test_listing_photo_error_exposes_friendly_recoverable_fallback():
         assert "1/" not in (await frame.locator(".kr-gallery-count").inner_text())
         await image.dispatch_event("load")
         assert "kr-gallery-missing" not in (await frame.get_attribute("class"))
+        await browser.close()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("width,height", [(320, 640), (390, 844)])
+async def test_native_telegram_title_bar_exactly_matches_web_header_in_both_themes(width, height):
+    """A Telegram native title bar is solid. Its paint must equal the first HTML surface."""
+    from pathlib import Path
+
+    index = Path(ROOT, "index.html").read_text(encoding="utf-8")
+    assert '<meta name="theme-color" content="#161E29">' in index
+    assert 'bg-[#161E29]' in index  # no black first-frame navbar flash
+    assert "h-[2.5px]" not in index  # no obsolete stripe at the border
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": width, "height": height},
+                                      is_mobile=True, has_touch=True)
+        await ready(page)
+        # Observe SDK calls without contacting Telegram or sending anything.
+        await page.evaluate("""() => {
+          window.__krNativeColors = [];
+          window.Telegram = window.Telegram || {};
+          window.Telegram.WebApp = window.Telegram.WebApp || {};
+          window.Telegram.WebApp.setHeaderColor =
+             color => window.__krNativeColors.push(color);
+          window.Telegram.WebApp.setBackgroundColor = () => {};
+        }""")
+        for mode, color, css_rgb in [
+            ("dark", "#161E29", "rgb(22, 30, 41)"),
+            ("light", "#EDF2F7", "rgb(237, 242, 247)")
+        ]:
+            await page.evaluate("(theme) => window.KyivRadarTheme.set(theme)", mode)
+            status = await page.evaluate("""() => {
+              const html = document.documentElement;
+              const header = document.querySelector('body > header');
+              return {
+                native: window.KyivRadarTheme.nativeColors().header,
+                cssToken: getComputedStyle(html).getPropertyValue('--kr-header').trim(),
+                webHeader: getComputedStyle(header).backgroundColor,
+                meta: document.querySelector('meta[name="theme-color"]').content,
+                sdkCalls: window.__krNativeColors,
+                stripe: document.querySelector('body > .h-\\\\[2\\\\.5px\\\\]')
+              };
+            }""")
+            assert status["native"] == color
+            assert status["cssToken"] == color
+            assert status["meta"] == color
+            assert status["webHeader"] == css_rgb
+            assert status["sdkCalls"][-1] == color
+            assert status["stripe"] is None
+        # The navbar background is a single opaque surface with no border/shadow seam.
+        border = await page.locator("body > header").evaluate(
+            "(el) => ({bottom: getComputedStyle(el).borderBottomWidth, shadow: getComputedStyle(el).boxShadow})"
+        )
+        assert border["bottom"] == "0px"
+        assert border["shadow"] == "none"
         await browser.close()
