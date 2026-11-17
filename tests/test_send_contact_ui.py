@@ -98,9 +98,12 @@ async def test_browser_mode_without_phone():
         await page.click("#modalCallBtn")
         await page.wait_for_timeout(400)
 
-        toast = await page.inner_text("#toastText")
-        assert "захищено" in toast or "Telegram" in toast, f"Expected privacy/Telegram message, got '{toast}'"
-        assert "+380671112233" not in toast, "Fake fallback phone MUST NOT be used!"
+        dialog = page.get_by_role("dialog", name="Відкрийте квартиру в Telegram")
+        assert await dialog.is_visible()
+        content = await dialog.inner_text()
+        assert "Контакт захищено" in content
+        assert await dialog.locator('a[href="https://t.me/prostov_shrink_bot"]').is_visible()
+        assert "+380671112233" not in content, "Fake fallback phone MUST NOT be used!"
 
         await browser.close()
 
@@ -162,10 +165,12 @@ async def test_telegram_mode_error_unmasked():
         await page.click("#modalCallBtn")
         await page.wait_for_timeout(500)
 
-        toast = await page.inner_text("#toastText")
-        assert "Не вдалося надіслати контакт" in toast, f"Expected error toast, got '{toast}'"
-        assert "@prostov_shrink_bot" in toast or "Запустіть" in toast
-        assert "скопійовано" not in toast, "Failure MUST NOT be masked by claiming phone was copied!"
+        dialog = page.get_by_role("dialog", name="Спробуйте ще раз через Telegram")
+        assert await dialog.is_visible()
+        content = await dialog.inner_text()
+        assert "Не вдалося отримати контакт" in content
+        assert "@prostov_shrink_bot" in content or "Запустіть" in content
+        assert "скопійовано" not in content, "Failure MUST NOT be masked by a false success!"
 
         await browser.close()
 
