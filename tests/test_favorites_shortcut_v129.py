@@ -28,6 +28,9 @@ async def test_favorites_entry_is_visible_and_one_tap(width,height):
         await shortcut.wait_for(state="visible")
         box=await shortcut.bounding_box()
         assert box is not None and box["width"]>=44 and box["height"]>=44
+        # One tap means the button is already on-screen, not revealed by
+        # Playwright auto-scrolling the horizontal filter bar into view.
+        assert box["x"] >= 0 and box["x"] + box["width"] <= width + 1
         assert await shortcut.get_attribute("aria-pressed")=="false"
         assert await shortcut.locator(".kr-favorites-count").inner_text()=="0"
 
