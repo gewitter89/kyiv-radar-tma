@@ -49,6 +49,13 @@ async def test_one_slow_telegram_request_disables_duplicate_calls_and_recovers()
         status = page.locator("#krContactStatus")
         assert await status.get_attribute("data-state") == "pending"
         assert "Надсилаємо" in await status.inner_text()
+        geometry = await page.evaluate("""() => {
+          const status=document.querySelector('#krContactStatus').getBoundingClientRect();
+          const action=document.querySelector('#krDealActionBar').getBoundingClientRect();
+          return {statusBottom:status.bottom,actionTop:action.top};
+        }""")
+        assert geometry["statusBottom"] <= geometry["actionTop"] + 1
+        assert geometry["statusBottom"] > geometry["actionTop"] - 100
         assert len(requests) == 1
         # Even a direct helper call must be idempotent while in flight.
         await page.evaluate("sendContactToBotChat()")
