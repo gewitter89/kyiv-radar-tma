@@ -159,3 +159,48 @@ async def test_mobile_photo_preparation_preserves_jpg_and_rejects_bad_heic():
         assert outcome["same"] is True
         assert "HEIC" in outcome["invalidError"]
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_catalog_quality_suppresses_obviously_corrupted_fields():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        await page.route("**/api/deals*", lambda route: route.abort())
+        await open_app(page)
+        await page.wait_for_function("LISTINGS.some(x => x.addressConflict === true)")
+        flags = await page.evaluate("""() => ({
+            badAddress: LISTINGS.filter(x => x.addressConflict === true).length,
+            roomConflict: LISTINGS.filter(x => x.roomConflict === true).length,
+            rawCorruptedAddress: LISTINGS.some(x => String(x.address || '').includes('Додати в обране')),
+            unverifiedPin: LISTINGS.some(x => x.locationVerified === true)
+        })""")
+        assert flags["badAddress"] == 8
+        assert flags["roomConflict"] >= 10
+        assert flags["rawCorruptedAddress"] is False
+        assert flags["unverifiedPin"] is False
+        await page.evaluate("() => setFilter('rooms2')")
+        incorrectly_matched = await page.evaluate(
+            "getFilteredListings().some(d => d.roomConflict === true)"
+        )
+        assert incorrectly_matched is False
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_offline_catalog_has_refresh_and_no_mobile_horizontal_overflow():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844},
+                                      is_mobile=True, has_touch=True)
+        await page.route("**/api/deals*", lambda route: route.abort())
+        await open_app(page)
+        assert await page.locator("#krRetry").is_visible()
+        overflow = await page.evaluate(
+            "() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth"
+        )
+        assert overflow <= 4, "Mobile viewport must not require horizontal page scrolling"
+        await page.locator("#krRetry").click()
+        await page.wait_for_function("document.getElementById('krRetry').disabled === false")
+        assert await page.locator("#krDataStatus").count() == 1
+        await browser.close()
