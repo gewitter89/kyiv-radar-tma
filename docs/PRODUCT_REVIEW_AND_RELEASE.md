@@ -29,7 +29,19 @@ The changes in this branch are not evidence of a successful production rollout.
 3. Run the isolated Python/Playwright suite in PR CI; no external production writes.
 4. Check compatibility of all new DB columns and `landlord_uploads` with the existing production database on a disposable copy. Confirm free space.
 5. Install dependencies declared in `server/requirements.txt` including Pillow and python-multipart in the app virtual environment.
-6. Schedule a controlled deploy with a rollback plan; do not touch `kyivpulse`, Vudstoria Monitor or other independent services.
+6. After applying the schema migrations to a *copy* of the production SQLite file, run the read-only preflight. It checks the required tables/columns, catalog phone privacy, and media disk capacity. It never prints secrets or phone values:
+
+   ```bash
+   python3 scripts/preflight_release.py \
+     --db /path/to/disposable-copy/rent_deals.db \
+     --deals /path/to/disposable-copy/deals.json \
+     --uploads /path/to/disposable-copy/uploads/landlords
+   ```
+
+   **Exit 0** means schema/catalog checks passed; it does not mean real Telegram delivery or the live proxy was tested. **Exit 2** blocks the release.
+
+7. Before directing live requests at the updated API, confirm Caddy forwards the real IP only from trusted loopback, and validate the `kyiv-radar-api` service file and imports of the canonical bot moderator.
+8. Coordinate a backend + frontend switch with an explicit rollback. Avoid a partial GitHub Pages update while the API still runs v1.4.0; do not touch `kyivpulse`, Vudstoria Monitor, or other independent services.
 
 ### After deployment
 
