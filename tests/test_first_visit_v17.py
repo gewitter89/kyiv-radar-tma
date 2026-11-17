@@ -28,17 +28,17 @@ async def test_first_visit_explains_product_and_has_visible_search():
         page = await browser.new_page(viewport={"width": 390, "height": 844},
                                       is_mobile=True, has_touch=True)
         await open_app(page)
-        assert await page.get_by_role("heading", name="Квартира під ваші умови. Без здогадок.").is_visible()
+        assert await page.get_by_role("heading", name="Квартири в Києві — легко знайти").is_visible()
         assert await page.locator("#krDataStatus").count() == 1
         assert await page.locator("#krResultsCount").count() == 1
         assert await page.locator("#smartRadarOpen").is_visible()
-        assert await page.locator("#krStart").is_visible()
+        assert await page.locator("#listViewContainer").is_visible()
         assert await page.evaluate("currentSort") == "price_asc"
-        await page.locator("#krStart").click()
+        await page.locator("#searchInput").click()
         assert await page.evaluate("document.activeElement.id") == "searchInput"
         assert await page.locator("#searchInput").evaluate(
             "(node) => Number.parseFloat(getComputedStyle(node).fontSize)") >= 16
-        assert await page.locator("#krStart").evaluate("(node) => node.getBoundingClientRect().height") >= 44
+        assert await page.locator("#searchInput").evaluate("(node) => node.getBoundingClientRect().height") >= 44
         await browser.close()
 
 
@@ -86,9 +86,9 @@ async def test_result_card_can_be_compared_without_scrolling_long_select():
         page = await browser.new_page(viewport={"width": 390, "height": 844},
                                       is_mobile=True, has_touch=True)
         await open_app(page)
-        await page.locator(".carousel-card .kr-compare-button").first.click()
+        await page.locator("#listViewContainer .kr-compare-button").first.click()
         assert await page.evaluate("window.KyivRadarSmart.compareCount()") == 1
-        await page.locator(".carousel-card .kr-compare-button").nth(1).click()
+        await page.locator("#listViewContainer .kr-compare-button").nth(1).click()
         assert await page.evaluate("window.KyivRadarSmart.compareCount()") == 2
         assert await page.locator("#smartRadarPanel").is_visible()
         assert await page.locator("#smartRadarComparison > div").count() == 2
