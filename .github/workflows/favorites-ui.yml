@@ -1,0 +1,33 @@
+name: Favorite buttons mobile smoke tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "tests/test_favorites_v128.py"
+      - ".github/workflows/favorites-ui.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  favorite-buttons:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      APP_ENV: test
+      BOT_TOKEN: "123456789:TEST_BOT_TOKEN_FOR_HMAC_VALIDATION"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install browser test dependencies
+        run: |
+          python -m pip install -r server/requirements.txt pytest pytest-asyncio httpx playwright
+          python -m playwright install --with-deps chromium
+      - name: Test real favorites controls on mobile and desktop
+        run: |
+          python -m pytest -q tests/test_favorites_v128.py
