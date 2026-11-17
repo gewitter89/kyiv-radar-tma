@@ -34,7 +34,7 @@ def eligible_public_row(row: Any) -> bool:
         external = row.get("partnerExternalId")
         # The caller MUST run enforce_partner_visibility() before here.
         # Do not allow a source prefix alone to become an approved partner.
-        return bool(key) and key == declared and isinstance(external, str) and bool(external.strip())
+        return bool(key) and key == declared and isinstance(external, (str, int)) and not isinstance(external, bool) and bool(str(external).strip())
 
     return False
 
