@@ -602,3 +602,43 @@ html.kr-unified-111.kr-simple[data-kr-theme] #krSimpleHelp > button:last-child {
     scroll-behavior:auto !important;
   }
 }
+
+
+/* Listing photos must never degrade to an unlabelled black rectangle. */
+html.kr-unified-111.kr-simple[data-kr-theme] #listViewContainer > div[onclick] > .relative.h-48 {
+  background:linear-gradient(145deg,var(--kr-raised),var(--kr-panel)) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #listViewContainer .kr-gallery-image {
+  position:relative;
+  z-index:1;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #listViewContainer .kr-gallery-fallback {
+  position:absolute;
+  inset:0;
+  z-index:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:15px;
+  background:radial-gradient(ellipse at 50% 45%,var(--kr-raised),var(--kr-panel) 86%);
+  color:var(--kr-muted);
+  font-size:12px;
+  font-weight:560;
+  text-align:center;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #listViewContainer .kr-gallery-fallback::before {
+  content:"⌂";
+  display:block;
+  font-size:30px;
+  line-height:1;
+  color:var(--kr-hint);
+  opacity:.7;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #listViewContainer .kr-gallery-missing .kr-gallery-image {
+  visibility:hidden;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #listViewContainer .kr-gallery-loading .kr-gallery-fallback {
+  opacity:.77;
+}
