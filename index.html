@@ -2391,6 +2391,10 @@
 
         function closeLandlordModal() {
             document.getElementById('landlordModal').classList.add('hidden');
+            // Consent is specific to one submission session. Closing the sheet
+            // must not silently pre-authorize future photo uploads.
+            const consentBox = document.getElementById('llRights');
+            if (consentBox) consentBox.checked = false;
             photoUploadGeneration++;
             landlordUploadedPhotoIds = [];
             landlordPhotoUploadPending = false;
