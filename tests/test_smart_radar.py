@@ -55,6 +55,7 @@ async def test_new_matches_count_is_truthful_and_resettable():
             images: [], generator: false, gpon: false, pets: false,
             isOwnerVerified: false, source: 'Тест', phone: null
         })""")
+        await page.keyboard.press("Escape")
         await page.locator("#smartRadarOpen").click()
         assert "1 нових" in await page.inner_text("#smartRadarSearches")
         await page.get_by_role("button", name="Переглянуто").click()
