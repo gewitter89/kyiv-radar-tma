@@ -144,12 +144,13 @@ header > button:last-child { min-height: 44px; }
 #activeListingsBadge { opacity: .9; }
 .kr-geodata-tip { color: #f5c989; }
 .kr-map-warning {
-  position: absolute; inset-inline: 12px; bottom: 60px; z-index: 20;
-  max-width: 480px; margin: auto; padding: 10px 13px;
-  background: rgba(15,24,38,.95); border: 1px solid #556577;
-  color: #d4dcea; border-radius: 12px; font-size: 12px;
-  box-shadow: 0 12px 24px rgba(0,0,0,.28);
+  position: absolute; left: 12px; top: 12px; z-index: 20;
+  max-width: 260px; margin: 0; padding: 7px 10px;
+  background: rgba(15,24,38,.93); border: 1px solid #4b5d79;
+  color: #d4dcea; border-radius: 11px; font-size: 11px;
+  line-height: 1.4; box-shadow: 0 6px 16px rgba(0,0,0,.22);
 }
+#activeListingsBadge { display: none !important; }
 #smartRadarPanel button, #smartRadarPanel select { min-height: 44px; }
 #smartRadarPanel input { font-size: 16px; min-height: 44px; }
 @media (max-width: 700px) {
