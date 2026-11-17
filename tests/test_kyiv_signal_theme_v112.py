@@ -12,7 +12,7 @@ URL = "file:///" + os.path.join(ROOT, "index.html").replace("\\", "/")
 async def ready(page):
     await page.goto(URL, wait_until="domcontentloaded")
     await page.wait_for_selector("html.kr-unified-111[data-kr-theme]")
-    await page.wait_for_selector(".kr-theme-option")
+    await page.wait_for_selector(".kr-theme-option", state="attached")
 
 
 def contrast_ratio(a, b):
