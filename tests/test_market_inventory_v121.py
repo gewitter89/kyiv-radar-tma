@@ -196,7 +196,7 @@ def test_csv_source_and_no_copied_contacts(tmp_path):
             "external_id", "source_url", "operation", "property_type",
             "city", "district", "price_uah", "rooms", "area_m2", "phone"])
         writer.writeheader()
-        writer.writerow(item(1))
+        writer.writerow({key: value for key, value in item(1).items() if key in writer.fieldnames})
     a = agreement(tmp_path / "a.json")
     out = ingest(path, a, tmp_path / "private.db", now=NOW)
     assert out["accepted"] == 1
