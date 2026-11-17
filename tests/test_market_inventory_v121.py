@@ -169,6 +169,37 @@ def test_detect_cross_source_url_duplicate_without_auto_merging(tmp_path):
     assert all(x[3] == "pending_review" for x in db_rows(db))
 
 
+def test_empty_unit_keys_do_not_create_false_duplicates(tmp_path):
+    a = agreement(tmp_path / "grant.json")
+    f = feed(tmp_path / "f.jsonl", [item(1, unit_key=""), item(2, unit_key="")])
+    q = ingest(f, a, tmp_path / "private.sqlite", now=NOW)
+    assert q["inserted"] == 2
+    assert q["possible_duplicates"] == 0
+
+
+def test_unit_key_duplicate_is_candidate_only(tmp_path):
+    a = agreement(tmp_path / "grant.json")
+    db = tmp_path / "private.sqlite"
+    f = feed(tmp_path / "f.jsonl", [item(1, unit_key="property_hash_123")])
+    ingest(f, a, db, now=NOW)
+    a = agreement(tmp_path / "grant.json", source="agency_two")
+    q = ingest(feed(f, [item(99, unit_key="property_hash_123")]), a, db, now=NOW)
+    assert q["possible_duplicates"] == 1
+    assert len(db_rows(db)) == 2
+
+
+def test_reappearing_previously_missing_listing_goes_back_to_review(tmp_path):
+    a = agreement(tmp_path / "grant.json")
+    db = tmp_path / "private.sqlite"
+    f = tmp_path / "f.jsonl"
+    ingest(feed(f, [item(1), item(2)]), a, db, now=NOW, full_snapshot=True)
+    for _ in range(2):
+        ingest(feed(f, [item(1)]), a, db, now=NOW, full_snapshot=True)
+    assert next(x for x in db_rows(db) if x[1] == "2")[3] == "possible_withdrawn"
+    ingest(feed(f, [item(1), item(2)]), a, db, now=NOW, full_snapshot=True)
+    assert next(x for x in db_rows(db) if x[1] == "2")[3] == "pending_review"
+
+
 def test_source_change_does_not_preserve_auto_approval(tmp_path):
     f = feed(tmp_path / "snapshot.jsonl", [item(1)])
     a = agreement(tmp_path / "grant.json")
