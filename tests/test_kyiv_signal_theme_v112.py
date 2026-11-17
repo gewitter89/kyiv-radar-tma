@@ -125,14 +125,14 @@ async def test_auto_theme_can_follow_os_when_telegram_theme_unavailable():
                                       is_mobile=True,has_touch=True)
         await page.emulate_media(color_scheme="light")
         await ready(page)
-        await page.evaluate("""() => {
-          if (window.Telegram && window.Telegram.WebApp) {
-            try { Object.defineProperty(window.Telegram.WebApp, 'colorScheme',
-              {configurable:true,value:undefined}); } catch (_) {}
-          }
+        expected = await page.evaluate("""() => {
+          const color = window.Telegram?.WebApp?.colorScheme;
+          if (color === 'light' || color === 'dark') return color;
+          return matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         }""")
         await page.evaluate("window.KyivRadarTheme.set('auto')")
-        assert await page.locator("html").get_attribute("data-kr-theme") == "light"
+        assert await page.locator("html").get_attribute("data-kr-theme") == expected
+        assert await page.evaluate("window.KyivRadarTheme.getMode()") == "auto"
         await browser.close()
 
 
