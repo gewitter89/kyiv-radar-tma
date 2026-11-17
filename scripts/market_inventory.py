@@ -162,6 +162,8 @@ def normalise(row: object, agreement: dict) -> dict:
     else:
         area = None
     unit = row.get("unit_key")
+    if unit == "":
+        unit = None
     if unit is not None and (not isinstance(unit, str) or len(unit) > 128 or
                              any(ord(ch) < 32 for ch in unit)):
         raise ValueError("Invalid unit_key")
