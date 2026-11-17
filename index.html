@@ -2253,10 +2253,12 @@
         let photoUploadGeneration = 0;
 
         function openLandlordModal() {
-            document.getElementById('landlordModal').classList.remove('hidden');
             if (!window.Telegram?.WebApp?.initData) {
-                showToast('Для подання заявки відкрийте Київ Радар через @prostov_shrink_bot');
+                if (typeof window.krLandlordHandoff === "function") window.krLandlordHandoff();
+                else showToast('Для подання заявки відкрийте Київ Радар через @prostov_shrink_bot');
+                return;
             }
+            document.getElementById('landlordModal').classList.remove('hidden');
         }
 
         function closeLandlordModal() {
@@ -2275,7 +2277,7 @@
         async function handleLandlordPhotosSelected(input) {
             const generation = ++photoUploadGeneration;
             landlordUploadedPhotoIds = [];
-            const files = Array.from(input.files || []);
+            let files = Array.from(input.files || []);
             const label = document.getElementById('llPhotoCountLabel');
             const previews = document.getElementById('llPhotoPreviews');
             if (files.length === 0) return;
@@ -2283,6 +2285,18 @@
                 showToast('Максимум 10 фотографій за один раз');
                 input.value = '';
                 return;
+            }
+            // A WebView that can decode HEIC converts it to safe JPEG first.
+            if (typeof window.krPrepareUploadPhotos === 'function') {
+                try {
+                    files = await window.krPrepareUploadPhotos(files, text => {
+                        if (label) label.textContent = text;
+                    });
+                } catch (error) {
+                    showToast(error.message || 'Не вдалося підготувати HEIC. Використайте JPG.');
+                    input.value = '';
+                    return;
+                }
             }
             const supported = new Set(['image/jpeg','image/png','image/webp']);
             if (files.some(file => !supported.has(file.type))) {
@@ -2470,6 +2484,7 @@
     <script src="./smart-radar.js?v=1.6.0"></script>
     <script src="./catalog-quality.js?v=1.7.0"></script>
     <script src="./experience.js?v=1.7.0"></script>
+    <script src="./mobile-media.js?v=1.7.0"></script>
 
     <!-- ==========================================
          REPORT PROBLEM MODAL (Apple Action Sheet)
