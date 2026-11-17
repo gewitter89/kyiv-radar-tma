@@ -46,6 +46,8 @@
       const locationVerified = item.locationVerified === true && !badAddress;
       return {
         ...item,
+        // A masked number is not evidence that a real contact is available.
+        phoneMasked: item.contactVerified === true ? item.phoneMasked || null : null,
         address: badAddress ? "Адреса уточнюється" : item.address,
         rooms: roomsConflict ? null : item.rooms,
         metro: metroConflict ? "Метро уточнюється" : item.metro,
