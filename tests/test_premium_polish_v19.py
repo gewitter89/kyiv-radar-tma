@@ -11,7 +11,7 @@ URL = "file:///" + os.path.join(ROOT, "index.html").replace("\\", "/")
 
 async def ready(page):
     await page.goto(URL, wait_until="domcontentloaded")
-    await page.wait_for_selector("#krHero .kr-ukraine-curve svg")
+    await page.wait_for_selector("#krHero .kr-kyiv-skyline svg")
     await page.wait_for_function(
         "typeof LISTINGS !== 'undefined' && LISTINGS.length > 0 && CURRENT_VIEW_MODE === 'list'"
     )
@@ -19,15 +19,15 @@ async def ready(page):
 
 
 @pytest.mark.asyncio
-async def test_skyline_wave_and_compact_result_row_on_phone():
+async def test_clean_svg_brand_and_compact_result_row_on_phone():
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={"width": 390, "height": 844},
                                       is_mobile=True, has_touch=True)
         await ready(page)
         assert await page.locator("#krHero .kr-kyiv-skyline svg").count() == 1
-        assert await page.locator("#krHero .kr-ukraine-curve path").count() == 1
-        assert await page.locator(".kr-brand-mark svg").count() == 1
+        assert await page.locator("#krHero .kr-ukraine-curve").count() == 0
+        assert await page.locator(".kr-brand-mark img").count() == 1
         count = await page.locator("#krResultsCount").inner_text()
         assert re.match(r"^\d+ оголош(ень|ення)$", count)
         assert "із" not in count
