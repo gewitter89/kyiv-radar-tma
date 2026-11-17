@@ -214,41 +214,20 @@
   .kr-gallery-nav,.kr-gallery-dot {transition:none !important;}
 }
 
-/* Native Telegram header continuity. Decorative wave was retired in Graphite. */
-:root { --kr-telegram-bar:#0e2037; }
+/* Telegram's chrome is native; only a solid color is allowed there.
+   The in-app header is kept as one uncluttered surface. */
 .kr-simple header.kr-unified-header {
   position:relative;
   isolation:isolate;
   overflow:hidden;
   border-bottom:0 !important;
-  background:linear-gradient(180deg,#0e2037 0%,#11233b 100%) !important;
-  padding-top:11px !important;
-  padding-bottom:6px !important;
 }
-.kr-simple header.kr-unified-header::before {
-  background:
-    radial-gradient(ellipse at 88% -15%,rgba(60,133,211,.16),transparent 63%),
-    linear-gradient(90deg,rgba(12,31,56,.34),transparent 72%);
-}
-.kr-simple header.kr-unified-header > :not(.kr-native-seam) {
+.kr-simple header.kr-unified-header > * {
   position:relative;
   z-index:4;
 }
-.kr-simple #krHero {
-  background:linear-gradient(180deg,#11233b 0%,#14253d 100%) !important;
-  border-top:0 !important;
+.kr-simple #krHero .kr-kyiv-skyline { opacity:.12; }
+@media(max-width:699px) {
+  .kr-simple header.kr-unified-header {padding:10px 11px 6px !important;}
+  .kr-simple #krHero .kr-kyiv-skyline {opacity:.10;}
 }
-.kr-simple #krHero::before {
-  background:
-    radial-gradient(ellipse at 91% 65%,rgba(242,193,65,.10),transparent 51%),
-    linear-gradient(90deg,rgba(23,63,103,.13),transparent 85%);
-}
-.kr-simple #krHero .kr-kyiv-skyline { opacity:.52; }
-.kr-simple #krHero @media (max-width:699px) {
-  .kr-simple header.kr-unified-header {
-    padding:10px 11px 6px !important;
-  }
-  .kr-simple #krHero .kr-kyiv-skyline {opacity:.46;}
-}
-@media (prefers-reduced-motion:reduce) {
-  .kr-native-seam svg,}
