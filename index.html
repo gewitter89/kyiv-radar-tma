@@ -1477,9 +1477,10 @@
                                 <span>•</span>
                                 <span>${specLine}</span>
                             </p>
-                            <div class="flex items-center justify-between text-[11px] text-[#8e8e93] pt-2 border-t border-white/[0.06]">
-                                <span>${item.isOwnerVerified && item.commissionVerified ? '0% комісії (перевірено)' : ''}</span>
-                                <span class="text-[#0a84ff] font-medium flex items-center gap-1">Детальніше →</span>
+                            <div class="flex items-center justify-between pt-2 border-t border-white/[0.06]">
+                                <button type="button" class="kr-open-detail" onclick="event.stopPropagation(); openDealModalById(${item.id})" aria-label="Переглянути квартиру">
+                                    Переглянути квартиру <span aria-hidden="true">→</span>
+                                </button>
                             </div>
                         </div>
                     </div>
