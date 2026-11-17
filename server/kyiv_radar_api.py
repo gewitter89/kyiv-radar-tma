@@ -47,9 +47,11 @@ from fastapi.responses import FileResponse
 try:
     from .listing_trust import load_private_register, public_listing_view
     from .partner_visibility import enforce_partner_visibility
+    from .partner_publication import read_private_export
 except ImportError:
     from listing_trust import load_private_register, public_listing_view
     from partner_visibility import enforce_partner_visibility
+    from partner_publication import read_private_export
 from pydantic import BaseModel, Field
 
 # Configure structured logging
@@ -87,6 +89,8 @@ DB_PATH = os.getenv("KYIV_RADAR_DB_PATH", "/opt/resell-radar-ukraine/data/rent_d
 DEALS_JSON_PATH = os.getenv("KYIV_RADAR_DEALS_PATH", "/opt/kyiv-radar-tma/data/deals.json")
 # Private staging source rights: never a public file or client-controlled path.
 PARTNER_RIGHTS_DB_PATH = os.getenv("KYIV_RADAR_PRIVATE_PARTNER_DB", "")
+PARTNER_EXPORT_PATH = os.getenv("KYIV_RADAR_PRIVATE_PARTNER_EXPORT", "")
+PARTNER_PUBLICATION_AUTH_PATH = os.getenv("KYIV_RADAR_PRIVATE_PUBLICATION_AUTH", "")
 # An operator-maintained file outside public GitHub Pages; never publish proof.
 REVIEW_REGISTER_PATH = os.getenv("KYIV_RADAR_PRIVATE_REVIEW_PATH", "")
 PRIVATE_CONTACTS_PATH = os.getenv(
@@ -481,15 +485,30 @@ def sanitize_and_save_photo(photo_bytes: bytes, dest_filename: str) -> str:
 
 # Helper: Load trusted catalog
 def load_trusted_deals() -> List[Dict[str, Any]]:
+    # Legacy catalog preserved for backward compatibility; it is not an
+    # independent proof of existence, ownership or rights to republish.
+    base: List[Dict[str, Any]] = []
     if os.path.exists(DEALS_JSON_PATH):
         try:
             with open(DEALS_JSON_PATH, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+                if isinstance(data, list):
+                    base = data
         except Exception as e:
-            logger.error(f"Error loading deals.json: {e}")
+            logger.error("Unable to load source catalog: %s", type(e).__name__)
             API_METRICS["db_errors"] += 1
-    return []
 
+    # Private partner publication is fully opt-in and disabled by default.
+    # Receipt expiry/changes and independent source-level checks fail closed.
+    if not (PARTNER_EXPORT_PATH and PARTNER_PUBLICATION_AUTH_PATH):
+        return base
+    staged = read_private_export(PARTNER_EXPORT_PATH, PARTNER_PUBLICATION_AUTH_PATH)
+    used = {row.get("id") for row in base if isinstance(row, dict)}
+    for row in staged:
+        if row.get("id") not in used:
+            used.add(row["id"])
+            base.append(row)
+    return base
 
 def load_effective_deals() -> List[Dict[str, Any]]:
     """Apply trusted listing moderation without changing the source catalog."""
