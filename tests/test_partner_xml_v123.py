@@ -189,3 +189,11 @@ def test_unknown_yrl_category_never_guessed(tmp_path):
            '</offer></offers></shop></yml_catalog>')
     with pytest.raises(ValueError, match="Unsupported operation"):
         ingest(xml_file(tmp_path, yrl), grant(tmp_path), tmp_path / "data.db", now=NOW)
+
+
+def test_canonical_xml_price_alias_without_currency_rejected(tmp_path):
+    text = ('<realty-feed><offer id="one"><source_url>https://partner.example.ua/p/1</source_url>'
+            '<operation>rent</operation><property_type>apartment</property_type>'
+            '<city>Київ</city><price>100</price></offer></realty-feed>')
+    with pytest.raises(UnsafePartnerXML, match="UAH"):
+        list(iter_partner_xml(xml_file(tmp_path, text)))
