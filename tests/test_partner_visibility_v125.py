@@ -158,6 +158,7 @@ def test_api_catalog_health_and_contact_lookup_share_the_same_rights_gate(tmp_pa
     # Partner can be served only with a private reviewer and current source rights.
     first = client.get("/api/deals")
     assert first.status_code == 200
+    assert "no-store" in first.headers.get("cache-control", "")
     assert [x["id"] for x in first.json()["deals"]] == [711]
     item = first.json()["deals"][0]
     for private_key in ("partnerSourceKey", "partnerExternalId", "ownerName", "evidence_ref"):
