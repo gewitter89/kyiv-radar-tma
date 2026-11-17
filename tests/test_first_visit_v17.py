@@ -220,3 +220,18 @@ async def test_linked_listing_opens_and_user_can_find_by_numeric_id():
         assert await page.evaluate("getFilteredListings().length") == 1
         assert await page.evaluate("getFilteredListings()[0].id") == 7
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_corrupt_favorites_storage_does_not_crash_entire_app():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        await page.add_init_script("""() => {
+            try { localStorage.setItem('kr_favs', '{broken-json'); } catch (e) {}
+        }""")
+        await open_app(page)
+        assert await page.evaluate("LISTINGS.length") > 0
+        assert await page.locator("#krResultsCount").is_visible()
+        assert await page.locator("#searchInput").is_visible()
+        await browser.close()
