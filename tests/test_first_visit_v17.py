@@ -235,3 +235,34 @@ async def test_corrupt_favorites_storage_does_not_crash_entire_app():
         assert await page.locator("#krResultsCount").is_visible()
         assert await page.locator("#searchInput").is_visible()
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_ukrainian_masthead_unifies_telegram_header_without_covering_controls():
+    """v1.9.1: native Telegram color is solid; the curve and Kyiv skyline are real app DOM."""
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844},
+                                      is_mobile=True, has_touch=True)
+        await open_app(page)
+        header = page.locator("header.kr-unified-header")
+        assert await header.is_visible()
+        assert await page.locator('meta[name="theme-color"]').get_attribute("content") == "#0e2037"
+        line = page.locator("header.kr-unified-header .kr-native-seam svg")
+        assert await line.is_visible()
+        assert await page.locator("header .kr-native-seam path").count() == 1
+        assert await page.locator("#krHero .kr-kyiv-skyline svg").count() == 1
+        assert await page.locator("#krHero .kr-ukraine-curve svg").count() == 1
+        line_box = await line.bounding_box()
+        assert line_box and 0 < line_box["height"] <= 12
+        gradient = await header.evaluate("(node) => getComputedStyle(node).backgroundImage")
+        assert "rgb(14, 32, 55)" in gradient
+        assert await page.locator("#krHero").is_visible()
+        await page.locator("#searchInput").click()
+        assert await page.evaluate("document.activeElement.id") == "searchInput"
+        assert await page.locator("#smartRadarOpen").is_visible()
+        overflow = await page.evaluate(
+            "() => Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) - innerWidth"
+        )
+        assert overflow <= 4
+        await browser.close()
