@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Kyiv Radar Production HTTPS API
-Version: 1.5.0 (Authenticated moderation media)
+Version: 1.5.1 (Authenticated moderation media)
 Production backend service for Kyiv Radar Telegram Mini App and Web Platform.
 
 Endpoints:
@@ -111,7 +111,7 @@ if not BOT_TOKEN and APP_ENV != "test":
 app = FastAPI(
     title="Kyiv Radar API",
     description="Listings and moderation API",
-    version="1.5.0"
+    version="1.5.1"
 )
 
 # Photos stay private on disk; /api/media/{id} serves only approved files.
@@ -549,7 +549,7 @@ async def health():
     return {
         "status": "healthy",
         "service": "kyiv-radar-api",
-        "version": "1.5.0",
+        "version": "1.5.1",
         "deals_count": len(deals),
         "timestamp": int(time.time())
     }
