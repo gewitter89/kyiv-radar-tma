@@ -19,7 +19,7 @@ async def screenshot(browser, name: str, width: int, height: int, mobile=False):
     page = await context.new_page()
     await page.goto(URL, wait_until="domcontentloaded")
     await page.wait_for_function(
-        "typeof LISTINGS !== 'undefined' && LISTINGS.length > 0 && document.querySelectorAll('.carousel-card').length > 0"
+        "typeof LISTINGS !== 'undefined' && LISTINGS.length > 0 && document.querySelectorAll('#listViewContainer > div[onclick]').length > 0"
     )
     await page.wait_for_timeout(550)
     exceptions = []

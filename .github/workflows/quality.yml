@@ -27,6 +27,14 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Compile backend modules
         run: python -m compileall -q server
+      - name: Capture phone, tablet and desktop preview
+        run: python scripts/capture_ui.py
+      - name: Store UI screenshots for human review
+        uses: actions/upload-artifact@v4
+        with:
+          name: kyiv-radar-visual-preview
+          path: artifacts/*.png
+          retention-days: 7
       - name: Test isolated user journeys, media privacy, moderation and responsive UI
         run: |
           python -m pytest -q \
@@ -38,16 +46,9 @@ jobs:
             tests/test_upload_body_limit.py \
             tests/test_smart_radar.py \
             tests/test_first_visit_v17.py \
+            tests/test_simple_first_view.py \
             tests/test_catalog_claims.py \
             tests/test_vps_release_snapshot.py \
             tests/test_public_catalog_privacy.py \
             tests/test_photo_swipe.py \
             tests/test_send_contact_ui.py
-      - name: Capture phone, tablet and desktop preview
-        run: python scripts/capture_ui.py
-      - name: Store UI screenshots for human review
-        uses: actions/upload-artifact@v4
-        with:
-          name: kyiv-radar-visual-preview
-          path: artifacts/*.png
-          retention-days: 7

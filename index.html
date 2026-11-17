@@ -11,6 +11,7 @@
     <meta name="color-scheme" content="dark">
     <title>Київ Радар — оренда з урахуванням автономності</title>
     <link rel="stylesheet" href="./experience.css?v=1.7.0">
+    <link rel="stylesheet" href="./simple-view.css?v=1.7.2">
     <meta name="description" content="Київ Радар — мапа та каталог оренди квартир у Києві. Пошук за районом, бюджетом і заявленими можливостями автономності. Джерела та рівень перевірки вказані в оголошеннях.">
     <!-- Open Graph / Telegram Card -->
     <meta property="og:title" content="Київ Радар 🇺🇦 — Каталог та мапа оренди квартир у Києві">
@@ -430,7 +431,7 @@
         </div>
 
         <!-- Floating Map Buttons (Top Right: Apple Maps Circle Buttons) -->
-        <div class="absolute right-3 top-3 z-20 flex flex-col gap-2">
+        <div id="mapActionControls" class="absolute right-3 top-3 z-20 flex flex-col gap-2">
             <button onclick="handleLocateClick()" class="w-10 h-10 rounded-full bg-[#1c1c1e]/90 border border-white/10 text-white flex items-center justify-center shadow-xl backdrop-blur-2xl transition-transform active:scale-90" title="Поруч зі мною (GPS)">
                 <svg class="w-4 h-4 text-[#0a84ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
             </button>
@@ -557,7 +558,7 @@
 
                 <!-- Blackout Equipment Checklist (Apple Inset Grouped) -->
                 <div class="p-3.5 rounded-2xl bg-[#2c2c2e]/70 border border-white/[0.06] space-y-2">
-                    <div class="text-[11px] font-semibold text-[#8e8e93] uppercase tracking-wider">Автономність при блекаутах</div>
+                    <div class="text-[11px] font-semibold text-[#8e8e93] uppercase tracking-wider">Умови під час відключень</div>
                     <div class="grid grid-cols-2 gap-2" id="modalEquipment">
                         <!-- Populated by JS -->
                     </div>
@@ -1160,8 +1161,8 @@
             toggleBtn('filterRooms1', ACTIVE_FILTERS.rooms === 1);
             toggleBtn('filterRooms2', ACTIVE_FILTERS.rooms === 2);
             toggleBtn('filterRooms3', ACTIVE_FILTERS.rooms === 3);
-            toggleBtn('filterUnder15k', ACTIVE_FILTERS.maxPrice === 15000);
-            toggleBtn('filterUnder20k', ACTIVE_FILTERS.maxPrice === 20000);
+            toggleBtn('filter15k', ACTIVE_FILTERS.maxPrice === 15000);
+            toggleBtn('filter20k', ACTIVE_FILTERS.maxPrice === 20000);
             toggleBtn('filterPower', ACTIVE_FILTERS.generator || ACTIVE_FILTERS.gpon);
             toggleBtn('filterPets', ACTIVE_FILTERS.pets);
             toggleBtn('filterFavs', ACTIVE_FILTERS.favs);
@@ -1385,8 +1386,9 @@
             if (item.actualityConfirmed) {
                 return '<span class="px-2 py-0.5 rounded-full bg-[#0a84ff]/20 text-[#0a84ff] border border-[#0a84ff]/40 text-[10px] font-semibold">✅ Актуально</span>';
             }
-            const src = escapeHtml(item.source || 'Імпортовано');
-            return `<span class="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] text-white/80 font-mono">📋 ${src}</span>`;
+            // Imported, unverified results get one general transparency notice,
+            // not a repeated source label over every photo.
+            return '';
         }
 
         function getCommissionSubtitle(item) {
@@ -1404,7 +1406,7 @@
             if (item.actualityConfirmed) {
                 return `Актуальність підтверджено`;
             }
-            return `Комісія уточнюється (${escapeHtml(item.source || 'відкриті джерела')})`;
+            return `Комісія уточнюється`;
         }
 
         function renderListView(items) {
@@ -1452,8 +1454,8 @@
                             
                             <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5 z-10">
                                 ${renderStatusPill(item)}
-                                ${item.generator ? '<span class="px-2 py-0.5 rounded-full bg-[#ff9f0a]/90 text-black text-[10px] font-bold">⚡ Генератор · заявлено</span>' : ''}
-                                ${item.gpon ? '<span class="px-2 py-0.5 rounded-full bg-[#30d158]/90 text-black text-[10px] font-bold">🌐 GPON · заявлено</span>' : ''}
+                                ${item.generator ? '<span class="px-2 py-0.5 rounded-full bg-[#372b1d]/95 text-[#ffdaa0] border border-[#c99f5f]/40 text-[10px] font-semibold">⚡ Генератор</span>' : ''}
+                                ${item.gpon ? '<span class="px-2 py-0.5 rounded-full bg-[#1b324b]/95 text-[#d3e5ff] border border-[#6d90b8]/40 text-[10px] font-semibold">🌐 Інтернет · заявлено</span>' : ''}
                             </div>
 
                             <button onclick="toggleFavorite(event, ${item.id})" class="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center transition-all active:scale-90 z-10">
@@ -1463,21 +1465,19 @@
                             <div class="absolute bottom-2.5 left-3 right-3 flex items-end justify-between z-10">
                                 <div>
                                     <div class="text-lg font-bold text-white leading-tight">${item.price ? item.price.toLocaleString('uk-UA') + ' ₴' : 'Ціна уточнюється'}<span class="text-xs font-normal text-white/70">/міс</span></div>
-                                    <div class="text-[11px] text-[#b9c8df] font-medium">${savingsStr}</div>
+                                    ${item.commissionVerified ? `<div class="text-[11px] text-white/90 font-medium">${savingsStr}</div>` : ''}
                                 </div>
                             </div>
                         </div>
 
                         <div class="p-3 text-xs">
                             <h4 class="font-semibold text-white truncate text-[13px] mb-1">${escapeHtml(item.title || item.address || 'Квартира в оренду')}</h4>
-                            <p class="text-[#8e8e93] text-[11px] flex items-center gap-1.5 mb-2">
-                                <span>📍 ${item.metro ? `${escapeHtml(item.metro)} · ${escapeHtml(item.district || 'Київ')}` : escapeHtml(item.district || 'Київ')}</span>
-                                <span>•</span>
-                                <span>${specLine}</span>
-                            </p>
-                            <div class="flex items-center justify-between text-[11px] text-[#8e8e93] pt-2 border-t border-white/[0.06]">
-                                <span>${item.isOwnerVerified && item.commissionVerified ? '0% комісії (перевірено)' : (item.contactVerified ? 'Контакт перевірено' : `Джерело: ${escapeHtml(item.source || 'Відкриті джерела')}`)}</span>
-                                <span class="text-[#0a84ff] font-medium flex items-center gap-1">Детальніше →</span>
+                            <p class="kr-card-location">📍 ${escapeHtml(item.district || 'Київ')}${item.metro ? ` · ${escapeHtml(item.metro)}` : ''}</p>
+                            <p class="kr-card-specs">${specLine}</p>
+                            <div class="kr-card-actions">
+                                <button type="button" class="kr-open-detail" onclick="event.stopPropagation(); openDealModalById(${item.id})" aria-label="Переглянути квартиру">
+                                    Переглянути квартиру <span aria-hidden="true">→</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1626,7 +1626,7 @@
                             <!-- Row 4: Rooms, Area & Power Badge (Single clean line) -->
                             <div class="flex items-center gap-2 text-[11px] text-[#8e8e93] whitespace-nowrap">
                                 <span class="font-medium text-white/90">${specLine}</span>
-                                ${hasPower ? '<span class="px-1.5 py-0.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-[9px] font-semibold flex items-center gap-0.5 shrink-0">⚡ Заявлено</span>' : ''}
+                                ${hasPower ? '<span class="px-1.5 py-0.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-[9px] font-semibold flex items-center gap-0.5 shrink-0">⚡ Генератор</span>' : ''}
                             </div>
                         </div>
                     </div>
@@ -1917,7 +1917,7 @@
                     savingsEl.innerText = `Прямий контакт з орендодавцем (комісія уточнюється)`;
                 } else {
                     savingsEl.className = "text-[#8e8e93] font-medium text-[12px]";
-                    savingsEl.innerText = `Комісія уточнюється (${escapeHtml(deal.source || 'відкриті джерела')})`;
+                    savingsEl.innerText = `Комісія уточнюється`;
                 }
             }
 
@@ -2059,12 +2059,12 @@
             if (eqContainer) {
                 eqContainer.innerHTML = `
                     <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full ${deal.gpon ? 'bg-[#30d158]' : 'bg-[#636366]'}"></span>
-                        <span class="text-white/80 text-[11px]">GPON: <b>${deal.gpon ? 'Заявлено' : 'Не вказано'}</b></span>
+                        <span class="w-2 h-2 rounded-full ${deal.gpon ? 'bg-[#ffcf85]' : 'bg-[#636366]'}"></span>
+                        <span class="text-white/80 text-[11px]">Інтернет під час відключень: <b>${deal.gpon ? 'Оптоволокно (заявлено)' : 'Немає даних'}</b><small class="kr-equipment-explanation" style="display:block;margin-top:5px">GPON — оптоволокно. Для роботи без світла потрібні живлення роутера й оптичного термінала та резервне живлення у провайдера.</small></span>
                     </div>
                     <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full ${deal.generator ? 'bg-[#ff9f0a]' : 'bg-[#636366]'}"></span>
-                        <span class="text-white/80 text-[11px]">Генератор: <b>${deal.generator ? 'Заявлено' : 'Не вказано'}</b></span>
+                        <span class="text-white/80 text-[11px]">Електрика в будинку: <b>${deal.generator ? 'Є генератор (заявлено)' : 'Немає даних'}</b><small class="kr-equipment-explanation" style="display:block;margin-top:5px">Уточніть, чи живить генератор саме квартиру, ліфт, воду та опалення.</small></span>
                     </div>
                     <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full ${deal.pets ? 'bg-[#30d158]' : 'bg-[#636366]'}"></span>
@@ -2507,6 +2507,7 @@
     <script src="./catalog-quality.js?v=1.7.0"></script>
     <script src="./experience.js?v=1.7.0"></script>
     <script src="./mobile-media.js?v=1.7.0"></script>
+    <script src="./simple-view.js?v=1.7.2"></script>
 
     <!-- ==========================================
          REPORT PROBLEM MODAL (Apple Action Sheet)
