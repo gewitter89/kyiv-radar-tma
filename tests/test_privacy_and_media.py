@@ -354,7 +354,9 @@ def test_invalid_rent_price_and_phone_are_rejected(privacy_test_env):
         response = client.post("/api/landlords/submit", json=dict(valid, phone=bad))
         assert response.status_code in (400, 422), response.text
 
-    good = client.post("/api/landlords/submit", json=valid)
+    with patch("server.kyiv_radar_api.send_telegram_alert", new_callable=AsyncMock) as send:
+        send.return_value = True
+        good = client.post("/api/landlords/submit", json=valid)
     assert good.status_code == 200, good.text
 
 
