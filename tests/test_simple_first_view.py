@@ -22,7 +22,7 @@ async def test_phone_first_view_shows_photos_not_full_screen_map():
         page = await browser.new_page(viewport={"width": 390, "height": 844},
                                       is_mobile=True, has_touch=True)
         await ready(page)
-        assert await page.get_by_role("heading", name="Квартири в Києві — легко знайти").is_visible()
+        assert await page.get_by_role("heading", name="Квартири в Києві").is_visible()
         assert await page.locator("#map").is_hidden()
         assert await page.locator("#listViewContainer").is_visible()
         assert await page.locator("#smartRadarOpen").is_visible()

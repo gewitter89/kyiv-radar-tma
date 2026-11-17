@@ -63,11 +63,11 @@
     internet.setAttribute("aria-label","Інтернет під час відключень: заявлене оптоволокно");
     document.getElementById("filterPower")?.insertAdjacentElement("afterend",internet);
 
-    const more = createButton("Ще фільтри +", () => {
+    const more = createButton("Фільтри", () => {
       const expanded = filters.dataset.more !== "true";
       filters.dataset.more = expanded ? "true" : "false";
       more.setAttribute("aria-expanded",String(expanded));
-      more.textContent = expanded ? "Менше фільтрів −" : "Ще фільтри +";
+      more.textContent = expanded ? "Сховати" : "Фільтри";
     });
     more.id = "krMoreFilters";
     more.setAttribute("aria-expanded","false");
@@ -101,7 +101,7 @@
         const f = ACTIVE_FILTERS || {};
         if (f.gpon || f.generator || f.pets || f.favs || f.maxPrice === 20000) {
           filters.dataset.more = "true";
-          more.textContent = "Менше фільтрів −";
+          more.textContent = "Сховати";
           more.setAttribute("aria-expanded","true");
         }
         const all = document.getElementById("filterAll");

@@ -150,10 +150,10 @@
     n.textContent = count + " " + (endsOne || endsFew ? "оголошення" : "оголошень");
     const mode = window.KR_CATALOG_MODE || "loading";
     const messages = {
-      live: "Актуальність не перевірено",
-      static: "Збережено · не перевірено",
-      cached: "Збережено · не перевірено",
-      loading: "Завантажуємо оголошення…"
+      live: "не перевірено",
+      static: "копія · не перевірено",
+      cached: "копія · не перевірено",
+      loading: "завантаження…"
     };
     if (source) source.textContent = messages[mode] || messages.cached;
     if (retry) retry.hidden = mode === "live" || mode === "loading";

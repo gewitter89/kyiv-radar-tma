@@ -28,7 +28,7 @@ async def test_first_visit_explains_product_and_has_visible_search():
         page = await browser.new_page(viewport={"width": 390, "height": 844},
                                       is_mobile=True, has_touch=True)
         await open_app(page)
-        assert await page.get_by_role("heading", name="Квартири в Києві — легко знайти").is_visible()
+        assert await page.get_by_role("heading", name="Квартири в Києві").is_visible()
         assert await page.locator("#krDataStatus").count() == 1
         assert await page.locator("#krResultsCount").count() == 1
         assert await page.locator("#smartRadarOpen").is_visible()
@@ -280,7 +280,7 @@ async def test_compact_apple_masthead_removes_duplicate_brand_without_losing_act
         await page.wait_for_selector("header.kr-compact-masthead")
         header = page.locator("header.kr-compact-masthead")
         assert await page.locator("header > #krHero").count() == 1
-        assert await page.get_by_role("heading", name="Квартири в Києві — легко знайти").is_visible()
+        assert await page.get_by_role("heading", name="Квартири в Києві").is_visible()
         assert await page.locator("header .kr-brand-label").is_hidden()
         assert await page.locator("header .kr-compact-search-row #searchInput").is_visible()
         assert await page.locator("header .kr-native-seam svg").is_visible()
@@ -310,4 +310,74 @@ async def test_compact_apple_masthead_removes_duplicate_brand_without_losing_act
         assert await page.evaluate("document.activeElement.id") == "searchInput"
         await page.locator("#smartRadarOpen").click()
         assert await page.locator("#smartRadarPanel").is_visible()
+        await browser.close()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("width,height", [(320, 640), (390, 844)])
+async def test_unified_toolbar_integrates_filters_radar_and_view_toggle(width, height):
+    """v1.11: one header hierarchy, space used for content, all controls survive."""
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width":width,"height":height},
+                                      is_mobile=True, has_touch=True)
+        await open_app(page)
+        await page.wait_for_selector("html.kr-unified-111")
+        assert await page.get_by_role("heading",name="Квартири в Києві").is_visible()
+        assert await page.locator("#krHero #floatingViewToggle").count() == 1
+        assert await page.locator("#krResultsBar #floatingViewToggle").count() == 0
+        assert await page.locator("#krRadarSlot #smartRadarOpen").is_visible()
+        assert await page.locator("#filterRooms1").is_visible()
+        assert await page.locator("#filterRooms2").is_visible()
+        assert await page.locator("#krMoreFilters").is_visible()
+        assert await page.locator("#filterAll").is_visible()
+        assert await page.locator("#krSimpleInfo").is_visible()
+        assert "не перевірено" in await page.locator("#krDataStatus").inner_text()
+        f = await page.locator("#filterBarWrapper").bounding_box()
+        radar = await page.locator("#krRadarSlot").bounding_box()
+        assert f and radar
+        assert f["y"] - 2 <= radar["y"] and radar["y"] + radar["height"] <= f["y"] + f["height"] + 3
+        header = await page.locator("header.kr-compact-masthead").bounding_box()
+        assert header and header["height"] <= 105
+        overflow = await page.evaluate(
+            "() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - innerWidth"
+        )
+        assert overflow <= 4
+        assert await page.locator("#searchInput").evaluate(
+            "(el) => el.getBoundingClientRect().height"
+        ) >= 44
+        await page.locator("#filterRooms1").click()
+        assert await page.evaluate("ACTIVE_FILTERS.rooms") == 1
+        await page.locator("#krMoreFilters").click()
+        assert await page.locator("#filterPower").is_visible()
+        await browser.close()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("width,height", [(390, 480), (320, 568)])
+async def test_landlord_submission_can_scroll_to_bottom_in_small_telegram_viewport(width, height):
+    """v1.11 regression: all landlord fields and submit stay reachable in short WebViews."""
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width":width,"height":height},
+                                      is_mobile=True, has_touch=True)
+        await open_app(page)
+        await page.locator("#landlordModal").evaluate(
+            "(el) => el.classList.remove('hidden')"
+        )
+        scroll = page.locator("#krLandlordScroll")
+        await scroll.wait_for(state="visible")
+        before = await scroll.evaluate("""el => ({
+          height:el.clientHeight, content:el.scrollHeight, top:el.scrollTop,
+          overflow:getComputedStyle(el).overflowY
+        })""")
+        assert before["overflow"] == "auto"
+        assert before["content"] > before["height"] + 100
+        await scroll.evaluate("(el) => el.scrollTop = el.scrollHeight")
+        after = await scroll.evaluate("(el) => el.scrollTop")
+        assert after > 100, "The landlord modal must support vertical scrolling"
+        submit = await page.locator("#llSubmitBtn").bounding_box()
+        assert submit and submit["y"] >= -2 and submit["y"] + submit["height"] <= height + 3
+        assert await page.locator("#llRights").is_visible()
+        assert await page.locator('#landlordModal button[onclick="closeLandlordModal()"]').is_visible()
         await browser.close()
