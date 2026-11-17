@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="./trust-experience.css?v=1.8.0">
     <link rel="stylesheet" href="./premium-polish.css?v=1.12.0">
     <link rel="stylesheet" href="./compact-masthead.css?v=1.12.0">
-    <link rel="stylesheet" href="./unified-toolbar.css?v=1.12.0">
+    <link rel="stylesheet" href="./unified-toolbar.css?v=1.13.0">
     <meta name="description" content="Київ Радар — мапа та каталог оренди квартир у Києві. Пошук за районом, бюджетом і заявленими можливостями автономності. Джерела та рівень перевірки вказані в оголошеннях.">
     <!-- Open Graph / Telegram Card -->
     <meta property="og:title" content="Київ Радар 🇺🇦 — Каталог та мапа оренди квартир у Києві">
@@ -1086,7 +1086,7 @@
         // 4. FILTERING & MULTI-CRITERIA SORTING
         let currentSort = 'price_asc'; // safe price-first default; no false geo or publication-date claims
         let ACTIVE_FILTERS = {
-            rooms: null,       // 1, 2, 3
+            rooms: null,       // 1, 2, 3, 4, 5 (5 means 5+)
             maxPrice: null,    // 15000, 20000
             generator: false,
             gpon: false,
@@ -1281,17 +1281,15 @@
                 // Never match a room-specific filter to disputed imported metadata.
                 if (ACTIVE_FILTERS.rooms !== null && item.roomConflict === true) return false;
                 // Multi-criteria filters
-                if (ACTIVE_FILTERS.rooms !== null && (item.rooms || getDealRooms(item)) !== ACTIVE_FILTERS.rooms) {
-                    if (ACTIVE_FILTERS.rooms === 3 && (item.rooms || getDealRooms(item)) >= 3) {
-                        // match 3+
-                    } else {
-                        return false;
-                    }
+                if (ACTIVE_FILTERS.rooms !== null) {
+                    const rooms = Number(item.rooms) || getDealRooms(item);
+                    const matches = ACTIVE_FILTERS.rooms === 5 ? rooms >= 5 : rooms === ACTIVE_FILTERS.rooms;
+                    if (!matches) return false;
                 }
-                if (ACTIVE_FILTERS.maxPrice !== null && item.price > ACTIVE_FILTERS.maxPrice) return false;
+                if (ACTIVE_FILTERS.maxPrice !== null && (!Number.isFinite(Number(item.price)) || Number(item.price) > ACTIVE_FILTERS.maxPrice)) return false;
                 if (ACTIVE_FILTERS.generator && !item.generator) return false;
                 if (ACTIVE_FILTERS.gpon && !item.gpon) return false;
-                if (ACTIVE_FILTERS.lowFloor && item.floor > 4) return false;
+                if (ACTIVE_FILTERS.lowFloor && (!Number.isInteger(Number(item.floor)) || Number(item.floor) < 1 || Number(item.floor) > 4)) return false;
                 if (ACTIVE_FILTERS.pets && !item.pets) return false;
                 if (ACTIVE_FILTERS.favs && !FAVORITES.has(item.id)) return false;
                 return true;
@@ -1329,13 +1327,11 @@
             const text = ((item.title || '') + ' ' + (item.desc || '')).toLowerCase();
             if (text.includes('1к') || text.includes('1-к') || text.includes('1 к') || text.includes('1-кімн') || text.includes('1 кімн') || text.includes('однокімн') || text.includes('однокомн') || text.includes('студ') || text.includes('смарт') || text.includes('окрема спальня')) return 1;
             if (text.includes('2к') || text.includes('2-к') || text.includes('2 к') || text.includes('2-кімн') || text.includes('2 кімн') || text.includes('двокімн') || text.includes('двухкомн') || text.includes('євродвушк') || text.includes('евродвушк') || text.includes('2-х')) return 2;
-            if (text.includes('3к') || text.includes('3-к') || text.includes('3 к') || text.includes('3-кімн') || text.includes('3 кімн') || text.includes('трикімн') || text.includes('трехкомн') || text.includes('3-х') || text.includes('4к')) return 3;
-            if (item.area) {
-                if (item.area <= 45) return 1;
-                if (item.area <= 72) return 2;
-                return 3;
-            }
-            return 1;
+            if (text.includes('5к') || text.includes('5-к') || text.includes('5 к') || text.includes('5-кімн') || text.includes('5 кімн') || text.includes("п'ять кімнат") || text.includes('пятикомн')) return 5;
+            if (text.includes('4к') || text.includes('4-к') || text.includes('4 к') || text.includes('4-кімн') || text.includes('4 кімн') || text.includes('чотирикімн') || text.includes('четырехкомн')) return 4;
+            if (text.includes('3к') || text.includes('3-к') || text.includes('3 к') || text.includes('3-кімн') || text.includes('3 кімн') || text.includes('трикімн') || text.includes('трехкомн') || text.includes('3-х')) return 3;
+            // Floor area does not prove the number of rooms.
+            return null;
         }
 
 // duplicate setFilter removed cleanly
@@ -2531,6 +2527,7 @@
     <script src="./compact-masthead.js?v=1.10.0"></script>
     <script src="./unified-toolbar.js?v=1.12.0"></script>
     <script src="./kyiv-signal-theme.js?v=1.12.0"></script>
+    <script src="./kyiv-smart-filters.js?v=1.13.0"></script>
 
     <!-- ==========================================
          REPORT PROBLEM MODAL (Apple Action Sheet)

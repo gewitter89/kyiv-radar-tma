@@ -51,6 +51,7 @@ jobs:
             tests/test_smart_radar.py \
             tests/test_first_visit_v17.py \
             tests/test_kyiv_signal_theme_v112.py \
+            tests/test_smart_filters_v113.py \
             tests/test_simple_first_view.py \
             tests/test_catalog_claims.py \
             tests/test_listing_trust_v18.py \

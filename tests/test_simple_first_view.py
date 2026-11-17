@@ -10,7 +10,7 @@ URL = "file:///" + os.path.join(ROOT, "index.html").replace("\\", "/")
 
 async def ready(page):
     await page.goto(URL, wait_until="domcontentloaded")
-    await page.wait_for_selector("#krMoreFilters")
+    await page.wait_for_selector("#krRoomsTrigger")
     await page.wait_for_function("LISTINGS.length > 0 && CURRENT_VIEW_MODE === 'list'")
     await page.locator("#listViewContainer > div[onclick]").first.wait_for()
 
@@ -22,15 +22,21 @@ async def test_phone_first_view_shows_photos_not_full_screen_map():
         page = await browser.new_page(viewport={"width": 390, "height": 844},
                                       is_mobile=True, has_touch=True)
         await ready(page)
-        assert await page.get_by_role("heading", name="Квартири в Києві").is_visible()
+        assert await page.get_by_role("heading", name="Знайти квартиру").is_visible()
         assert await page.locator("#map").is_hidden()
         assert await page.locator("#listViewContainer").is_visible()
         assert await page.locator("#smartRadarOpen").is_visible()
-        assert await page.locator("#krMoreFilters").is_visible()
+        assert await page.locator("#krRoomsTrigger").is_visible()
         assert await page.locator("#filterPower").is_hidden()
         assert await page.locator("#filterRooms3").is_hidden()
-        assert await page.locator("#listViewContainer img").first.is_visible()
-        assert await page.locator("#listViewContainer img").first.bounding_box() is not None
+        # Catalog may re-render while its live snapshot is being refreshed.
+        # Wait for an actual, sized image frame instead of sampling mid-repaint.
+        await page.wait_for_function("""() => {
+          const img = document.querySelector("#listViewContainer img.kr-gallery-image");
+          if (!img) return false;
+          const rect = img.getBoundingClientRect();
+          return rect.width > 100 && rect.height > 100 && getComputedStyle(img).visibility !== 'hidden';
+        }""", timeout=10000)
         assert await page.locator("#listViewContainer > div[onclick]").count() >= 10
         first_card = await page.locator("#listViewContainer > div[onclick]").nth(0).bounding_box()
         second_card = await page.locator("#listViewContainer > div[onclick]").nth(1).bounding_box()
@@ -74,14 +80,19 @@ async def test_advanced_filters_split_generator_and_fiber_correctly():
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={"width": 390, "height": 844})
         await ready(page)
-        await page.locator("#krMoreFilters").click()
-        assert await page.locator("#filterPower").is_visible()
-        assert await page.locator("#filterInternet").is_visible()
-        await page.locator("#filterInternet").click()
+        await page.locator("#krConditionsTrigger").click()
+        internet = page.locator('#krConditionOptions input[data-key="gpon"]')
+        generator = page.locator('#krConditionOptions input[data-key="generator"]')
+        assert await internet.is_visible()
+        assert await generator.is_visible()
+        await internet.check()
+        await page.locator("#krFiltersApply").click()
         assert await page.evaluate("ACTIVE_FILTERS.gpon === true && ACTIVE_FILTERS.generator === false")
-        await page.locator("#filterPower").click()
+        await page.locator("#krConditionsTrigger").click()
+        await generator.check()
+        await page.locator("#krFiltersApply").click()
         assert await page.evaluate("ACTIVE_FILTERS.gpon === true && ACTIVE_FILTERS.generator === true")
-        assert await page.locator("#filterInternet").get_attribute("aria-pressed") == "true"
+        assert "2" in await page.locator("#krConditionsTrigger").inner_text()
         await page.locator("#krSimpleInfo").click()
         dialog = page.locator("#krSimpleHelp")
         assert await dialog.is_visible()

@@ -41,9 +41,13 @@ async def test_graphite_logo_is_single_source_and_decorative_wave_is_gone(width,
         assert await mark.evaluate("(img) => img.naturalWidth > 0")
         assert await page.locator("#krRadarSlot img.kr-radar-mini-mark").count() == 1
         assert await page.locator('#krHero .kr-kyiv-skyline svg').count() == 1
-        assert "repeating-radial-gradient" in await page.locator("#krHero").evaluate(
+        # Brand image appears as a low-opacity watermark behind functional controls.
+        assert "kyiv-radar-mark.svg" in await page.locator("body > header").evaluate(
             "(el) => getComputedStyle(el, '::after').backgroundImage"
         )
+        assert await page.locator("#krHero").evaluate(
+            "(el) => getComputedStyle(el, '::after').content"
+        ) == "none"
         assert await page.locator("#searchInput").is_visible()
         assert await page.locator("#floatingViewToggle").is_visible()
         assert await page.locator("#krDataStatus").is_visible()
