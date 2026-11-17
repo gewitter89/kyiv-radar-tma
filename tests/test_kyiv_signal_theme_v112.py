@@ -150,15 +150,25 @@ async def test_listing_photo_error_exposes_friendly_recoverable_fallback():
         await ready(page)
         frame = page.locator("#listViewContainer > div[onclick]").first.locator(".relative.h-48")
         await frame.locator(".kr-gallery-fallback").wait_for()
-        image = frame.locator(".kr-gallery-image")
-        await image.dispatch_event("error")
-        assert "kr-gallery-missing" in (await frame.get_attribute("class"))
-        assert "тимчасово недоступне" in await frame.locator(".kr-gallery-fallback").inner_text()
+        # Observe error/load handler effects synchronously, without an unrelated
+        # network image event or live catalog re-render racing our assertions.
+        error_state = await frame.evaluate("""el => {
+          el.querySelector('.kr-gallery-image').dispatchEvent(new Event('error'));
+          return {
+            missing: el.classList.contains('kr-gallery-missing'),
+            text: el.querySelector('.kr-gallery-fallback').textContent
+          };
+        }""")
+        assert error_state["missing"]
+        assert "тимчасово недоступне" in error_state["text"]
         assert await frame.locator(".kr-gallery-next").is_visible()
         await frame.locator(".kr-gallery-next").click()
         assert "1/" not in (await frame.locator(".kr-gallery-count").inner_text())
-        await image.dispatch_event("load")
-        assert "kr-gallery-missing" not in (await frame.get_attribute("class"))
+        recovered = await frame.evaluate("""el => {
+          el.querySelector('.kr-gallery-image').dispatchEvent(new Event('load'));
+          return !el.classList.contains('kr-gallery-missing');
+        }""")
+        assert recovered
         await browser.close()
 
 
