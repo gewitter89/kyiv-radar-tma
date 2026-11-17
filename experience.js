@@ -168,7 +168,8 @@
       live: "не перевірено",
       static: "копія · не перевірено",
       cached: "копія · не перевірено",
-      loading: "завантаження…"
+      loading: "завантаження…",
+      error: "немає зв’язку з каталогом"
     };
     if (source) source.textContent = messages[mode] || messages.cached;
     if (retry) retry.hidden = mode === "live" || mode === "loading";
