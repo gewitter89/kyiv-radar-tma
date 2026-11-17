@@ -144,11 +144,13 @@
     const retry = document.getElementById("krRetry");
     if (!n || typeof getFilteredListings !== "function") return;
     const items = getFilteredListings();
-    const total = Array.isArray(LISTINGS) ? LISTINGS.length : 0;
-    n.textContent = "Знайдено " + items.length + " із " + total;
+    const count = items.length;
+    const endsOne = count % 10 === 1 && count % 100 !== 11;
+    const endsFew = count % 10 >= 2 && count % 10 <= 4 && !(count % 100 >= 12 && count % 100 <= 14);
+    n.textContent = count + " " + (endsOne || endsFew ? "оголошення" : "оголошень");
     const mode = window.KR_CATALOG_MODE || "loading";
     const messages = {
-      live: "Актуальність не перевірена",
+      live: "Актуальність не перевірено",
       static: "Збережено · не перевірено",
       cached: "Збережено · не перевірено",
       loading: "Завантажуємо оголошення…"
