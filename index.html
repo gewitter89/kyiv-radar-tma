@@ -1327,8 +1327,8 @@
             const text = ((item.title || '') + ' ' + (item.desc || '')).toLowerCase();
             if (text.includes('1к') || text.includes('1-к') || text.includes('1 к') || text.includes('1-кімн') || text.includes('1 кімн') || text.includes('однокімн') || text.includes('однокомн') || text.includes('студ') || text.includes('смарт') || text.includes('окрема спальня')) return 1;
             if (text.includes('2к') || text.includes('2-к') || text.includes('2 к') || text.includes('2-кімн') || text.includes('2 кімн') || text.includes('двокімн') || text.includes('двухкомн') || text.includes('євродвушк') || text.includes('евродвушк') || text.includes('2-х')) return 2;
-            if (/\b5\s*[-–]?\s*[кk]\b|5[- ]?кімн|пятикомн|п'ять кімнат/i.test(text)) return 5;
-            if (/\b4\s*[-–]?\s*[кk]\b|4[- ]?кімн|четырехкомн|чотирикімн/i.test(text)) return 4;
+            if (text.includes('5к') || text.includes('5-к') || text.includes('5 к') || text.includes('5-кімн') || text.includes('5 кімн') || text.includes("п'ять кімнат") || text.includes('пятикомн')) return 5;
+            if (text.includes('4к') || text.includes('4-к') || text.includes('4 к') || text.includes('4-кімн') || text.includes('4 кімн') || text.includes('чотирикімн') || text.includes('четырехкомн')) return 4;
             if (text.includes('3к') || text.includes('3-к') || text.includes('3 к') || text.includes('3-кімн') || text.includes('3 кімн') || text.includes('трикімн') || text.includes('трехкомн') || text.includes('3-х')) return 3;
             // Floor area does not prove the number of rooms.
             return null;
