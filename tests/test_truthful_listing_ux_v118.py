@@ -82,6 +82,11 @@ async def test_server_contact_failure_has_specific_truthful_recovery(status, mes
 
         await page.route("**/api/send_contact", send_contact)
         await open_app(page, telegram=True)
+        await page.evaluate("""() => {
+            const fixture = getFilteredListings()[0];
+            fixture.source = "Київ Радар";
+            fixture.contactVerified = true;
+        }""")
         await page.locator("#listViewContainer .kr-open-detail").first.click()
         await page.locator("#modalCallBtn").click()
         await page.wait_for_function(

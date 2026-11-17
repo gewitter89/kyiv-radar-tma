@@ -59,6 +59,7 @@ jobs:
             tests/test_catalog_integrity_v116.py \
             tests/test_reviewer_queue_v117.py \
             tests/test_truthful_listing_ux_v118.py \
+            tests/test_source_first_contact_v119.py \
             tests/test_unverified_metro_v120.py \
             tests/test_rental_safety_v116.py \
             tests/test_listing_light_contrast_v116.py \

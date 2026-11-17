@@ -44,11 +44,21 @@ async def screenshot(browser, name: str, width: int, height: int, mobile=False):
     await page.evaluate("""() => openDealModalById(LISTINGS[0].id)""")
     await page.wait_for_timeout(450)
     await page.screenshot(path=str(OUTPUT / (name + "-listing.png")))
-    await page.locator("#modalCallBtn").click()
-    await page.wait_for_timeout(180)
-    if await page.locator("#krHandoff").is_visible():
-        await page.screenshot(path=str(OUTPUT / (name + "-telegram-handoff.png")))
-        await page.keyboard.press("Escape")
+    if await page.locator("#krOriginalAction").is_visible():
+        # The import's safe first action is an outgoing source URL, not a bot
+        # contact request. Do not navigate to a third-party website in QA.
+        original = page.locator("#krOriginalAction")
+        href = await original.get_attribute("href")
+        assert href and href.startswith("https://")
+        assert await page.locator("#modalCallBtn").is_hidden()
+        await page.screenshot(path=str(OUTPUT / (name + "-source-action.png")))
+    else:
+        # Only a supported first-party contact flow can show Telegram handoff.
+        await page.locator("#modalCallBtn").click()
+        await page.wait_for_timeout(180)
+        if await page.locator("#krHandoff").is_visible():
+            await page.screenshot(path=str(OUTPUT / (name + "-telegram-handoff.png")))
+            await page.keyboard.press("Escape")
     await page.evaluate("""() => closeDealModal()""")
     await page.locator("#smartRadarOpen").click()
     await page.wait_for_timeout(200)
