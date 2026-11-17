@@ -201,7 +201,7 @@ async def test_native_telegram_title_bar_exactly_matches_web_header_in_both_them
                 webHeader: getComputedStyle(header).backgroundColor,
                 meta: document.querySelector('meta[name="theme-color"]').content,
                 sdkCalls: window.__krNativeColors,
-                stripe: document.querySelector('body > .h-\\\\[2\\\\.5px\\\\]')
+                stripe: Boolean(document.body.firstElementChild?.classList.contains("h-[2.5px]"))
               };
             }""")
             assert status["native"] == color
@@ -209,7 +209,7 @@ async def test_native_telegram_title_bar_exactly_matches_web_header_in_both_them
             assert status["meta"] == color
             assert status["webHeader"] == css_rgb
             assert status["sdkCalls"][-1] == color
-            assert status["stripe"] is None
+            assert status["stripe"] is False
         # The navbar background is a single opaque surface with no border/shadow seam.
         border = await page.locator("body > header").evaluate(
             "(el) => ({bottom: getComputedStyle(el).borderBottomWidth, shadow: getComputedStyle(el).boxShadow})"
