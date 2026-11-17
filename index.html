@@ -2267,7 +2267,7 @@
                     if (status) status.textContent = "Повідомлення отримано. Дякуємо.";
                     window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred?.("success");
                     closeReportModal();
-                    showToast("Повідомлення №" + data.id + " передано модератору");
+                    showToast("Повідомлення передано модератору");
                     return true;
                 }
                 if (status) status.textContent = typeof data.detail === "string"
