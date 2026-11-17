@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""v1.23 local-only permissioned XML/YRL feeds; never auto-publish."""
+"""v1.23 local-only permissioned XML/YML feeds; never auto-publish."""
 import json
 import sqlite3
 from datetime import datetime, timezone
