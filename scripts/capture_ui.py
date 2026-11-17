@@ -20,10 +20,24 @@ async def screenshot(browser, name: str, width: int, height: int, mobile=False):
     await page.goto(URL, wait_until="domcontentloaded")
     await page.wait_for_function("typeof LISTINGS !== 'undefined' && LISTINGS.length > 0")
     await page.wait_for_timeout(1200)
-    await page.screenshot(path=str(OUTPUT / (name + "-map.png")))
+    exceptions = []
+    page.on("pageerror", lambda error: exceptions.append(str(error)))
+    await page.wait_for_selector("#krHero")
+    await page.screenshot(path=str(OUTPUT / (name + "-first-visit.png")))
     await page.evaluate("""() => openDealModalById(LISTINGS[0].id)""")
-    await page.wait_for_timeout(800)
+    await page.wait_for_timeout(450)
     await page.screenshot(path=str(OUTPUT / (name + "-listing.png")))
+    await page.locator("#modalCallBtn").click()
+    await page.wait_for_timeout(180)
+    if await page.locator("#krHandoff").is_visible():
+        await page.screenshot(path=str(OUTPUT / (name + "-telegram-handoff.png")))
+        await page.keyboard.press("Escape")
+    await page.evaluate("""() => closeDealModal()""")
+    await page.locator("#smartRadarOpen").click()
+    await page.wait_for_timeout(200)
+    await page.screenshot(path=str(OUTPUT / (name + "-saved-search.png")))
+    await page.keyboard.press("Escape")
+    assert not exceptions, "Uncaught browser errors in " + name + ": " + "; ".join(exceptions)
     await context.close()
 
 
