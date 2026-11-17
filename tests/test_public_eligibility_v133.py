@@ -36,6 +36,8 @@ def test_partner_needs_consistent_trusted_source_identifiers():
     assert not eligible_public_row(row("partner:agency", partnerSourceKey="agency"))
     assert eligible_public_row(row("partner:agency", partnerSourceKey="agency",
                                    partnerExternalId="X1"))
+    assert eligible_public_row(row("partner:agency", partnerSourceKey="agency",
+                                   partnerExternalId=123))
 
 
 def test_filter_is_nonmutating_and_protects_empty_or_malformed_rows():
