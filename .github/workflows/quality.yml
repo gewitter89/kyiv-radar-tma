@@ -62,6 +62,7 @@ jobs:
             tests/test_source_first_contact_v119.py \
             tests/test_landlord_consent_v121.py \
             tests/test_market_inventory_v122.py \
+            tests/test_partner_xml_v123.py \
             tests/test_dim_ria_discovery_v122.py \
             tests/test_unverified_metro_v120.py \
             tests/test_rental_safety_v116.py \
