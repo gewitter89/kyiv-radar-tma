@@ -206,13 +206,14 @@ def ingest(feed_path: Path, agreement_path: Path, database_path: Path,
     agreement = load_agreement(agreement_path, now)
     if full_snapshot and agreement.get("full_snapshot_allowed") is not True:
         raise ValueError("Agreement does not authorize full snapshots")
-    target = database_path.expanduser().resolve()
+    requested = database_path.expanduser()
+    if requested.is_symlink():
+        raise ValueError("Symlink destination forbidden")
+    target = requested.resolve()
     if path_is_public(target):
         raise ValueError("Private inventory DB may not be stored inside the public repo")
     if not target.parent.is_dir():
         raise ValueError("Database parent directory must exist")
-    if target.is_symlink():
-        raise ValueError("Symlink destination forbidden")
 
     old_umask = os.umask(0o077)
     try:
@@ -251,8 +252,11 @@ def ingest(feed_path: Path, agreement_path: Path, database_path: Path,
                 status = "pending_review"
                 stats["inserted"] += 1
                 # Cross-feed duplicates are candidates for human review, never merged.
-                if conn.execute("SELECT 1 FROM inventory WHERE source_url=? LIMIT 1",
-                                (row["source_url"],)).fetchone():
+                if conn.execute(
+                    "SELECT 1 FROM inventory WHERE source_url=? OR "
+                    "(? IS NOT NULL AND unit_key=?) LIMIT 1",
+                    (row["source_url"], row["unit_key"], row["unit_key"])
+                ).fetchone():
                     stats["possible_duplicates"] += 1
                 conn.execute(
                     "INSERT INTO inventory (source, external_id, source_url, operation, "
@@ -263,7 +267,9 @@ def ingest(feed_path: Path, agreement_path: Path, database_path: Path,
             elif tuple(previous[:9]) != payload:
                 stats["changed"] += 1
                 # Changing any approved listing requires renewed human verification.
-                status = "needs_review" if previous[9] == "approved" else previous[9]
+                status = ("needs_review" if previous[9] == "approved"
+                          else "pending_review" if previous[9] == "possible_withdrawn"
+                          else previous[9])
                 conn.execute(
                     "UPDATE inventory SET source_url=?, operation=?, property_type=?, "
                     "city=?, district=?, price_uah=?, rooms=?, area_m2=?, unit_key=?, "
@@ -273,7 +279,9 @@ def ingest(feed_path: Path, agreement_path: Path, database_path: Path,
             else:
                 stats["unchanged"] += 1
                 conn.execute(
-                    "UPDATE inventory SET imported_last_at=?,last_batch=?,misses=0 "
+                    "UPDATE inventory SET imported_last_at=?,last_batch=?,misses=0, "
+                    "review_status=CASE WHEN review_status='possible_withdrawn' "
+                    "THEN 'pending_review' ELSE review_status END "
                     "WHERE source=? AND external_id=?",
                     (timestamp, batch, source, ext))
 
