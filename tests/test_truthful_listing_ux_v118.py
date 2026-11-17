@@ -152,6 +152,32 @@ async def test_distance_sort_without_evidence_refuses_false_precision():
         assert result["anyDistances"] is False
         await browser.close()
 
+
+
+def test_imported_catalog_no_longer_imitates_phone_availability():
+    with open(os.path.join(ROOT, "data", "deals.json"), encoding="utf-8") as stream:
+        catalog = json.load(stream)
+    assert len(catalog) == 150
+    assert all(row.get("phoneMasked") is None for row in catalog)
+    assert all(not row.get("contactVerified") for row in catalog)
+
+
+@pytest.mark.asyncio
+async def test_unverified_masked_contact_is_not_rendered_on_mobile():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844})
+        await open_app(page)
+        await page.locator("#listViewContainer .kr-open-detail").first.click()
+        assert await page.locator("#modalMaskedPhone").inner_text() == "Контакт не підтверджено"
+        cleared = await page.evaluate("""() => {
+            const raw = {...LISTINGS[0], phoneMasked:"+38 (067) •••-••-51",
+              contactVerified:false};
+            return krQualityCatalog([raw])[0].phoneMasked;
+        }""")
+        assert cleared is None
+        await browser.close()
+
 def test_text_never_pretends_imported_listings_were_posted_by_owner():
     html = open(os.path.join(ROOT, "index.html"), encoding="utf-8").read()
     assert "Оголошення подано власником через Київ Радар" not in html
