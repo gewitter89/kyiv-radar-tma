@@ -107,10 +107,10 @@ async def test_saved_string_ids_normalized_and_corrupt_data_is_ignored():
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={"width": 390, "height": 844})
-        await page.add_init_script("""() => {
+        await page.add_init_script("""(() => {
           try { localStorage.setItem('kr_favs', JSON.stringify(['1', '2', 'bad', -8])); }
           catch (e) {}
-        }""")
+        })();""")
         await open_apartments(page)
         assert await page.evaluate("FAVORITES.has(1) && FAVORITES.has(2)") is True
         assert await page.evaluate("FAVORITES.has('1')") is False
@@ -135,24 +135,30 @@ async def test_keyboard_button_can_toggle_favorite_without_opening_modal():
 
 @pytest.mark.asyncio
 async def test_visible_more_filters_and_favorites_button_work_with_touch():
+    # New visible filter UI is the smart bottom sheet. The legacy filter bar is
+    # intentionally hidden/inert and must never be used in user-facing tests.
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page(viewport={"width":390,"height":844}, is_mobile=True, has_touch=True)
+        page = await browser.new_page(viewport={"width":390,"height":844},
+                                      is_mobile=True, has_touch=True)
         await open_apartments(page)
-        more = page.locator("#krMoreFilters")
-        await more.wait_for(state="visible")
-        await more.click()
-        filter_button = page.locator("#filterFavs")
-        await filter_button.wait_for(state="visible")
-        assert await filter_button.get_attribute("aria-pressed") == "false"
-        await filter_button.click()
-        assert await filter_button.get_attribute("aria-pressed") == "true"
+        trigger = page.locator("#krConditionsTrigger")
+        await trigger.wait_for(state="visible")
+        await trigger.click()
+        sheet = page.locator("#krFiltersSheet")
+        assert await sheet.is_visible()
+        checkbox = page.locator('#krConditionOptions input[data-key="favs"]')
+        await checkbox.check()
+        await page.locator("#krFiltersApply").click()
+        assert await sheet.is_hidden()
+        assert await page.evaluate("ACTIVE_FILTERS.favs") is True
         assert await page.locator("#listViewContainer").get_by_text("Обраних квартир поки немає").is_visible()
-        await filter_button.click()
-        assert await filter_button.get_attribute("aria-pressed") == "false"
+        await trigger.click()
+        await checkbox.uncheck()
+        await page.locator("#krFiltersApply").click()
+        assert await page.evaluate("ACTIVE_FILTERS.favs") is False
         assert await page.evaluate("getFilteredListings().length") > 2
         await browser.close()
-
 
 @pytest.mark.asyncio
 async def test_telegram_contact_button_only_works_for_verified_safe_username():
@@ -163,6 +169,11 @@ async def test_telegram_contact_button_only_works_for_verified_safe_username():
         await page.evaluate("""() => {
           window.__tgOpened = [];
           window.open = (url) => { window.__tgOpened.push(url); return null; };
+          // Telegram's SDK can expose openTelegramLink even outside the app.
+          // Stub both paths so this smoke test cannot navigate away.
+          window.Telegram = { WebApp: {
+            openTelegramLink: (url) => { window.__tgOpened.push(url); }
+          }};
           const d = getFilteredListings()[0];
           d.ownerTg = '@valid_owner123';
           d.contactVerified = false;
