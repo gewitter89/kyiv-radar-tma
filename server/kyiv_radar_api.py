@@ -578,7 +578,7 @@ async def get_live_deals():
     """
     deals = load_effective_deals()
     sanitized = []
-    public_fields = frozenset(["id","title","district","address","metro","walkMin","price","realtorCommissionSaved","area","floor","totalFloors","lat","lng","generator","gpon","gas","lowFloor","pets","url","images","desc","rooms","source","status","verifiedAt","isOwnerVerified","cleanAddress","verificationStatus","statusLabel","contactVerified","actualityConfirmed","commissionVerified","commissionNote","phoneMasked"])
+    public_fields = frozenset(["id","title","district","address","metro","walkMin","price","realtorCommissionSaved","area","floor","totalFloors","lat","lng","generator","gpon","gas","lowFloor","pets","url","images","desc","rooms","source","status","verifiedAt","isOwnerVerified","cleanAddress","verificationStatus","statusLabel","reviewedByRadar","contactVerified","actualityConfirmed","commissionVerified","commissionNote","phoneMasked"])
     for d in deals:
         if not isinstance(d, dict):
             continue
@@ -613,7 +613,7 @@ async def submit_report(req: ReportRequest, request: Request):
         raise HTTPException(status_code=400, detail="Вкажіть причину скарги")
 
     user_data = validate_telegram_init_data(req.initData) if req.initData else None
-    user_label = f"@{user_data.get('username', 'anon')} (TG ID: {user_data.get('id')})" if user_data else f"Веб (IP: {client_ip})"
+    user_label = f"Telegram ID: {user_data.get('id')}" if user_data else "Веб"
 
     comp_id = 0
     try:
@@ -627,7 +627,7 @@ async def submit_report(req: ReportRequest, request: Request):
         conn.commit()
         conn.close()
     except Exception as e:
-        logger.error(f"DB Error saving complaint: {e}")
+        logger.error("Unable to save a report (%s)", type(e).__name__)
         raise HTTPException(status_code=500, detail="Помилка збереження скарги на сервері")
 
     safe_reason = html.escape(req.reason.strip())
