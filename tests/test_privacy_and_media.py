@@ -262,3 +262,40 @@ def test_photo_ownership_and_moderated_public_access(privacy_test_env):
     assert published["images"] == [
         "https://vmi3445944.contaboserver.net/api/media/" + photo_id
     ]
+
+    # Repeated moderation must not mistake approved images for missing ones.
+    duplicate = process_landlord_approval(
+        submission_id, 555, 555,
+        privacy_test_env["db_path"], privacy_test_env["deals_path"]
+    )
+    assert duplicate["success"] is True
+    assert duplicate.get("already_approved") is True
+    assert sum(x.get("submission_id") == submission_id
+               for x in __import__("json").load(open(privacy_test_env["deals_path"], encoding="utf-8"))) == 1
+
+
+def test_rejected_submission_cannot_be_approved(privacy_test_env):
+    """An out-of-date moderator callback must not revive a rejected listing."""
+    import sqlite3
+    from server.bot_moderation import process_landlord_approval
+    client = privacy_test_env["client"]
+    auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=554422)
+    with patch("server.kyiv_radar_api.send_telegram_alert", new_callable=AsyncMock) as alert:
+        alert.return_value = True
+        response = client.post("/api/landlords/submit", json={
+            "address": "вул. Кирилівська, 12, Київ", "price": "16000",
+            "rooms": 1, "phone": "+380671122334", "photos": [],
+            "rightsConfirmed": True, "initData": auth
+        })
+    assert response.status_code == 200
+    sub_id = response.json()["id"]
+    with sqlite3.connect(privacy_test_env["db_path"]) as conn:
+        conn.execute("UPDATE landlord_submissions SET status='rejected' WHERE id=?", (sub_id,))
+    result = process_landlord_approval(
+        sub_id, 555, 555,
+        privacy_test_env["db_path"], privacy_test_env["deals_path"]
+    )
+    assert result["success"] is False
+    with open(privacy_test_env["deals_path"], encoding="utf-8") as fh:
+        assert all(x.get("submission_id") != sub_id for x in json.load(fh))
+
