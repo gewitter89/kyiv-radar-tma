@@ -348,16 +348,52 @@
         const x=old.call(this,id);
         const deal = Array.isArray(LISTINGS) ? LISTINGS.find(d => d.id === id) : null;
         const secure = Boolean(window.Telegram?.WebApp?.initData);
+        const source = String(deal?.source || "").toUpperCase();
+        const sourceFirst = ["OLX", "DOM.RIA"].includes(source)
+          && deal?.contactVerified !== true
+          && !(typeof deal?.phone === "string" && deal.phone.trim());
+        const original = document.getElementById("modalOriginalLink");
+        // Reuse the main application's validated OLX/DIM.RIA source link. Never
+        // make a button from arbitrary data.url, and never assume it is active.
+        const sourceHref = sourceFirst && original && !original.classList.contains("hidden")
+          ? original.getAttribute("href") : null;
+        const sourceAction = document.getElementById("krOriginalAction");
+        if (sourceAction) {
+          sourceAction.hidden = !sourceHref;
+          sourceAction.classList.toggle("hidden", !sourceHref);
+          sourceAction.style.display = sourceHref ? "flex" : "none";
+          if (sourceHref) {
+            sourceAction.href = sourceHref;
+            sourceAction.textContent = source === "OLX" ? "Перевірити на OLX" : "Перевірити на DIM.RIA";
+          } else {
+            sourceAction.removeAttribute("href");
+          }
+        }
+        const header = document.getElementById("modalPhoneHeaderTitle");
+        if (header) header.textContent = sourceFirst ? "Контакт у джерелі" : "Контакт з оголошення";
+        const info = document.getElementById("phoneLockedBox")?.querySelector("span:last-child");
+        if (info) info.textContent = sourceFirst
+          ? "Контакт і наявність не перевірено. Уточніть на сайті джерела."
+          : "Якщо контакт доступний, надішлемо його в Telegram";
+        const free = document.getElementById("freeTrialPill");
+        if (free) {
+          free.hidden = sourceFirst;
+          free.classList.toggle("hidden", sourceFirst);
+        }
         const action = document.getElementById("modalCallLabel");
         if (action) action.textContent = secure ? "Запросити контакт у чат" : "Відкрити Telegram";
         const primary = document.getElementById("modalCallBtn");
         if (primary) {
+          primary.hidden = sourceFirst;
+          primary.style.display = sourceFirst ? "none" : "";
           primary.style.backgroundColor = secure ? "#30d158" : "#85b5ff";
           const phoneIcon = primary.querySelector("svg");
           if (phoneIcon) phoneIcon.style.display = secure ? "" : "none";
         }
         const secondary = document.getElementById("modalChatBtn");
         if (secondary) secondary.hidden = true;
+        const ownerTelegram = document.getElementById("modalTgBtn");
+        if (ownerTelegram && sourceFirst) ownerTelegram.classList.add("hidden");
         const bar = document.getElementById("modalCallBtn")?.parentElement;
         if (bar) {
           let share = document.getElementById("krShareListing");
