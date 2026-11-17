@@ -252,7 +252,16 @@ def normalise(row: object, agreement: dict) -> dict:
     }
 
 
-def read_rows(path: Path):
+def read_rows(path: Path, *, feed_format: str = "auto"):
+    if feed_format == "yrl":
+        try:
+            from .partner_yrl import iter_yrl
+        except ImportError:
+            from partner_yrl import iter_yrl
+        yield from iter_yrl(path)
+        return
+    if feed_format != "auto":
+        raise ValueError("Unknown partner feed format")
     if path.suffix.lower() == ".jsonl":
         with path.open("r", encoding="utf-8") as stream:
             for line in stream:
@@ -277,7 +286,8 @@ def read_rows(path: Path):
 
 
 def ingest(feed_path: Path, agreement_path: Path, database_path: Path,
-           *, full_snapshot: bool = False, now: datetime | None = None) -> dict:
+           *, full_snapshot: bool = False, now: datetime | None = None,
+           feed_format: str = "auto") -> dict:
     now = now or datetime.now(timezone.utc)
     feed = checked_input(feed_path)
     agreement = load_agreement(agreement_path, now)
@@ -315,7 +325,7 @@ def ingest(feed_path: Path, agreement_path: Path, database_path: Path,
         stats = {"accepted": 0, "inserted": 0, "changed": 0, "unchanged": 0,
                  "possible_duplicates": 0, "needs_withdrawal_review": 0}
         seen: set[str] = set()
-        for input_row in read_rows(feed):
+        for input_row in read_rows(feed, feed_format=feed_format):
             row = normalise(input_row, agreement)
             ext = row["external_id"]
             if ext in seen:
@@ -401,10 +411,12 @@ def main() -> int:
     p.add_argument("--agreement", type=Path, required=True)
     p.add_argument("--database", type=Path, required=True)
     p.add_argument("--full-snapshot", action="store_true")
+    p.add_argument("--format", choices=("auto", "yrl"), default="auto",
+                   help="Explicitly select licensed YRL instead of canonical XML/YML")
     args = p.parse_args()
     try:
         result = ingest(args.feed, args.agreement, args.database,
-                        full_snapshot=args.full_snapshot)
+                        full_snapshot=args.full_snapshot, feed_format=args.format)
         print(json.dumps({"ok": True, **result}, ensure_ascii=False))
         return 0
     except (ValueError, OSError, sqlite3.Error, UnicodeError,
