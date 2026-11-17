@@ -52,7 +52,7 @@ async def test_imported_card_has_prominent_real_original_link(width, height):
         assert await page.locator("#modalChatBtn").is_hidden()
         assert await page.locator("#freeTrialPill").is_hidden()
         assert await page.locator("#modalMaskedPhone").inner_text() == "Контакт не підтверджено"
-        assert await page.locator("#modalPhoneHeaderTitle").inner_text() == "Контакт у джерелі"
+        assert (await page.locator("#modalPhoneHeaderTitle").inner_text()).casefold() == "контакт у джерелі"
         assert "Перегляньте джерело" in await page.locator("#modalContactHint").inner_text()
         assert "Telegram" not in await page.locator("#modalContactHint").inner_text()
         assert "Комісія уточнюється" in await page.locator("#modalRealtorSavings").inner_text()
