@@ -20,10 +20,6 @@ html.kr-compact.kr-simple header.kr-unified-header.kr-compact-masthead {
 html.kr-compact.kr-simple header.kr-compact-masthead::before {
   opacity:.42;
 }
-html.kr-compact.kr-simple header.kr-compact-masthead .kr-native-seam {
-  height:7px;
-  opacity:.75;
-}
 html.kr-compact.kr-simple header.kr-compact-masthead #krHero {
   display:flex !important;
   flex-direction:row !important;
@@ -98,11 +94,6 @@ html.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-kyiv-skyline {
   width:35%;height:110%;
   opacity:.26 !important;
   filter:none;
-}
-html.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-ukraine-curve {
-  height:8px !important;
-  bottom:-2px;
-  opacity:.37 !important;
 }
 html.kr-compact.kr-simple header.kr-compact-masthead .kr-compact-search-row {
   display:flex;

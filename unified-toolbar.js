@@ -31,9 +31,8 @@
     const radarSlot = document.createElement("div");
     radarSlot.id = "krRadarSlot";
     radarSlot.className = "kr-radar-slot";
-    radar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true" focusable="false">' +
-      '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/>' +
-      '<path d="M12 12 18 6"/><circle cx="18" cy="6" r="1.2" fill="currentColor" stroke="none"/></svg>' +
+    // Reuse the same original mark as the city selector and site favicon.
+    radar.innerHTML = '<img class="kr-radar-mini-mark" src="./kyiv-radar-mark.svg" alt="" width="18" height="18">' +
       '<span class="kr-radar-label">Мій радар</span>';
     radar.setAttribute("aria-label", "Мій радар: збережені пошуки та порівняння");
     radar.title = "Мій радар";

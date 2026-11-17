@@ -9,6 +9,16 @@ URL = (ROOT / "index.html").as_uri()
 OUTPUT = ROOT / "artifacts"
 
 
+async def wait_for_photo(page):
+    """Avoid photographing a loading frame when remote images are slow."""
+    try:
+        await page.wait_for_function(
+            "document.querySelector('#listViewContainer img.kr-gallery-image')?.naturalWidth > 0",
+            timeout=2800)
+    except Exception:
+        pass
+
+
 async def screenshot(browser, name: str, width: int, height: int, mobile=False):
     context = await browser.new_context(
         viewport={"width": width, "height": height},
@@ -25,6 +35,7 @@ async def screenshot(browser, name: str, width: int, height: int, mobile=False):
     exceptions = []
     page.on("pageerror", lambda error: exceptions.append(str(error)))
     await page.wait_for_selector("#krHero")
+    await wait_for_photo(page)
     await page.screenshot(path=str(OUTPUT / (name + "-first-visit.png")))
     await page.evaluate("""() => openDealModalById(LISTINGS[0].id)""")
     await page.wait_for_timeout(450)
@@ -43,12 +54,33 @@ async def screenshot(browser, name: str, width: int, height: int, mobile=False):
     await context.close()
 
 
+async def screenshot_light(browser):
+    """Review light theme in the actual app, not a separate design mockup."""
+    context = await browser.new_context(
+        viewport={"width":390,"height":844},device_scale_factor=1,
+        is_mobile=True,has_touch=True)
+    page = await context.new_page()
+    await page.goto(URL,wait_until="domcontentloaded")
+    await page.wait_for_selector("html.kr-unified-111[data-kr-theme]")
+    await page.wait_for_function(
+        "document.querySelectorAll('#listViewContainer > div[onclick]').length > 0")
+    await page.evaluate("window.KyivRadarTheme.set('light')")
+    await page.wait_for_selector("html[data-kr-theme='light']")
+    await wait_for_photo(page)
+    await page.wait_for_timeout(350)
+    await page.screenshot(path=str(OUTPUT / "phone-light-first-visit.png"))
+    await page.locator("#krSimpleInfo").click()
+    await page.screenshot(path=str(OUTPUT / "phone-light-theme-settings.png"))
+    await context.close()
+
+
 async def main():
     OUTPUT.mkdir(parents=True, exist_ok=True)
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(headless=True)
         try:
             await screenshot(browser, "phone", 390, 844, True)
+            await screenshot_light(browser)
             await screenshot(browser, "tablet", 820, 1180, True)
             await screenshot(browser, "desktop", 1440, 900, False)
         finally:

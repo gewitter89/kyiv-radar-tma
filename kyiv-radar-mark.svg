@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Київ Радар</title>
+  <desc id="desc">Геомітка з трьома радарними колами та точкою сигналу</desc>
+  <defs>
+    <linearGradient id="kr-body" x1="7" y1="7" x2="57" y2="59" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#274359"/>
+      <stop offset="1" stop-color="#17212E"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 4.5C18.4 4.5 7.5 15.4 7.5 29c0 16.8 19.9 28.8 23.4 31.1a2 2 0 0 0 2.2 0C36.6 57.8 56.5 45.8 56.5 29 56.5 15.4 45.6 4.5 32 4.5Z" fill="url(#kr-body)" stroke="#6D9AC0" stroke-width="1.8"/>
+  <circle cx="32" cy="28.3" r="17.2" fill="none" stroke="#7192B0" stroke-width="1.4" opacity=".87"/>
+  <circle cx="32" cy="28.3" r="11.7" fill="none" stroke="#85A7C4" stroke-width="1.6"/>
+  <circle cx="32" cy="28.3" r="5.5" fill="#86BFF2"/>
+  <path d="M32 28.3 43.2 17.1" stroke="#B4D6F2" stroke-width="2.1" stroke-linecap="round"/>
+  <circle cx="43.2" cy="17.1" r="3.4" fill="#E4C26B" stroke="#FFF3D1" stroke-opacity=".5" stroke-width=".7"/>
+</svg>
