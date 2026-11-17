@@ -30,13 +30,15 @@ async def test_phone_first_view_shows_photos_not_full_screen_map():
         assert await page.locator("#krRoomsTrigger").is_visible()
         assert await page.locator("#filterPower").is_hidden()
         assert await page.locator("#filterRooms3").is_hidden()
-        # Catalog may re-render while its live snapshot is being refreshed.
-        # Wait for an actual, sized image frame instead of sampling mid-repaint.
+        # Synthetic CI image URLs deliberately never fetch real photos.
+        # Demand a sized photo container with either an image or the truthful
+        # recoverable placeholder; do not depend on external photo networks.
         await page.wait_for_function("""() => {
-          const img = document.querySelector("#listViewContainer img.kr-gallery-image");
-          if (!img) return false;
-          const rect = img.getBoundingClientRect();
-          return rect.width > 100 && rect.height > 100 && getComputedStyle(img).visibility !== 'hidden';
+          const frame = document.querySelector("#listViewContainer > div[onclick] > .relative.h-48");
+          if (!frame || !frame.querySelector("img, .kr-gallery-fallback")) return false;
+          const rect = frame.getBoundingClientRect();
+          return rect.width > 100 && rect.height > 100 &&
+                 getComputedStyle(frame).display !== 'none';
         }""", timeout=10000)
         # A live refresh can replace the card nodes between two Playwright calls.
         # Wait for BOTH cards in one animation frame and sample their geometry
