@@ -58,6 +58,7 @@ def test_vps_release_preparation_backs_up_and_migrates_only_copy(privacy_test_en
 def test_release_preparation_rejects_public_backup_directory(privacy_test_env, tmp_path):
     directory = tmp_path / "public"
     directory.mkdir(mode=0o755)
+    directory.chmod(0o755)  # Do not rely on CI runner umask.
     command = [
         sys.executable, "scripts/prepare_vps_release.py",
         "--db", privacy_test_env["db_path"],
