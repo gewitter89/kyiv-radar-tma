@@ -218,3 +218,55 @@
 @media(prefers-reduced-motion:reduce) {
   .kr-gallery-nav,.kr-gallery-dot {transition:none !important;}
 }
+
+/* v1.9.1 — seamless native Telegram header continuation.
+   Native Telegram controls stay native; only their supported solid color is changed.
+   A subtle skyline and two independent curved lines live in our HTML area. */
+:root { --kr-telegram-bar:#0e2037; }
+.kr-simple header.kr-unified-header {
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  border-bottom:0 !important;
+  background:linear-gradient(180deg,#0e2037 0%,#11233b 100%) !important;
+  padding-top:11px !important;
+  padding-bottom:6px !important;
+}
+.kr-simple header.kr-unified-header::before {
+  background:
+    radial-gradient(ellipse at 88% -15%,rgba(60,133,211,.16),transparent 63%),
+    linear-gradient(90deg,rgba(12,31,56,.34),transparent 72%);
+}
+.kr-simple header.kr-unified-header > .kr-native-seam {
+  position:absolute !important;
+  z-index:3 !important;
+  pointer-events:none;
+  top:0;left:0;right:0;
+  width:100%;height:9px;
+  opacity:.93;
+}
+.kr-native-seam svg { width:100%;height:100%;display:block; }
+.kr-simple header.kr-unified-header > :not(.kr-native-seam) {
+  position:relative;
+  z-index:4;
+}
+.kr-simple #krHero {
+  background:linear-gradient(180deg,#11233b 0%,#14253d 100%) !important;
+  border-top:0 !important;
+}
+.kr-simple #krHero::before {
+  background:
+    radial-gradient(ellipse at 91% 65%,rgba(242,193,65,.10),transparent 51%),
+    linear-gradient(90deg,rgba(23,63,103,.13),transparent 85%);
+}
+.kr-simple #krHero .kr-kyiv-skyline { opacity:.52; }
+.kr-simple #krHero .kr-ukraine-curve { opacity:.83; }
+@media (max-width:699px) {
+  .kr-simple header.kr-unified-header {
+    padding:10px 11px 6px !important;
+  }
+  .kr-simple #krHero .kr-kyiv-skyline {opacity:.46;}
+}
+@media (prefers-reduced-motion:reduce) {
+  .kr-native-seam svg,.kr-ukraine-curve svg {animation:none !important;}
+}
