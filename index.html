@@ -1012,9 +1012,15 @@
                 LISTINGS = KYIV_DEALS_INIT;
             }
 
+            // A slow API must not freeze the first visit; fall back to static/offline data.
+            const controller = new AbortController();
+            const abortTimer = setTimeout(() => controller.abort(), 6000);
             // Sync with live production HTTPS API so newly approved landlord deals appear immediately
             try {
-                const res = await fetch('https://vmi3445944.contaboserver.net/api/deals?v=' + Date.now());
+                const res = await fetch(
+                    'https://vmi3445944.contaboserver.net/api/deals?v=' + Date.now(),
+                    { signal: controller.signal }
+                );
                 if (res.ok) {
                     const data = await res.json();
                     if (data && data.success && Array.isArray(data.deals) && data.deals.length > 0) {
@@ -1042,6 +1048,8 @@
                         }
                     }
                 } catch (err) {}
+            } finally {
+                clearTimeout(abortTimer);
             }
 
             // Protect the public UI even if an older production API returns
