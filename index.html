@@ -1764,6 +1764,10 @@
                         contactRequestPending = false;
                         contactRequestDealId = null;
                         updateContactRequestControls();
+                        // A previous apartment must not leave a stale spinner
+                        // on a different apartment opened during the request.
+                        if (currentModalDeal?.id !== deal.id && currentModalDeal)
+                            showContactRequestStatus('idle', '', currentModalDeal.id);
                     }
                 }
                 return;
