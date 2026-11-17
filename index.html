@@ -1041,11 +1041,20 @@
             renderAll();
         }
 
+        // Never resurrect rights-gated partner inventory through a static/offline copy.
+        // Unlicensed legacy cards remain source-labelled, NOT independently verified.
+        function staticCatalogWithoutPartners(records) {
+            if (!Array.isArray(records)) return [];
+            return records.filter(item => item && typeof item === "object" &&
+                item.partnerSourceKey == null && item.partnerExternalId == null &&
+                !String(item.source || "").toLowerCase().startsWith("partner:"));
+        }
+
         // 3. LOAD DEALS (High-speed load with live VPS API synchronization)
         async function loadDeals() {
             window.KR_CATALOG_MODE = "cached";
             if (typeof KYIV_DEALS_INIT !== 'undefined' && Array.isArray(KYIV_DEALS_INIT)) {
-                LISTINGS = KYIV_DEALS_INIT;
+                LISTINGS = staticCatalogWithoutPartners(KYIV_DEALS_INIT);
             }
 
             // A slow API must not freeze the first visit; fall back to static/offline data.
@@ -1055,7 +1064,7 @@
             try {
                 const res = await fetch(
                     'https://vmi3445944.contaboserver.net/api/deals?v=' + Date.now(),
-                    { signal: controller.signal }
+                    { signal: controller.signal, cache: 'no-store' }
                 );
                 if (res.ok) {
                     const data = await res.json();
@@ -1068,7 +1077,7 @@
                     if (resJson.ok) {
                         const dataJson = await resJson.json();
                         if (Array.isArray(dataJson) && dataJson.length > 0) {
-                            LISTINGS = dataJson;
+                            LISTINGS = staticCatalogWithoutPartners(dataJson);
                             window.KR_CATALOG_MODE = "static";
                         }
                     }
@@ -1079,7 +1088,7 @@
                     if (resJson.ok) {
                         const dataJson = await resJson.json();
                         if (Array.isArray(dataJson) && dataJson.length > 0) {
-                            LISTINGS = dataJson;
+                            LISTINGS = staticCatalogWithoutPartners(dataJson);
                             window.KR_CATALOG_MODE = "static";
                         }
                     }

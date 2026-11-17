@@ -40,14 +40,16 @@ from typing import Optional, List, Dict, Any
 import sqlite3
 import aiohttp
 from PIL import Image, ImageOps, UnidentifiedImageError
-from fastapi import FastAPI, Request, HTTPException, Depends, Header, UploadFile, File, Form
+from fastapi import FastAPI, Request, HTTPException, Depends, Header, UploadFile, File, Form, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 try:
     from .listing_trust import load_private_register, public_listing_view
+    from .partner_visibility import enforce_partner_visibility
 except ImportError:
     from listing_trust import load_private_register, public_listing_view
+    from partner_visibility import enforce_partner_visibility
 from pydantic import BaseModel, Field
 
 # Configure structured logging
@@ -83,6 +85,8 @@ _load_env_file()
 APP_ENV = os.getenv("APP_ENV", "production")
 DB_PATH = os.getenv("KYIV_RADAR_DB_PATH", "/opt/resell-radar-ukraine/data/rent_deals.db")
 DEALS_JSON_PATH = os.getenv("KYIV_RADAR_DEALS_PATH", "/opt/kyiv-radar-tma/data/deals.json")
+# Private staging source rights: never a public file or client-controlled path.
+PARTNER_RIGHTS_DB_PATH = os.getenv("KYIV_RADAR_PRIVATE_PARTNER_DB", "")
 # An operator-maintained file outside public GitHub Pages; never publish proof.
 REVIEW_REGISTER_PATH = os.getenv("KYIV_RADAR_PRIVATE_REVIEW_PATH", "")
 PRIVATE_CONTACTS_PATH = os.getenv(
@@ -489,10 +493,11 @@ def load_trusted_deals() -> List[Dict[str, Any]]:
 
 def load_effective_deals() -> List[Dict[str, Any]]:
     """Apply trusted listing moderation without changing the source catalog."""
-    return public_listing_view(
+    reviewed = public_listing_view(
         load_trusted_deals(),
         load_private_register(REVIEW_REGISTER_PATH),
     )
+    return enforce_partner_visibility(reviewed, PARTNER_RIGHTS_DB_PATH)
 
 # Helper: Look up private landlord contact from secure vault
 def get_private_contact(deal_id: int) -> Optional[dict]:
@@ -587,12 +592,14 @@ async def health():
     }
 
 @app.api_route("/api/deals", methods=["GET", "HEAD"])
-async def get_live_deals():
+async def get_live_deals(response: Response):
     """
     Live catalog endpoint.
     Serves synchronized listings from the verified catalog.
     Raw landlord phone numbers are strictly stripped for privacy protection.
     """
+    # Revocation must not be defeated by HTTP/proxy/browser response caching.
+    response.headers["Cache-Control"] = "no-store, max-age=0"
     deals = load_effective_deals()
     sanitized = []
     public_fields = frozenset(["id","title","district","address","metro","walkMin","price","realtorCommissionSaved","area","floor","totalFloors","lat","lng","generator","gpon","gas","lowFloor","pets","url","images","desc","rooms","source","status","verifiedAt","isOwnerVerified","cleanAddress","verificationStatus","statusLabel","reviewedByRadar","contactVerified","actualityConfirmed","commissionVerified","commissionNote","phoneMasked"])
