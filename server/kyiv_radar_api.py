@@ -40,7 +40,7 @@ from typing import Optional, List, Dict, Any
 import sqlite3
 import aiohttp
 from PIL import Image, ImageOps, UnidentifiedImageError
-from fastapi import FastAPI, Request, HTTPException, Depends, Header, UploadFile, File, Form
+from fastapi import FastAPI, Request, HTTPException, Depends, Header, UploadFile, File, Form, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
@@ -592,12 +592,14 @@ async def health():
     }
 
 @app.api_route("/api/deals", methods=["GET", "HEAD"])
-async def get_live_deals():
+async def get_live_deals(response: Response):
     """
     Live catalog endpoint.
     Serves synchronized listings from the verified catalog.
     Raw landlord phone numbers are strictly stripped for privacy protection.
     """
+    # Revocation must not be defeated by HTTP/proxy/browser response caching.
+    response.headers["Cache-Control"] = "no-store, max-age=0"
     deals = load_effective_deals()
     sanitized = []
     public_fields = frozenset(["id","title","district","address","metro","walkMin","price","realtorCommissionSaved","area","floor","totalFloors","lat","lng","generator","gpon","gas","lowFloor","pets","url","images","desc","rooms","source","status","verifiedAt","isOwnerVerified","cleanAddress","verificationStatus","statusLabel","reviewedByRadar","contactVerified","actualityConfirmed","commissionVerified","commissionNote","phoneMasked"])
