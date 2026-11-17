@@ -252,6 +252,37 @@
     render();
   }
 
+  function addFromCard(value) {
+    const id = String(value);
+    if (!Array.isArray(LISTINGS) || !LISTINGS.some(d => String(d.id) === id)) {
+      notice("Ця квартира недоступна для порівняння");
+      return false;
+    }
+    if (compareIds.includes(id)) {
+      open();
+      notice("Квартира вже є у порівнянні");
+      return true;
+    }
+    if (compareIds.length >= MAX_COMPARE) {
+      open();
+      notice("Можна порівнювати до 3 квартир");
+      return false;
+    }
+    const next = compareIds.concat(id);
+    if (!persist(COMPARE_KEY, next)) return false;
+    compareIds = next;
+    render();
+    notice("Квартиру додано до порівняння (" + compareIds.length + "/3)");
+    if (compareIds.length > 1) open();
+    return true;
+  }
+
+  window.KyivRadarSmart = {
+    open,
+    addFromCard,
+    compareCount: () => compareIds.length,
+  };
+
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
 })();
