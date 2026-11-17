@@ -78,7 +78,7 @@ async def test_comparison_does_not_claim_unverified_features_or_expose_contacts(
         }""")
         await page.locator("#smartRadarOpen").click()
         await page.locator("#smartRadarCompareSelect").select_option("1")
-        await page.get_by_role("button", name="Додати").click()
+        await page.get_by_role("button", name="Додати", exact=True).click()
         content = await page.inner_text("#smartRadarComparison")
         assert "Генератор: не вказано" in content
         assert "GPON: не вказано" in content

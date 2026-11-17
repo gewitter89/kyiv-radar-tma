@@ -9,7 +9,8 @@
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="color-scheme" content="dark">
-    <title>Київ Радар</title>
+    <title>Київ Радар — оренда з урахуванням автономності</title>
+    <link rel="stylesheet" href="./experience.css?v=1.7.0">
     <meta name="description" content="Київ Радар — мапа та каталог оренди квартир у Києві. Пошук за районом, бюджетом і заявленими можливостями автономності. Джерела та рівень перевірки вказані в оголошеннях.">
     <!-- Open Graph / Telegram Card -->
     <meta property="og:title" content="Київ Радар 🇺🇦 — Каталог та мапа оренди квартир у Києві">
@@ -544,7 +545,7 @@
                                 <span id="modalRealtorSavings">Комісія уточнюється</span>
                             </div>
                         </div>
-                        <span class="text-[11px] leading-snug text-right text-[#b2b7c3] max-w-[120px]">Контакт надійде у ваш Telegram після запиту</span>
+                        <span class="text-[11px] leading-snug text-right text-[#b2b7c3] max-w-[120px]">Якщо контакт доступний, надішлемо його в Telegram</span>
                     </div>
                 </div>
 
@@ -668,7 +669,7 @@
                 <!-- Row 4: Newest -->
                 <button onclick="applySort('newest')" id="sortOpt-newest" class="w-full px-4 py-3 flex items-center justify-between text-left transition-colors active:bg-white/10 hover:bg-white/[0.04]">
                     <div>
-                        <div class="text-[14px] text-white font-medium leading-snug">Найновіші оголошення</div>
+                        <div class="text-[14px] text-white font-medium leading-snug">Порядок у каталозі оголошення</div>
                         <div class="text-[11px] text-slate-400 leading-tight">Оголошення від власників та з відкритих джерел</div>
                     </div>
                     <div id="check-newest" class="text-[#0a84ff] shrink-0 pl-2 hidden">
@@ -833,7 +834,14 @@
         let currentActiveId = null;
         let currentModalDeal = null;
         let currentModalPhotoIdx = 0;
-        let FAVORITES = new Set(JSON.parse(localStorage.getItem('kr_favs') || '[]'));
+        let FAVORITES = new Set((() => {
+            try {
+                const saved = JSON.parse(localStorage.getItem('kr_favs') || '[]');
+                return Array.isArray(saved) ? saved : [];
+            } catch (error) {
+                return []; // Private mode or damaged saved data must not blank the app.
+            }
+        })());
 
         // Toast Helper
         function showToast(text) {
@@ -1006,17 +1014,25 @@
 
         // 3. LOAD DEALS (High-speed load with live VPS API synchronization)
         async function loadDeals() {
+            window.KR_CATALOG_MODE = "cached";
             if (typeof KYIV_DEALS_INIT !== 'undefined' && Array.isArray(KYIV_DEALS_INIT)) {
                 LISTINGS = KYIV_DEALS_INIT;
             }
 
+            // A slow API must not freeze the first visit; fall back to static/offline data.
+            const controller = new AbortController();
+            const abortTimer = setTimeout(() => controller.abort(), 6000);
             // Sync with live production HTTPS API so newly approved landlord deals appear immediately
             try {
-                const res = await fetch('https://vmi3445944.contaboserver.net/api/deals?v=' + Date.now());
+                const res = await fetch(
+                    'https://vmi3445944.contaboserver.net/api/deals?v=' + Date.now(),
+                    { signal: controller.signal }
+                );
                 if (res.ok) {
                     const data = await res.json();
                     if (data && data.success && Array.isArray(data.deals) && data.deals.length > 0) {
                         LISTINGS = data.deals;
+                        window.KR_CATALOG_MODE = "live";
                     }
                 } else {
                     const resJson = await fetch('data/deals.json?v=' + Date.now());
@@ -1024,6 +1040,7 @@
                         const dataJson = await resJson.json();
                         if (Array.isArray(dataJson) && dataJson.length > 0) {
                             LISTINGS = dataJson;
+                            window.KR_CATALOG_MODE = "static";
                         }
                     }
                 }
@@ -1034,9 +1051,12 @@
                         const dataJson = await resJson.json();
                         if (Array.isArray(dataJson) && dataJson.length > 0) {
                             LISTINGS = dataJson;
+                            window.KR_CATALOG_MODE = "static";
                         }
                     }
                 } catch (err) {}
+            } finally {
+                clearTimeout(abortTimer);
             }
 
             // Protect the public UI even if an older production API returns
@@ -1050,13 +1070,15 @@
                 return cleanDesc === item.desc ? item : { ...item, desc: cleanDesc };
             });
 
+            // Flag uncertain imported metadata; do not substitute guessed values.
+            if (typeof window.krQualityCatalog === "function") LISTINGS = window.krQualityCatalog(LISTINGS);
             document.getElementById('filterAll').innerText = `Всі (${LISTINGS.length})`;
             document.getElementById('activeListingsCount').innerText = `Оголошення: ${LISTINGS.length}`;
             renderAll();
         }
 
         // 4. FILTERING & MULTI-CRITERIA SORTING
-        let currentSort = 'distance'; // 'distance' | 'price_asc' | 'price_desc' | 'newest' | 'area_desc'
+        let currentSort = 'price_asc'; // safe price-first default; no false geo or publication-date claims
         let ACTIVE_FILTERS = {
             rooms: null,       // 1, 2, 3
             maxPrice: null,    // 15000, 20000
@@ -1162,7 +1184,14 @@
                 window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
             }
 
-            // If distance sort chosen without userCoords, trigger locate or center
+            // Do not sort by unverifiable imported pin positions.
+            if (sortKey === 'distance' && !LISTINGS.some(d => d.locationVerified === true)) {
+                currentSort = 'price_asc';
+                updateSortLabels();
+                renderAll();
+                showToast("Точну відстань не обчислюємо: адреси квартир ще не перевірені");
+                return;
+            }
             if (sortKey === 'distance' && !userCoords) {
                 handleLocateClick();
                 return;
@@ -1178,7 +1207,7 @@
                 distance: "✓ Відсортовано: За відстанню від вас",
                 price_asc: "✓ Відсортовано: Спочатку дешевші",
                 price_desc: "✓ Відсортовано: Спочатку дорожчі",
-                newest: "✓ Відсортовано: Найновіші лоти",
+                newest: "✓ Відсортовано: За порядком у каталозі",
                 area_desc: "✓ Відсортовано: За площею (м²)"
             };
             showToast(labels[sortKey] || "✓ Сортування оновлено");
@@ -1212,7 +1241,7 @@
                 distance: "За відстанню ⌄",
                 price_asc: "Дешевші ⌄",
                 price_desc: "Дорожчі ⌄",
-                newest: "Нові лоти ⌄",
+                newest: "За каталогом ⌄",
                 area_desc: "За площею ⌄",
                 default: "Сортування ⌄"
             };
@@ -1222,10 +1251,10 @@
             }
 
             if (radarLocationText) {
-                if (currentSort === 'price_asc') radarLocationText.innerText = "Поруч із вами · Спочатку дешевші";
-                else if (currentSort === 'price_desc') radarLocationText.innerText = "Поруч із вами · Спочатку дорожчі";
-                else if (currentSort === 'area_desc') radarLocationText.innerText = "Поруч із вами · За площею";
-                else if (currentSort === 'newest') radarLocationText.innerText = "Поруч із вами · Найновіші";
+                if (currentSort === 'price_asc') radarLocationText.innerText = "Спочатку дешевші";
+                else if (currentSort === 'price_desc') radarLocationText.innerText = "Спочатку дорожчі";
+                else if (currentSort === 'area_desc') radarLocationText.innerText = "За площею";
+                else if (currentSort === 'newest') radarLocationText.innerText = "Порядок у каталозі";
                 else radarLocationText.innerText = "Поруч із вами · За відстанню";
             }
         }
@@ -1233,10 +1262,18 @@
         function getFilteredListings() {
             let items = LISTINGS.filter(item => {
                 if (searchQuery) {
-                    const q = searchQuery.toLowerCase();
-                    const text = `${escapeHtml(item.title)} ${escapeHtml(item.district)} ${item.address} ${escapeHtml(item.metro)}`.toLowerCase();
-                    if (!text.includes(q)) return false;
+                    const q = searchQuery.toLowerCase().trim();
+                    // A person returning from the Telegram bot can find #123 directly.
+                    const idQuery = q.replace(/^#/, "");
+                    if (/^\d{1,10}$/.test(idQuery)) {
+                        if (String(item.id) !== idQuery) return false;
+                    } else {
+                        const text = `${escapeHtml(item.title)} ${escapeHtml(item.district)} ${item.address} ${escapeHtml(item.metro)}`.toLowerCase();
+                        if (!text.includes(q)) return false;
+                    }
                 }
+                // Never match a room-specific filter to disputed imported metadata.
+                if (ACTIVE_FILTERS.rooms !== null && item.roomConflict === true) return false;
                 // Multi-criteria filters
                 if (ACTIVE_FILTERS.rooms !== null && (item.rooms || getDealRooms(item)) !== ACTIVE_FILTERS.rooms) {
                     if (ACTIVE_FILTERS.rooms === 3 && (item.rooms || getDealRooms(item)) >= 3) {
@@ -1415,8 +1452,8 @@
                             
                             <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5 z-10">
                                 ${renderStatusPill(item)}
-                                ${item.generator ? '<span class="px-2 py-0.5 rounded-full bg-[#ff9f0a]/90 text-black text-[10px] font-bold">⚡ Генератор</span>' : ''}
-                                ${item.gpon ? '<span class="px-2 py-0.5 rounded-full bg-[#30d158]/90 text-black text-[10px] font-bold">🌐 GPON</span>' : ''}
+                                ${item.generator ? '<span class="px-2 py-0.5 rounded-full bg-[#ff9f0a]/90 text-black text-[10px] font-bold">⚡ Генератор · заявлено</span>' : ''}
+                                ${item.gpon ? '<span class="px-2 py-0.5 rounded-full bg-[#30d158]/90 text-black text-[10px] font-bold">🌐 GPON · заявлено</span>' : ''}
                             </div>
 
                             <button onclick="toggleFavorite(event, ${item.id})" class="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center transition-all active:scale-90 z-10">
@@ -1426,7 +1463,7 @@
                             <div class="absolute bottom-2.5 left-3 right-3 flex items-end justify-between z-10">
                                 <div>
                                     <div class="text-lg font-bold text-white leading-tight">${item.price ? item.price.toLocaleString('uk-UA') + ' ₴' : 'Ціна уточнюється'}<span class="text-xs font-normal text-white/70">/міс</span></div>
-                                    <div class="text-[11px] text-[#30d158] font-medium">${savingsStr}</div>
+                                    <div class="text-[11px] text-[#b9c8df] font-medium">${savingsStr}</div>
                                 </div>
                             </div>
                         </div>
@@ -1551,7 +1588,7 @@
                 const specLine = [roomStr, areaStr].filter(Boolean).join(' · ');
 
                 let distancePill = '';
-                if (item._dist !== undefined) {
+                if (item.locationVerified === true && item._dist !== undefined) {
                     const distLabel = item._dist < 1 ? `${Math.round(item._dist * 1000)} м` : `${item._dist.toFixed(1)} км`;
                     distancePill = `<span class="px-2 py-0.5 rounded-full bg-[#0a84ff]/15 text-[#0a84ff] font-medium text-[10px] shrink-0 whitespace-nowrap">📍 ${distLabel}</span>`;
                 }
@@ -1582,7 +1619,7 @@
                             </div>
 
                             <!-- Row 3: Savings -->
-                            <div class="text-[11px] text-[#30d158] font-medium leading-none">
+                            <div class="text-[11px] text-[#b9c8df] font-medium leading-none">
                                 ${savedAmount}
                             </div>
 
@@ -1618,7 +1655,7 @@
 
             if (shouldPanMap && map) {
                 const deal = LISTINGS.find(x => x.id === dealId);
-                if (deal && typeof deal.lat === 'number' && typeof deal.lng === 'number' && !isNaN(deal.lat) && !isNaN(deal.lng) && deal.lat !== 0 && deal.lng !== 0) {
+                if (deal && deal.locationVerified === true && typeof deal.lat === 'number' && typeof deal.lng === 'number' && !isNaN(deal.lat) && !isNaN(deal.lng) && deal.lat !== 0 && deal.lng !== 0) {
                     map.panTo([deal.lat, deal.lng], { animate: true, duration: 0.6 });
                 }
             }
@@ -1688,7 +1725,8 @@
                             window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
                         }
                         const errReason = data.detail || (res.status === 502 ? "Запустіть бота @prostov_shrink_bot (/start)" : "Помилка сервера");
-                        showToast(`⚠️ Не вдалося надіслати контакт: ${errReason}`);
+                        if (typeof window.krContactError === "function") window.krContactError(errReason);
+                        else showToast(`⚠️ Не вдалося надіслати контакт: ${errReason}`);
                         return;
                     }
                 } catch (e) {
@@ -1696,14 +1734,20 @@
                     if (window.Telegram?.WebApp?.HapticFeedback) {
                         window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
                     }
-                    showToast("⚠️ Помилка з'єднання з сервером. Спробуйте пізніше.");
+                    if (typeof window.krContactError === "function")
+                        window.krContactError("Помилка з'єднання з сервером. Спробуйте пізніше.");
+                    else showToast("⚠️ Помилка з'єднання з сервером. Спробуйте пізніше.");
                     return;
                 }
             }
 
             // 2. Regular Web Browser (outside Telegram WebApp)
             if (!realPhone) {
-                showToast("🔒 Контакт захищено. Відкрийте бота в Telegram (@prostov_shrink_bot)");
+                if (typeof window.krContactHandoff === "function") {
+                    window.krContactHandoff(deal.id, deal.title);
+                } else {
+                    showToast("Відкрийте @prostov_shrink_bot у Telegram та знайдіть це оголошення");
+                }
                 return;
             }
 
@@ -2157,7 +2201,8 @@
             } else {
                 FAVORITES.add(id);
             }
-            localStorage.setItem('kr_favs', JSON.stringify([...FAVORITES]));
+            try { localStorage.setItem('kr_favs', JSON.stringify([...FAVORITES])); }
+            catch (error) { showToast('Обране працює тимчасово; зберігання на пристрої недоступне'); }
             updateFavCount();
             renderCarousel(getFilteredListings());
         }
@@ -2230,10 +2275,12 @@
         let photoUploadGeneration = 0;
 
         function openLandlordModal() {
-            document.getElementById('landlordModal').classList.remove('hidden');
             if (!window.Telegram?.WebApp?.initData) {
-                showToast('Для подання заявки відкрийте Київ Радар через @prostov_shrink_bot');
+                if (typeof window.krLandlordHandoff === "function") window.krLandlordHandoff();
+                else showToast('Для подання заявки відкрийте Київ Радар через @prostov_shrink_bot');
+                return;
             }
+            document.getElementById('landlordModal').classList.remove('hidden');
         }
 
         function closeLandlordModal() {
@@ -2252,7 +2299,7 @@
         async function handleLandlordPhotosSelected(input) {
             const generation = ++photoUploadGeneration;
             landlordUploadedPhotoIds = [];
-            const files = Array.from(input.files || []);
+            let files = Array.from(input.files || []);
             const label = document.getElementById('llPhotoCountLabel');
             const previews = document.getElementById('llPhotoPreviews');
             if (files.length === 0) return;
@@ -2260,6 +2307,18 @@
                 showToast('Максимум 10 фотографій за один раз');
                 input.value = '';
                 return;
+            }
+            // A WebView that can decode HEIC converts it to safe JPEG first.
+            if (typeof window.krPrepareUploadPhotos === 'function') {
+                try {
+                    files = await window.krPrepareUploadPhotos(files, text => {
+                        if (label) label.textContent = text;
+                    });
+                } catch (error) {
+                    showToast(error.message || 'Не вдалося підготувати HEIC. Використайте JPG.');
+                    input.value = '';
+                    return;
+                }
             }
             const supported = new Set(['image/jpeg','image/png','image/webp']);
             if (files.some(file => !supported.has(file.type))) {
@@ -2430,14 +2489,24 @@
                 }
             }
 
-            initMap();
-            setupFilterBarInteractions();
-            setupCarouselInteractions();
+            window.KR_MAP_AVAILABLE = true;
+            try {
+                initMap();
+            } catch (error) {
+                window.KR_MAP_AVAILABLE = false;
+                console.warn("Map library unavailable; list view remains accessible");
+            }
+            try { setupFilterBarInteractions(); } catch (error) { console.warn("Filter enhancements unavailable"); }
+            try { setupCarouselInteractions(); } catch (error) { console.warn("Carousel enhancements unavailable"); }
+            if (window.KR_MAP_AVAILABLE === false) setViewMode('list');
             loadDeals();
         });
     </script>
     <!-- v1.6: optional local-first saved searches and apartment comparison -->
     <script src="./smart-radar.js?v=1.6.0"></script>
+    <script src="./catalog-quality.js?v=1.7.0"></script>
+    <script src="./experience.js?v=1.7.0"></script>
+    <script src="./mobile-media.js?v=1.7.0"></script>
 
     <!-- ==========================================
          REPORT PROBLEM MODAL (Apple Action Sheet)

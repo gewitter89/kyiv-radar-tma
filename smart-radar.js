@@ -44,6 +44,8 @@
     const haystack = [deal.title, deal.district, deal.address, deal.metro]
       .map(v => String(v || "")).join(" ").toLocaleLowerCase("uk-UA");
     if (query && !haystack.includes(query)) return false;
+    // Imported room-count conflicts are unknown, not safe filter matches.
+    if (f.rooms != null && deal.roomConflict === true) return false;
     const rooms = Number(deal.rooms || (typeof getDealRooms === "function" ? getDealRooms(deal) : 0));
     if (f.rooms != null && !(f.rooms === 3 ? rooms >= 3 : rooms === f.rooms)) return false;
     if (f.maxPrice != null && !(Number(deal.price) <= f.maxPrice)) return false;
@@ -251,6 +253,37 @@
     });
     render();
   }
+
+  function addFromCard(value) {
+    const id = String(value);
+    if (!Array.isArray(LISTINGS) || !LISTINGS.some(d => String(d.id) === id)) {
+      notice("Ця квартира недоступна для порівняння");
+      return false;
+    }
+    if (compareIds.includes(id)) {
+      open();
+      notice("Квартира вже є у порівнянні");
+      return true;
+    }
+    if (compareIds.length >= MAX_COMPARE) {
+      open();
+      notice("Можна порівнювати до 3 квартир");
+      return false;
+    }
+    const next = compareIds.concat(id);
+    if (!persist(COMPARE_KEY, next)) return false;
+    compareIds = next;
+    render();
+    notice("Квартиру додано до порівняння (" + compareIds.length + "/3)");
+    if (compareIds.length > 1) open();
+    return true;
+  }
+
+  window.KyivRadarSmart = {
+    open,
+    addFromCard,
+    compareCount: () => compareIds.length,
+  };
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
