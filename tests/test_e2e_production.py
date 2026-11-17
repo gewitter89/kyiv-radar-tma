@@ -81,7 +81,7 @@ def test_api_health():
     status, health, headers = http_get("/api/health")
     assert status == 200, f"Expected 200, got {status}: {health}"
     assert health.get("status") == "healthy"
-    assert health.get("version") in ["1.3.0", "1.3.1", "1.4.0", "1.5.0", "1.5.1"], f"Expected version >= 1.3.0, got {health.get('version')}"
+    assert health.get("version") in ["1.3.0", "1.3.1", "1.4.0", "1.5.0", "1.5.1", "1.6.0"], f"Expected version >= 1.3.0, got {health.get('version')}"
     print(f"✓ PASS: Production API is active (v{health.get('version')}, {health.get('deals_count')} deals)")
 
 def test_cors_security():
