@@ -106,6 +106,7 @@ def public_listing_view(
             checked = _valid_evidence(availability, now)
             if checked and isinstance(availability, dict) and availability.get("available") is True:
                 deal["actualityConfirmed"] = True
+                deal["reviewedByRadar"] = True
                 deal["verifiedAt"] = checked.isoformat(timespec="seconds")
                 deal["verificationStatus"] = "availability_verified"
                 deal["statusLabel"] = "Наявність перевірено"
