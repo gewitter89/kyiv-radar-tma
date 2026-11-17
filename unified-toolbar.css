@@ -1187,3 +1187,67 @@ html.kr-unified-111.kr-simple[data-kr-theme="light"] #dealModal #krDealScroll #m
 html.kr-unified-111.kr-simple[data-kr-theme="light"] #dealModal #krDealScroll #modalEquipment > div small {
   color:#526579 !important;
 }
+
+
+/* v1.29 — always-visible favorites destination next to the main filters.
+   Compact 44px touch control on phones; no floating overlay on listing photos. */
+html.kr-focused-filter-ui.kr-simple[data-kr-theme] #krFilterToolbar #krFavoritesShortcut {
+  flex:0 0 auto;
+  min-width:48px;
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  padding:0 10px;
+  border:1px solid var(--kr-border);
+  border-radius:12px;
+  color:var(--kr-ink);
+  background:var(--kr-panel);
+  box-shadow:none;
+  font-weight:650;
+  font-size:12px;
+  white-space:nowrap;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+html.kr-focused-filter-ui.kr-simple[data-kr-theme] #krFilterToolbar #krFavoritesShortcut .kr-favorites-heart {
+  color:#f15d6f;
+  font-size:21px;
+  line-height:1;
+}
+html.kr-focused-filter-ui.kr-simple[data-kr-theme] #krFilterToolbar #krFavoritesShortcut .kr-favorites-count {
+  min-width:16px;
+  text-align:center;
+  font-size:11px;
+  font-variant-numeric:tabular-nums;
+}
+html.kr-focused-filter-ui.kr-simple[data-kr-theme] #krFilterToolbar #krFavoritesShortcut.kr-chip-on {
+  border-color:#d56777;
+  background:var(--kr-raised);
+  color:var(--kr-ink);
+}
+html.kr-focused-filter-ui.kr-simple[data-kr-theme] #krFilterToolbar #krFavoritesShortcut:focus-visible {
+  outline:2px solid var(--kr-blue);
+  outline-offset:2px;
+}
+@media(max-width:699px){
+  html.kr-focused-filter-ui.kr-simple[data-kr-theme] #krFilterToolbar #krFavoritesShortcut {
+    min-width:48px;
+    padding:0 6px;
+    gap:2px;
+  }
+  html.kr-focused-filter-ui.kr-simple[data-kr-theme] #krFilterToolbar #krFavoritesShortcut .kr-favorites-label{
+    position:absolute;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+    clip-path:inset(50%);
+    white-space:nowrap;
+  }
+}
+@media(max-width:360px){
+  html.kr-focused-filter-ui.kr-simple[data-kr-theme] #krFilterToolbar .kr-filter-trigger {
+    padding-inline:6px;
+  }
+}
