@@ -23,6 +23,7 @@ async def test_phone_first_view_shows_photos_not_full_screen_map():
                                       is_mobile=True, has_touch=True)
         await ready(page)
         assert await page.get_by_role("heading", name="Знайти квартиру").is_visible()
+        assert await page.locator(".kr-hero-eyebrow").inner_text() == "Житло по суті"
         assert await page.locator("#map").is_hidden()
         assert await page.locator("#listViewContainer").is_visible()
         assert await page.locator("#smartRadarOpen").is_visible()
