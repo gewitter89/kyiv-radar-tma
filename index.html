@@ -11,6 +11,7 @@
     <meta name="color-scheme" content="dark">
     <title>Київ Радар — оренда з урахуванням автономності</title>
     <link rel="stylesheet" href="./experience.css?v=1.7.0">
+    <link rel="stylesheet" href="./simple-view.css?v=1.7.2">
     <meta name="description" content="Київ Радар — мапа та каталог оренди квартир у Києві. Пошук за районом, бюджетом і заявленими можливостями автономності. Джерела та рівень перевірки вказані в оголошеннях.">
     <!-- Open Graph / Telegram Card -->
     <meta property="og:title" content="Київ Радар 🇺🇦 — Каталог та мапа оренди квартир у Києві">
@@ -1160,8 +1161,8 @@
             toggleBtn('filterRooms1', ACTIVE_FILTERS.rooms === 1);
             toggleBtn('filterRooms2', ACTIVE_FILTERS.rooms === 2);
             toggleBtn('filterRooms3', ACTIVE_FILTERS.rooms === 3);
-            toggleBtn('filterUnder15k', ACTIVE_FILTERS.maxPrice === 15000);
-            toggleBtn('filterUnder20k', ACTIVE_FILTERS.maxPrice === 20000);
+            toggleBtn('filter15k', ACTIVE_FILTERS.maxPrice === 15000);
+            toggleBtn('filter20k', ACTIVE_FILTERS.maxPrice === 20000);
             toggleBtn('filterPower', ACTIVE_FILTERS.generator || ACTIVE_FILTERS.gpon);
             toggleBtn('filterPets', ACTIVE_FILTERS.pets);
             toggleBtn('filterFavs', ACTIVE_FILTERS.favs);
@@ -1385,8 +1386,9 @@
             if (item.actualityConfirmed) {
                 return '<span class="px-2 py-0.5 rounded-full bg-[#0a84ff]/20 text-[#0a84ff] border border-[#0a84ff]/40 text-[10px] font-semibold">✅ Актуально</span>';
             }
-            const src = escapeHtml(item.source || 'Імпортовано');
-            return `<span class="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] text-white/80 font-mono">📋 ${src}</span>`;
+            // Imported, unverified results get one general transparency notice,
+            // not a repeated source label over every photo.
+            return '';
         }
 
         function getCommissionSubtitle(item) {
@@ -1404,7 +1406,7 @@
             if (item.actualityConfirmed) {
                 return `Актуальність підтверджено`;
             }
-            return `Комісія уточнюється (${escapeHtml(item.source || 'відкриті джерела')})`;
+            return `Комісія уточнюється`;
         }
 
         function renderListView(items) {
@@ -1452,8 +1454,8 @@
                             
                             <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5 z-10">
                                 ${renderStatusPill(item)}
-                                ${item.generator ? '<span class="px-2 py-0.5 rounded-full bg-[#ff9f0a]/90 text-black text-[10px] font-bold">⚡ Генератор · заявлено</span>' : ''}
-                                ${item.gpon ? '<span class="px-2 py-0.5 rounded-full bg-[#30d158]/90 text-black text-[10px] font-bold">🌐 GPON · заявлено</span>' : ''}
+                                ${item.generator ? '<span class="px-2 py-0.5 rounded-full bg-[#ff9f0a]/90 text-black text-[10px] font-bold">⚡ Генератор</span>' : ''}
+                                ${item.gpon ? '<span class="px-2 py-0.5 rounded-full bg-[#30d158]/90 text-black text-[10px] font-bold">🌐 Інтернет · заявлено</span>' : ''}
                             </div>
 
                             <button onclick="toggleFavorite(event, ${item.id})" class="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center transition-all active:scale-90 z-10">
@@ -1463,7 +1465,7 @@
                             <div class="absolute bottom-2.5 left-3 right-3 flex items-end justify-between z-10">
                                 <div>
                                     <div class="text-lg font-bold text-white leading-tight">${item.price ? item.price.toLocaleString('uk-UA') + ' ₴' : 'Ціна уточнюється'}<span class="text-xs font-normal text-white/70">/міс</span></div>
-                                    <div class="text-[11px] text-[#b9c8df] font-medium">${savingsStr}</div>
+                                    ${item.commissionVerified ? `<div class="text-[11px] text-white/90 font-medium">${savingsStr}</div>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -1476,7 +1478,7 @@
                                 <span>${specLine}</span>
                             </p>
                             <div class="flex items-center justify-between text-[11px] text-[#8e8e93] pt-2 border-t border-white/[0.06]">
-                                <span>${item.isOwnerVerified && item.commissionVerified ? '0% комісії (перевірено)' : (item.contactVerified ? 'Контакт перевірено' : `Джерело: ${escapeHtml(item.source || 'Відкриті джерела')}`)}</span>
+                                <span>${item.isOwnerVerified && item.commissionVerified ? '0% комісії (перевірено)' : ''}</span>
                                 <span class="text-[#0a84ff] font-medium flex items-center gap-1">Детальніше →</span>
                             </div>
                         </div>
@@ -1626,7 +1628,7 @@
                             <!-- Row 4: Rooms, Area & Power Badge (Single clean line) -->
                             <div class="flex items-center gap-2 text-[11px] text-[#8e8e93] whitespace-nowrap">
                                 <span class="font-medium text-white/90">${specLine}</span>
-                                ${hasPower ? '<span class="px-1.5 py-0.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-[9px] font-semibold flex items-center gap-0.5 shrink-0">⚡ Заявлено</span>' : ''}
+                                ${hasPower ? '<span class="px-1.5 py-0.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-[9px] font-semibold flex items-center gap-0.5 shrink-0">⚡ Генератор</span>' : ''}
                             </div>
                         </div>
                     </div>
@@ -1917,7 +1919,7 @@
                     savingsEl.innerText = `Прямий контакт з орендодавцем (комісія уточнюється)`;
                 } else {
                     savingsEl.className = "text-[#8e8e93] font-medium text-[12px]";
-                    savingsEl.innerText = `Комісія уточнюється (${escapeHtml(deal.source || 'відкриті джерела')})`;
+                    savingsEl.innerText = `Комісія уточнюється`;
                 }
             }
 
@@ -2507,6 +2509,7 @@
     <script src="./catalog-quality.js?v=1.7.0"></script>
     <script src="./experience.js?v=1.7.0"></script>
     <script src="./mobile-media.js?v=1.7.0"></script>
+    <script src="./simple-view.js?v=1.7.2"></script>
 
     <!-- ==========================================
          REPORT PROBLEM MODAL (Apple Action Sheet)
