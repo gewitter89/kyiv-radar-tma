@@ -156,3 +156,19 @@ html.kr-simple, .kr-simple body { background:var(--kr-base) !important; }
 @media (prefers-reduced-motion: reduce) {
   .kr-simple #listViewContainer > div[onclick] { transition:none; }
 }
+
+
+/* Only selected core filters remain visible on narrow screens. */
+.kr-simple #listViewContainer .kr-card-tools .kr-trust-note { display:none; }
+.kr-simple #listViewContainer .kr-card-tools .kr-compare-button { margin-left:auto; }
+.kr-simple #krSimpleInfo { font-size:11px; white-space:nowrap; }
+#krSimpleHelp::backdrop { background:rgba(0,5,12,.78); backdrop-filter:blur(6px); }
+#krSimpleHelp:focus-visible { outline:3px solid #8bb8ff; }
+@media (max-width:699px) {
+  .kr-simple #filterContainer[data-more="false"] > #filterRooms3,
+  .kr-simple #filterContainer[data-more="false"] > #filter15k { display:none !important; }
+  .kr-simple #filterContainer > #krMoreFilters { order:1; }
+  .kr-simple #krSimpleInfo { min-width:32px; padding:5px 8px; font-size:0; }
+  .kr-simple #krSimpleInfo::before { content:"ⓘ"; font-size:16px; }
+  .kr-simple #krReset { font-size:11px; }
+}
