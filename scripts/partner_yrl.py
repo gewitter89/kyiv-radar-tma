@@ -90,7 +90,7 @@ def _canonical_row(data: dict) -> dict:
         raise InvalidYRL("Only explicitly Ukrainian partner data supported")
     if data.get("_currency", "").casefold().strip() not in UAH:
         raise InvalidYRL("Currency is not UAH")
-    if data.get("_price_unit"):
+    if "_price_unit" in data:
         raise InvalidYRL("Price per area is not a whole-property price")
     period = data.get("_period", "").casefold().strip()
     if operation == "rent" and period not in MONTH:
