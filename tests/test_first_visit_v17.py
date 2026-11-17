@@ -55,7 +55,7 @@ async def test_filter_count_reset_and_source_uncertainty():
         await page.locator("#krReset").click()
         assert await page.evaluate("ACTIVE_FILTERS.rooms") is None
         assert await page.locator("#krReset").is_hidden()
-        assert "не перевірена" in (await page.inner_text("#krDataStatus"))
+        assert "не перевірено" in (await page.inner_text("#krDataStatus"))
         await browser.close()
 
 
