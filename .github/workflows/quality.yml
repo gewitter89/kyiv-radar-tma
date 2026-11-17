@@ -36,6 +36,7 @@ jobs:
             tests/test_user_journeys_isolated.py \
             tests/test_privacy_and_media.py \
             tests/test_vps_release_snapshot.py \
+            tests/test_public_catalog_privacy.py \
             tests/test_photo_swipe.py \
             tests/test_send_contact_ui.py
       - name: Capture phone, tablet and desktop preview
