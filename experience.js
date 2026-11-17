@@ -112,16 +112,31 @@
       ]
     });
   }
-  function contactError(detail) {
+  function contactError(detail, statusCode) {
+    const missing = statusCode === 404;
+    const limited = statusCode === 429;
+    const unauthorized = statusCode === 401;
+    const delivery = statusCode === 502;
+    const title = missing ? "Контакт поки недоступний"
+      : limited ? "Ліміт запитів вичерпано"
+      : unauthorized ? "Відкрийте застосунок у Telegram"
+      : delivery ? "Спробуйте ще раз через Telegram"
+      : "Сервіс тимчасово недоступний";
+    const guidance = missing
+      ? "Для цієї квартири немає доступного контакту. Перевірте оригінальне оголошення за посиланням у картці, якщо воно є."
+      : limited ? "Не повторюйте запити поспіль. Поверніться після поновлення ліміту."
+      : unauthorized ? "Відкрийте бота та застосунок заново, щоб оновити авторизацію."
+      : delivery ? "Відкрийте чат із ботом і натисніть /start, потім повторіть запит."
+      : "Перевірте з’єднання та спробуйте пізніше. Результат попереднього запиту не підтверджений.";
     showDialog({
-      kicker: "Не вдалося отримати контакт",
-      title: "Спробуйте ще раз через Telegram",
+      kicker: "Контакт не надіслано",
+      title,
       paragraphs: [
-        detail || "Сервер не зміг надіслати повідомлення.",
-        "Переконайтеся, що відкрили чат із ботом і натиснули /start. Поверніться в застосунок та повторіть запит.",
-        "Ми не показуємо вигадані номери і не вважаємо контакт надісланим, доки сервер цього не підтвердить."
+        detail || "Сервер не підтвердив надсилання контакту.",
+        guidance,
+        "Номер не вигадуємо, а відсутність контакту не вважаємо успішною доставкою."
       ],
-      actions: [{label: "Відкрити бота", url: BOT_URL, primary: true}]
+      actions: unauthorized || delivery ? [{label: "Відкрити бота", url: BOT_URL, primary: true}] : []
     });
   }
   window.krContactHandoff = contactHandoff;
@@ -234,8 +249,13 @@
         }
       });
       const tools = el("div", "kr-card-tools");
-      tools.append(el("span", "kr-trust-note",
-        deal.isOwnerVerified ? "Власника перевірено" : "Власника та актуальність не перевірено"));
+      const ownership = deal.isOwnerVerified === true;
+      const availability = deal.actualityConfirmed === true;
+      const trustMessage = ownership && availability ? "Власника та наявність підтверджено"
+        : ownership ? "Власника підтверджено · наявність не перевірено"
+        : availability ? "Наявність підтверджено · власника не перевірено"
+        : "Власника та наявність не перевірено";
+      tools.append(el("span", "kr-trust-note", trustMessage));
       const compare = el("button", "kr-compare-button", "Порівняти +");
       compare.type = "button";
       compare.setAttribute("aria-label", "Додати квартиру до порівняння");
