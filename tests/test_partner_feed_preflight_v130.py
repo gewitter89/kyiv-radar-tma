@@ -120,3 +120,20 @@ def test_unsupported_format_rejected(tmp_path):
     feed = write_jsonl(tmp_path, [listing(1)])
     with pytest.raises(ValueError):
         preflight(feed, grant(tmp_path), now=NOW, feed_format="other")
+
+
+def test_cli_redacts_unexpected_parser_error(tmp_path, capsys, monkeypatch):
+    from scripts import partner_feed_preflight as module
+
+    def broken_parser(*args, **kwargs):
+        raise RuntimeError("PRIVATE_OWNER: +380501112233 /secure/contract.json")
+
+    monkeypatch.setattr(module, "preflight", broken_parser)
+    rc = module.main(["--feed", str(tmp_path / "unreadable.csv"),
+                      "--agreement", str(tmp_path / "grant.json")])
+    output = capsys.readouterr().out
+    assert rc == 2
+    assert "PRIVATE_OWNER" not in output
+    assert "+380501112233" not in output
+    assert "/secure/contract.json" not in output
+    assert json.loads(output)["error_type"] == "RuntimeError"
