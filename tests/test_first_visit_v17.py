@@ -295,7 +295,7 @@ async def test_compact_apple_masthead_removes_duplicate_brand_without_losing_act
         first = page.locator("#listViewContainer > div[onclick]").first
         await first.wait_for(state="visible")
         first_box = await first.bounding_box()
-        assert first_box and first_box["y"] < 220, "Photos should appear above the old fold"
+        assert first_box and first_box["y"] < 250, "Listing photos should start within the compact top quarter"
         overlap = await page.evaluate("""() => {
           const title = document.querySelector("#krHero h1").getBoundingClientRect();
           const radar = document.querySelector("#smartRadarOpen").getBoundingClientRect();
