@@ -52,7 +52,7 @@ async def test_card_has_no_source_or_false_verification_but_detail_has_attributi
         assert "GPON" not in card
         assert "OLX" not in card
         assert "DOM.RIA" not in card
-        await first.click()
+        await first.locator(".kr-open-detail").click()
         assert await page.locator("#dealModal").is_visible()
         assert await page.locator("#modalSourceDetails").is_visible()
         assert await page.locator("#modalOriginalLink").is_visible()
