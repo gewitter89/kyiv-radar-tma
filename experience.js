@@ -220,7 +220,7 @@
       const fromOnclick = attr.match(/openDealModalById\((\d+)\)/);
       const id = fromId || (fromOnclick && fromOnclick[1]);
       const deal = byId.get(id);
-      if (!deal || card.querySelector(".kr-card-tools")) return;
+      if (!deal || card.querySelector(".kr-compare-button")) return;
       card.setAttribute("role", "button");
       card.setAttribute("tabindex", "0");
       card.setAttribute("aria-label", "Переглянути квартиру: " + (deal.title || "оголошення №" + id));
@@ -241,9 +241,13 @@
         event.preventDefault(); event.stopPropagation();
         if (window.KyivRadarSmart?.addFromCard) window.KyivRadarSmart.addFromCard(deal.id);
       });
-      tools.append(compare);
-      const target = card.querySelector(".flex-1.p-2\\.5, .p-3.text-xs") || card;
-      target.append(tools);
+      const cardActions = card.querySelector(".kr-card-actions");
+      if (cardActions) cardActions.append(compare);
+      else {
+        tools.append(compare);
+        const target = card.querySelector(".flex-1.p-2\\.5, .p-3.text-xs") || card;
+        target.append(tools);
+      }
     });
   }
   function installMapDistrictSummary() {
