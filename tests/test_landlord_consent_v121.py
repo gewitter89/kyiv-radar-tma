@@ -139,6 +139,14 @@ async def test_mobile_upload_is_blocked_until_checkbox_is_checked():
         assert "rightsConfirmed" in calls[0] and "true" in calls[0]
         assert api.LANDLORD_CONSENT_VERSION in calls[0]
         assert "Завантажено" in await page.locator("#llPhotoCountLabel").inner_text()
+        await page.evaluate("closeLandlordModal()")
+        await page.evaluate(
+            "() => document.getElementById('landlordModal').classList.remove('hidden')"
+        )
+        assert not await consent.is_checked(), "No carry-over consent to another submission"
+        await page.locator("#llPhotoInput").set_input_files(image)
+        await page.wait_for_timeout(150)
+        assert len(calls) == 1, "Reopened form must require a fresh rights assertion"
         await browser.close()
 
 
