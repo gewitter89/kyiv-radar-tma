@@ -420,3 +420,43 @@ def test_readonly_release_preflight_detects_privacy_and_schema(privacy_test_env)
     absent_media = inspect_release(db, catalog, os.path.join(uploads, "absent"))
     assert absent_media["ready_for_smoke_test"] is False
     assert any("Media storage" in e for e in absent_media["errors"])
+
+
+def test_media_cleanup_preserves_approved_photos(privacy_test_env):
+    """Expired pending/rejected photos are removed; published media is never purged."""
+    import sqlite3
+    from pathlib import Path
+    from server.kyiv_radar_api import cleanup_abandoned_uploads
+
+    uploads = Path(privacy_test_env["uploads_dir"])
+    orphan = "a" * 32
+    approved = "b" * 32
+    rejected = "c" * 32
+    for photo_id in (orphan, approved, rejected):
+        (uploads / (photo_id + ".webp")).write_bytes(b"test private file")
+
+    with sqlite3.connect(privacy_test_env["db_path"]) as conn:
+        submission = conn.execute(
+            "INSERT INTO landlord_submissions (address, price, rooms, phone, status) "
+            "VALUES (?, ?, ?, ?, ?)",
+            ("вул. Златоустівська, 2, Київ", "20000", 2, "+380671234500", "rejected")
+        ).lastrowid
+        for photo_id, status, sub_id in [
+            (orphan, "pending", None),
+            (approved, "approved", submission),
+            (rejected, "pending", submission),
+        ]:
+            conn.execute(
+                "INSERT INTO landlord_uploads "
+                "(photo_id, owner_telegram_id, submission_id, status, created_at) "
+                "VALUES (?, ?, ?, ?, datetime('now', '-9 days'))",
+                (photo_id, 222333, sub_id, status)
+            )
+
+    cleanup_abandoned_uploads()
+    assert not (uploads / (orphan + ".webp")).exists()
+    assert not (uploads / (rejected + ".webp")).exists()
+    assert (uploads / (approved + ".webp")).exists()
+    with sqlite3.connect(privacy_test_env["db_path"]) as conn:
+        remaining = {row[0] for row in conn.execute("SELECT photo_id FROM landlord_uploads")}
+    assert approved in remaining and orphan not in remaining and rejected not in remaining
