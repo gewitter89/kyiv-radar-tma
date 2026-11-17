@@ -17,7 +17,8 @@ on:
       - "index.html"
       - "tests/test_partner_xml_v123.py"
       - "tests/test_source_rights_v124.py"
-      - "tests/test_partner_visibility_v125.py"
+      - "tests/test_partner_visibility_v125.py \
+            tests/test_public_eligibility_v133.py"
       - "tests/test_market_inventory_v122.py"
       - ".github/workflows/partner-xml.yml"
   workflow_dispatch:
