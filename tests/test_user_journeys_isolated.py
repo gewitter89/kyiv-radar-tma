@@ -148,6 +148,7 @@ def test_landlord_submit_isolated(isolated_app):
             "gpon": True,
             "generator": False,
             "rightsConfirmed": True,
+            "consentVersion": kyiv_radar_api.LANDLORD_CONSENT_VERSION,
             "initData": generate_valid_init_data(TEST_BOT_TOKEN, user_id=TEST_USER_ID)
         }
         resp = client.post("/api/landlords/submit", json=payload)
