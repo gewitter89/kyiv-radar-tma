@@ -113,3 +113,21 @@ async def test_report_reasons_have_clear_specific_choices():
         assert await page.locator("#krReportStatus").get_attribute("role") == "status"
         assert await page.locator("#reportModal button[onclick^='submitReport']").count() == 7
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_server_empty_result_does_not_resurrect_stale_static_catalog():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch()
+        page = await browser.new_page(viewport={"width": 390, "height": 844})
+        await page.route("**/api/deals*", lambda route: route.fulfill(
+            status=200, content_type="application/json",
+            headers={"access-control-allow-origin": "*"},
+            body='{"success":true,"count":0,"deals":[]}'))
+        await page.goto(URL, wait_until="domcontentloaded")
+        await page.wait_for_function(
+            "() => window.KR_CATALOG_MODE === 'live' && LISTINGS.length === 0"
+        )
+        assert await page.locator("#listViewContainer > div[onclick]").count() == 0
+        assert "немає доступних оголошень" in await page.locator("#listViewContainer").inner_text()
+        await browser.close()
