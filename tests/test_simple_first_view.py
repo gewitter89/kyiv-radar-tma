@@ -21,6 +21,15 @@ async def test_phone_first_view_shows_photos_not_full_screen_map():
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={"width": 390, "height": 844},
                                       is_mobile=True, has_touch=True)
+        # CI fixtures use intentionally nonexistent photo hosts. Serve a
+        # clearly synthetic SVG without external network to verify the actual
+        # image layout, rather than assuming original OLX photos exist.
+        async def synthetic_photo(route):
+            await route.fulfill(
+                status=200, content_type="image/svg+xml",
+                body='<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="800" height="600" fill="#777"/></svg>'
+            )
+        await page.route("https://images.example.invalid/**", synthetic_photo)
         await ready(page)
         assert await page.get_by_role("heading", name="Знайти квартиру").is_visible()
         assert await page.locator(".kr-hero-eyebrow").inner_text() == "Житло по суті"
