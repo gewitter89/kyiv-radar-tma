@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bounded, local-only XML/YRL adapter for permissioned real-estate partner feeds.
+"""Bounded, local-only XML/YML adapter for permissioned real-estate partner feeds.
 
 No network requests, no personal data, no media and no approval/publication.
 Every parsed record is passed into market_inventory.normalise() and its existing
@@ -37,14 +37,14 @@ class UnsafePartnerXML(ValueError):
 
 
 def iter_partner_xml(path: Path):
-    """Yield only whitelisted metadata from a local XML/YRL document.
+    """Yield only whitelisted metadata from a local XML/YML document.
 
-    Supported paths:
+    Supported paths (NOT a general-purpose YRL/Yandex Realty Language parser):
       realty-feed/offer with canonical field names;
       yml_catalog/shop/offers/offer with url, price (UAH) and explicit
       param name="operation", "property_type" and "city" (etc).
 
-    Generic YRL category IDs are intentionally never guessed into property
+    Generic YML category IDs are intentionally never guessed into property
     classes. The feed owner must supply an explicitly approved field mapping.
     """
     parser = expat.ParserCreate()
@@ -128,7 +128,7 @@ def iter_partner_xml(path: Path):
             if "_currency" in row and row["_currency"] != "UAH":
                 raise UnsafePartnerXML("Unconverted non-UAH price")
             if stack[0] == "yml_catalog" and "price_uah" in row and row.get("_currency") != "UAH":
-                raise UnsafePartnerXML("YRL price must declare UAH explicitly")
+                raise UnsafePartnerXML("YML price must declare UAH explicitly")
             row.pop("_currency", None)
             completed.append(row)
             row = None
