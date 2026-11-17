@@ -68,8 +68,10 @@ async def test_api_sanitizer_drops_unverified_metro_but_preserves_verified_and_f
 
 def test_unsourced_metro_fields_do_not_reappear_in_public_fallback():
     html = open(os.path.join(ROOT, "index.html"), encoding="utf-8").read()
+    # Imported image URLs contain semicolons inside quoted JSON values.
+    # Read the whole assignment line, not the first semicolon in a URL.
     start = html.index("const KYIV_DEALS_INIT = ")
-    end = html.index(";",start)
-    catalog = json.loads(html[start + len("const KYIV_DEALS_INIT = "):end])
+    assignment = html[start:].splitlines()[0]
+    catalog = json.loads(assignment.split(" = ", 1)[1].removesuffix(";"))
     assert len(catalog) == 150
     assert all(item.get("metro") is None and item.get("walkMin") is None for item in catalog)
