@@ -79,6 +79,26 @@ def inspect_release(db_path: str, deals_path: str, uploads_path: str) -> dict:
                     counts["registered_images"] = conn.execute(
                         "SELECT COUNT(*) FROM landlord_uploads"
                     ).fetchone()[0]
+                if not any(error.startswith("Missing database table: private_deal_contacts") for error in errors):
+                    # Record only IDs and counts in diagnostics: never log contact values.
+                    available_contact_ids = {
+                        row[0] for row in conn.execute(
+                            "SELECT deal_id FROM private_deal_contacts "
+                            "WHERE phone IS NOT NULL AND length(trim(phone)) >= 9"
+                        )
+                    }
+                    counts["private_contacts_available"] = len(available_contact_ids)
+                    if isinstance(locals().get("records"), list):
+                        listing_ids = {
+                            row["id"] for row in records
+                            if isinstance(row, dict) and type(row.get("id")) is int
+                        }
+                        missing_contacts = listing_ids - available_contact_ids
+                        counts["listings_without_private_contact"] = len(missing_contacts)
+                        if missing_contacts:
+                            warnings.append("Some listings have no contact in the protected database")
+                        if listing_ids and not available_contact_ids:
+                            errors.append("No protected contacts available for published listings")
             finally:
                 conn.close()
         except sqlite3.Error:
