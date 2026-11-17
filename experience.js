@@ -141,6 +141,7 @@
     const n = document.getElementById("krResultsCount");
     const source = document.getElementById("krDataStatus");
     const reset = document.getElementById("krReset");
+    const retry = document.getElementById("krRetry");
     if (!n || typeof getFilteredListings !== "function") return;
     const items = getFilteredListings();
     const total = Array.isArray(LISTINGS) ? LISTINGS.length : 0;
@@ -153,6 +154,7 @@
       loading: "Завантажуємо оголошення…"
     };
     if (source) source.textContent = messages[mode] || messages.cached;
+    if (retry) retry.hidden = mode === "live" || mode === "loading";
     const f = ACTIVE_FILTERS || {};
     const selected = Boolean(searchQuery) || f.rooms !== null || f.maxPrice !== null ||
       f.generator || f.gpon || f.pets || f.lowFloor || f.favs;
@@ -346,6 +348,21 @@
     reset.id="krReset";reset.type="button";reset.hidden=true;
     reset.addEventListener("click",resetFilters);
     status.append(reset);
+    const retry = el("button", "kr-reset", "Оновити");
+    retry.id = "krRetry"; retry.type = "button"; retry.hidden = true;
+    retry.setAttribute("aria-label", "Спробувати завантажити актуальний каталог");
+    retry.addEventListener("click", async () => {
+      retry.disabled = true;
+      retry.textContent = "Оновлюємо…";
+      try {
+        await loadDeals();
+      } finally {
+        retry.disabled = false;
+        retry.textContent = "Оновити";
+        updateStatus();
+      }
+    });
+    status.append(retry);
     // Put Map/List where people can see it without obscuring card actions.
     const viewSwitch = document.getElementById("floatingViewToggle");
     if (viewSwitch) status.append(viewSwitch);
