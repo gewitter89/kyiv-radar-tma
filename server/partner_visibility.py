@@ -46,7 +46,7 @@ def _readonly_connection(db_path: str | None) -> sqlite3.Connection | None:
         if supplied.is_symlink() or not supplied.is_file():
             return None
         resolved = supplied.resolve(strict=True)
-        if resolved.is_symlink():
+        if resolved.is_symlink() or resolved.is_relative_to(Path(__file__).resolve().parents[1]):
             return None
         uri = "file:" + quote(str(resolved), safe="/") + "?mode=ro"
         return sqlite3.connect(uri, uri=True, timeout=3.0)
@@ -86,7 +86,7 @@ def enforce_partner_visibility(
             source, external, source_url = identity
             try:
                 match = conn.execute(
-                    "SELECT i.source_url FROM inventory AS i "
+                    "SELECT i.source_url, i.price_uah FROM inventory AS i "
                     "JOIN source_rights AS r ON r.source=i.source "
                     "WHERE i.source=? AND i.external_id=? "
                     "AND i.review_status='approved' "
@@ -97,7 +97,11 @@ def enforce_partner_visibility(
             except sqlite3.Error:
                 # Missing/corrupt schema, locked or inaccessible DB -> no partner.
                 continue
-            if match is not None and source_url == match[0]:
+            price = item.get("price")
+            # Public-facing price must be the reviewed private price, never an
+            # arbitrary partner/client-supplied override.
+            if (match is not None and source_url == match[0]
+                    and type(price) is int and price > 0 and price == match[1]):
                 result.append(item)
     finally:
         if conn is not None:
