@@ -32,8 +32,8 @@ async def test_gpon_without_generator_is_never_advertised_as_generator():
             return item.id;
         }""")
         card = page.locator(f"#card-{listing_id}")
-        await card.wait_for()
-        card_text = await card.inner_text()
+        await card.wait_for(state="attached")
+        card_text = await card.text_content()
         assert "Інтернет · заявлено" in card_text
         assert "Генератор" not in card_text
         await browser.close()
