@@ -59,6 +59,10 @@ The active Caddy is reported to be 2.6.2, which cannot use the built-in
 Caddy reference:
 https://caddyserver.com/docs/caddyfile/directives/request_body
 
+## Owner decision (17 November 2026): preserve the existing token
+
+The owner has explicitly instructed **do not rotate, revoke, regenerate or replace the Telegram bot token**. No token action is part of the authorized v1.5.1 scope. Do not block independent upload hardening or QA work solely because this explicitly deferred item is unresolved. **The historic exposure risk remains open** and must be stated in release notes. Do not claim credential hygiene complete or promote the app as fully secure. Never print or publish the existing credential. Issue #7 stays open as a consciously deferred risk.
+
 ## Risk B — possibly exposed Telegram bot token
 
 The existing Telegram token was intentionally left unchanged for the v1.5.0
@@ -90,7 +94,7 @@ terminal command that is saved in shell history.**
 
 ## Post-rollout acceptance (required for v1.5.1)
 
-- [ ] No secrets committed, and old Telegram token revoked by owner
+- [ ] No secrets committed. Existing Telegram token unchanged per explicit owner decision; historical token-exposure risk accepted for this phase and remains OPEN as Issue #7
 - [ ] 413 for oversized known-length and streamed upload at Caddy *and* app
 - [ ] Standard image upload, moderation, approved media and contact E2E pass
 - [ ] `/api/deals` still has no raw phones, owner names or private data
