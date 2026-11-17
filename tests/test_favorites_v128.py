@@ -152,3 +152,36 @@ async def test_visible_more_filters_and_favorites_button_work_with_touch():
         assert await filter_button.get_attribute("aria-pressed") == "false"
         assert await page.evaluate("getFilteredListings().length") > 2
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_telegram_contact_button_only_works_for_verified_safe_username():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844})
+        await open_apartments(page)
+        await page.evaluate("""() => {
+          window.__tgOpened = [];
+          window.open = (url) => { window.__tgOpened.push(url); return null; };
+          const d = getFilteredListings()[0];
+          d.ownerTg = '@valid_owner123';
+          d.contactVerified = false;
+          openDealModalById(d.id);
+        }""")
+        tg = page.locator("#modalTgBtn")
+        assert await tg.is_hidden()
+        # Verified independent contact only; no guessed or invalid usernames.
+        await page.evaluate("""() => {
+          currentModalDeal.contactVerified = true;
+          currentModalDeal.ownerTg = '@bad-url.example/evil';
+          openDealModalById(currentModalDeal.id);
+        }""")
+        assert await tg.is_hidden()
+        await page.evaluate("""() => {
+          currentModalDeal.ownerTg = '@valid_owner123';
+          openDealModalById(currentModalDeal.id);
+        }""")
+        assert await tg.is_visible()
+        await tg.click()
+        assert await page.evaluate("window.__tgOpened") == ["https://t.me/valid_owner123"]
+        await browser.close()
