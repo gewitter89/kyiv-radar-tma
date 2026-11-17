@@ -1723,6 +1723,33 @@
         
         // Free contact requests are verified server-side via Telegram.
 
+        function verifiedTelegramHandle(deal) {
+            if (!deal || deal.contactVerified !== true) return null;
+            const raw = typeof deal.ownerTg === 'string' ? deal.ownerTg :
+                typeof deal.phone === 'string' && deal.phone.startsWith('@') ? deal.phone : '';
+            const username = raw.trim().replace(/^@/, '');
+            return /^[a-zA-Z0-9_]{5,32}$/.test(username) ? username : null;
+        }
+
+        function handleTgClick(e) {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+            const username = verifiedTelegramHandle(currentModalDeal);
+            if (!username) {
+                showToast('Telegram-контакт не підтверджено');
+                return;
+            }
+            const url = 'https://t.me/' + encodeURIComponent(username);
+            try {
+                if (window.Telegram?.WebApp?.openTelegramLink) {
+                    window.Telegram.WebApp.openTelegramLink(url);
+                } else {
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                }
+            } catch (error) {
+                showToast('Не вдалося відкрити Telegram');
+            }
+        }
+
         function handleCallClick(e) {
             if (e) e.stopPropagation();
             if (!currentModalDeal) return;
@@ -2044,15 +2071,10 @@
                 }
             }
 
-            // Telegram button visibility: only show if genuine owner Telegram handle exists
+            // A source-supplied username is not proof of a working owner contact.
             const tgBtn = document.getElementById('modalTgBtn');
-            const hasOwnerTg = !!(deal.ownerTg || (deal.phone && deal.phone.startsWith('@')));
             if (tgBtn) {
-                if (hasOwnerTg) {
-                    tgBtn.classList.remove('hidden');
-                } else {
-                    tgBtn.classList.add('hidden');
-                }
+                tgBtn.classList.toggle('hidden', verifiedTelegramHandle(deal) === null);
             }
 
             // Contact details are released after server-side Telegram authorization.
