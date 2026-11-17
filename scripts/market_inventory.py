@@ -56,6 +56,40 @@ CREATE TABLE IF NOT EXISTS batches (
     count INTEGER NOT NULL,
     agreement_ref TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS source_rights (
+    source TEXT PRIMARY KEY,
+    agreement_ref TEXT NOT NULL,
+    valid_until TEXT NOT NULL,
+    status TEXT NOT NULL CHECK(status IN ('active','revoked')),
+    updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS source_rights_audit (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    source TEXT NOT NULL,
+    event TEXT NOT NULL CHECK(event IN ('registered','shortened','revoked')),
+    at_utc TEXT NOT NULL,
+    reason_code TEXT
+);
+CREATE INDEX IF NOT EXISTS ix_source_rights_audit_source ON source_rights_audit(source);
+-- Even manual SQL cannot approve a listing without current source rights.
+CREATE TRIGGER IF NOT EXISTS trg_rights_before_approval_update
+BEFORE UPDATE OF review_status ON inventory
+WHEN NEW.review_status='approved' AND NOT EXISTS (
+    SELECT 1 FROM source_rights
+    WHERE source=NEW.source AND status='active' AND valid_until>=DATE('now')
+)
+BEGIN
+    SELECT RAISE(ABORT, 'Source rights do not permit approval');
+END;
+CREATE TRIGGER IF NOT EXISTS trg_rights_before_approval_insert
+BEFORE INSERT ON inventory
+WHEN NEW.review_status='approved' AND NOT EXISTS (
+    SELECT 1 FROM source_rights
+    WHERE source=NEW.source AND status='active' AND valid_until>=DATE('now')
+)
+BEGIN
+    SELECT RAISE(ABORT, 'Source rights do not permit approval');
+END;
 """
 
 
@@ -232,6 +266,11 @@ def ingest(feed_path: Path, agreement_path: Path, database_path: Path,
         conn.executescript(SCHEMA)
         conn.commit()
         conn.execute("BEGIN IMMEDIATE")
+        try:
+            from .source_rights import register_rights
+        except ImportError:
+            from source_rights import register_rights
+        register_rights(conn, agreement, now)
         source = agreement["source_key"]
         existing = conn.execute("SELECT COUNT(*) FROM inventory WHERE source=?", (source,)).fetchone()[0]
         timestamp = now.astimezone(timezone.utc).isoformat()
