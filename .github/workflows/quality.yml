@@ -58,6 +58,7 @@ jobs:
             tests/test_simple_first_view.py \
             tests/test_catalog_integrity_v116.py \
             tests/test_rental_safety_v116.py \
+            tests/test_listing_light_contrast_v116.py \
             tests/test_catalog_claims.py \
             tests/test_listing_trust_v18.py \
             tests/test_trust_experience_v18.py \
