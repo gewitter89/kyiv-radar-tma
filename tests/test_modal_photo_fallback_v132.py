@@ -43,6 +43,12 @@ async def test_modal_bad_photo_fallback_and_recovery_without_external_images():
         fallback = page.locator("#modalPhotoPlaceholder")
         await fallback.get_by_text("Фото тимчасово недоступне").wait_for(state="visible")
         assert await page.locator("#modalImage").is_hidden()
+        # The dark photo surface must retain readable text in light UI theme.
+        await page.evaluate("window.KyivRadarTheme.set('light')")
+        await page.wait_for_function("document.documentElement.getAttribute('data-kr-theme') === 'light'")
+        fg = await fallback.locator(".kr-modal-photo-message").evaluate(
+            "element => getComputedStyle(element).color")
+        assert fg == "rgb(245, 248, 253)"
         # User may swipe to another image; the image failure does not trap them.
         assert await page.locator("#modalPhotoIndex").inner_text() == "1/2"
         await page.evaluate("switchModalPhoto(1)")
