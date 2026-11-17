@@ -383,9 +383,9 @@
         }
         const header = document.getElementById("modalPhoneHeaderTitle");
         if (header) header.textContent = sourceFirst ? "Контакт у джерелі" : "Контакт з оголошення";
-        const info = document.getElementById("phoneLockedBox")?.querySelector("span:last-child");
+        const info = document.getElementById("modalContactHint");
         if (info) info.textContent = sourceFirst
-          ? "Контакт і наявність не перевірено. Уточніть на сайті джерела."
+          ? "Контакт і наявність не перевірено. Перегляньте джерело."
           : "Якщо контакт доступний, надішлемо його в Telegram";
         const free = document.getElementById("freeTrialPill");
         if (free) {
