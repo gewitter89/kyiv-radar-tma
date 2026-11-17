@@ -53,6 +53,9 @@ async def test_imported_card_has_prominent_real_original_link(width, height):
         assert await page.locator("#freeTrialPill").is_hidden()
         assert await page.locator("#modalMaskedPhone").inner_text() == "Контакт не підтверджено"
         assert await page.locator("#modalPhoneHeaderTitle").inner_text() == "Контакт у джерелі"
+        assert "Перегляньте джерело" in await page.locator("#modalContactHint").inner_text()
+        assert "Telegram" not in await page.locator("#modalContactHint").inner_text()
+        assert "Комісія уточнюється" in await page.locator("#modalRealtorSavings").inner_text()
         bbox = await link.bounding_box()
         assert bbox and bbox["height"] >= 44
         assert 0 <= bbox["x"] and bbox["x"] + bbox["width"] <= width + 2
@@ -153,6 +156,7 @@ async def test_isolated_verified_first_party_retains_contact_request():
         }""")
         assert await page.locator("#modalCallBtn").is_visible()
         assert await page.locator("#krOriginalAction").is_hidden()
+        assert "Telegram" in await page.locator("#modalContactHint").inner_text()
         await page.locator("#modalCallBtn").click()
         await page.wait_for_function("""() =>
           document.querySelector('#krContactStatus').dataset.state === 'success'""")
