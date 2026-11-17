@@ -1,0 +1,269 @@
+/* Kyiv Radar 1.10 — compact native-first masthead, iOS-style type rhythm.
+   Product UI changes only; no asset downloads, no stock images, no claims. */
+html.kr-compact.kr-simple body {
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Arial,sans-serif;
+}
+html.kr-compact.kr-simple header.kr-unified-header.kr-compact-masthead {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  justify-content:center !important;
+  flex:none;
+  gap:2px !important;
+  height:auto !important;
+  min-height:0 !important;
+  padding:6px 10px 5px !important;
+  border:0 !important;
+  background:linear-gradient(180deg,#0e2037 0%,#12253d 67%,#102138 100%) !important;
+  box-shadow:none !important;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead::before {
+  opacity:.42;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead .kr-native-seam {
+  height:7px;
+  opacity:.75;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead #krHero {
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  flex:none !important;
+  position:relative;
+  width:100%;
+  height:34px !important;
+  min-height:34px !important;
+  padding:2px 2px 3px !important;
+  margin:0 !important;
+  gap:7px !important;
+  overflow:hidden;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead #krHero::before {
+  background:radial-gradient(ellipse at 86% 50%,rgba(246,201,79,.055),transparent 63%) !important;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-hero-copy {
+  min-width:0;
+  flex:1 1 auto;
+  max-width:100%;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-hero-copy h1 {
+  display:block;
+  margin:0;
+  color:#f6f8fd;
+  font-size:13px !important;
+  font-weight:650 !important;
+  line-height:1.24 !important;
+  letter-spacing:-.022em !important;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-hero-eyebrow,
+html.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-hero-copy > p:not(.kr-hero-eyebrow) {
+  display:none !important;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-hero-actions {
+  width:auto !important;
+  flex:0 0 auto !important;
+  min-width:0;
+  gap:0 !important;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-hero-actions > :not(#smartRadarOpen) {
+  display:none !important;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead #smartRadarOpen {
+  position:relative;
+  min-height:32px !important;
+  height:32px !important;
+  padding:5px 10px !important;
+  border:1px solid rgba(142,182,235,.22) !important;
+  border-radius:11px !important;
+  background:rgba(76,132,195,.12) !important;
+  color:#dfeafa !important;
+  box-shadow:none !important;
+  font-size:11px !important;
+  font-weight:600 !important;
+  line-height:1;
+  white-space:nowrap;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead #smartRadarOpen:hover {
+  background:rgba(92,153,222,.19) !important;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-kyiv-skyline {
+  top:-5px;right:17%;bottom:auto;
+  width:35%;height:110%;
+  opacity:.26 !important;
+  filter:none;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-ukraine-curve {
+  height:8px !important;
+  bottom:-2px;
+  opacity:.37 !important;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead .kr-compact-search-row {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-height:44px;
+  width:100%;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead .kr-compact-search-row > .kr-brand {
+  flex:0 0 33px;
+  display:grid;
+  place-items:center;
+  width:33px !important;
+  min-width:33px;
+  height:40px;
+  min-height:40px;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:11px;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead .kr-compact-search-row .kr-brand-mark {
+  display:grid !important;
+  place-items:center;
+  height:30px !important;
+  width:30px !important;
+  padding:5px;
+  border-radius:10px;
+  border-color:rgba(114,164,233,.22);
+  box-shadow:none;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead .kr-compact-search-row .kr-brand-label {
+  display:none !important;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead .kr-compact-search-row > .relative {
+  flex:1 1 auto;
+  min-width:0;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead #searchInput {
+  height:44px !important;
+  min-height:44px !important;
+  width:100%;
+  padding-left:33px !important;
+  padding-right:11px !important;
+  border:1px solid rgba(175,202,235,.16) !important;
+  border-radius:14px !important;
+  color:#f3f7fc !important;
+  background:rgba(224,239,255,.065) !important;
+  font-size:16px !important; /* 16px prevents iPhone zoom-on-focus. */
+  line-height:1.25;
+  box-shadow:none !important;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead #searchInput::placeholder {
+  color:#90a5bf;
+  opacity:1;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead .kr-compact-search-row > button[onclick="openLandlordModal()"] {
+  display:grid !important;
+  place-items:center;
+  flex:0 0 41px;
+  width:41px !important;
+  height:44px !important;
+  min-height:44px !important;
+  padding:0 !important;
+  border-radius:13px;
+  background:rgba(111,164,232,.08) !important;
+  border:1px solid rgba(173,198,228,.16) !important;
+  box-shadow:none !important;
+  color:#eaf4ff !important;
+}
+html.kr-compact.kr-simple header.kr-compact-masthead .kr-compact-search-row > button[onclick="openLandlordModal()"] svg {
+  width:17px;height:17px;
+  color:#81bbf5 !important;
+}
+html.kr-compact.kr-simple #filterBarWrapper {
+  padding:4px 9px !important;
+  border:0 !important;
+  background:#0b1728 !important;
+}
+html.kr-compact.kr-simple #filterContainer {
+  gap:6px !important;
+}
+html.kr-compact.kr-simple #filterContainer > button {
+  min-height:36px !important;
+  padding:6px 10px !important;
+  border-radius:11px !important;
+  font-size:11.5px !important;
+  box-shadow:none !important;
+}
+html.kr-compact.kr-simple #filterContainer > #krMoreFilters {
+  background:rgba(56,111,183,.22) !important;
+  color:#dceaff;
+}
+html.kr-compact.kr-simple #krResultsBar {
+  display:flex !important;
+  align-items:center;
+  min-height:43px !important;
+  padding:3px 9px !important;
+  gap:6px !important;
+  background:#0b1728 !important;
+  border-bottom:1px solid rgba(157,190,232,.10) !important;
+}
+html.kr-compact.kr-simple #krResultsCount {
+  font-size:12px !important;
+  font-weight:640;
+}
+html.kr-compact.kr-simple #krDataStatus {
+  color:#96aac5 !important;
+  font-size:9.5px !important;
+}
+html.kr-compact.kr-simple #floatingViewToggle {
+  background:#16263d !important;
+  border-color:rgba(173,196,229,.17) !important;
+  border-radius:20px;
+  padding:2px !important;
+}
+html.kr-compact.kr-simple #floatingViewToggle button {
+  min-width:52px !important;
+  min-height:34px !important;
+  padding:5px 8px !important;
+  font-size:10.5px !important;
+}
+html.kr-compact.kr-simple #krSimpleInfo {
+  width:34px !important;
+  min-width:34px !important;
+  min-height:36px !important;
+  padding:5px 6px !important;
+  background:transparent;
+  border-color:rgba(174,198,229,.13);
+}
+html.kr-compact.kr-simple #listViewContainer:not(.hidden) {
+  padding-top:8px !important;
+}
+@media(min-width:700px) {
+  html.kr-compact.kr-simple header.kr-unified-header.kr-compact-masthead {
+    flex-direction:row !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:18px !important;
+    padding:8px 18px !important;
+    min-height:58px !important;
+  }
+  html.kr-compact.kr-simple header.kr-compact-masthead #krHero {
+    width:auto;
+    flex:1 1 44% !important;
+    max-width:540px;
+    height:38px !important;
+  }
+  html.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-hero-copy h1 {font-size:15px !important;}
+  html.kr-compact.kr-simple header.kr-compact-masthead .kr-compact-search-row {max-width:610px;flex:1 1 56%;}
+}
+@media(max-width:370px) {
+  html.kr-compact.kr-simple header.kr-unified-header.kr-compact-masthead {padding-inline:7px !important;}
+  html.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-hero-copy h1 {font-size:12px !important;}
+  html.kr-compact.kr-simple header.kr-compact-masthead #smartRadarOpen {padding-inline:7px !important;font-size:10px !important;}
+  html.kr-compact.kr-simple header.kr-compact-masthead .kr-compact-search-row {gap:5px;}
+  html.kr-compact.kr-simple #krResultsBar {padding-inline:6px !important;gap:4px !important;}
+  html.kr-compact.kr-simple #floatingViewToggle button {min-width:46px !important;padding-inline:5px !important;}
+  html.kr-compact.kr-simple #krSimpleInfo {min-width:30px !important;width:30px !important;}
+}
+@media (prefers-reduced-motion:reduce) {
+  html.kr-compact.kr-simple header.kr-compact-masthead * {animation:none !important;}
+}
