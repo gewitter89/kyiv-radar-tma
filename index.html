@@ -1465,10 +1465,11 @@
 
             if (items.length === 0) {
                 const emptyCatalog = LISTINGS.length === 0;
+                const noSaved = !emptyCatalog && ACTIVE_FILTERS.favs && FAVORITES.size === 0;
                 listEl.innerHTML = `
                     <div class="kr-empty-state">
-                        <div class="text-white font-semibold text-base">${emptyCatalog ? 'Зараз немає доступних оголошень' : 'Нічого не знайдено'}</div>
-                        <p class="mt-2 text-sm text-[#aebdd0]">${emptyCatalog ? 'Опубліковані пропозиції тимчасово відсутні. Не показуємо зняті оголошення.' : 'Змініть район, бюджет або інші умови.'}</p>
+                        <div class="text-white font-semibold text-base">${emptyCatalog ? 'Зараз немає доступних оголошень' : noSaved ? 'Обраних квартир поки немає' : 'Нічого не знайдено'}</div>
+                        <p class="mt-2 text-sm text-[#aebdd0]">${emptyCatalog ? 'Опубліковані пропозиції тимчасово відсутні. Не показуємо зняті оголошення.' : noSaved ? 'Натисніть сердечко на квартирі, щоб зберегти її тут.' : 'Змініть район, бюджет або інші умови.'}</p>
                         ${emptyCatalog ? '' : '<button type="button" onclick="setFilter(\'all\')" class="kr-reset mt-4">Скинути фільтри</button>'}
                     </div>
                 `;
@@ -1609,7 +1610,7 @@
             if (items.length === 0) {
                 track.innerHTML = `
                     <div class="py-6 px-4 text-center text-[#8e8e93] bg-[#1c1c1e] border border-white/[0.08] rounded-2xl w-full">
-                        Нічого не знайдено за вашим фільтром. Спробуйте змінити критерії пошуку.
+                        ${ACTIVE_FILTERS.favs && FAVORITES.size === 0 ? 'Обраних квартир поки немає. Збережіть квартиру сердечком.' : 'Нічого не знайдено за вашим фільтром. Спробуйте змінити критерії пошуку.'}
                     </div>
                 `;
                 return;
