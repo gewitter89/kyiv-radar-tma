@@ -65,6 +65,7 @@ jobs:
             tests/test_favorites_shortcut_v129.py \
             tests/test_favorite_identity_v130.py \
             tests/test_public_catalog_outage_v131.py \
+            tests/test_backend_public_source_gate_v132.py \
             tests/test_kyiv_signal_theme_v112.py \
             tests/test_smart_filters_v113.py \
             tests/test_simple_first_view.py \
