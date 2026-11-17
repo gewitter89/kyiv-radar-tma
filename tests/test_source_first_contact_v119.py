@@ -88,6 +88,7 @@ async def test_imported_telegram_card_never_promises_server_contact():
     "https://fake-dom.ria.com/123",
     "https://example.com/123",
     "http://example.com/path",
+    "http://www.olx.ua/d/uk/obyavlenie/test.html",
 ])
 async def test_suspicious_original_url_fails_closed(bad_url):
     async with async_playwright() as p:
@@ -105,6 +106,26 @@ async def test_suspicious_original_url_fails_closed(bad_url):
         assert await page.locator("#modalOriginalLink").is_hidden()
         assert await page.locator("#modalCallBtn").is_hidden()
         assert await page.locator("#krShareListing").is_visible()
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_provider_label_must_match_link_domain():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width":390,"height":844})
+        await page.goto(URL, wait_until="domcontentloaded")
+        await page.wait_for_selector("#listViewContainer .kr-open-detail")
+        await page.evaluate("""() => {
+            const item = getFilteredListings()[0];
+            item.source = "OLX";
+            item.url = "https://dom.ria.com/uk/realty-123.html";
+            openDealModalById(item.id);
+        }""")
+        assert await page.locator("#modalOriginalLink").is_visible()
+        assert await page.locator("#krOriginalAction").is_hidden()
+        assert await page.locator("#krOriginalAction").get_attribute("href") is None
+        assert await page.locator("#modalCallBtn").is_hidden()
         await browser.close()
 
 
