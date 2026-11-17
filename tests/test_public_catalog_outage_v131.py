@@ -132,3 +132,54 @@ async def test_file_scheme_retains_only_local_test_fixtures():
         )
         assert await page.locator("#listViewContainer > div[onclick]").count() > 10
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_legacy_imports_are_not_reanimated_by_successful_old_api(hosted_catalog):
+    """HTTP 200 alone is not legal provenance or current availability."""
+    async with async_playwright() as playwright:
+        browser = await playwright.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844})
+        rows = [
+            {"id": 7001, "title": "OLD UNLICENSED OLX ROW", "source": "OLX",
+             "price": 11000, "rooms": 1, "images": [],
+             "district": "Тестовий", "address": "Тест"},
+            {"id": 7002, "title": "OLD UNLICENSED DIM ROW", "source": "DOM.RIA",
+             "price": 11000, "rooms": 1, "images": [],
+             "district": "Тестовий", "address": "Тест"},
+            {"id": 7003, "title": "SYNTHETIC FIXTURE ONLY", "source": "Київ Радар",
+             "fixtureOnly": True, "price": 11000, "rooms": 1,
+             "district": "Тестовий", "address": "Тест", "images": []},
+            {"id": 7004, "title": "FIRST-PARTY TEST APPROVED", "source": "Київ Радар (Пряма заявка)",
+             "price": 11000, "rooms": 1, "images": [],
+             "district": "Тестовий", "address": "Тест", "moderationStatus": "approved"}
+        ]
+        async def api_handler(route):
+            await route.fulfill(status=200, content_type="application/json",
+                                body=json.dumps({"success": True, "deals": rows}))
+        await page.route(API_PATTERN, api_handler)
+        await page.goto(hosted_catalog, wait_until="domcontentloaded")
+        await page.wait_for_function(
+            "window.KR_CATALOG_MODE === 'live' && LISTINGS.length === 1",
+            timeout=15000)
+        assert await page.evaluate("LISTINGS.map(item => item.id)") == [7004]
+        assert await page.locator("#listViewContainer > div[onclick]").count() == 1
+        assert await page.get_by_text("OLD UNLICENSED OLX ROW").count() == 0
+        assert await page.get_by_text("SYNTHETIC FIXTURE ONLY").count() == 0
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_old_api_with_only_unlicensed_rows_is_legitimately_empty(hosted_catalog):
+    async with async_playwright() as playwright:
+        browser = await playwright.chromium.launch(headless=True)
+        page = await browser.new_page()
+        async def api_handler(route):
+            await route.fulfill(status=200, content_type="application/json",
+                                body='{"success":true,"deals":[{"id":42,"source":"OLX","title":"OLD","price":20000}]}')
+        await page.route(API_PATTERN, api_handler)
+        await page.goto(hosted_catalog, wait_until="domcontentloaded")
+        await page.wait_for_function("window.KR_CATALOG_MODE === 'live'", timeout=15000)
+        assert await page.evaluate("LISTINGS.length") == 0
+        assert await page.get_by_text("Зараз немає доступних оголошень").is_visible()
+        await browser.close()
