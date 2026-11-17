@@ -510,13 +510,39 @@ def load_trusted_deals() -> List[Dict[str, Any]]:
             base.append(row)
     return base
 
+def _is_public_catalog_eligible(row: Dict[str, Any]) -> bool:
+    """Source authorization is distinct from checking availability/ownership.
+
+    Legacy OLX/DIM.RIA imports lack republication rights, so a 200 response or
+    even a moderator's availability check cannot make them publishable.
+    Partner rows must *also* pass the private revocation/rights gate below.
+    """
+    if not isinstance(row, dict) or row.get("fixtureOnly") is True:
+        return False
+    source = str(row.get("source") or "").strip().casefold()
+    if source == "київ радар (пряма заявка)":
+        submission_id = row.get("submission_id")
+        return (
+            type(submission_id) is int and submission_id > 0
+            and row.get("moderationStatus") == "approved"
+        )
+    if source.startswith("partner:"):
+        return bool(source.removeprefix("partner:").strip())
+    return False
+
+
 def load_effective_deals() -> List[Dict[str, Any]]:
-    """Apply trusted listing moderation without changing the source catalog."""
+    """Apply moderation, live partner rights and strict source eligibility.
+
+    Shared by public catalog, health and contact routes so a stale data file
+    cannot resurrect old imports through an alternate API endpoint.
+    """
     reviewed = public_listing_view(
         load_trusted_deals(),
         load_private_register(REVIEW_REGISTER_PATH),
     )
-    return enforce_partner_visibility(reviewed, PARTNER_RIGHTS_DB_PATH)
+    authorized = enforce_partner_visibility(reviewed, PARTNER_RIGHTS_DB_PATH)
+    return [row for row in authorized if _is_public_catalog_eligible(row)]
 
 # Helper: Look up private landlord contact from secure vault
 def get_private_contact(deal_id: int) -> Optional[dict]:
