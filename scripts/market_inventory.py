@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS source_rights (
     agreement_ref TEXT NOT NULL,
     valid_until TEXT NOT NULL,
     status TEXT NOT NULL CHECK(status IN ('active','revoked')),
+    scope_digest TEXT NOT NULL CHECK(length(scope_digest) = 64),
     updated_at TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS source_rights_audit (
@@ -88,6 +89,12 @@ BEFORE UPDATE OF valid_until ON source_rights
 WHEN NEW.valid_until > OLD.valid_until
 BEGIN
     SELECT RAISE(ABORT, 'Contract extension requires separate migration');
+END;
+CREATE TRIGGER IF NOT EXISTS trg_source_rights_no_scope_change
+BEFORE UPDATE OF scope_digest ON source_rights
+WHEN NEW.scope_digest != OLD.scope_digest
+BEGIN
+    SELECT RAISE(ABORT, 'Contract scope change requires separate migration');
 END;
 CREATE TRIGGER IF NOT EXISTS trg_source_rights_audit_no_delete
 BEFORE DELETE ON source_rights_audit
