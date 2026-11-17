@@ -1412,7 +1412,7 @@
                 return `Власник підтверджений (комісія уточнюється)`;
             }
             if (item.contactVerified) {
-                return `Прямий контакт (комісія уточнюється)`;
+                return `Контакт підтверджено (комісія уточнюється)`;
             }
             if (item.actualityConfirmed) {
                 return `Актуальність підтверджено`;
@@ -1468,7 +1468,7 @@
                             
                             <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5 z-10">
                                 ${renderStatusPill(item)}
-                                ${item.generator ? '<span class="px-2 py-0.5 rounded-full bg-[#372b1d]/95 text-[#ffdaa0] border border-[#c99f5f]/40 text-[10px] font-semibold">⚡ Генератор</span>' : ''}
+                                ${item.generator ? '<span class="px-2 py-0.5 rounded-full bg-[#372b1d]/95 text-[#ffdaa0] border border-[#c99f5f]/40 text-[10px] font-semibold">⚡ Генератор · заявлено</span>' : ''}
                                 ${item.gpon ? '<span class="px-2 py-0.5 rounded-full bg-[#1b324b]/95 text-[#d3e5ff] border border-[#6d90b8]/40 text-[10px] font-semibold">🌐 Інтернет · заявлено</span>' : ''}
                             </div>
 
@@ -1640,7 +1640,7 @@
                             <!-- Row 4: Rooms, Area & Power Badge (Single clean line) -->
                             <div class="flex items-center gap-2 text-[11px] text-[#8e8e93] whitespace-nowrap">
                                 <span class="font-medium text-white/90">${specLine}</span>
-                                ${hasPower ? '<span class="px-1.5 py-0.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-[9px] font-semibold flex items-center gap-0.5 shrink-0">⚡ Генератор</span>' : ''}
+                                ${item.generator ? '<span class="px-1.5 py-0.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-[9px] font-semibold flex items-center gap-0.5 shrink-0">⚡ Генератор · заявлено</span>' : item.gpon ? '<span class="px-1.5 py-0.5 rounded-full bg-[#0a84ff]/15 text-[#a9d7ff] text-[9px] font-semibold flex items-center gap-0.5 shrink-0">🌐 Інтернет · заявлено</span>' : ''}
                             </div>
                         </div>
                     </div>
@@ -1759,9 +1759,18 @@
                             : res.status === 502
                                 ? "Запустіть бота @prostov_shrink_bot (/start)"
                                 : "Не вдалося отримати відповідь сервера";
-                        showContactRequestStatus('error', 'Не вдалося надіслати контакт. Перевірте, чи запущений бот, і повторіть запит.', deal.id);
-                        if (typeof window.krContactError === "function") window.krContactError(reason);
-                        else showToast("⚠️ Не вдалося надіслати контакт: " + reason);
+                        const contactMessage = res.status === 404
+                            ? 'Контакт цього оголошення поки недоступний. Перевірте оригінал у картці.'
+                            : res.status === 429
+                                ? 'Ліміт запитів вичерпано. Спробуйте після його поновлення.'
+                                : res.status === 401
+                                    ? 'Сесія Telegram недійсна. Відкрийте застосунок через бота.'
+                                    : res.status === 502
+                                        ? 'Не вдалося доставити повідомлення. Відкрийте чат із ботом і натисніть /start.'
+                                        : 'Сервер не підтвердив надсилання контакту. Спробуйте пізніше.';
+                        showContactRequestStatus('error', contactMessage, deal.id);
+                        if (typeof window.krContactError === "function") window.krContactError(reason, res.status);
+                        else showToast("⚠️ " + contactMessage);
                     }
                 } catch (error) {
                     console.error("sendContact network error:", error);
@@ -1963,7 +1972,7 @@
                     savingsEl.innerText = `Документи власника перевірено (комісія уточнюється)`;
                 } else if (deal.contactVerified) {
                     savingsEl.className = "text-[#ff9f0a] font-medium text-[12px]";
-                    savingsEl.innerText = `Прямий контакт з орендодавцем (комісія уточнюється)`;
+                    savingsEl.innerText = `Контакт підтверджено (комісія уточнюється)`;
                 } else {
                     savingsEl.className = "text-[#8e8e93] font-medium text-[12px]";
                     savingsEl.innerText = `Комісія уточнюється`;
@@ -2033,17 +2042,17 @@
                         : 'Комісія орендодавця уточнюється (перевірка документів власності не підтверджує відсутність комісії).';
                     sourceDetails.innerHTML = `
                         <div class="flex items-center justify-between text-white/90">
-                            <span class="font-medium">${escapeHtml(deal.ownerName || 'Контактна особа')}</span>
+                            <span class="font-medium">Контактна особа</span>
                             <span class="text-[#30d158] text-[11px] font-semibold">Документи перевірено</span>
                         </div>
-                        <p class="text-[#8e8e93] text-[11px] leading-relaxed">Оголошення подано власником через Київ Радар. Документи на право власності підтверджено модератором. ${commDetail}</p>
+                        <p class="text-[#8e8e93] text-[11px] leading-relaxed">Право власності підтверджено модератором на підставі окремої перевірки. ${commDetail} Актуальність та контакт перевіряються окремо.</p>
                     `;
                 } else if (deal.contactVerified) {
                     if (verTag) verTag.innerHTML = '<span class="text-[#ff9f0a] font-bold">📞 Контакт перевірено</span>';
                     sourceDetails.innerHTML = `
                         <div class="flex items-center justify-between text-white/90">
-                            <span class="font-medium">Орендодавець</span>
-                            <span class="text-[#ff9f0a] text-[11px] font-semibold">Прямий номер</span>
+                            <span class="font-medium">Контактна особа</span>
+                            <span class="text-[#ff9f0a] text-[11px] font-semibold">Зв’язок перевірено</span>
                         </div>
                         <p class="text-[#8e8e93] text-[11px] leading-relaxed">Номер телефону підтверджено модератором. Актуальність квартири, документи власності та комісія потребують окремої перевірки.</p>
                     `;
