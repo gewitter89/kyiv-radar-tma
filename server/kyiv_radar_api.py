@@ -48,10 +48,12 @@ try:
     from .listing_trust import load_private_register, public_listing_view
     from .partner_visibility import enforce_partner_visibility
     from .partner_publication import read_private_export
+    from .public_eligibility import public_eligible_rows
 except ImportError:
     from listing_trust import load_private_register, public_listing_view
     from partner_visibility import enforce_partner_visibility
     from partner_publication import read_private_export
+    from public_eligibility import public_eligible_rows
 from pydantic import BaseModel, Field
 
 # Configure structured logging
@@ -516,7 +518,9 @@ def load_effective_deals() -> List[Dict[str, Any]]:
         load_trusted_deals(),
         load_private_register(REVIEW_REGISTER_PATH),
     )
-    return enforce_partner_visibility(reviewed, PARTNER_RIGHTS_DB_PATH)
+    # The same source-eligibility decision applies to public API, health and
+    # authenticated contact delivery. Historical imports never bypass rights.
+    return public_eligible_rows(enforce_partner_visibility(reviewed, PARTNER_RIGHTS_DB_PATH))
 
 # Helper: Look up private landlord contact from secure vault
 def get_private_contact(deal_id: int) -> Optional[dict]:
