@@ -41,7 +41,7 @@
     filterBar.appendChild(radarSlot);
 
     const filterMore = document.getElementById("krMoreFilters");
-    if (filterMore) filterMore.setAttribute("aria-label", "Показати або приховати додаткові фільтри");
+    if (filterMore) filterMore.setAttribute("aria-label", "Додаткові фільтри");
 
     // The source remains visible as plain text, with its disclosure button.
     const source = document.getElementById("krDataStatus");
