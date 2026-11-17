@@ -134,3 +134,25 @@ async def test_auto_theme_can_follow_os_when_telegram_theme_unavailable():
         await page.evaluate("window.KyivRadarTheme.set('auto')")
         assert await page.locator("html").get_attribute("data-kr-theme") == "light"
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_listing_photo_error_exposes_friendly_recoverable_fallback():
+    """The main apartment image may fail remotely; never leave an unlabelled black box."""
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width":390,"height":844},
+                                      is_mobile=True,has_touch=True)
+        await ready(page)
+        frame = page.locator("#listViewContainer > div[onclick]").first.locator(".relative.h-48")
+        await frame.locator(".kr-gallery-fallback").wait_for()
+        image = frame.locator(".kr-gallery-image")
+        await image.dispatch_event("error")
+        assert "kr-gallery-missing" in (await frame.get_attribute("class"))
+        assert "тимчасово недоступне" in await frame.locator(".kr-gallery-fallback").inner_text()
+        assert await frame.locator(".kr-gallery-next").is_visible()
+        await frame.locator(".kr-gallery-next").click()
+        assert "1/" not in (await frame.locator(".kr-gallery-count").inner_text())
+        await image.dispatch_event("load")
+        assert "kr-gallery-missing" not in (await frame.get_attribute("class"))
+        await browser.close()
