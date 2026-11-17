@@ -114,8 +114,28 @@ def process_landlord_approval(
                     "error": f"Помилка читання каталогу {deals_path}: {e}"
                 }
 
-        # A submitted photo is an opaque registered ID, never a client-provided URL.
-        if len(photos_val) > 10 or any(
+        # Only pending requests may be published. Rejected/closed submissions
+        # must never be revived through a stale moderator callback.
+        if current_status not in ("pending_review", "published"):
+            conn.close()
+            return {"success": False, "error": "Заявку вже закрито. Повторна публікація недоступна."}
+
+        deal_in_catalog = next((d for d in deals_list if d.get("submission_id") == sub_id), None)
+
+        # Idempotent repeat: already approved photos are *not* pending anymore.
+        # Check this before validating their initial upload state.
+        if current_status == "published" and deal_in_catalog is not None:
+            conn.close()
+            return {
+                "success": True,
+                "already_approved": True,
+                "message": f"ℹ️ Заявку #{sub_id} вже було схвалено раніше. Повторна публікація відхилена."
+            }
+
+        # Recovering a published row with a missing catalog entry must accept
+        # its already approved, owner-bound images; a new request cannot.
+        expected_photo_status = "approved" if current_status == "published" else "pending"
+        if len(photos_val) > 10 or len(set(photos_val)) != len(photos_val) or any(
             not isinstance(pid, str) or not PHOTO_ID_PATTERN.fullmatch(pid)
             for pid in photos_val
         ):
@@ -126,26 +146,15 @@ def process_landlord_approval(
                 placeholders = ",".join("?" for _ in photos_val)
                 available = cur.execute(
                     f"SELECT photo_id FROM landlord_uploads WHERE submission_id = ? "
-                    f"AND status = 'pending' AND photo_id IN ({placeholders})",
-                    (sub_id, *photos_val)
+                    f"AND status = ? AND photo_id IN ({placeholders})",
+                    (sub_id, expected_photo_status, *photos_val)
                 ).fetchall()
-                if len(available) != len(photos_val) or len(set(photos_val)) != len(photos_val):
+                if len(available) != len(photos_val):
                     conn.close()
                     return {"success": False, "error": "Не всі фото прив'язані до заявки."}
             except sqlite3.Error:
                 conn.close()
                 return {"success": False, "error": "Неможливо перевірити право на фото."}
-
-        deal_in_catalog = next((d for d in deals_list if d.get("submission_id") == sub_id), None)
-
-        # Idempotency check: only if published in DB AND already present in catalog
-        if current_status == "published" and deal_in_catalog is not None:
-            conn.close()
-            return {
-                "success": True,
-                "already_approved": True,
-                "message": f"ℹ️ Заявку #{sub_id} вже було схвалено раніше. Повторна публікація відхилена."
-            }
 
         # 4. Construct truthful deal
         if deal_in_catalog is None:
@@ -234,7 +243,7 @@ def process_landlord_approval(
                 "INSERT OR REPLACE INTO private_deal_contacts (deal_id, phone, owner_name, phone_masked) VALUES (?, ?, ?, ?)",
                 (new_deal["id"], phone_val, "Орендодавець", masked_phone)
             )
-            if photos_val:
+            if photos_val and current_status == "pending_review":
                 cur.execute(
                     "UPDATE landlord_uploads SET status = 'approved' "
                     "WHERE submission_id = ? AND status = 'pending'",
