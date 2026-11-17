@@ -207,3 +207,27 @@ html.kr-simple, .kr-simple body { background:var(--kr-base) !important; }
 @media (max-width:699px) {
   .kr-simple #listViewContainer > div[onclick] { min-height:346px; }
 }
+
+/* A single clear action row instead of two stacked toolbars. */
+.kr-simple #listViewContainer .kr-card-location {
+  color:#b9c8d9; font-size:12px; line-height:1.45; margin-top:6px;
+  white-space:normal; overflow-wrap:anywhere;
+}
+.kr-simple #listViewContainer .kr-card-specs {
+  color:#c6d3e5; font-size:12px; line-height:1.45;
+  margin-top:4px; margin-bottom:10px; font-weight:550;
+}
+.kr-simple #listViewContainer .kr-card-actions {
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:7px; border-top:1px solid var(--kr-border);
+  padding-top:11px; margin-top:auto;
+}
+.kr-simple #listViewContainer .kr-card-actions .kr-compare-button {
+  min-height:44px; flex:0 0 auto;
+  position:relative; z-index:5;
+}
+.kr-simple #listViewContainer .kr-open-detail { flex:1 1 155px; min-height:44px; }
+.kr-simple #listViewContainer > div[onclick] > .relative.h-48 { flex:0 0 206px; }
+@media(max-width:699px) {
+  .kr-simple #listViewContainer > div[onclick] > .relative.h-48 { flex-basis:210px; }
+}
