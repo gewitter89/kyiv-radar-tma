@@ -78,8 +78,9 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(preflight(args.feed, args.agreement,
                                    feed_format=args.format), ensure_ascii=False))
         return 0
-    except (ValueError, OSError, UnicodeError, csv.Error,
-            json.JSONDecodeError, TypeError, KeyError) as error:
+    except Exception as error:
+        # Any parser failure must stay sanitized; unexpected errors must not
+        # expose private file paths or raw partner rows via tracebacks.
         # Errors must NOT contain raw private data or file paths.
         print(json.dumps({"ok": False, "mode": "read_only_preflight",
                           "error_type": type(error).__name__, "private_database_writes": 0,
