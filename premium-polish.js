@@ -19,6 +19,14 @@
     '<path d="M0 12 C67 -2 136 12 202 13 S323 3 400 11" fill="none" stroke="url(#krUaWave19)" stroke-width="2.6" stroke-linecap="round"/>' +
     '</svg>';
 
+  const topSeam = '<svg viewBox="0 0 400 12" preserveAspectRatio="none" focusable="false" aria-hidden="true">' +
+    '<defs><linearGradient id="krUaTopWave20" x1="0%" y1="0%" x2="100%" y2="0%">' +
+    '<stop offset="0%" stop-color="#1f9cf7"/><stop offset="48%" stop-color="#3984d9"/>' +
+    '<stop offset="74%" stop-color="#e6c452"/><stop offset="100%" stop-color="#f3d669"/>' +
+    '</linearGradient></defs>' +
+    '<path d="M0 8 C64 1 110 2 179 7 S319 10 400 3" fill="none" stroke="url(#krUaTopWave20)" stroke-width="2.25" stroke-linecap="round"/>' +
+    '</svg>';
+
   const logo = '<svg viewBox="0 0 32 32" fill="none" focusable="false" aria-hidden="true">' +
     '<circle cx="16" cy="16" r="12.5" stroke="#78b8fb" stroke-width="2"/>' +
     '<circle cx="16" cy="16" r="7.8" stroke="#78b8fb" stroke-width="1.7"/>' +
@@ -28,6 +36,15 @@
     '</svg>';
 
   function initKyivIdentity() {
+    const header = document.querySelector("header");
+    if (header && !header.querySelector(".kr-native-seam")) {
+      header.classList.add("kr-unified-header");
+      const seam = document.createElement("div");
+      seam.className = "kr-native-seam";
+      seam.setAttribute("aria-hidden", "true");
+      seam.innerHTML = topSeam;
+      header.prepend(seam);
+    }
     const hero = document.getElementById("krHero");
     if (hero && !hero.querySelector(".kr-ukraine-curve")) {
       const city = document.createElement("div");
