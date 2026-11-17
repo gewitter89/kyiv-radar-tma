@@ -204,3 +204,19 @@ async def test_offline_catalog_has_refresh_and_no_mobile_horizontal_overflow():
         await page.wait_for_function("document.getElementById('krRetry').disabled === false")
         assert await page.locator("#krDataStatus").count() == 1
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_linked_listing_opens_and_user_can_find_by_numeric_id():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844})
+        await page.goto(URL + "?deal=1", wait_until="domcontentloaded")
+        await page.wait_for_function("LISTINGS.length > 0")
+        await page.locator("#dealModal").wait_for(state="visible")
+        assert await page.locator("#krShareListing").is_visible()
+        await page.evaluate("() => closeDealModal()")
+        await page.evaluate("() => handleSearch('#7')")
+        assert await page.evaluate("getFilteredListings().length") == 1
+        assert await page.evaluate("getFilteredListings()[0].id") == 7
+        await browser.close()
