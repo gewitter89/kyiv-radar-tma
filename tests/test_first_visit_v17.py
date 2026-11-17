@@ -266,3 +266,48 @@ async def test_ukrainian_masthead_unifies_telegram_header_without_covering_contr
         )
         assert overflow <= 4
         await browser.close()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("width,height", [(390, 844), (320, 700)])
+async def test_compact_apple_masthead_removes_duplicate_brand_without_losing_actions(width, height):
+    """v1.10: first listing appears earlier; Kyiv identity, controls and trust remain."""
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": width, "height": height},
+                                      is_mobile=True, has_touch=True)
+        await open_app(page)
+        await page.wait_for_selector("header.kr-compact-masthead")
+        header = page.locator("header.kr-compact-masthead")
+        assert await page.locator("header > #krHero").count() == 1
+        assert await page.get_by_role("heading", name="Квартири в Києві — легко знайти").is_visible()
+        assert await page.locator("header .kr-brand-label").is_hidden()
+        assert await page.locator("header .kr-compact-search-row #searchInput").is_visible()
+        assert await page.locator("header .kr-native-seam svg").is_visible()
+        assert await page.locator("header #krHero .kr-kyiv-skyline svg").count() == 1
+        assert await page.locator("header #krHero .kr-ukraine-curve svg").count() == 1
+        assert await page.locator("#krDataStatus").is_visible()
+        assert "не перевірено" in await page.locator("#krDataStatus").inner_text()
+        assert await page.locator("#krSimpleInfo").is_visible()
+        assert await page.locator("#floatingViewToggle").is_visible()
+        header_box = await header.bounding_box()
+        assert header_box and header_box["height"] <= 100, "One compact app header, not two stacked banners"
+        first = page.locator("#listViewContainer > div[onclick]").first
+        await first.wait_for(state="visible")
+        first_box = await first.bounding_box()
+        assert first_box and first_box["y"] < 220, "Photos should appear above the old fold"
+        overlap = await page.evaluate("""() => {
+          const title = document.querySelector("#krHero h1").getBoundingClientRect();
+          const radar = document.querySelector("#smartRadarOpen").getBoundingClientRect();
+          return title.right > radar.left + 2;
+        }""")
+        assert not overlap
+        page_overflow = await page.evaluate(
+            "() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - innerWidth"
+        )
+        assert page_overflow <= 4
+        await page.locator("#searchInput").click()
+        assert await page.evaluate("document.activeElement.id") == "searchInput"
+        await page.locator("#smartRadarOpen").click()
+        assert await page.locator("#smartRadarPanel").is_visible()
+        await browser.close()
