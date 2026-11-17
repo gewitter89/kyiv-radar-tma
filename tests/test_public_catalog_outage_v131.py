@@ -220,3 +220,46 @@ async def test_live_refresh_hides_previous_cards_before_api_finishes(hosted_cata
         assert await page.evaluate("window.KR_CATALOG_MODE") == "live"
         assert await page.get_by_text("Зараз немає доступних оголошень").is_visible()
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_http_200_with_legacy_imports_does_not_resurrect_them(hosted_catalog):
+    """A successful but stale API must not bypass the frontend rights gate."""
+    async with async_playwright() as playwright:
+        browser = await playwright.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844})
+        async def api_handler(route):
+            await route.fulfill(status=200, content_type="application/json",
+                body=json.dumps({"success": True, "deals": [
+                    {"id": 5, "source": "OLX", "title": "Historical-only synthetic offer", "price": 12345},
+                    {"id": 6, "source": "DOM.RIA", "title": "Historical-only synthetic offer", "price": 13456}
+                ]}))
+        await page.route(API_PATTERN, api_handler)
+        await page.goto(hosted_catalog, wait_until="domcontentloaded")
+        await page.wait_for_function("window.KR_CATALOG_MODE === 'live'", timeout=15000)
+        assert await page.evaluate("LISTINGS.length") == 0
+        assert await page.get_by_text("Зараз немає доступних оголошень").is_visible()
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_http_200_moderated_first_party_keeps_real_catalog_path(hosted_catalog):
+    """One mock approved direct submission remains visible; no stale fallback."""
+    async with async_playwright() as playwright:
+        browser = await playwright.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844})
+        async def api_handler(route):
+            await route.fulfill(status=200, content_type="application/json",
+                body=json.dumps({"success": True, "deals": [
+                    {"id": 7, "source": "Київ Радар (Пряма заявка)",
+                     "submission_id": 707, "moderationStatus": "approved",
+                     "title": "Synthetic allowed item", "price": 10000,
+                     "district": "Тестовий район", "images": [], "rooms": 1}
+                ]}))
+        await page.route(API_PATTERN, api_handler)
+        await page.goto(hosted_catalog, wait_until="domcontentloaded")
+        await page.wait_for_function("window.KR_CATALOG_MODE === 'live' && LISTINGS.length === 1",
+                                     timeout=15000)
+        assert await page.evaluate("LISTINGS[0].id") == 7
+        assert await page.locator("#listViewContainer > div[onclick]").count() == 1
+        await browser.close()
