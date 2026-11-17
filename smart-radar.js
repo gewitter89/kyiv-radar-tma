@@ -195,12 +195,13 @@
     if (!panel) return;
     lastFocus = document.activeElement;
     panel.hidden = false;
+    panel.style.display = "flex";
     render();
     document.getElementById("smartRadarName")?.focus();
   }
   function close() {
     const panel = document.getElementById("smartRadarPanel");
-    if (panel) panel.hidden = true;
+    if (panel) { panel.hidden = true; panel.style.display = "none"; }
     lastFocus?.focus?.();
   }
   function init() {
@@ -215,7 +216,7 @@
     document.getElementById("filterContainer").append(trigger);
 
     const overlay = elem("div", "fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4");
-    overlay.id = "smartRadarPanel"; overlay.hidden = true;
+    overlay.id = "smartRadarPanel"; overlay.hidden = true; overlay.style.display = "none";
     overlay.setAttribute("role", "dialog"); overlay.setAttribute("aria-modal", "true");
     overlay.setAttribute("aria-labelledby", "smartRadarTitle");
     overlay.addEventListener("click", event => { if (event.target === overlay) close(); });
