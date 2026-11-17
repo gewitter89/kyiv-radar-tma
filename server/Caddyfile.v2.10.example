@@ -1,0 +1,28 @@
+# REFERENCE ONLY — NOT compatible with the deployed Caddy 2.6.2.
+# Requires Caddy >= 2.10.0. Preserve unrelated production routes before using.
+# Limit only the photo upload endpoint, rather than imposing 33 MiB on every API.
+vmi3445944.contaboserver.net {
+    encode gzip zstd
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    @landlord_photo_upload {
+        method POST
+        path /api/landlords/upload_photos
+    }
+    request_body @landlord_photo_upload {
+        max_size 33MiB
+    }
+
+    reverse_proxy /api/* 127.0.0.1:8000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+}
