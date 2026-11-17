@@ -1255,9 +1255,15 @@
         function getFilteredListings() {
             let items = LISTINGS.filter(item => {
                 if (searchQuery) {
-                    const q = searchQuery.toLowerCase();
-                    const text = `${escapeHtml(item.title)} ${escapeHtml(item.district)} ${item.address} ${escapeHtml(item.metro)}`.toLowerCase();
-                    if (!text.includes(q)) return false;
+                    const q = searchQuery.toLowerCase().trim();
+                    // A person returning from the Telegram bot can find #123 directly.
+                    const idQuery = q.replace(/^#/, "");
+                    if (/^\d{1,10}$/.test(idQuery)) {
+                        if (String(item.id) !== idQuery) return false;
+                    } else {
+                        const text = `${escapeHtml(item.title)} ${escapeHtml(item.district)} ${item.address} ${escapeHtml(item.metro)}`.toLowerCase();
+                        if (!text.includes(q)) return false;
+                    }
                 }
                 // Never match a room-specific filter to disputed imported metadata.
                 if (ACTIVE_FILTERS.rooms !== null && item.roomConflict === true) return false;
