@@ -1,4 +1,4 @@
-name: Partner XML/YRL importer checks
+name: Partner XML/YML importer checks
 
 on:
   pull_request:
