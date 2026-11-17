@@ -116,6 +116,7 @@ def test_revoked_or_expired_partner_disappears_without_delete_of_inventory(tmp_p
     {"url": "https://agency.example.ua.evil.test/p/11"},
     {"url": "http://agency.example.ua/p/11"},
     {"url": "https://agency.example.ua/p/11?utm=untrusted"},
+    {"price": 20000},
     {"source": "Київ Радар"},
 ])
 def test_mismatched_partner_identity_never_bypasses_rights(tmp_path, broken):
