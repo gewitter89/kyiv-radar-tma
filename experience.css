@@ -76,6 +76,19 @@ button:focus-visible, a:focus-visible, input:focus-visible, [role="dialog"]:focu
   border-radius: 9px; background: #142337; cursor: pointer;
 }
 .kr-compare-button:hover { background: #223b5d; }
+.carousel-card {
+  height: 184px !important;
+  width: min(330px, calc(100vw - 28px)) !important;
+}
+.carousel-card .kr-card-tools {
+  flex-wrap: wrap;
+  margin-top: 4px;
+  gap: 4px;
+}
+.carousel-card .kr-compare-button { min-height: 40px; }
+.carousel-card .kr-trust-note { font-size: 10px; width: 100%; }
+#listViewContainer .kr-compare-button { min-height: 44px; }
+
 .kr-card-tools {
   display: flex; align-items: center; gap: 8px;
   margin: 7px 0 1px; justify-content: flex-start;
