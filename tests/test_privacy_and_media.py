@@ -336,3 +336,41 @@ def test_forwarded_client_ip_only_from_local_proxy():
     assert client_ip_for_rate_limit(sample_request("203.0.113.18", "8.8.8.8")) == "203.0.113.18"
     assert client_ip_for_rate_limit(sample_request("127.0.0.1", "8.8.8.8")) == "8.8.8.8"
     assert client_ip_for_rate_limit(sample_request("127.0.0.1", "not-an-ip")) == "127.0.0.1"
+
+
+def test_invalid_rent_price_and_phone_are_rejected(privacy_test_env):
+    """Client-side fields cannot create a misleading or corrupt listing."""
+    client = privacy_test_env["client"]
+    auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=456789)
+    valid = {
+        "address": "вул. Саксаганського, 20, Київ", "price": "20 000",
+        "rooms": 1, "phone": "+380671234567", "rightsConfirmed": True,
+        "initData": auth, "photos": []
+    }
+    for bad in ("за домовленістю", "-10", "0"):
+        response = client.post("/api/landlords/submit", json=dict(valid, price=bad))
+        assert response.status_code in (400, 422), response.text
+    for bad in ("000000abc", "+380 500 TEST"):
+        response = client.post("/api/landlords/submit", json=dict(valid, phone=bad))
+        assert response.status_code in (400, 422), response.text
+
+    good = client.post("/api/landlords/submit", json=valid)
+    assert good.status_code == 200, good.text
+
+
+def test_unknown_price_delivers_truthful_contact_message(privacy_test_env):
+    """A listing with unknown rent should never crash the Telegram dispatcher."""
+    client = privacy_test_env["client"]
+    with open(privacy_test_env["deals_path"], encoding="utf-8") as fh:
+        deals = json.load(fh)
+    deals[0]["price"] = None
+    with open(privacy_test_env["deals_path"], "w", encoding="utf-8") as fh:
+        json.dump(deals, fh)
+    auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=999888)
+    with patch("server.kyiv_radar_api.send_telegram_alert", new_callable=AsyncMock) as send:
+        send.return_value = True
+        response = client.post("/api/send_contact", json={"dealId": 1, "initData": auth})
+    assert response.status_code == 200, response.text
+    message = send.call_args.args[0]
+    assert "Ціна:</b> Уточнюється" in message
+    assert "None ₴" not in message
