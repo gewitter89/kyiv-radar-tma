@@ -109,6 +109,12 @@ MAX_IMAGE_BYTES = 8 * 1024 * 1024
 MAX_IMAGE_BATCH_BYTES = 32 * 1024 * 1024
 Image.MAX_IMAGE_PIXELS = 20_000_000
 PHOTO_ID_PATTERN = re.compile(r"^[0-9a-f]{32}$")
+LANDLORD_CONSENT_VERSION = "owner-rights-2026-11-v1"
+LANDLORD_CONSENT_STATEMENT = (
+    "Я підтверджую право розміщувати оголошення, передавати контакт і "
+    "завантажувати обрані фото для модерації та можливої публікації."
+)
+LANDLORD_CONSENT_HASH = hashlib.sha256(LANDLORD_CONSENT_STATEMENT.encode("utf-8")).hexdigest()
 
 # MANDATORY SECURITY CHECK: BOT_TOKEN or TELEGRAM_BOT_TOKEN MUST BE SUPPLIED IN ENVIRONMENT
 BOT_TOKEN = os.getenv("BOT_TOKEN") or os.getenv("TELEGRAM_BOT_TOKEN")
@@ -380,6 +386,16 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    # Only a declaration/acknowledgement receipt, NOT proof of property ownership
+    # or photograph copyright. Deliberately no raw phone, name, files or address.
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS landlord_consent_receipts (
+            submission_id INTEGER PRIMARY KEY,
+            consent_version TEXT NOT NULL,
+            statement_sha256 TEXT NOT NULL,
+            accepted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
     cur.execute("CREATE INDEX IF NOT EXISTS idx_landlord_uploads_submission ON landlord_uploads(submission_id)")
     cur.execute("CREATE INDEX IF NOT EXISTS idx_rate_limits_key_time ON rate_limits(key, timestamp)")
 
@@ -546,6 +562,7 @@ class LandlordSubmitRequest(BaseModel):
     phone: str = Field(min_length=9, max_length=64)
     photos: List[str] = Field(default_factory=list, max_length=10)
     rightsConfirmed: bool = False
+    consentVersion: str = Field(default="", max_length=64)
     gpon: bool = False
     generator: bool = False
     initData: Optional[str] = Field(default=None, max_length=8192)
@@ -775,13 +792,22 @@ async def send_landlord_photo_previews(photo_ids: List[str], submission_id: int)
 async def upload_landlord_photos(
     request: Request,
     photos: List[UploadFile] = File(...),
-    initData: str = Form(...)
+    initData: str = Form(...),
+    rightsConfirmed: bool = Form(False),
+    consentVersion: str = Form("")
 ):
     """Stage private, owner-bound images for moderation. Returns opaque IDs, not URLs."""
     user = validate_telegram_init_data(initData)
     if not user or not isinstance(user.get("id"), int):
         raise HTTPException(status_code=401, detail="Відкрийте форму в Telegram для завантаження фото")
     user_id = user["id"]
+    # Require the owner's declaration BEFORE persisting bytes. Verification of
+    # legal rights remains a separate human moderation step.
+    if not rightsConfirmed or consentVersion != LANDLORD_CONSENT_VERSION:
+        raise HTTPException(
+            status_code=400,
+            detail="Підтвердьте права на фотографії та оновіть форму перед завантаженням"
+        )
     request_bytes = request.headers.get("content-length")
     if request_bytes and request_bytes.isdigit() and int(request_bytes) > MAX_IMAGE_BATCH_BYTES + 1024 * 1024:
         raise HTTPException(status_code=413, detail="Перевищено максимальний обсяг завантаження")
@@ -861,6 +887,8 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
             status_code=400,
             detail="Підтвердьте право розміщувати оголошення, фотографії та контакт"
         )
+    if req.consentVersion != LANDLORD_CONSENT_VERSION:
+        raise HTTPException(status_code=400, detail="Оновіть форму та повторно підтвердьте права")
 
     user_data = validate_telegram_init_data(req.initData) if req.initData else None
     if not user_data or not isinstance(user_data.get("id"), int):
@@ -899,6 +927,13 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
         """, (req.address.strip(), req.price.strip(), req.rooms, req.phone.strip(), photos_json,
               user_id, 1 if req.gpon else 0, 1 if req.generator else 0, f"Подав: {user_label}"))
         sub_id = cur.lastrowid
+        # Same SQLite transaction: a failed receipt must not leave a submission.
+        # The receipt records a dated self-declaration, not a completed verification.
+        cur.execute(
+            "INSERT INTO landlord_consent_receipts "
+            "(submission_id, consent_version, statement_sha256) VALUES (?, ?, ?)",
+            (sub_id, LANDLORD_CONSENT_VERSION, LANDLORD_CONSENT_HASH)
+        )
         if photo_ids:
             cur.execute(
                 f"UPDATE landlord_uploads SET submission_id = ? WHERE photo_id IN ({markers}) "
@@ -935,7 +970,8 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
         f"{photos_desc}",
         f"⚡ <b>Генератор:</b> {'Так' if req.generator else 'Ні'} | 🌐 <b>GPON:</b> {'Так' if req.gpon else 'Ні'}",
         "",
-        f"👤 <b>Джерело:</b> {safe_user}"
+        f"👤 <b>Джерело:</b> {safe_user}",
+        "📝 Права заявлені автором заявки; документи й права на фото ще не перевірені."
     ]
     admin_kb = {
         "inline_keyboard": [
