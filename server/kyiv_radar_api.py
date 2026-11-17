@@ -46,8 +46,10 @@ from fastapi.responses import FileResponse
 
 try:
     from .listing_trust import load_private_register, public_listing_view
+    from .partner_visibility import enforce_partner_visibility
 except ImportError:
     from listing_trust import load_private_register, public_listing_view
+    from partner_visibility import enforce_partner_visibility
 from pydantic import BaseModel, Field
 
 # Configure structured logging
@@ -83,6 +85,8 @@ _load_env_file()
 APP_ENV = os.getenv("APP_ENV", "production")
 DB_PATH = os.getenv("KYIV_RADAR_DB_PATH", "/opt/resell-radar-ukraine/data/rent_deals.db")
 DEALS_JSON_PATH = os.getenv("KYIV_RADAR_DEALS_PATH", "/opt/kyiv-radar-tma/data/deals.json")
+# Private staging source rights: never a public file or client-controlled path.
+PARTNER_RIGHTS_DB_PATH = os.getenv("KYIV_RADAR_PRIVATE_PARTNER_DB", "")
 # An operator-maintained file outside public GitHub Pages; never publish proof.
 REVIEW_REGISTER_PATH = os.getenv("KYIV_RADAR_PRIVATE_REVIEW_PATH", "")
 PRIVATE_CONTACTS_PATH = os.getenv(
@@ -489,10 +493,11 @@ def load_trusted_deals() -> List[Dict[str, Any]]:
 
 def load_effective_deals() -> List[Dict[str, Any]]:
     """Apply trusted listing moderation without changing the source catalog."""
-    return public_listing_view(
+    reviewed = public_listing_view(
         load_trusted_deals(),
         load_private_register(REVIEW_REGISTER_PATH),
     )
+    return enforce_partner_visibility(reviewed, PARTNER_RIGHTS_DB_PATH)
 
 # Helper: Look up private landlord contact from secure vault
 def get_private_contact(deal_id: int) -> Optional[dict]:
