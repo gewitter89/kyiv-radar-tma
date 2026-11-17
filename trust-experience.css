@@ -1,0 +1,24 @@
+/* 1.8 quiet trust indicators, not badges of false certainty. */
+#modalSourceBadge { display: none !important; }
+#modalVerificationTag.kr-trust-badge {
+  font-size: 11px; font-weight: 650; border-radius: 9px; color: #b1bdcf;
+  background: #293240; border: 1px solid #4a5665; padding: 6px 9px;
+}
+#modalVerificationTag.kr-trust-badge.verified {
+  color: #cde5d4; background: #21352b; border-color: #466d54;
+}
+#modalSourceDetails .kr-trust-source {
+  color: #d1def1; font-weight: 650; font-size: 12px; line-height: 1.5;
+}
+#modalSourceDetails .kr-trust-description {
+  color: #aebcd1; line-height: 1.5; font-size: 12px; margin-top: 5px;
+}
+#reportModal button[onclick^="submitReport"] { min-height: 44px; font-size: 13px; }
+#reportModal button[onclick="closeReportModal()"] { min-height:44px; min-width:44px; }
+#reportModal button:disabled { opacity:.55; cursor:wait; }
+#krReportStatus {
+  min-height:22px; color:#d8c5a7; font-size:12px; line-height:1.5;
+}
+@media (prefers-reduced-motion: reduce) {
+  #reportModal * { animation:none !important; transition:none !important; }
+}
