@@ -859,7 +859,10 @@
         let FAVORITES = new Set((() => {
             try {
                 const saved = JSON.parse(localStorage.getItem('kr_favs') || '[]');
-                return Array.isArray(saved) ? saved : [];
+                // Older builds sometimes stored IDs as strings. Normalize them so
+                // the same apartment stays selected after refresh/API reload.
+                return Array.isArray(saved) ? saved.map(Number)
+                    .filter(id => Number.isSafeInteger(id) && id > 0).slice(0, 2000) : [];
             } catch (error) {
                 return []; // Private mode or damaged saved data must not blank the app.
             }
@@ -1508,8 +1511,8 @@
                                 ${item.gpon ? '<span class="px-2 py-0.5 rounded-full bg-[#1b324b]/95 text-[#d3e5ff] border border-[#6d90b8]/40 text-[10px] font-semibold">🌐 Інтернет · заявлено</span>' : ''}
                             </div>
 
-                            <button onclick="toggleFavorite(event, ${item.id})" class="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center transition-all active:scale-90 z-10">
-                                <svg class="w-4 h-4 ${isFav ? 'text-[#ff453a] fill-[#ff453a]' : 'text-white/80'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            <button type="button" data-favorite-id="${item.id}" onclick="toggleFavorite(event, ${item.id})" aria-pressed="${isFav}" aria-label="${isFav ? 'Прибрати з обраного' : 'Додати в обрані'}" title="${isFav ? 'Прибрати з обраного' : 'Додати в обрані'}" class="absolute top-2 right-2 w-11 h-11 rounded-full bg-black/65 backdrop-blur-md text-white flex items-center justify-center transition-all active:scale-95 z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0a84ff]">
+                                <svg aria-hidden="true" class="w-5 h-5 ${isFav ? 'text-[#ff453a]' : 'text-white/90'}" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2.2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                             </button>
 
                             <div class="absolute bottom-2.5 left-3 right-3 flex items-end justify-between z-10">
@@ -1655,8 +1658,8 @@
                                 <div class="text-[11px] font-medium text-[#8e8e93] truncate">
                                     ${item.metro ? `${escapeHtml(item.metro)}${typeof item.walkMin === 'number' && item.walkMin > 0 ? ` · ${item.walkMin} хв (за джерелом)` : ''}` : escapeHtml(item.district || 'Київ')}
                                 </div>
-                                <button onclick="toggleFavorite(event, ${item.id})" class="p-0.5 text-[#8e8e93] hover:text-[#ff453a] transition-colors shrink-0">
-                                    <svg class="w-3.5 h-3.5 ${isFav ? 'text-[#ff453a] fill-[#ff453a]' : 'text-[#8e8e93]'}" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                <button type="button" data-favorite-id="${item.id}" onclick="toggleFavorite(event, ${item.id})" aria-pressed="${isFav}" aria-label="${isFav ? 'Прибрати з обраного' : 'Додати в обрані'}" title="${isFav ? 'Прибрати з обраного' : 'Додати в обрані'}" class="w-11 h-11 inline-flex items-center justify-center rounded-full text-[#8e8e93] hover:text-[#ff453a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0a84ff] transition-colors shrink-0">
+                                    <svg aria-hidden="true" class="w-5 h-5 ${isFav ? 'text-[#ff453a]' : 'text-[#a8a8ad]'}" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                                 </button>
                             </div>
 
@@ -2299,21 +2302,52 @@
 
         // 8. FAVORITES
         function toggleFavorite(e, id) {
-            e.stopPropagation();
-            if (FAVORITES.has(id)) {
-                FAVORITES.delete(id);
-            } else {
-                FAVORITES.add(id);
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+            const numericId = Number(id);
+            if (!Number.isSafeInteger(numericId) || numericId <= 0 ||
+                !LISTINGS.some(item => Number(item.id) === numericId)) return;
+            const added = !FAVORITES.has(numericId);
+            if (added) FAVORITES.add(numericId);
+            else FAVORITES.delete(numericId);
+            let stored = true;
+            try {
+                localStorage.setItem('kr_favs', JSON.stringify([...FAVORITES]));
+            } catch (error) {
+                stored = false; // Keep favorites functional within the current session.
             }
-            try { localStorage.setItem('kr_favs', JSON.stringify([...FAVORITES])); }
-            catch (error) { showToast('Обране працює тимчасово; зберігання на пристрої недоступне'); }
-            updateFavCount();
-            renderCarousel(getFilteredListings());
+
+            // Both the full list and carousel render their own heart buttons.
+            // Updating only the carousel left mobile-list hearts visually unchanged.
+            const list = document.getElementById('listViewContainer');
+            const track = document.getElementById('carousel-track');
+            const listPosition = list ? list.scrollTop : 0;
+            const carouselPosition = track ? track.scrollLeft : 0;
+            const restoreFocus = document.activeElement?.hasAttribute('data-favorite-id');
+            if (ACTIVE_FILTERS.favs && currentActiveId === numericId && !added) {
+                currentActiveId = null;
+            }
+            renderAll();
+            if (list) list.scrollTop = listPosition;
+            if (track) track.scrollLeft = carouselPosition;
+            if (restoreFocus) {
+                const replacement = (CURRENT_VIEW_MODE === 'list' ? list : track)
+                    ?.querySelector('[data-favorite-id="' + numericId + '"]');
+                if (replacement) replacement.focus({ preventScroll: true });
+            }
+            showToast(!stored ? 'Обране збережено лише до закриття застосунку' :
+                added ? 'Додано в обрані' : 'Прибрано з обраного');
+            try { window.Telegram?.WebApp?.HapticFeedback?.selectionChanged(); }
+            catch (error) { /* Haptics are optional in browsers and older Telegram. */ }
         }
 
         function updateFavCount() {
             const countEl = document.getElementById('favCount');
             if (countEl) countEl.innerText = FAVORITES.size;
+            const filter = document.getElementById('filterFavs');
+            if (filter) {
+                filter.setAttribute('aria-pressed', String(Boolean(ACTIVE_FILTERS.favs)));
+                filter.setAttribute('aria-label', 'Показати обрані квартири: ' + FAVORITES.size);
+            }
         }
 
         // 9. MODALS: CITY & LANDLORD
