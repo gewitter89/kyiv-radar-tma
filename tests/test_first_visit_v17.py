@@ -238,8 +238,8 @@ async def test_corrupt_favorites_storage_does_not_crash_entire_app():
 
 
 @pytest.mark.asyncio
-async def test_ukrainian_masthead_unifies_telegram_header_without_covering_controls():
-    """v1.9.1: native Telegram color is solid; the curve and Kyiv skyline are real app DOM."""
+async def test_graphite_masthead_has_brand_mark_not_decorative_wave():
+    """v1.12: native Telegram header is solid, brand SVG and quiet radar pattern are real app DOM."""
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={"width": 390, "height": 844},
@@ -247,16 +247,19 @@ async def test_ukrainian_masthead_unifies_telegram_header_without_covering_contr
         await open_app(page)
         header = page.locator("header.kr-unified-header")
         assert await header.is_visible()
-        assert await page.locator('meta[name="theme-color"]').get_attribute("content") == "#0e2037"
-        line = page.locator("header.kr-unified-header .kr-native-seam svg")
-        assert await line.is_visible()
-        assert await page.locator("header .kr-native-seam path").count() == 1
+        assert await page.locator('meta[name="theme-color"]').get_attribute("content") == "#10151D"
+        assert await page.locator("header .kr-native-seam").count() == 0
+        assert await page.locator("#krHero .kr-ukraine-curve").count() == 0
         assert await page.locator("#krHero .kr-kyiv-skyline svg").count() == 1
-        assert await page.locator("#krHero .kr-ukraine-curve svg").count() == 1
-        line_box = await line.bounding_box()
-        assert line_box and 0 < line_box["height"] <= 12
-        gradient = await header.evaluate("(node) => getComputedStyle(node).backgroundImage")
-        assert "rgb(14, 32, 55)" in gradient
+        assert await page.locator("header .kr-brand-mark img").is_visible()
+        assert await page.locator("header .kr-brand-mark img").evaluate("(img) => img.naturalWidth") > 0
+        assert await page.locator('#krRadarSlot .kr-radar-mini-mark').count() == 1
+        bg = await header.evaluate("(node) => getComputedStyle(node).backgroundColor")
+        assert bg == "rgb(22, 30, 41)"
+        rings = await page.locator("#krHero").evaluate(
+            "(node) => getComputedStyle(node,'::after').backgroundImage"
+        )
+        assert "repeating-radial-gradient" in rings
         assert await page.locator("#krHero").is_visible()
         await page.locator("#searchInput").click()
         assert await page.evaluate("document.activeElement.id") == "searchInput"
@@ -266,7 +269,6 @@ async def test_ukrainian_masthead_unifies_telegram_header_without_covering_contr
         )
         assert overflow <= 4
         await browser.close()
-
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("width,height", [(390, 844), (320, 700)])
@@ -283,9 +285,10 @@ async def test_compact_apple_masthead_removes_duplicate_brand_without_losing_act
         assert await page.get_by_role("heading", name="Квартири в Києві").is_visible()
         assert await page.locator("header .kr-brand-label").is_hidden()
         assert await page.locator("header .kr-compact-search-row #searchInput").is_visible()
-        assert await page.locator("header .kr-native-seam svg").is_visible()
+        assert await page.locator("header .kr-brand-mark img").is_visible()
+        assert await page.locator("header .kr-native-seam").count() == 0
         assert await page.locator("header #krHero .kr-kyiv-skyline svg").count() == 1
-        assert await page.locator("header #krHero .kr-ukraine-curve svg").count() == 1
+        assert await page.locator("header #krHero .kr-ukraine-curve").count() == 0
         assert await page.locator("#krDataStatus").is_visible()
         assert "не перевірено" in await page.locator("#krDataStatus").inner_text()
         assert await page.locator("#krSimpleInfo").is_visible()
