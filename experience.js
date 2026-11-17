@@ -201,7 +201,11 @@
     });
   }
   function installMapDistrictSummary() {
-    if (typeof map === "undefined" || !map || typeof L === "undefined") return;
+    if (typeof map === "undefined" || !map || typeof L === "undefined") {
+      // The list must keep rendering even if Leaflet, tiles or a CDN failed.
+      window.renderMarkers = function() {};
+      return;
+    }
     // Area-level map, rather than potentially fabricated exact building pins.
     const centers = {
       "Дарницький": [50.395,30.645], "Дніпровський": [50.453,30.616],
@@ -331,6 +335,9 @@
     reset.id="krReset";reset.type="button";reset.hidden=true;
     reset.addEventListener("click",resetFilters);
     status.append(reset);
+    // Put Map/List where people can see it without obscuring card actions.
+    const viewSwitch = document.getElementById("floatingViewToggle");
+    if (viewSwitch) status.append(viewSwitch);
     const filterBar = document.getElementById("filterBarWrapper");
     filterBar?.insertAdjacentElement("afterend",status);
     const mapEl = document.getElementById("map");
