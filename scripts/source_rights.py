@@ -7,6 +7,7 @@ No public data export, no network calls, and no automatic listing approval.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sqlite3
@@ -29,6 +30,16 @@ def private_existing_db(value: Path) -> Path:
     return resolved
 
 
+def scope_digest(agreement: dict) -> str:
+    """Stable fingerprint of the contractual source hosts and allowed operations."""
+    scope = {
+        "allowed_source_hosts": sorted(set(agreement["allowed_source_hosts"])),
+        "metadata_display_permitted": agreement["metadata_display_permitted"],
+        "full_snapshot_allowed": agreement.get("full_snapshot_allowed", False),
+    }
+    encoded = json.dumps(scope, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
 def register_rights(conn: sqlite3.Connection, agreement: dict, now: datetime) -> None:
     """Run within the caller's SQLite BEGIN IMMEDIATE transaction.
 
@@ -38,15 +49,16 @@ def register_rights(conn: sqlite3.Connection, agreement: dict, now: datetime) ->
     source = agreement["source_key"]
     ref = agreement["agreement_ref"]
     end = agreement["valid_until"]
+    scope = scope_digest(agreement)
     row = conn.execute(
-        "SELECT agreement_ref, valid_until, status FROM source_rights WHERE source=?",
+        "SELECT agreement_ref, valid_until, status, scope_digest FROM source_rights WHERE source=?",
         (source,),
     ).fetchone()
     timestamp = now.astimezone(timezone.utc).isoformat()
     if row is None:
         conn.execute(
-            "INSERT INTO source_rights(source,agreement_ref,valid_until,status,updated_at) "
-            "VALUES (?,?,?,'active',?)", (source, ref, end, timestamp),
+            "INSERT INTO source_rights(source,agreement_ref,valid_until,status,scope_digest,updated_at) "
+            "VALUES (?,?,?,'active',?,?)", (source, ref, end, scope, timestamp),
         )
         # An older approval is not transferred to a newly registered source
         # contract. Human review is required after the first provenance gate.
@@ -59,11 +71,13 @@ def register_rights(conn: sqlite3.Connection, agreement: dict, now: datetime) ->
             (source, timestamp),
         )
         return
-    previous_ref, previous_end, status = row
+    previous_ref, previous_end, status, previous_scope = row
     if status != "active":
         raise ValueError("Source disabled by private operator; ingestion blocked")
     if previous_ref != ref:
         raise ValueError("Agreement replacement requires separate operator review")
+    if previous_scope != scope:
+        raise ValueError("Contract scope change requires separate operator review")
     if end > previous_end:
         raise ValueError("Contract extension requires separate operator review")
     if end < previous_end:
