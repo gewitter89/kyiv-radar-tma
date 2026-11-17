@@ -141,7 +141,7 @@ def iter_partner_xml(path: Path):
     try:
         with path.open("rb") as stream:
             first = stream.read(65536)
-            if first.startswith((b"\\xff\\xfe", b"\\xfe\\xff")):
+            if first.startswith((bytes((0xff, 0xfe)), bytes((0xfe, 0xff)))):
                 raise UnsafePartnerXML("UTF-16 XML is not accepted")
             part = first
             while part:
