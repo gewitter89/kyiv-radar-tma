@@ -2,6 +2,7 @@
 """v1.25: partner availability and rights must be checked at public read time."""
 import json
 import os
+import re
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
@@ -145,8 +146,9 @@ def test_api_catalog_health_and_contact_lookup_share_the_same_rights_gate(tmp_pa
     db = private_inventory(tmp_path)
     approved(db)
     reg = tmp_path / "private-reviews.json"
-    reg.write_text(json.dumps({"schema_version": 1,
-                               "listings": verified_at_review_time()}))
+    actual = verified_at_review_time()
+    actual["711"]["availability"]["checked_at"] = datetime.now(timezone.utc).isoformat()
+    reg.write_text(json.dumps({"schema_version": 1, "listings": actual}))
     monkeypatch.setattr(api, "REVIEW_REGISTER_PATH", str(reg))
     monkeypatch.setattr(api, "PARTNER_RIGHTS_DB_PATH", str(db))
     monkeypatch.setattr(api, "load_trusted_deals", lambda: [partner()])
@@ -180,3 +182,11 @@ def test_no_partner_data_may_be_embedded_in_public_offline_copies():
     assert "staticCatalogWithoutPartners(KYIV_DEALS_INIT)" in page
     assert "staticCatalogWithoutPartners(dataJson)" in page
     assert "function staticCatalogWithoutPartners(records)" in page
+    initial = re.search(r"const KYIV_DEALS_INIT\\s*=\\s*(\\[[^\\n]+\\]);", page)
+    assert initial, "No embedded catalog found"
+    embedded = json.loads(initial.group(1))
+    assert all("partnerSourceKey" not in item and
+               "partnerExternalId" not in item and
+               not str(item.get("source", "")).lower().startswith("partner:")
+               for item in embedded)
+
