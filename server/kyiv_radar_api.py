@@ -423,10 +423,10 @@ async def send_telegram_alert(text: str, reply_markup: Optional[dict] = None, ta
 
 # Pydantic Schemas
 class ReportRequest(BaseModel):
-    dealId: int
-    reason: str
-    details: Optional[str] = None
-    initData: Optional[str] = None
+    dealId: int = Field(ge=1)
+    reason: str = Field(min_length=3, max_length=160)
+    details: Optional[str] = Field(default=None, max_length=1500)
+    initData: Optional[str] = Field(default=None, max_length=8192)
 
 class LandlordSubmitRequest(BaseModel):
     address: str = Field(min_length=5, max_length=220)
@@ -437,11 +437,11 @@ class LandlordSubmitRequest(BaseModel):
     rightsConfirmed: bool = False
     gpon: bool = False
     generator: bool = False
-    initData: Optional[str] = None
+    initData: Optional[str] = Field(default=None, max_length=8192)
 
 class SendContactRequest(BaseModel):
-    dealId: int
-    initData: str
+    dealId: int = Field(ge=1)
+    initData: str = Field(min_length=1, max_length=8192)
 
 # ==========================================
 # API ROUTES
@@ -716,6 +716,12 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
         raise HTTPException(status_code=400, detail="Вкажіть повну адресу квартири (вулиця, номер будинку)")
     if not req.phone or len(req.phone.strip()) < 9:
         raise HTTPException(status_code=400, detail="Вкажіть коректний номер телефону")
+    digits = re.sub(r"\\D", "", req.phone)
+    if not re.fullmatch(r"\\+?[0-9()\\s-]{9,20}", req.phone.strip()) or not 9 <= len(digits) <= 15:
+        raise HTTPException(status_code=400, detail="Номер телефону має містити від 9 до 15 цифр")
+    normalized_price = re.sub(r"\\s", "", req.price)
+    if not normalized_price.isascii() or not normalized_price.isdigit() or int(normalized_price) <= 0:
+        raise HTTPException(status_code=400, detail="Ціна оренди має бути додатним числом у гривнях")
     if not req.rightsConfirmed:
         raise HTTPException(
             status_code=400,
@@ -861,7 +867,8 @@ async def send_contact(req: SendContactRequest):
     safe_title = html.escape(deal.get("title", "Квартира"))
     safe_address = html.escape(deal.get("address", "Київ"))
     safe_phone = html.escape(trusted_phone)
-    trusted_price = deal.get("price", 0)
+    trusted_price = deal.get("price")
+    price_text = f"{trusted_price:,}".replace(",", " ") if isinstance(trusted_price, int) and trusted_price > 0 else "Уточнюється"
 
     commission_label = "0% комісії (підтверджено)" if deal.get("commissionVerified") else "Комісія уточнюється"
     msg_lines = [
@@ -869,9 +876,9 @@ async def send_contact(req: SendContactRequest):
         "━━━━━━━━━━━━━━━━━━",
         f"🏢 <b>{safe_title}</b>",
         f"📍 {safe_address}",
-        f"💰 <b>Ціна:</b> {format(trusted_price, ',').replace(',', ' ')} ₴/міс ({commission_label})",
+        f"💰 <b>Ціна:</b> {price_text}{' ₴/міс' if isinstance(trusted_price, int) and trusted_price > 0 else ''} ({commission_label})",
         "",
-        f"📱 <b>Телефон орендодавця:</b> <code>{safe_phone}</code>",
+        f"📱 <b>Контактний номер:</b> <code>{safe_phone}</code>",
         "",
         "<i>Перед дзвінком уточніть актуальність, чи це власник, та умови комісії.</i>"
     ]
