@@ -48,10 +48,12 @@ try:
     from .listing_trust import load_private_register, public_listing_view
     from .partner_visibility import enforce_partner_visibility
     from .partner_publication import read_private_export
+    from . import favorites_sync
 except ImportError:
     from listing_trust import load_private_register, public_listing_view
     from partner_visibility import enforce_partner_visibility
     from partner_publication import read_private_export
+    import favorites_sync
 from pydantic import BaseModel, Field
 
 # Configure structured logging
@@ -91,6 +93,8 @@ DEALS_JSON_PATH = os.getenv("KYIV_RADAR_DEALS_PATH", "/opt/kyiv-radar-tma/data/d
 PARTNER_RIGHTS_DB_PATH = os.getenv("KYIV_RADAR_PRIVATE_PARTNER_DB", "")
 PARTNER_EXPORT_PATH = os.getenv("KYIV_RADAR_PRIVATE_PARTNER_EXPORT", "")
 PARTNER_PUBLICATION_AUTH_PATH = os.getenv("KYIV_RADAR_PRIVATE_PUBLICATION_AUTH", "")
+# Opt-in only: needs signed Telegram auth and privacy review before production activation.
+FAVORITES_SYNC_ENABLED = os.getenv("KYIV_RADAR_FAVORITES_SYNC_ENABLED", "false").lower() == "true"
 # An operator-maintained file outside public GitHub Pages; never publish proof.
 REVIEW_REGISTER_PATH = os.getenv("KYIV_RADAR_PRIVATE_REVIEW_PATH", "")
 PRIVATE_CONTACTS_PATH = os.getenv(
@@ -406,6 +410,7 @@ def init_db():
     """)
     cur.execute("CREATE INDEX IF NOT EXISTS idx_landlord_uploads_submission ON landlord_uploads(submission_id)")
     cur.execute("CREATE INDEX IF NOT EXISTS idx_rate_limits_key_time ON rate_limits(key, timestamp)")
+    favorites_sync.create_schema(conn)
 
     # Ensure schema migrations
     for col_def in [
@@ -595,6 +600,33 @@ class SendContactRequest(BaseModel):
     dealId: int = Field(ge=1)
     initData: str = Field(min_length=1, max_length=8192)
 
+class FavoritesCloudAuth(BaseModel):
+    initData: str = Field(min_length=1, max_length=8192)
+
+class FavoritesCloudReplace(FavoritesCloudAuth):
+    generation: str = Field(min_length=32, max_length=32)
+    revision: int = Field(ge=0)
+    keys: List[str] = Field(default_factory=list, max_length=300)
+
+class FavoritesCloudPurge(FavoritesCloudAuth):
+    generation: str = Field(min_length=32, max_length=32)
+    confirmDelete: bool = False
+
+def verified_favorites_user(init_data: str) -> int:
+    if not FAVORITES_SYNC_ENABLED:
+        raise HTTPException(status_code=503, detail="Синхронізація обраного ще не увімкнена")
+    # Reject duplicate signed fields, so the canonical verifier and clients
+    # cannot disagree about which user/auth_date was authenticated.
+    pairs = urllib.parse.parse_qsl(init_data, keep_blank_values=True)
+    keys = [key for key, _ in pairs]
+    if len(set(keys)) != len(keys):
+        raise HTTPException(status_code=401, detail="Недійсні дані Telegram")
+    user = validate_telegram_init_data(init_data, max_age_seconds=3600)
+    user_id = user.get("id") if isinstance(user, dict) else None
+    if type(user_id) is not int or not 0 < user_id < 2**63:
+        raise HTTPException(status_code=401, detail="Потрібна перевірена сесія Telegram")
+    return user_id
+
 # ==========================================
 # API ROUTES
 # ==========================================
@@ -609,6 +641,47 @@ async def health():
         "deals_count": len(deals),
         "timestamp": int(time.time())
     }
+
+@app.post("/api/favorites/state")
+async def favorites_cloud_state(req: FavoritesCloudAuth, response: Response):
+    response.headers["Cache-Control"] = "no-store"
+    user_id = verified_favorites_user(req.initData)
+    if not check_rate_limit(f"favorite_read_{user_id}", max_requests=100, window_seconds=3600):
+        raise HTTPException(status_code=429, detail="Забагато запитів синхронізації")
+    try:
+        return favorites_sync.state(DB_PATH, user_id)
+    except sqlite3.Error:
+        raise HTTPException(status_code=503, detail="Приватне сховище тимчасово недоступне")
+
+@app.post("/api/favorites/replace")
+async def favorites_cloud_replace(req: FavoritesCloudReplace, response: Response):
+    response.headers["Cache-Control"] = "no-store"
+    user_id = verified_favorites_user(req.initData)
+    if not check_rate_limit(f"favorite_write_{user_id}", max_requests=30, window_seconds=3600):
+        raise HTTPException(status_code=429, detail="Забагато змін обраного")
+    try:
+        return favorites_sync.replace(DB_PATH, user_id, req.generation, req.revision, req.keys)
+    except favorites_sync.FavoritesConflict:
+        raise HTTPException(status_code=409, detail="Обране змінено на іншому пристрої. Оновіть стан.")
+    except favorites_sync.InvalidFavorites:
+        raise HTTPException(status_code=422, detail="Недопустимі ідентифікатори обраного")
+    except sqlite3.Error:
+        raise HTTPException(status_code=503, detail="Приватне сховище тимчасово недоступне")
+
+@app.post("/api/favorites/purge")
+async def favorites_cloud_purge(req: FavoritesCloudPurge, response: Response):
+    response.headers["Cache-Control"] = "no-store"
+    user_id = verified_favorites_user(req.initData)
+    if req.confirmDelete is not True:
+        raise HTTPException(status_code=400, detail="Потрібне явне підтвердження видалення")
+    if not check_rate_limit(f"favorite_write_{user_id}", max_requests=30, window_seconds=3600):
+        raise HTTPException(status_code=429, detail="Забагато змін обраного")
+    try:
+        return favorites_sync.purge(DB_PATH, user_id, req.generation)
+    except favorites_sync.FavoritesConflict:
+        raise HTTPException(status_code=409, detail="Стан синхронізації змінився. Оновіть його.")
+    except sqlite3.Error:
+        raise HTTPException(status_code=503, detail="Приватне сховище тимчасово недоступне")
 
 @app.api_route("/api/deals", methods=["GET", "HEAD"])
 async def get_live_deals(response: Response):
