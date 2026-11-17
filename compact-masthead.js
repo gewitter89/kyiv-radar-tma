@@ -20,17 +20,13 @@
     searchRow.className = "kr-compact-search-row";
     searchRow.append(brand, search, add);
 
-    // The product statement now lives ABOVE the search field. The quiet Kyiv
-    // skyline and the Ukrainian curve remain on this actual app component.
+    // The product statement now lives ABOVE the search field. The quiet Kyiv skyline
+    // remains on this actual app component.
     // Keep the original #krHero ID and its live "Мій радар" action intact.
     header.append(hero, searchRow);
     header.classList.add("kr-compact-masthead");
     document.documentElement.classList.add("kr-compact");
 
-    // Remove the redundant, straight flag stripe. Curved Ukrainian accents
-    // inside the header and hero already carry the visual identity.
-    const topStripe = document.body.firstElementChild;
-    if (topStripe?.classList.contains("h-[2.5px]")) topStripe.hidden = true;
   }
 
   if (document.readyState === "loading") {
