@@ -22,6 +22,7 @@ import json
 import logging
 import sqlite3
 import threading
+import re
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 
@@ -29,6 +30,8 @@ logger = logging.getLogger(__name__)
 
 # Concurrency lock to prevent simultaneous write race conditions on catalog
 _moderation_lock = threading.Lock()
+PHOTO_ID_PATTERN = re.compile(r"^[0-9a-f]{32}$")
+MEDIA_BASE_URL = os.getenv("KYIV_RADAR_PUBLIC_API_BASE", "https://vmi3445944.contaboserver.net").rstrip("/")
 
 def process_landlord_approval(
     sub_id: int,
@@ -111,9 +114,16 @@ def process_landlord_approval(
                     "error": f"Помилка читання каталогу {deals_path}: {e}"
                 }
 
+        # Only pending requests may be published. Rejected/closed submissions
+        # must never be revived through a stale moderator callback.
+        if current_status not in ("pending_review", "published"):
+            conn.close()
+            return {"success": False, "error": "Заявку вже закрито. Повторна публікація недоступна."}
+
         deal_in_catalog = next((d for d in deals_list if d.get("submission_id") == sub_id), None)
 
-        # Idempotency check: only if published in DB AND already present in catalog
+        # Idempotent repeat: already approved photos are *not* pending anymore.
+        # Check this before validating their initial upload state.
         if current_status == "published" and deal_in_catalog is not None:
             conn.close()
             return {
@@ -121,6 +131,30 @@ def process_landlord_approval(
                 "already_approved": True,
                 "message": f"ℹ️ Заявку #{sub_id} вже було схвалено раніше. Повторна публікація відхилена."
             }
+
+        # Recovering a published row with a missing catalog entry must accept
+        # its already approved, owner-bound images; a new request cannot.
+        expected_photo_status = "approved" if current_status == "published" else "pending"
+        if len(photos_val) > 10 or len(set(photos_val)) != len(photos_val) or any(
+            not isinstance(pid, str) or not PHOTO_ID_PATTERN.fullmatch(pid)
+            for pid in photos_val
+        ):
+            conn.close()
+            return {"success": False, "error": "Некоректні фото у заявці. Потрібна ручна перевірка."}
+        if photos_val:
+            try:
+                placeholders = ",".join("?" for _ in photos_val)
+                available = cur.execute(
+                    f"SELECT photo_id FROM landlord_uploads WHERE submission_id = ? "
+                    f"AND status = ? AND photo_id IN ({placeholders})",
+                    (sub_id, expected_photo_status, *photos_val)
+                ).fetchall()
+                if len(available) != len(photos_val):
+                    conn.close()
+                    return {"success": False, "error": "Не всі фото прив'язані до заявки."}
+            except sqlite3.Error:
+                conn.close()
+                return {"success": False, "error": "Неможливо перевірити право на фото."}
 
         # 4. Construct truthful deal
         if deal_in_catalog is None:
@@ -152,10 +186,10 @@ def process_landlord_approval(
                 "gas": None,
                 "lowFloor": None,
                 "pets": None,
-                "ownerName": "Орендодавець",
+                "ownerName": "Контактна особа",
                 "phone": None,  # PRIVACY: Raw phone stripped from public catalog
                 "phoneMasked": phone_val[:6] + "***" if len(phone_val) >= 6 else phone_val,
-                "images": photos_val if isinstance(photos_val, list) else [],
+                "images": [f"{MEDIA_BASE_URL}/api/media/{pid}" for pid in photos_val],
                 "desc": "Оголошення додано орендодавцем через Київ Радар.",
                 "source": "Київ Радар (Пряма заявка)",
                 "status": "Опубліковано",
@@ -209,6 +243,14 @@ def process_landlord_approval(
                 "INSERT OR REPLACE INTO private_deal_contacts (deal_id, phone, owner_name, phone_masked) VALUES (?, ?, ?, ?)",
                 (new_deal["id"], phone_val, "Орендодавець", masked_phone)
             )
+            if photos_val and current_status == "pending_review":
+                cur.execute(
+                    "UPDATE landlord_uploads SET status = 'approved' "
+                    "WHERE submission_id = ? AND status = 'pending'",
+                    (sub_id,)
+                )
+                if cur.rowcount != len(photos_val):
+                    raise sqlite3.IntegrityError("Не вдалося опублікувати всі фотографії")
             cur.execute(
                 "UPDATE landlord_submissions SET status = 'published', moderator_notes = ? WHERE id = ?",
                 (moderator_notes, sub_id)

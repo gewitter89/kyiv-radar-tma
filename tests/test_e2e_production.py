@@ -81,7 +81,7 @@ def test_api_health():
     status, health, headers = http_get("/api/health")
     assert status == 200, f"Expected 200, got {status}: {health}"
     assert health.get("status") == "healthy"
-    assert health.get("version") in ["1.3.0", "1.3.1", "1.4.0"], f"Expected version >= 1.3.0, got {health.get('version')}"
+    assert health.get("version") in ["1.3.0", "1.3.1", "1.4.0", "1.5.0"], f"Expected version >= 1.3.0, got {health.get('version')}"
     print(f"✓ PASS: Production API is active (v{health.get('version')}, {health.get('deals_count')} deals)")
 
 def test_cors_security():
@@ -180,9 +180,9 @@ async def test_frontend_ui():
         await page.wait_for_timeout(600)
         assert await page.is_visible("#dealModal")
         call_text = await page.inner_text("#modalCallBtn")
-        assert "Зателефонувати" in call_text
-        phone_text = await page.inner_text("#modalPhoneText")
-        assert len(phone_text) >= 10
+        assert "Отримати контакт" in call_text or "Зателефонувати" in call_text
+        phone_text = await page.inner_text("#modalMaskedPhone")
+        assert len(phone_text) >= 5
         print("✓ PASS: Deal modal features verified: Apple action bar, direct calling, verified status")
         await page.click("#dealModal button[onclick='closeDealModal()']")
         await page.wait_for_timeout(300)

@@ -78,7 +78,7 @@ async def test_browser_mode_with_phone():
 
 @pytest.mark.asyncio
 async def test_browser_mode_without_phone():
-    """Outside Telegram: default deal with phone=null displays truthful 'Номер не вказано'."""
+    """Outside Telegram: default masked deal directs users to Telegram instead of leaking a number."""
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         context = await browser.new_context(
@@ -95,11 +95,11 @@ async def test_browser_mode_without_phone():
         assert await page.is_visible("#dealModal")
 
         # Click "У чат" button
-        await page.click("#modalChatBtn")
+        await page.click("#modalCallBtn")
         await page.wait_for_timeout(400)
 
         toast = await page.inner_text("#toastText")
-        assert "Номер не вказано" in toast or "захищено" in toast, f"Expected privacy/no-number message, got '{toast}'"
+        assert "захищено" in toast or "Telegram" in toast, f"Expected privacy/Telegram message, got '{toast}'"
         assert "+380671112233" not in toast, "Fake fallback phone MUST NOT be used!"
 
         await browser.close()
@@ -126,7 +126,7 @@ async def test_telegram_mode_successful_delivery():
         await page.locator(".carousel-card").first.click()
         await page.wait_for_timeout(500)
 
-        await page.click("#modalChatBtn")
+        await page.click("#modalCallBtn")
         await page.wait_for_timeout(500)
 
         toast = await page.inner_text("#toastText")
@@ -159,7 +159,7 @@ async def test_telegram_mode_error_unmasked():
         await page.locator(".carousel-card").first.click()
         await page.wait_for_timeout(500)
 
-        await page.click("#modalChatBtn")
+        await page.click("#modalCallBtn")
         await page.wait_for_timeout(500)
 
         toast = await page.inner_text("#toastText")
@@ -168,3 +168,14 @@ async def test_telegram_mode_error_unmasked():
         assert "скопійовано" not in toast, "Failure MUST NOT be masked by claiming phone was copied!"
 
         await browser.close()
+
+
+def test_social_share_metadata_is_truthful_and_complete():
+    """The published preview must describe filters, not fabricate verification."""
+    with open(INDEX_PATH, encoding="utf-8") as html:
+        page = html.read()
+    assert '<meta property="og:locale" content="uk_UA">' in page
+    assert '<meta property="og:site_name" content="Київ Радар">' in page
+    assert 'перевірка автономності при блекаутах' not in page
+    assert 'заявленими можливостями автономності' in page
+    assert os.path.isfile(os.path.join(os.path.dirname(INDEX_PATH), "og-preview.png"))

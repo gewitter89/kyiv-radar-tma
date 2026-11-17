@@ -57,6 +57,8 @@ def privacy_test_env():
                 "address": "вул. Хрещатик, 1",
                 "price": 15000,
                 "phone": "+380671112233", # Raw phone in disk catalog
+                "private_note": "internal moderation note must never be public",
+                "ownerName": "private submitter's name",
                 "phoneMasked": "+38 (067) •••-••-33",
                 "isOwnerVerified": False
             }
@@ -93,6 +95,8 @@ def privacy_test_env():
 
         yield {
             "client": client,
+            "db_path": test_db,
+            "deals_path": test_deals,
             "uploads_dir": test_uploads
         }
 
@@ -115,6 +119,8 @@ def test_public_catalog_sanitizes_phones(privacy_test_env):
     assert data["deals"][0]["phone"] is None
     # Masked representation remains safe
     assert data["deals"][0]["phoneMasked"] == "+38 (067) •••-••-33"
+    assert "private_note" not in data["deals"][0]
+    assert "ownerName" not in data["deals"][0]
 
 def test_photo_upload_valid_exif_stripped(privacy_test_env):
     """POST /api/landlords/upload_photos accepts valid JPEG, strips EXIF, converts to WebP."""
@@ -124,16 +130,18 @@ def test_photo_upload_valid_exif_stripped(privacy_test_env):
     files = [
         ("photos", ("living_room.jpg", io.BytesIO(jpeg_bytes), "image/jpeg"))
     ]
-    resp = client.post("/api/landlords/upload_photos", files=files)
+    auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=123456)
+    resp = client.post("/api/landlords/upload_photos", data={"initData": auth}, files=files)
     assert resp.status_code == 200
     data = resp.json()
     assert data["success"] is True
     assert data["count"] == 1
-    photo_url = data["photos"][0]
-    assert photo_url.endswith(".webp")
+    photo_id = data["photos"][0]
+    assert len(photo_id) == 32 and all(ch in "0123456789abcdef" for ch in photo_id)
+    assert client.get(f"/api/media/{photo_id}").status_code == 404
 
     # Verify that stored file on disk has zero EXIF metadata
-    filename = os.path.basename(photo_url)
+    filename = photo_id + ".webp"
     disk_path = os.path.join(privacy_test_env["uploads_dir"], filename)
     assert os.path.exists(disk_path)
     with Image.open(disk_path) as saved_img:
@@ -148,9 +156,10 @@ def test_photo_upload_rejects_non_images(privacy_test_env):
     files = [
         ("photos", ("malicious.jpg", io.BytesIO(fake_file), "image/jpeg"))
     ]
-    resp = client.post("/api/landlords/upload_photos", files=files)
+    auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=123456)
+    resp = client.post("/api/landlords/upload_photos", data={"initData": auth}, files=files)
     assert resp.status_code == 400
-    assert "Непідтримуваний формат" in resp.json()["detail"] or "пошкоджений" in resp.json()["detail"]
+    assert "Пошкоджене" in resp.json()["detail"] or "непідтримуване" in resp.json()["detail"]
 
 def test_photo_upload_rejects_too_many(privacy_test_env):
     """POST /api/landlords/upload_photos rejects more than 10 photos in a single batch."""
@@ -160,9 +169,10 @@ def test_photo_upload_rejects_too_many(privacy_test_env):
         ("photos", (f"photo_{i}.jpg", io.BytesIO(jpeg_bytes), "image/jpeg"))
         for i in range(11)
     ]
-    resp = client.post("/api/landlords/upload_photos", files=files)
+    auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=123456)
+    resp = client.post("/api/landlords/upload_photos", data={"initData": auth}, files=files)
     assert resp.status_code == 400
-    assert "Максимум 10 фотографій" in resp.json()["detail"]
+    assert "1 до 10 фотографій" in resp.json()["detail"]
 
 def test_send_contact_rate_limiting(privacy_test_env):
     """POST /api/send_contact limits contact requests to 10/hour per user ID."""
@@ -181,3 +191,272 @@ def test_send_contact_rate_limiting(privacy_test_env):
         resp_blocked = client.post("/api/send_contact", json={"dealId": 1, "initData": init_data})
         assert resp_blocked.status_code == 429
         assert "Перевищено ліміт запитів контактів" in resp_blocked.json()["detail"]
+
+
+def test_anonymous_media_upload_and_injected_references_are_rejected(privacy_test_env):
+    """Anonymous uploads and arbitrary strings cannot become published photo sources."""
+    client = privacy_test_env["client"]
+    img_bytes = create_test_image()
+    anonymous = client.post(
+        "/api/landlords/upload_photos",
+        files=[("photos", ("image.jpg", io.BytesIO(img_bytes), "image/jpeg"))]
+    )
+    assert anonymous.status_code in (401, 422)
+
+    auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=10001)
+    submit = client.post("/api/landlords/submit", json={
+        "address": "вул. Глибочицька, 9, Київ",
+        "price": "14000", "rooms": 1, "phone": "+380501234567",
+        "initData": auth, "rightsConfirmed": True, "photos": ["javascript:alert(1)"]
+    })
+    assert submit.status_code == 400
+    assert "фотографій" in submit.json()["detail"].lower()
+
+
+def test_photo_ownership_and_moderated_public_access(privacy_test_env):
+    """Upload -> private -> owner-bound submission -> moderator approval -> public WebP."""
+    from server.bot_moderation import process_landlord_approval
+
+    client = privacy_test_env["client"]
+    owner_auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=20002)
+    other_auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=30003)
+    response = client.post(
+        "/api/landlords/upload_photos",
+        data={"initData": owner_auth},
+        files=[("photos", ("room.jpg", io.BytesIO(create_test_image()), "image/jpeg"))]
+    )
+    assert response.status_code == 200, response.text
+    photo_id = response.json()["photos"][0]
+    assert client.get("/api/media/" + photo_id).status_code == 404
+
+    payload = {
+        "address": "вул. Глибочицька, 12, Київ",
+        "price": "17500", "rooms": 1,
+        "phone": "+380671234567", "rightsConfirmed": True, "photos": [photo_id]
+    }
+    with patch("server.kyiv_radar_api.send_telegram_alert", new_callable=AsyncMock) as alert, \
+         patch("server.kyiv_radar_api.send_landlord_photo_previews", new_callable=AsyncMock) as previews:
+        alert.return_value = True
+        previews.return_value = True
+        bad = client.post("/api/landlords/submit", json=dict(payload, initData=other_auth))
+        assert bad.status_code == 403
+        good = client.post("/api/landlords/submit", json=dict(payload, initData=owner_auth))
+        assert good.status_code == 200, good.text
+        submission_id = good.json()["id"]
+
+    # Submission alone must not disclose the photo on the public endpoint.
+    assert client.get("/api/media/" + photo_id).status_code == 404
+    accepted = process_landlord_approval(
+        submission_id, 555, 555,
+        privacy_test_env["db_path"], privacy_test_env["deals_path"]
+    )
+    assert accepted["success"] is True, accepted
+    photo = client.get("/api/media/" + photo_id)
+    assert photo.status_code == 200
+    assert photo.headers["content-type"].startswith("image/webp")
+    assert client.get("/api/media/not-a-valid-uuid").status_code == 404
+
+    catalog = client.get("/api/deals").json()["deals"]
+    published = next(x for x in catalog if x["id"] == accepted["published_deal"]["id"])
+    assert published["phone"] is None
+    assert published["images"] == [
+        "https://vmi3445944.contaboserver.net/api/media/" + photo_id
+    ]
+
+    # Repeated moderation must not mistake approved images for missing ones.
+    duplicate = process_landlord_approval(
+        submission_id, 555, 555,
+        privacy_test_env["db_path"], privacy_test_env["deals_path"]
+    )
+    assert duplicate["success"] is True
+    assert duplicate.get("already_approved") is True
+    with open(privacy_test_env["deals_path"], encoding="utf-8") as stream:
+        listings = json.load(stream)
+    assert sum(x.get("submission_id") == submission_id for x in listings) == 1
+
+    # Simulate a recoverable catalog loss with SQLite already committed:
+    # the same already-approved photo must still be reusable for reconciliation.
+    remaining = [x for x in listings if x.get("submission_id") != submission_id]
+    with open(privacy_test_env["deals_path"], "w", encoding="utf-8") as stream:
+        json.dump(remaining, stream)
+    repaired = process_landlord_approval(
+        submission_id, 555, 555,
+        privacy_test_env["db_path"], privacy_test_env["deals_path"]
+    )
+    assert repaired["success"] is True, repaired
+    assert client.get("/api/media/" + photo_id).status_code == 200
+    with open(privacy_test_env["deals_path"], encoding="utf-8") as stream:
+        listings_after = json.load(stream)
+    assert sum(x.get("submission_id") == submission_id for x in listings_after) == 1
+
+
+def test_rejected_submission_cannot_be_approved(privacy_test_env):
+    """An out-of-date moderator callback must not revive a rejected listing."""
+    import sqlite3
+    from server.bot_moderation import process_landlord_approval
+    client = privacy_test_env["client"]
+    auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=554422)
+    with patch("server.kyiv_radar_api.send_telegram_alert", new_callable=AsyncMock) as alert:
+        alert.return_value = True
+        response = client.post("/api/landlords/submit", json={
+            "address": "вул. Кирилівська, 12, Київ", "price": "16000",
+            "rooms": 1, "phone": "+380671122334", "photos": [],
+            "rightsConfirmed": True, "initData": auth
+        })
+    assert response.status_code == 200
+    sub_id = response.json()["id"]
+    with sqlite3.connect(privacy_test_env["db_path"]) as conn:
+        conn.execute("UPDATE landlord_submissions SET status='rejected' WHERE id=?", (sub_id,))
+    result = process_landlord_approval(
+        sub_id, 555, 555,
+        privacy_test_env["db_path"], privacy_test_env["deals_path"]
+    )
+    assert result["success"] is False
+    with open(privacy_test_env["deals_path"], encoding="utf-8") as fh:
+        assert all(x.get("submission_id") != sub_id for x in json.load(fh))
+
+
+
+def test_parallel_rate_limit_is_atomic(privacy_test_env):
+    """Concurrent requests cannot race between COUNT and INSERT."""
+    import sqlite3
+    from concurrent.futures import ThreadPoolExecutor
+    from server.kyiv_radar_api import check_rate_limit
+
+    key = "parallel_tenant_contact_test"
+    with ThreadPoolExecutor(max_workers=12) as pool:
+        decisions = list(pool.map(
+            lambda _: check_rate_limit(key, max_requests=5, window_seconds=3600),
+            range(20)
+        ))
+    assert sum(decisions) == 5
+    with sqlite3.connect(privacy_test_env["db_path"]) as conn:
+        recorded = conn.execute(
+            "SELECT COUNT(*) FROM rate_limits WHERE key = ?", (key,)
+        ).fetchone()[0]
+    assert recorded == 5
+
+
+def test_forwarded_client_ip_only_from_local_proxy():
+    """A remote attacker cannot spoof its source IP with X-Forwarded-For."""
+    from starlette.requests import Request
+    from server.kyiv_radar_api import client_ip_for_rate_limit
+
+    def sample_request(peer, forwarded):
+        return Request({
+            "type": "http", "method": "GET", "path": "/api/health",
+            "headers": [(b"x-forwarded-for", forwarded.encode("ascii"))],
+            "client": (peer, 1234), "server": ("test", 80)
+        })
+
+    assert client_ip_for_rate_limit(sample_request("203.0.113.18", "8.8.8.8")) == "203.0.113.18"
+    assert client_ip_for_rate_limit(sample_request("127.0.0.1", "8.8.8.8")) == "8.8.8.8"
+    assert client_ip_for_rate_limit(sample_request("127.0.0.1", "not-an-ip")) == "127.0.0.1"
+
+
+def test_invalid_rent_price_and_phone_are_rejected(privacy_test_env):
+    """Client-side fields cannot create a misleading or corrupt listing."""
+    client = privacy_test_env["client"]
+    auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=456789)
+    valid = {
+        "address": "вул. Саксаганського, 20, Київ", "price": "20 000",
+        "rooms": 1, "phone": "+380671234567", "rightsConfirmed": True,
+        "initData": auth, "photos": []
+    }
+    for bad in ("за домовленістю", "-10", "0"):
+        response = client.post("/api/landlords/submit", json=dict(valid, price=bad))
+        assert response.status_code in (400, 422), response.text
+    for bad in ("000000abc", "+380 500 TEST"):
+        response = client.post("/api/landlords/submit", json=dict(valid, phone=bad))
+        assert response.status_code in (400, 422), response.text
+
+    with patch("server.kyiv_radar_api.send_telegram_alert", new_callable=AsyncMock) as send:
+        send.return_value = True
+        good = client.post("/api/landlords/submit", json=valid)
+    assert good.status_code == 200, good.text
+
+
+def test_unknown_price_delivers_truthful_contact_message(privacy_test_env):
+    """A listing with unknown rent should never crash the Telegram dispatcher."""
+    client = privacy_test_env["client"]
+    with open(privacy_test_env["deals_path"], encoding="utf-8") as fh:
+        deals = json.load(fh)
+    deals[0]["price"] = None
+    with open(privacy_test_env["deals_path"], "w", encoding="utf-8") as fh:
+        json.dump(deals, fh)
+    auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=999888)
+    with patch("server.kyiv_radar_api.send_telegram_alert", new_callable=AsyncMock) as send:
+        send.return_value = True
+        response = client.post("/api/send_contact", json={"dealId": 1, "initData": auth})
+    assert response.status_code == 200, response.text
+    message = send.call_args.args[0]
+    assert "Ціна:</b> Уточнюється" in message
+    assert "None ₴" not in message
+
+
+def test_readonly_release_preflight_detects_privacy_and_schema(privacy_test_env):
+    """The deploy guard must reject raw phone leakage without changing the database."""
+    from scripts.preflight_release import inspect_release
+
+    db = privacy_test_env["db_path"]
+    catalog = privacy_test_env["deals_path"]
+    uploads = privacy_test_env["uploads_dir"]
+    exposed = inspect_release(db, catalog, uploads)
+    assert exposed["ready_for_smoke_test"] is False
+    assert any("raw public phone" in error for error in exposed["errors"])
+
+    with open(catalog, encoding="utf-8") as fh:
+        listings = json.load(fh)
+    for listing in listings:
+        listing["phone"] = None
+        listing.pop("ownerName", None)
+    with open(catalog, "w", encoding="utf-8") as fh:
+        json.dump(listings, fh)
+
+    safe = inspect_release(db, catalog, uploads)
+    assert safe["ready_for_smoke_test"] is True, safe["errors"]
+    assert safe["counts"]["catalog_listings"] == 1
+
+    absent_media = inspect_release(db, catalog, os.path.join(uploads, "absent"))
+    assert absent_media["ready_for_smoke_test"] is False
+    assert any("Media storage" in e for e in absent_media["errors"])
+
+
+def test_media_cleanup_preserves_approved_photos(privacy_test_env):
+    """Expired pending/rejected photos are removed; published media is never purged."""
+    import sqlite3
+    from pathlib import Path
+    from server.kyiv_radar_api import cleanup_abandoned_uploads
+
+    uploads = Path(privacy_test_env["uploads_dir"])
+    orphan = "a" * 32
+    approved = "b" * 32
+    rejected = "c" * 32
+    for photo_id in (orphan, approved, rejected):
+        (uploads / (photo_id + ".webp")).write_bytes(b"test private file")
+
+    with sqlite3.connect(privacy_test_env["db_path"]) as conn:
+        submission = conn.execute(
+            "INSERT INTO landlord_submissions (address, price, rooms, phone, status) "
+            "VALUES (?, ?, ?, ?, ?)",
+            ("вул. Златоустівська, 2, Київ", "20000", 2, "+380671234500", "rejected")
+        ).lastrowid
+        for photo_id, status, sub_id in [
+            (orphan, "pending", None),
+            (approved, "approved", submission),
+            (rejected, "pending", submission),
+        ]:
+            conn.execute(
+                "INSERT INTO landlord_uploads "
+                "(photo_id, owner_telegram_id, submission_id, status, created_at) "
+                "VALUES (?, ?, ?, ?, datetime('now', '-9 days'))",
+                (photo_id, 222333, sub_id, status)
+            )
+
+    cleanup_abandoned_uploads()
+    assert not (uploads / (orphan + ".webp")).exists()
+    assert not (uploads / (rejected + ".webp")).exists()
+    assert (uploads / (approved + ".webp")).exists()
+    with sqlite3.connect(privacy_test_env["db_path"]) as conn:
+        remaining = {row[0] for row in conn.execute("SELECT photo_id FROM landlord_uploads")}
+    assert approved in remaining and orphan not in remaining and rejected not in remaining
