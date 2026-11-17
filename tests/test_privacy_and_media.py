@@ -299,3 +299,40 @@ def test_rejected_submission_cannot_be_approved(privacy_test_env):
     with open(privacy_test_env["deals_path"], encoding="utf-8") as fh:
         assert all(x.get("submission_id") != sub_id for x in json.load(fh))
 
+
+
+def test_parallel_rate_limit_is_atomic(privacy_test_env):
+    """Concurrent requests cannot race between COUNT and INSERT."""
+    import sqlite3
+    from concurrent.futures import ThreadPoolExecutor
+    from server.kyiv_radar_api import check_rate_limit
+
+    key = "parallel_tenant_contact_test"
+    with ThreadPoolExecutor(max_workers=12) as pool:
+        decisions = list(pool.map(
+            lambda _: check_rate_limit(key, max_requests=5, window_seconds=3600),
+            range(20)
+        ))
+    assert sum(decisions) == 5
+    with sqlite3.connect(privacy_test_env["db_path"]) as conn:
+        recorded = conn.execute(
+            "SELECT COUNT(*) FROM rate_limits WHERE key = ?", (key,)
+        ).fetchone()[0]
+    assert recorded == 5
+
+
+def test_forwarded_client_ip_only_from_local_proxy():
+    """A remote attacker cannot spoof its source IP with X-Forwarded-For."""
+    from starlette.requests import Request
+    from server.kyiv_radar_api import client_ip_for_rate_limit
+
+    def sample_request(peer, forwarded):
+        return Request({
+            "type": "http", "method": "GET", "path": "/api/health",
+            "headers": [(b"x-forwarded-for", forwarded.encode("ascii"))],
+            "client": (peer, 1234), "server": ("test", 80)
+        })
+
+    assert client_ip_for_rate_limit(sample_request("203.0.113.18", "8.8.8.8")) == "203.0.113.18"
+    assert client_ip_for_rate_limit(sample_request("127.0.0.1", "8.8.8.8")) == "8.8.8.8"
+    assert client_ip_for_rate_limit(sample_request("127.0.0.1", "not-an-ip")) == "127.0.0.1"
