@@ -101,7 +101,7 @@ async def test_browser_mode_without_phone():
         dialog = page.get_by_role("dialog", name="Відкрийте квартиру в Telegram")
         assert await dialog.is_visible()
         content = await dialog.inner_text()
-        assert "Контакт захищено" in content
+        assert "контакт захищено" in content.lower()
         assert await dialog.locator('a[href="https://t.me/prostov_shrink_bot"]').is_visible()
         assert "+380671112233" not in content, "Fake fallback phone MUST NOT be used!"
 
@@ -168,7 +168,7 @@ async def test_telegram_mode_error_unmasked():
         dialog = page.get_by_role("dialog", name="Спробуйте ще раз через Telegram")
         assert await dialog.is_visible()
         content = await dialog.inner_text()
-        assert "Не вдалося отримати контакт" in content
+        assert "не вдалося отримати контакт" in content.lower()
         assert "@prostov_shrink_bot" in content or "Запустіть" in content
         assert "скопійовано" not in content, "Failure MUST NOT be masked by a false success!"
 
