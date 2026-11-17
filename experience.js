@@ -320,6 +320,7 @@
       const old = window.openDealModalById;
       window.openDealModalById = function(id) {
         const x=old.call(this,id);
+        const deal = Array.isArray(LISTINGS) ? LISTINGS.find(d => d.id === id) : null;
         const secure = Boolean(window.Telegram?.WebApp?.initData);
         const action = document.getElementById("modalCallLabel");
         if (action) action.textContent = secure ? "Запросити контакт у чат" : "Відкрити Telegram";
