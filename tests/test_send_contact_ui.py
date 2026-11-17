@@ -168,3 +168,14 @@ async def test_telegram_mode_error_unmasked():
         assert "скопійовано" not in toast, "Failure MUST NOT be masked by claiming phone was copied!"
 
         await browser.close()
+
+
+def test_social_share_metadata_is_truthful_and_complete():
+    """The published preview must describe filters, not fabricate verification."""
+    with open(INDEX_PATH, encoding="utf-8") as html:
+        page = html.read()
+    assert '<meta property="og:locale" content="uk_UA">' in page
+    assert '<meta property="og:site_name" content="Київ Радар">' in page
+    assert 'перевірка автономності при блекаутах' not in page
+    assert 'заявленими можливостями автономності' in page
+    assert os.path.isfile(os.path.join(os.path.dirname(INDEX_PATH), "og-preview.png"))
