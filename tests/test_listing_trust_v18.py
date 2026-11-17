@@ -178,3 +178,27 @@ def test_monitor_catches_public_data_exposure_and_malformed_api():
         verify_public_api(health, {"success": True, "deals": [{"id": 1, "phone": "+380501111111"}]})
     with pytest.raises(AssertionError):
         verify_public_api(health, {"success": True, "deals": [{"id": 1}, {"id": 1}]})
+
+
+def test_hidden_listing_contact_is_rejected_even_with_valid_telegram_auth(monkeypatch, tmp_path):
+    doc = tmp_path / "private_reviews.json"
+    doc.write_text(json.dumps({
+        "schema_version": 1, "listings": {"42": {"state": "hidden"}}
+    }), encoding="utf-8")
+    monkeypatch.setattr(api, "REVIEW_REGISTER_PATH", str(doc))
+    monkeypatch.setattr(api, "load_trusted_deals", lambda: [imported()])
+    monkeypatch.setattr(api, "validate_telegram_init_data", lambda _data: {"id": 998877})
+    monkeypatch.setattr(api, "check_rate_limit", lambda *a, **kw: True)
+    def reject_contact_lookup(*args):
+        raise AssertionError("Hidden listing must not reach private contact lookup")
+    monkeypatch.setattr(api, "get_private_contact", reject_contact_lookup)
+    response = TestClient(api.app).post("/api/send_contact",
+                                        json={"dealId": 42, "initData": "signed-mock"})
+    assert response.status_code == 404
+
+
+def test_verified_availability_has_a_public_evidence_gated_marker():
+    records = {"42": {"state": "verified", "availability": proof(available=True)}}
+    [row] = public_listing_view([imported()], records, now=NOW)
+    assert row["reviewedByRadar"] is True
+    assert "reviewer" not in row and "evidence_ref" not in row
