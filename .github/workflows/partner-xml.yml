@@ -29,6 +29,8 @@ jobs:
   partner-xml-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 8
+    env:
+      APP_ENV: test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
