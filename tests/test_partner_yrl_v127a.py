@@ -121,6 +121,9 @@ def test_large_yrl_intake_and_idempotence_no_auto_publication(tmp_path):
     {"city": ""},
     {"url": "https://agency.example.ua.evil.test/p/1"},
     {"url": "http://agency.example.ua/p/1"},
+    {"url": "https://agency.example.ua/offer?id=123"},
+    {"url": "https://agency.example.ua/offer?private_token=secret"},
+
 ])
 def test_invalid_yrl_never_inserts_partial_data(tmp_path, kwargs):
     path = write_yrl(tmp_path, [offer(1, **kwargs)])
@@ -200,3 +203,15 @@ def test_arbitrary_new_location_or_agent_tags_are_never_copied(tmp_path):
     ingest(path, grant(tmp_path), db, now=NOW, feed_format="yrl")
     with sqlite3.connect(db) as conn:
         assert "private" not in str(conn.execute("SELECT * FROM inventory").fetchone())
+
+
+def test_yrl_tracking_query_removed_without_breaking_stable_path(tmp_path):
+    path = write_yrl(tmp_path, [
+        offer(77, url="https://agency.example.ua/offers/77?utm_source=crm&gclid=mock")
+    ])
+    db = tmp_path / "inventory.sqlite"
+    result = ingest(path, grant(tmp_path), db, now=NOW, feed_format="yrl")
+    assert result["accepted"] == 1
+    with sqlite3.connect(db) as conn:
+        saved = conn.execute("SELECT source_url FROM inventory").fetchone()[0]
+    assert saved == "https://agency.example.ua/offers/77"
