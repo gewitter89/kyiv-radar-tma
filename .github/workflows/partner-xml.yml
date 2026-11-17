@@ -30,8 +30,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install pytest (no application secrets or network feed calls)
-        run: python -m pip install pytest
+      - name: Install isolated test dependencies (no provider calls)
+        run: python -m pip install -r server/requirements.txt pytest httpx
       - name: Compile strict parser
         run: python -m compileall -q scripts/partner_xml.py scripts/market_inventory.py scripts/source_rights.py server/partner_visibility.py
       - name: Run XML and legacy bulk intake regression tests
