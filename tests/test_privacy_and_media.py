@@ -376,3 +376,31 @@ def test_unknown_price_delivers_truthful_contact_message(privacy_test_env):
     message = send.call_args.args[0]
     assert "Ціна:</b> Уточнюється" in message
     assert "None ₴" not in message
+
+
+def test_readonly_release_preflight_detects_privacy_and_schema(privacy_test_env):
+    """The deploy guard must reject raw phone leakage without changing the database."""
+    from scripts.preflight_release import inspect_release
+
+    db = privacy_test_env["db_path"]
+    catalog = privacy_test_env["deals_path"]
+    uploads = privacy_test_env["uploads_dir"]
+    exposed = inspect_release(db, catalog, uploads)
+    assert exposed["ready_for_smoke_test"] is False
+    assert any("raw public phone" in error for error in exposed["errors"])
+
+    with open(catalog, encoding="utf-8") as fh:
+        listings = json.load(fh)
+    for listing in listings:
+        listing["phone"] = None
+        listing.pop("ownerName", None)
+    with open(catalog, "w", encoding="utf-8") as fh:
+        json.dump(listings, fh)
+
+    safe = inspect_release(db, catalog, uploads)
+    assert safe["ready_for_smoke_test"] is True, safe["errors"]
+    assert safe["counts"]["catalog_listings"] == 1
+
+    absent_media = inspect_release(db, catalog, os.path.join(uploads, "absent"))
+    assert absent_media["ready_for_smoke_test"] is False
+    assert any("Media storage" in e for e in absent_media["errors"])
