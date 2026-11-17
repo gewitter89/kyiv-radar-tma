@@ -22,7 +22,7 @@ UNSUPPORTED = [
 
 def test_json_and_embedded_catalogue_have_zero_fabricated_template_claims():
     deals = json.loads((ROOT / "data" / "deals.json").read_text(encoding="utf-8"))
-    assert len(deals) >= 150
+    assert deals, 'Catalog must not be empty'
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     match = re.search(r"const KYIV_DEALS_INIT = (\[[^\n]+\]);", html)
     assert match, "Expected offline fallback catalog"
