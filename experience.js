@@ -447,7 +447,7 @@
     }
     const hero = el("section","kr-hero"); hero.id = "krHero";
     const intro = el("div","kr-hero-copy");
-    intro.append(el("p","kr-hero-eyebrow","Оренда в умовах відключень"));
+    intro.append(el("p","kr-hero-eyebrow","Житло по суті"));
     intro.append(el("h1","","Квартира під ваші умови. Без здогадок."));
     intro.append(el("p","","Ціна, район і заявлені умови автономності. Перевірку кожного оголошення позначаємо окремо."));
     const actions = el("div","kr-hero-actions");
