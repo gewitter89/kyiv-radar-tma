@@ -1055,47 +1055,46 @@
 
         // 3. LOAD DEALS (High-speed load with live VPS API synchronization)
         async function loadDeals() {
-            window.KR_CATALOG_MODE = "cached";
-            if (typeof KYIV_DEALS_INIT !== 'undefined' && Array.isArray(KYIV_DEALS_INIT)) {
-                LISTINGS = staticCatalogWithoutPartners(KYIV_DEALS_INIT);
-            }
+            // Bundled historic records may be used only in local file:// QA.
+            // A deployed website must never silently reanimate archival records
+            // when the live API fails or an approved feed is withdrawn.
+            const localFixture = window.location.protocol === 'file:';
+            window.KR_CATALOG_MODE = localFixture ? "cached" : "loading";
+            LISTINGS = localFixture && typeof KYIV_DEALS_INIT !== 'undefined' &&
+                Array.isArray(KYIV_DEALS_INIT)
+                ? staticCatalogWithoutPartners(KYIV_DEALS_INIT) : [];
 
-            // A slow API must not freeze the first visit; fall back to static/offline data.
             const controller = new AbortController();
             const abortTimer = setTimeout(() => controller.abort(), 6000);
-            // Sync with live production HTTPS API so newly approved landlord deals appear immediately
             try {
                 const res = await fetch(
                     'https://vmi3445944.contaboserver.net/api/deals?v=' + Date.now(),
                     { signal: controller.signal, cache: 'no-store' }
                 );
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && data.success && Array.isArray(data.deals)) {
-                        LISTINGS = data.deals;
-                        window.KR_CATALOG_MODE = "live";
-                    }
+                if (!res.ok) throw new Error("Catalog request failed");
+                const data = await res.json();
+                if (!data || data.success !== true || !Array.isArray(data.deals))
+                    throw new Error("Invalid catalog response");
+                LISTINGS = data.deals;
+                window.KR_CATALOG_MODE = "live"; // An empty approved array is a valid response.
+            } catch (error) {
+                if (localFixture) {
+                    // Keep explicit file:// preview and offline browser test fixtures.
+                    // These are never evidence of availability, permission or real stock.
+                    try {
+                        const resJson = await fetch('data/deals.json?v=' + Date.now());
+                        if (resJson.ok) {
+                            const dataJson = await resJson.json();
+                            if (Array.isArray(dataJson) && dataJson.length > 0) {
+                                LISTINGS = staticCatalogWithoutPartners(dataJson);
+                                window.KR_CATALOG_MODE = "static";
+                            }
+                        }
+                    } catch (err) { /* Local fixture remains the embedded snapshot. */ }
                 } else {
-                    const resJson = await fetch('data/deals.json?v=' + Date.now());
-                    if (resJson.ok) {
-                        const dataJson = await resJson.json();
-                        if (Array.isArray(dataJson) && dataJson.length > 0) {
-                            LISTINGS = staticCatalogWithoutPartners(dataJson);
-                            window.KR_CATALOG_MODE = "static";
-                        }
-                    }
+                    LISTINGS = [];
+                    window.KR_CATALOG_MODE = "error";
                 }
-            } catch (e) {
-                try {
-                    const resJson = await fetch('data/deals.json?v=' + Date.now());
-                    if (resJson.ok) {
-                        const dataJson = await resJson.json();
-                        if (Array.isArray(dataJson) && dataJson.length > 0) {
-                            LISTINGS = staticCatalogWithoutPartners(dataJson);
-                            window.KR_CATALOG_MODE = "static";
-                        }
-                    }
-                } catch (err) {}
             } finally {
                 clearTimeout(abortTimer);
             }
@@ -1111,7 +1110,6 @@
                 return cleanDesc === item.desc ? item : { ...item, desc: cleanDesc };
             });
 
-            // Flag uncertain imported metadata; do not substitute guessed values.
             if (typeof window.krQualityCatalog === "function") LISTINGS = window.krQualityCatalog(LISTINGS);
             document.getElementById('filterAll').innerText = `Всі (${LISTINGS.length})`;
             document.getElementById('activeListingsCount').innerText = `Оголошення: ${LISTINGS.length}`;
@@ -1464,15 +1462,16 @@
             if (!listEl) return;
 
             if (items.length === 0) {
+                const catalogError = window.KR_CATALOG_MODE === "error";
                 const emptyCatalog = LISTINGS.length === 0;
                 const noSaved = !emptyCatalog && ACTIVE_FILTERS.favs && FAVORITES.size === 0;
                 const savedMissing = !emptyCatalog && ACTIVE_FILTERS.favs &&
                     FAVORITES.size > 0 && !LISTINGS.some(item => FAVORITES.has(Number(item.id)));
                 listEl.innerHTML = `
-                    <div class="kr-empty-state">
-                        <div class="text-white font-semibold text-base">${emptyCatalog ? 'Зараз немає доступних оголошень' : noSaved ? 'Обраних квартир поки немає' : savedMissing ? 'Збережені оголошення зараз недоступні' : 'Нічого не знайдено'}</div>
-                        <p class="mt-2 text-sm text-[#aebdd0]">${emptyCatalog ? 'Опубліковані пропозиції тимчасово відсутні. Не показуємо зняті оголошення.' : noSaved ? 'Натисніть сердечко на квартирі, щоб зберегти її тут. Обрані залишаються лише у цьому браузері.' : savedMissing ? 'Ці квартири наразі відсутні в доступному каталозі. Ми не показуємо зняті або недоступні оголошення як активні.' : 'Змініть район, бюджет або інші умови.'}</p>
-                        ${emptyCatalog ? '' : '<button type="button" onclick="setFilter(\'all\')" class="kr-reset mt-4">Скинути фільтри</button>'}
+                    <div class="kr-empty-state" role="status" aria-live="polite">
+                        <div class="text-white font-semibold text-base">${catalogError ? 'Не вдалося завантажити оголошення' : emptyCatalog ? 'Зараз немає доступних оголошень' : noSaved ? 'Обраних квартир поки немає' : savedMissing ? 'Збережені оголошення зараз недоступні' : 'Нічого не знайдено'}</div>
+                        <p class="mt-2 text-sm text-[#aebdd0]">${catalogError ? 'Зараз немає зв’язку з каталогом. Архівні оголошення не показуємо як актуальні. Перевірте інтернет і спробуйте ще раз.' : emptyCatalog ? 'Опубліковані пропозиції тимчасово відсутні. Не показуємо зняті оголошення.' : noSaved ? 'Натисніть сердечко на квартирі, щоб зберегти її тут. Обрані залишаються лише у цьому браузері.' : savedMissing ? 'Ці квартири наразі відсутні в доступному каталозі. Ми не показуємо зняті або недоступні оголошення як активні.' : 'Змініть район, бюджет або інші умови.'}</p>
+                        ${catalogError ? '<button type="button" id="krCatalogRetry" onclick="loadDeals()" class="kr-reset mt-4">Спробувати знову</button>' : emptyCatalog ? '' : '<button type="button" onclick="setFilter(\'all\')" class="kr-reset mt-4">Скинути фільтри</button>'}
                     </div>
                 `;
                 return;
