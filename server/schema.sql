@@ -25,6 +25,15 @@ CREATE TABLE IF NOT EXISTS landlord_submissions (
     moderator_notes TEXT
 );
 
+-- A self-declaration receipt, not an identity, title-deed, or copyright verification.
+-- Keep private; do not expose this table or submission details through public APIs.
+CREATE TABLE IF NOT EXISTS landlord_consent_receipts (
+    submission_id INTEGER PRIMARY KEY,
+    consent_version TEXT NOT NULL,
+    statement_sha256 TEXT NOT NULL,
+    accepted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_complaints_deal_id ON complaints(deal_id);
 CREATE INDEX IF NOT EXISTS idx_complaints_status ON complaints(status);
 CREATE INDEX IF NOT EXISTS idx_landlords_status ON landlord_submissions(status);
