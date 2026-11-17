@@ -72,3 +72,29 @@ def test_release_preparation_rejects_public_backup_directory(privacy_test_env, t
     )
     assert process.returncode != 0
     assert list(directory.iterdir()) == []
+
+
+def test_release_preflight_rejects_catalog_without_protected_contacts(privacy_test_env):
+    """A 'healthy' listing site with no accessible contacts must block launch."""
+    from scripts.preflight_release import inspect_release
+
+    catalog = Path(privacy_test_env["deals_path"])
+    records = json.loads(catalog.read_text(encoding="utf-8"))
+    for record in records:
+        record["phone"] = None
+        record.pop("ownerName", None)
+    catalog.write_text(json.dumps(records), encoding="utf-8")
+
+    with sqlite3.connect(privacy_test_env["db_path"]) as conn:
+        conn.execute("DELETE FROM private_deal_contacts")
+
+    assessment = inspect_release(
+        privacy_test_env["db_path"],
+        privacy_test_env["deals_path"],
+        privacy_test_env["uploads_dir"]
+    )
+    assert assessment["ready_for_smoke_test"] is False
+    assert assessment["counts"]["private_contacts_available"] == 0
+    assert assessment["counts"]["listings_without_private_contact"] == 1
+    assert any("No protected contacts" in e for e in assessment["errors"])
+    assert not any("+380" in str(e) for e in assessment["errors"])
