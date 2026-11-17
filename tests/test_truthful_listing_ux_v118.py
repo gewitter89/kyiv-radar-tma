@@ -100,9 +100,63 @@ async def test_server_contact_failure_has_specific_truthful_recovery(status, mes
         await browser.close()
 
 
+
+@pytest.mark.asyncio
+async def test_distance_sort_uses_only_verified_coordinates():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844})
+        await page.route("**/api/deals*", lambda route: route.abort())
+        await open_app(page)
+        result = await page.evaluate("""() => {
+            const first = LISTINGS[0], second = LISTINGS[1];
+            first.locationVerified = false;
+            first.lat = 50.4501;
+            first.lng = 30.5234; // unverified coordinates, even if "very close"
+            first.price = 1;
+            second.locationVerified = true;
+            second.lat = 50.455;
+            second.lng = 30.529;
+            userCoords = [50.4501, 30.5234];
+            applySort('distance');
+            const sorted = getFilteredListings();
+            return {
+                sort: currentSort,
+                unknownHasDistance: Number.isFinite(first._dist),
+                confirmedHasDistance: Number.isFinite(second._dist),
+                firstId: sorted[0].id,
+                confirmedId: second.id,
+            };
+        }""")
+        assert result["sort"] == "distance"
+        assert result["unknownHasDistance"] is False
+        assert result["confirmedHasDistance"] is True
+        assert result["firstId"] == result["confirmedId"]
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_distance_sort_without_evidence_refuses_false_precision():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844})
+        await page.route("**/api/deals*", lambda route: route.abort())
+        await open_app(page)
+        result = await page.evaluate("""() => {
+            LISTINGS.forEach(x => x.locationVerified = false);
+            userCoords = [50.4501, 30.5234];
+            applySort('distance');
+            return {sort:currentSort, anyDistances:LISTINGS.some(x => Number.isFinite(x._dist))};
+        }""")
+        assert result["sort"] == "price_asc"
+        assert result["anyDistances"] is False
+        await browser.close()
+
 def test_text_never_pretends_imported_listings_were_posted_by_owner():
     html = open(os.path.join(ROOT, "index.html"), encoding="utf-8").read()
     assert "Оголошення подано власником через Київ Радар" not in html
     assert "Прямий номер" not in html
     assert "Прямий контакт з орендодавцем" not in html
+    assert "Ціна та актуальність об'єкта підтверджені" not in html
+    assert "запускається найближчим часом" not in html
     assert "⚡ Генератор · заявлено" in html
