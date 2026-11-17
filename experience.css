@@ -41,7 +41,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, [role="dialog"]:focu
 .kr-action {
   border: 1px solid var(--kr-edge); border-radius: 13px; padding: 10px 12px;
   display: inline-flex; align-items: center; justify-content: center;
-  min-height: 42px; cursor: pointer; color: #e2ebfc;
+  min-height: 44px; cursor: pointer; color: #e2ebfc;
   background: #283344; font-size: 12px; font-weight: 650;
   white-space: nowrap; transition: background .16s, transform .16s;
 }
@@ -99,9 +99,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, [role="dialog"]:focu
 .kr-handoff-dialog .kr-dialog-kicker { color: #a2c2ff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 10px; }
 .kr-handoff-dialog strong { color: #f4f7ff; }
 .kr-handoff-dialog .kr-dialog-close { float: right; min-width: 44px; min-height: 44px; border-radius: 12px; color: white; background: #35435a; }
-#searchInput { font-size: 16px !important; height: 39px; }
+#searchInput { font-size: 16px !important; height: 44px; }
+header { min-height: 54px; height: auto !important; }
+header > button:last-child { min-height: 44px; }
+#viewModeMapBtn, #viewModeListBtn { min-height: 44px; }
 #filterBarWrapper { background: #0b111b !important; }
-#filterContainer > button { min-height: 36px; font-size: 11px; }
+#filterContainer > button { min-height: 44px; font-size: 12px; }
 #modalPhotoContainer img { object-position: center; }
 #dealModal button[onclick="closeDealModal()"],
 #sortModal button[onclick="closeSortModal()"],
@@ -126,7 +129,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, [role="dialog"]:focu
   .kr-hero h1 { font-size: 17px; }
   .kr-hero p { font-size: 11px; margin-top: 3px; }
   .kr-hero-actions { width: 100%; }
-  .kr-hero-actions .kr-action { min-height: 37px; padding: 7px 12px; }
+  .kr-hero-actions .kr-action { min-height: 44px; padding: 7px 12px; }
   .kr-hero-actions .kr-action.primary { flex: 1; }
   .kr-results-bar { padding: 6px 12px; font-size: 11px; }
   .kr-brand-label strong { font-size: 11px; }
