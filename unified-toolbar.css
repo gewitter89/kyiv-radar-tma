@@ -1141,3 +1141,32 @@ html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety .kr-rental-safety-c
   font-size:11px;
   color:var(--kr-hint);
 }
+
+
+/* Visual QA v1.16: old hard-coded dark utility tiles became unreadable when
+   switching to the light theme. Keep the same semantic order and real data. */
+html.kr-unified-111.kr-simple[data-kr-theme] #modalEquipment > div {
+  background:var(--kr-raised) !important;
+  border:1px solid var(--kr-border) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalEquipment > div span:not(.w-2) {
+  color:var(--kr-ink) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalEquipment > div small {
+  color:var(--kr-muted) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalEquipment > div b {
+  color:var(--kr-ink) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalCommissionBadge {
+  background:var(--kr-raised) !important;
+  border:1px solid var(--kr-border) !important;
+  color:var(--kr-ink) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalPhoneHeaderTitle {
+  color:var(--kr-muted) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalPhotoIndex {
+  background:rgba(10,19,30,.8) !important;
+  color:#fff !important;
+}
