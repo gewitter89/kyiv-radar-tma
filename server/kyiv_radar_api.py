@@ -539,29 +539,43 @@ async def submit_report(req: ReportRequest, request: Request):
     }
 
 def cleanup_abandoned_uploads(max_age_hours: int = 48) -> None:
-    """Remove only unclaimed, unapproved uploads; never delete submitted photos."""
+    """Remove aged unclaimed files and rejected submissions; never purge approved photos."""
+    conn = None
     try:
         conn = sqlite3.connect(DB_PATH, timeout=5.0)
-        try:
-            rows = conn.execute(
-                "SELECT photo_id FROM landlord_uploads WHERE status = 'pending' "
-                "AND submission_id IS NULL AND created_at < datetime('now', ?)",
-                (f"-{max_age_hours} hours",)
-            ).fetchmany(100)
-            for (photo_id,) in rows:
-                if PHOTO_ID_PATTERN.fullmatch(photo_id):
-                    path = os.path.join(UPLOADS_BASE_DIR, photo_id + ".webp")
-                    try:
-                        if os.path.exists(path): os.remove(path)
-                    except OSError:
-                        continue
-                    conn.execute("DELETE FROM landlord_uploads WHERE photo_id = ? "
-                                 "AND submission_id IS NULL AND status = 'pending'", (photo_id,))
-            conn.commit()
-        finally:
-            conn.close()
+        # Coordinate cleanup with submissions and moderation in other processes.
+        conn.execute("BEGIN IMMEDIATE")
+        rows = conn.execute(
+            "SELECT u.photo_id FROM landlord_uploads u "
+            "LEFT JOIN landlord_submissions s ON s.id = u.submission_id "
+            "WHERE u.status = 'pending' AND ("
+            "(u.submission_id IS NULL AND u.created_at < datetime('now', ?)) OR "
+            "(u.submission_id IS NOT NULL AND s.status IN ('rejected', 'declined') "
+            "AND u.created_at < datetime('now', '-7 days'))"
+            ") LIMIT 100",
+            (f"-{max_age_hours} hours",)
+        ).fetchall()
+        for (photo_id,) in rows:
+            if not PHOTO_ID_PATTERN.fullmatch(photo_id):
+                continue
+            path = os.path.join(UPLOADS_BASE_DIR, photo_id + ".webp")
+            try:
+                if os.path.exists(path):
+                    os.remove(path)
+            except OSError:
+                continue
+            conn.execute(
+                "DELETE FROM landlord_uploads WHERE photo_id = ? AND status = 'pending'",
+                (photo_id,)
+            )
+        conn.commit()
     except sqlite3.Error:
+        if conn:
+            conn.rollback()
         logger.warning("Unable to purge abandoned uploads")
+    finally:
+        if conn:
+            conn.close()
 
 
 @app.get("/api/media/{photo_id}")
