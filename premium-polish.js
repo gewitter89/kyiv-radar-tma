@@ -76,6 +76,24 @@
 
     image.classList.add("kr-gallery-image");
     image.draggable = false;
+    // Show helpful feedback instead of a black image box on a slow/broken source.
+    const fallback = document.createElement("div");
+    fallback.className = "kr-gallery-fallback";
+    fallback.setAttribute("aria-hidden", "true");
+    fallback.textContent = "Завантажуємо фото…";
+    frame.insertBefore(fallback, image);
+    image.addEventListener("load", () => {
+      frame.classList.remove("kr-gallery-loading", "kr-gallery-missing");
+    });
+    image.addEventListener("error", () => {
+      frame.classList.remove("kr-gallery-loading");
+      frame.classList.add("kr-gallery-missing");
+      fallback.textContent = "Фото тимчасово недоступне";
+    });
+    frame.classList.add("kr-gallery-loading");
+    if (image.complete && image.naturalWidth > 0) {
+      frame.classList.remove("kr-gallery-loading");
+    }
     frame.setAttribute("role", "group");
     frame.setAttribute("aria-label", "Фотографії квартири. Гортайте вліво чи вправо.");
     frame.tabIndex = 0;
@@ -107,7 +125,11 @@
     let index = 0;
     let suppressClickUntil = 0;
     function display() {
+      frame.classList.remove("kr-gallery-missing");
+      frame.classList.add("kr-gallery-loading");
+      fallback.textContent = "Завантажуємо фото…";
       image.src = photos[index];
+      if (image.complete && image.naturalWidth > 0) frame.classList.remove("kr-gallery-loading");
       image.alt = "Фото квартири " + (index + 1) + " з " + photos.length;
       count.textContent = (index + 1) + "/" + photos.length;
       dots.replaceChildren();
