@@ -4,6 +4,9 @@
  const Q=id=>document.getElementById(id);
  const choices=[["generator","Генератор у будинку","Заявлено, не перевірено"],["gpon","Інтернет під час відключень","Заявлено, не перевірено"],["pets","З тваринами","Уточнюйте умови"],["lowFloor","До 4-го поверху","Лише з відомим поверхом"],["favs","Лише обрані","Ваші збережені квартири"]];
  let draft=null,opener=null,previousOverflow="";
+ // Preserve the user's search and advanced filters when entering favorites.
+ // The shortcut is a separate browsing destination, not another hidden criterion.
+ let previousBrowse=null;
  const btn=(title,id,className)=>{const b=document.createElement("button");b.type="button";b.textContent=title;if(id)b.id=id;if(className)b.className=className;return b};
  function countRoom(value){
   const data=typeof LISTINGS!=="undefined"&&Array.isArray(LISTINGS)?LISTINGS:[];
@@ -17,6 +20,17 @@
   if(rooms){rooms.textContent=f.rooms==null?"Кімнати":f.rooms===5?"5+ кімн":f.rooms+" кімн";rooms.classList.toggle("kr-chip-on",f.rooms!=null)}
   if(price){price.textContent=f.maxPrice==null?"Ціна":"До "+Number(f.maxPrice).toLocaleString("uk-UA")+" ₴";price.classList.toggle("kr-chip-on",f.maxPrice!=null)}
   if(extra){let count=choices.filter(([key])=>Boolean(f[key])).length;extra.textContent=count?"Умови · "+count:"Умови";extra.classList.toggle("kr-chip-on",count>0)}
+  const fav=Q("krFavoritesShortcut");
+  if(fav){
+   const count=typeof FAVORITES!=="undefined"?FAVORITES.size:0;
+   const active=Boolean(f.favs);
+   fav.querySelector(".kr-favorites-count").textContent=String(count);
+   fav.querySelector(".kr-favorites-heart").textContent=active?"♥":"♡";
+   fav.classList.toggle("kr-chip-on",active);
+   fav.setAttribute("aria-pressed",String(active));
+   fav.setAttribute("aria-label",active?"Повернутися до пошуку квартир":"Відкрити обрані квартири: "+count);
+   fav.title=active?"Повернутися до пошуку":"Мої обрані квартири";
+  }
  }
  function sync(){
   if(!draft)return;
@@ -33,6 +47,37 @@
   const input=Q("krMaxPriceInput");if(document.activeElement!==input)input.value=draft.maxPrice==null?"":String(draft.maxPrice);
   const zero=[3,4,5].filter(v=>countRoom(v)===0);
   Q("krRoomNotice").textContent=zero.length?"Для "+zero.map(v=>v===5?"5+":v).join(", ")+" кімнат зараз немає оголошень. Вибір залишається доступним для нових надходжень.":"Показуємо кількість квартир у поточному каталозі.";
+ }
+ function toggleFavoritesShortcut(){
+  if(typeof ACTIVE_FILTERS==="undefined")return;
+  const favoritesAreOpen=Boolean(ACTIVE_FILTERS.favs);
+  const input=Q("searchInput");
+  if(!favoritesAreOpen){
+   previousBrowse={
+    filters:{...ACTIVE_FILTERS},
+    query:typeof searchQuery==="string"?searchQuery:""
+   };
+   Object.assign(ACTIVE_FILTERS,{
+    rooms:null,maxPrice:null,generator:false,gpon:false,
+    lowFloor:false,pets:false,favs:true
+   });
+   // All saved cards should be visible, not silently hidden by the old query.
+   if(typeof searchQuery!=="undefined")searchQuery="";
+   if(input)input.value="";
+   if(typeof setViewMode==="function")setViewMode("list");
+  }else{
+   if(previousBrowse){
+    Object.assign(ACTIVE_FILTERS,previousBrowse.filters,{favs:false});
+    if(typeof searchQuery!=="undefined")searchQuery=previousBrowse.query;
+    if(input)input.value=previousBrowse.query;
+   }else ACTIVE_FILTERS.favs=false;
+   previousBrowse=null;
+  }
+  if(typeof currentActiveId!=="undefined")currentActiveId=null;
+  if(typeof updateFilterPillsUI==="function")updateFilterPillsUI();
+  if(typeof renderAll==="function")renderAll();
+  const list=Q("listViewContainer");
+  if(list&&!list.classList.contains("hidden"))list.scrollTop=0;
  }
  function open(section,source){
   const modal=Q("krFiltersSheet");if(!modal||!modal.hidden)return;
@@ -106,6 +151,13 @@
    const chip=btn(title,id,"kr-filter-trigger");chip.setAttribute("aria-controls","krFiltersSheet");chip.setAttribute("aria-haspopup","dialog");chip.setAttribute("aria-expanded","false");
    chip.addEventListener("click",()=>open(section,chip));strip.append(chip);
   }
+  const favorites=btn("", "krFavoritesShortcut", "kr-favorites-shortcut");
+  favorites.innerHTML='<span class="kr-favorites-heart" aria-hidden="true">♡</span>'+
+    '<span class="kr-favorites-label">Обрані</span>'+
+    '<span class="kr-favorites-count" aria-hidden="true">0</span>';
+  favorites.setAttribute("aria-pressed","false");
+  favorites.addEventListener("click",toggleFavoritesShortcut);
+  strip.append(favorites);
   legacy.classList.add("kr-legacy-filters");legacy.setAttribute("aria-hidden","true");legacy.inert=true;
   bar.insertBefore(strip,legacy);createSheet();document.documentElement.classList.add("kr-focused-filter-ui");
   const oldRender=window.renderAll;
