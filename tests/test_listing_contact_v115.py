@@ -17,6 +17,14 @@ TELEGRAM_URL = URL + "#tgWebAppData=" + urllib.parse.quote(INIT)
 async def ready(page, telegram=False):
     await page.goto(TELEGRAM_URL if telegram else URL, wait_until="domcontentloaded")
     await page.wait_for_selector("#listViewContainer .kr-open-detail")
+    # Isolated verified-contact fixture: does not write to any production dataset.
+    # Contact endpoint tests must not impersonate unverified OLX/DIM.RIA cards.
+    await page.evaluate("""() => {
+        const fixture = getFilteredListings()[0];
+        fixture.source = 'Київ Радар';
+        fixture.contactVerified = true;
+        renderAll();
+    }""")
     await page.locator("#listViewContainer .kr-open-detail").first.click()
     await page.wait_for_selector("#dealModal:not(.hidden)")
     assert await page.locator("#dealModal").get_attribute("aria-modal") == "true"
