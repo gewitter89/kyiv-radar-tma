@@ -355,8 +355,20 @@
         const original = document.getElementById("modalOriginalLink");
         // Reuse the main application's validated OLX/DIM.RIA source link. Never
         // make a button from arbitrary data.url, and never assume it is active.
-        const sourceHref = sourceFirst && original && !original.classList.contains("hidden")
-          ? original.getAttribute("href") : null;
+        let sourceHref = null;
+        if (sourceFirst && original && !original.classList.contains("hidden")) {
+          try {
+            const address = new URL(original.getAttribute("href"), window.location.href);
+            const host = address.hostname.toLowerCase();
+            const matchingProvider = source === "OLX"
+              ? (host === "olx.ua" || host.endsWith(".olx.ua"))
+              : (host === "dom.ria.com" || host.endsWith(".dom.ria.com"));
+            if (address.protocol === "https:" && matchingProvider &&
+                !address.username && !address.password) sourceHref = address.href;
+          } catch (_) {
+            // A malformed or mismatched source must never become an outgoing CTA.
+          }
+        }
         const sourceAction = document.getElementById("krOriginalAction");
         if (sourceAction) {
           sourceAction.hidden = !sourceHref;
