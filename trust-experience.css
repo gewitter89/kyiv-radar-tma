@@ -22,3 +22,8 @@
 @media (prefers-reduced-motion: reduce) {
   #reportModal * { animation:none !important; transition:none !important; }
 }
+
+.kr-empty-state { grid-column:1/-1; padding:35px 20px; text-align:center; border:1px solid #2d3b50; border-radius:18px; background:#152132; }
+.kr-empty-state .kr-reset { min-height:44px; font-size:13px; }
+#reportModal > div { max-height:min(92vh,740px); }
+#reportModal > div > .p-3\\.5 { overflow-y:auto; }
