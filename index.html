@@ -1115,7 +1115,7 @@
                 LISTINGS = data.deals.filter(item => {
                     if (!item || typeof item !== "object") return false;
                     const source = String(item.source || "").trim().toLowerCase();
-                    const isFirstParty = source === "київ радар" || source === "київ радар (пряма заявка)";
+                    const isFirstParty = source === "київ радар (пряма заявка)";
                     const isPartner = source.startsWith("partner:");
                     // Fail closed for unknown sources, archived fixtures and
                     // historical records, even if an old API returns 200 OK.
