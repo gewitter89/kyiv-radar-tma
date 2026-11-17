@@ -270,8 +270,24 @@ def test_photo_ownership_and_moderated_public_access(privacy_test_env):
     )
     assert duplicate["success"] is True
     assert duplicate.get("already_approved") is True
-    assert sum(x.get("submission_id") == submission_id
-               for x in __import__("json").load(open(privacy_test_env["deals_path"], encoding="utf-8"))) == 1
+    with open(privacy_test_env["deals_path"], encoding="utf-8") as stream:
+        listings = json.load(stream)
+    assert sum(x.get("submission_id") == submission_id for x in listings) == 1
+
+    # Simulate a recoverable catalog loss with SQLite already committed:
+    # the same already-approved photo must still be reusable for reconciliation.
+    remaining = [x for x in listings if x.get("submission_id") != submission_id]
+    with open(privacy_test_env["deals_path"], "w", encoding="utf-8") as stream:
+        json.dump(remaining, stream)
+    repaired = process_landlord_approval(
+        submission_id, 555, 555,
+        privacy_test_env["db_path"], privacy_test_env["deals_path"]
+    )
+    assert repaired["success"] is True, repaired
+    assert client.get("/api/media/" + photo_id).status_code == 200
+    with open(privacy_test_env["deals_path"], encoding="utf-8") as stream:
+        listings_after = json.load(stream)
+    assert sum(x.get("submission_id") == submission_id for x in listings_after) == 1
 
 
 def test_rejected_submission_cannot_be_approved(privacy_test_env):
