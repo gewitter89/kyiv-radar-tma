@@ -13,13 +13,13 @@ NOW = datetime(2026, 11, 17, 12, 0, tzinfo=timezone.utc)
 
 
 def make_grant(tmp_path, *, source="agency_one", ref="contract_v1",
-               end="2027-01-01", full=True):
+               end="2027-01-01", full=True, hosts=None):
     p = tmp_path / f"grant_{source}.json"
     p.write_text(json.dumps({
         "source_key": source, "agreement_ref": ref,
         "valid_until": end, "operator_rights_reviewed": True,
         "metadata_display_permitted": True,
-        "allowed_source_hosts": ["agency.example.ua"],
+        "allowed_source_hosts": hosts or ["agency.example.ua"],
         "full_snapshot_allowed": full,
     }), encoding="utf8")
     return p
@@ -220,3 +220,19 @@ def test_sql_accidental_rights_reopen_deletion_and_audit_tampering_blocked(tmp_p
             conn.execute("UPDATE source_rights_audit SET reason_code='changed'")
     assert get_rights(db)[0][-1] == "revoked"
     assert audit_count(db) == 2
+
+
+def test_contract_host_or_full_snapshot_scope_cannot_expand_implicitly(tmp_path):
+    db = tmp_path / "private.sqlite"
+    feed = make_feed(tmp_path)
+    ingest(feed, make_grant(tmp_path), db, now=NOW)
+    with pytest.raises(ValueError, match="scope change"):
+        ingest(feed, make_grant(tmp_path, hosts=["agency.example.ua", "new.example.ua"]),
+               db, now=NOW)
+    with pytest.raises(ValueError, match="scope change"):
+        ingest(feed, make_grant(tmp_path, full=False), db, now=NOW)
+    assert get_rights(db)[0][-1] == "active"
+    assert audit_count(db) == 1
+    with sqlite3.connect(db) as conn:
+        with pytest.raises(sqlite3.IntegrityError, match="scope change"):
+            conn.execute("UPDATE source_rights SET scope_digest=?", ("0" * 64,))
