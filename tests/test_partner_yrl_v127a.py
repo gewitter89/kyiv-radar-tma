@@ -3,6 +3,7 @@
 import json
 import sqlite3
 from datetime import datetime, timezone
+from xml.sax.saxutils import escape
 
 import pytest
 
@@ -29,7 +30,7 @@ def grant(tmp_path, **changes):
 def offer(n, *, currency="UAH", typ="оренда", category="квартира",
           price="18000", period="<period>місяць</period>", city="Київ",
           url=None, extra=""):
-    url = url or f"https://agency.example.ua/offers/{n}"
+    url = escape(url or f"https://agency.example.ua/offers/{n}")
     return f"""<offer internal-id="A-{n}">
         <type>{typ}</type>
         <property-type>житлова</property-type>
