@@ -177,6 +177,39 @@
     updateStatus();
     input?.focus();
   }
+  let requestedDealOpened = false;
+  function maybeOpenRequestedDeal() {
+    if (requestedDealOpened) return;
+    const raw = new URLSearchParams(window.location.search).get("deal");
+    if (!raw || !/^[1-9]\d{0,9}$/.test(raw)) return;
+    const id = Number(raw);
+    if (!Array.isArray(LISTINGS) || !LISTINGS.some(d => d.id === id)) return;
+    requestedDealOpened = true;
+    setTimeout(() => {
+      if (typeof window.openDealModalById === "function") window.openDealModalById(id);
+    }, 0);
+  }
+  function shareListing(deal) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("deal", String(deal.id));
+    url.hash = "";
+    const value = url.toString();
+    if (navigator.share) {
+      navigator.share({title:"Київ Радар · квартира",url:value}).catch(() => {});
+      return;
+    }
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(value).then(() => {
+        if (typeof showToast === "function") showToast("Посилання на квартиру скопійовано");
+      }).catch(() => showDialog({
+        title:"Посилання на квартиру",
+        paragraphs:[value,"Збережіть посилання та надішліть його кому потрібно."]
+      }));
+      return;
+    }
+    showDialog({title:"Посилання на квартиру",paragraphs:[value]});
+  }
+
   function enrichCards() {
     if (!Array.isArray(LISTINGS)) return;
     const byId = new Map(LISTINGS.map(x => [String(x.id), x]));
@@ -275,6 +308,7 @@
         const value = original.apply(this,arguments);
         enrichCards();
         updateStatus();
+        maybeOpenRequestedDeal();
         return value;
       };
     }
@@ -297,6 +331,18 @@
         }
         const secondary = document.getElementById("modalChatBtn");
         if (secondary) secondary.hidden = true;
+        const bar = document.getElementById("modalCallBtn")?.parentElement;
+        if (bar) {
+          let share = document.getElementById("krShareListing");
+          if (!share) {
+            share = button("Поділитися", () => shareListing(deal));
+            share.id = "krShareListing";
+            share.setAttribute("aria-label", "Поділитися посиланням на квартиру");
+            bar.append(share);
+          } else {
+            share.onclick = () => shareListing(deal);
+          }
+        }
         return x;
       };
     }
