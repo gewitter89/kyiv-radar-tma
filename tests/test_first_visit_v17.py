@@ -123,3 +123,39 @@ async def test_no_leaflet_still_opens_list_and_search():
         assert await page.locator("#listViewContainer").is_visible()
         assert await page.locator(".kr-compare-button").count() > 0
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_landlord_browser_entry_guides_before_long_form():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844})
+        await open_app(page)
+        await page.evaluate("() => openLandlordModal()")
+        dialog = page.get_by_role("dialog", name="Оголошення надсилаються через Telegram")
+        assert await dialog.is_visible()
+        assert not await page.locator("#landlordModal").is_visible()
+        assert await dialog.locator('a[href="https://t.me/prostov_shrink_bot"]').is_visible()
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_mobile_photo_preparation_preserves_jpg_and_rejects_bad_heic():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        await open_app(page)
+        outcome = await page.evaluate("""async () => {
+            const jpg = new File([new Uint8Array([1,2,3])], 'photo.jpg',
+                {type:'image/jpeg'});
+            const regular = await window.krPrepareUploadPhotos([jpg]);
+            let invalidError = '';
+            try {
+                const broken = new File(['not an image'], 'broken.heic', {type:'image/heic'});
+                await window.krPrepareUploadPhotos([broken]);
+            } catch (err) { invalidError = String(err.message || err); }
+            return {same: regular[0] === jpg, invalidError};
+        }""")
+        assert outcome["same"] is True
+        assert "HEIC" in outcome["invalidError"]
+        await browser.close()
