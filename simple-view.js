@@ -86,7 +86,7 @@
     }
 
     const search = document.getElementById("searchInput");
-    if (search) search.placeholder = "Метро або район…";
+    if (search) search.placeholder = "Район або назва квартири…";
 
     // New visitors should see apartments, not a map filling their whole screen.
     let savedView;

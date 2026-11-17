@@ -37,20 +37,25 @@
         Number.isInteger(Number(item.rooms)) &&
         Number(item.rooms) > 0 && roomFromTitle !== Number(item.rooms) &&
         item.isOwnerVerified !== true);
-      const titleStation = titleMetro(item.title);
-      const metroConflict = item.metroConflict === true || (titleStation &&
-        !String(item.metro || "").toLocaleLowerCase("uk-UA")
-          .includes(titleStation.toLocaleLowerCase("uk-UA")) &&
-        item.isOwnerVerified !== true);
-      // Only independently verified location may become a precise map marker.
+      // A model-derived station or walk time is not a sourced routing fact.
+      // Imports with no independently verified location cannot assert either.
       const locationVerified = item.locationVerified === true && !badAddress;
+      const source = String(item.source || "").toUpperCase();
+      const importedUnverified = (source === "OLX" || source === "DOM.RIA") && !locationVerified;
+      const titleStation = titleMetro(item.title);
+      const metroConflict = !importedUnverified &&
+        (item.metroConflict === true || (titleStation && item.metro &&
+        !String(item.metro).toLocaleLowerCase("uk-UA")
+          .includes(titleStation.toLocaleLowerCase("uk-UA")) &&
+        item.isOwnerVerified !== true));
       return {
         ...item,
         // A masked number is not evidence that a real contact is available.
         phoneMasked: item.contactVerified === true ? item.phoneMasked || null : null,
         address: badAddress ? "Адреса уточнюється" : item.address,
         rooms: roomsConflict ? null : item.rooms,
-        metro: metroConflict ? "Метро уточнюється" : item.metro,
+        metro: importedUnverified ? null : metroConflict ? "Метро уточнюється" : item.metro,
+        walkMin: importedUnverified ? null : item.walkMin,
         roomConflict: Boolean(roomsConflict),
         metroConflict: Boolean(metroConflict),
         addressConflict: Boolean(badAddress),
