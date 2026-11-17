@@ -28,7 +28,9 @@ jobs:
       - name: Compile backend modules
         run: python -m compileall -q server
       - name: Audit public listings without promoting unverified claims
-        run: python scripts/audit_catalog.py --output artifacts/catalog-quality.json
+        run: |
+          python scripts/audit_catalog.py --output artifacts/catalog-quality.json
+          python scripts/catalog_integrity.py --output artifacts/catalog-integrity.json
       - name: Capture phone, tablet and desktop preview
         run: python scripts/capture_ui.py
       - name: Store UI screenshots for human review
@@ -38,6 +40,7 @@ jobs:
           path: |
             artifacts/*.png
             artifacts/catalog-quality.json
+            artifacts/catalog-integrity.json
           retention-days: 7
       - name: Test isolated user journeys, media privacy, moderation and responsive UI
         run: |
@@ -53,6 +56,9 @@ jobs:
             tests/test_kyiv_signal_theme_v112.py \
             tests/test_smart_filters_v113.py \
             tests/test_simple_first_view.py \
+            tests/test_catalog_integrity_v116.py \
+            tests/test_rental_safety_v116.py \
+            tests/test_listing_light_contrast_v116.py \
             tests/test_catalog_claims.py \
             tests/test_listing_trust_v18.py \
             tests/test_trust_experience_v18.py \

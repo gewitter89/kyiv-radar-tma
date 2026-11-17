@@ -1081,3 +1081,109 @@ html.kr-unified-111.kr-simple[data-kr-theme] #dealModal button:focus-visible {
     padding-inline:8px !important;
   }
 }
+
+
+/* v1.16: safety literacy without claiming this listing is vetted. */
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety {
+  padding:0;
+  border:1px solid var(--kr-border);
+  border-radius:13px;
+  background:var(--kr-raised);
+  color:var(--kr-ink);
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety > summary {
+  list-style:none;
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:12px 38px 12px 13px;
+  min-height:44px;
+  cursor:pointer;
+  font-size:12px;
+  line-height:1.35;
+  font-weight:660;
+  color:var(--kr-ink);
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety > summary::-webkit-details-marker {
+  display:none;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety > summary::after {
+  content:"⌄";
+  position:absolute;
+  right:13px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:18px;
+  font-weight:400;
+  color:var(--kr-muted);
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety[open] > summary::after {
+  transform:translateY(-50%) rotate(180deg);
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety > summary:focus-visible {
+  outline:2px solid var(--kr-focus);
+  outline-offset:2px;
+  border-radius:11px;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety .kr-rental-safety-copy {
+  padding:0 13px 13px;
+  display:grid;
+  gap:8px;
+  font-size:12px;
+  line-height:1.5;
+  color:var(--kr-muted);
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety .kr-rental-safety-copy p {
+  margin:0;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety .kr-rental-safety-copy small {
+  font-size:11px;
+  color:var(--kr-hint);
+}
+
+
+/* Visual QA v1.16: old hard-coded dark utility tiles became unreadable when
+   switching to the light theme. Keep the same semantic order and real data. */
+html.kr-unified-111.kr-simple[data-kr-theme] #modalEquipment > div {
+  background:var(--kr-raised) !important;
+  border:1px solid var(--kr-border) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalEquipment > div span:not(.w-2) {
+  color:var(--kr-ink) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalEquipment > div small {
+  color:var(--kr-muted) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalEquipment > div b {
+  color:var(--kr-ink) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalCommissionBadge {
+  background:var(--kr-raised) !important;
+  border:1px solid var(--kr-border) !important;
+  color:var(--kr-ink) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalPhoneHeaderTitle {
+  color:var(--kr-muted) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalPhotoIndex {
+  background:rgba(10,19,30,.8) !important;
+  color:#fff !important;
+}
+
+
+/* Explicit light surfaces override legacy dark palette values injected
+   into the original per-listing equipment section. Avoid inherited dark
+   component tokens; enforce actual light colors in the light theme. */
+html.kr-unified-111.kr-simple[data-kr-theme="light"] #dealModal #krDealScroll #modalEquipment > div {
+  background:#E8EFF5 !important;
+  background-color:#E8EFF5 !important;
+  border-color:rgba(54,85,117,.17) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme="light"] #dealModal #krDealScroll #modalEquipment > div span:not(.w-2),
+html.kr-unified-111.kr-simple[data-kr-theme="light"] #dealModal #krDealScroll #modalEquipment > div b {
+  color:#19283A !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme="light"] #dealModal #krDealScroll #modalEquipment > div small {
+  color:#526579 !important;
+}
