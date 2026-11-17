@@ -131,3 +131,24 @@ async def test_keyboard_button_can_toggle_favorite_without_opening_modal():
         assert await page.locator(f'#listViewContainer [data-favorite-id="{fav_id}"]').get_attribute("aria-pressed") == "true"
         assert await page.locator("#dealModal").is_hidden()
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_visible_more_filters_and_favorites_button_work_with_touch():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width":390,"height":844}, is_mobile=True, has_touch=True)
+        await open_apartments(page)
+        more = page.locator("#krMoreFilters")
+        await more.wait_for(state="visible")
+        await more.click()
+        filter_button = page.locator("#filterFavs")
+        await filter_button.wait_for(state="visible")
+        assert await filter_button.get_attribute("aria-pressed") == "false"
+        await filter_button.click()
+        assert await filter_button.get_attribute("aria-pressed") == "true"
+        assert await page.locator("#listViewContainer").get_by_text("Обраних квартир поки немає").is_visible()
+        await filter_button.click()
+        assert await filter_button.get_attribute("aria-pressed") == "false"
+        assert await page.evaluate("getFilteredListings().length") > 2
+        await browser.close()
