@@ -141,7 +141,7 @@ html.kr-simple, .kr-simple body { background:var(--kr-base) !important; }
   .kr-simple #filterContainer { gap:5px; }
   .kr-simple #filterContainer > button { min-height:40px !important; padding:7px 9px; }
   .kr-simple #krResultsBar { padding:6px 10px; gap:8px; }
-  .kr-simple #krDataStatus { display:none; }
+  .kr-simple #krDataStatus { display:inline; font-size:10px; white-space:nowrap; color:#b1bfce; }
   .kr-simple #krResultsCount { font-size:12px; }
   .kr-simple #floatingViewToggle button { font-size:11px; min-width:56px; }
   .kr-simple #listViewContainer:not(.hidden) { grid-template-columns:minmax(0,1fr); padding:10px 12px 25px; gap:12px; }
