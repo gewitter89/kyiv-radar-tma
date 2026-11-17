@@ -13,6 +13,7 @@ from __future__ import annotations
 import re
 from collections import deque
 from pathlib import Path
+from urllib.parse import parse_qsl, urlsplit
 from xml.parsers import expat
 
 MAX_DEPTH = 24
@@ -103,6 +104,19 @@ def _canonical_row(data: dict) -> dict:
     if not INTEGER.fullmatch(raw_price):
         # Do not turn floating, currency-converted or per-metre values into UAH.
         raise InvalidYRL("A positive integer UAH whole-property price is required")
+    source_url = data.get("source_url")
+    if isinstance(source_url, str):
+        query = urlsplit(source_url).query
+        if query:
+            params = parse_qsl(query, keep_blank_values=True)
+            safe_tracking = {"fbclid", "gclid", "yclid"}
+            if not params or any(
+                not (key.lower().startswith("utm_") or key.lower() in safe_tracking)
+                for key, _value in params
+            ):
+                # The legacy canonical URL gate drops query params. Never
+                # erase a partner's real listing identifier by accident.
+                raise InvalidYRL("Ambiguous source URL query; stable permalink required")
     row = {
         "external_id": data["external_id"],
         "source_url": data.get("source_url"),
