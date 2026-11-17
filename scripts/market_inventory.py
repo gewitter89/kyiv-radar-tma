@@ -71,6 +71,34 @@ CREATE TABLE IF NOT EXISTS source_rights_audit (
     reason_code TEXT
 );
 CREATE INDEX IF NOT EXISTS ix_source_rights_audit_source ON source_rights_audit(source);
+-- Fail closed if an old source-rights row is accidentally manipulated.
+CREATE TRIGGER IF NOT EXISTS trg_source_rights_no_delete
+BEFORE DELETE ON source_rights
+BEGIN
+    SELECT RAISE(ABORT, 'Source rights deletion is forbidden');
+END;
+CREATE TRIGGER IF NOT EXISTS trg_source_rights_no_reactivation
+BEFORE UPDATE OF status ON source_rights
+WHEN OLD.status='revoked' AND NEW.status!='revoked'
+BEGIN
+    SELECT RAISE(ABORT, 'Revoked source cannot be reactivated in place');
+END;
+CREATE TRIGGER IF NOT EXISTS trg_source_rights_no_extension
+BEFORE UPDATE OF valid_until ON source_rights
+WHEN NEW.valid_until > OLD.valid_until
+BEGIN
+    SELECT RAISE(ABORT, 'Contract extension requires separate migration');
+END;
+CREATE TRIGGER IF NOT EXISTS trg_source_rights_audit_no_delete
+BEFORE DELETE ON source_rights_audit
+BEGIN
+    SELECT RAISE(ABORT, 'Source audit deletion is forbidden');
+END;
+CREATE TRIGGER IF NOT EXISTS trg_source_rights_audit_no_update
+BEFORE UPDATE ON source_rights_audit
+BEGIN
+    SELECT RAISE(ABORT, 'Source audit modification is forbidden');
+END;
 -- Even manual SQL cannot approve a listing without current source rights.
 CREATE TRIGGER IF NOT EXISTS trg_rights_before_approval_update
 BEFORE UPDATE OF review_status ON inventory
