@@ -998,14 +998,19 @@
                     // 3. Smooth Fly to location
                     map.flyTo([latitude, longitude], 14, { duration: 1.0 });
 
-                    // 4. Activate Distance Sorting & Show Apple Status Pill
-                    activeFilter = 'nearby';
+                    // Distance is meaningful only for independently verified coordinates.
+                    const hasVerifiedAddresses = LISTINGS.some(hasVerifiedPoint);
+                    activeFilter = hasVerifiedAddresses ? 'nearby' : 'all';
+                    currentSort = hasVerifiedAddresses ? 'distance' : 'price_asc';
+                    updateSortLabels();
                     const locPill = document.getElementById('radarLocationPill');
                     const countBadge = document.getElementById('activeListingsBadge');
-                    if (locPill) locPill.classList.remove('hidden');
-                    if (countBadge) countBadge.classList.add('hidden'); // Eliminate overlap bug
+                    if (locPill) locPill.classList.toggle('hidden', !hasVerifiedAddresses);
+                    if (countBadge) countBadge.classList.toggle('hidden', hasVerifiedAddresses);
 
-                    showToast("✓ Локацію знайдено! Квартири відсортовано за відстанню");
+                    showToast(hasVerifiedAddresses
+                        ? "Локацію знайдено. Спочатку показано квартири з перевіреними координатами."
+                        : "Локацію знайдено. Адреси квартир не перевірені, тож відстань до них не показуємо.");
                     renderAll();
                 },
                 (err) => {
@@ -1025,6 +1030,8 @@
             if (userRadarCircle) map.removeLayer(userRadarCircle);
             userCoords = null;
             activeFilter = 'all';
+            if (currentSort === 'distance') currentSort = 'price_asc';
+            updateSortLabels();
             renderAll();
         }
 
@@ -1201,7 +1208,7 @@
             }
 
             // Do not sort by unverifiable imported pin positions.
-            if (sortKey === 'distance' && !LISTINGS.some(d => d.locationVerified === true)) {
+            if (sortKey === 'distance' && !LISTINGS.some(hasVerifiedPoint)) {
                 currentSort = 'price_asc';
                 updateSortLabels();
                 renderAll();
@@ -1209,6 +1216,8 @@
                 return;
             }
             if (sortKey === 'distance' && !userCoords) {
+                currentSort = 'price_asc';
+                updateSortLabels();
                 handleLocateClick();
                 return;
             }
@@ -1275,6 +1284,13 @@
             }
         }
 
+        function hasVerifiedPoint(item) {
+            return item?.locationVerified === true
+                && Number.isFinite(item.lat) && Number.isFinite(item.lng)
+                && Math.abs(item.lat) <= 90 && Math.abs(item.lng) <= 180
+                && item.lat !== 0 && item.lng !== 0;
+        }
+
         function getFilteredListings() {
             let items = LISTINGS.filter(item => {
                 if (searchQuery) {
@@ -1305,12 +1321,14 @@
                 return true;
             });
 
-            // Calculate distance if GPS active or distance sort
-            if (userCoords) {
-                items.forEach(it => {
+            // Do not calculate or cache distances for unverified source coordinates.
+            items.forEach(it => {
+                if (userCoords && hasVerifiedPoint(it)) {
                     it._dist = getDistanceKm(userCoords[0], userCoords[1], it.lat, it.lng);
-                });
-            }
+                } else {
+                    delete it._dist;
+                }
+            });
 
             // Apply active sorting
             if (currentSort === 'price_asc') {
@@ -1321,12 +1339,15 @@
                 items.sort((a, b) => (b.area || 0) - (a.area || 0));
             } else if (currentSort === 'newest') {
                 items.sort((a, b) => b.id - a.id);
-            } else if (currentSort === 'distance' || (userCoords && activeFilter === 'nearby')) {
-                const c = userCoords || [50.4501, 30.5234];
-                items.forEach(it => {
-                    if (it._dist === undefined) it._dist = getDistanceKm(c[0], c[1], it.lat, it.lng);
+            } else if (currentSort === 'distance') {
+                // Rank only evidenced distances; unmatched locations follow by price.
+                items.sort((a, b) => {
+                    const aKnown = Number.isFinite(a._dist);
+                    const bKnown = Number.isFinite(b._dist);
+                    if (aKnown !== bKnown) return aKnown ? -1 : 1;
+                    if (aKnown) return a._dist - b._dist;
+                    return (Number(a.price) || 0) - (Number(b.price) || 0);
                 });
-                items.sort((a, b) => a._dist - b._dist);
             }
 
             return items;
@@ -2063,7 +2084,7 @@
                             <span class="font-medium">Джерело: ${escapeHtml(deal.source || 'Відкриті джерела')}</span>
                             <span class="text-[#0a84ff] text-[11px] font-semibold">Актуально</span>
                         </div>
-                        <p class="text-[#8e8e93] text-[11px] leading-relaxed">Ціна та актуальність об'єкта підтверджені. Власник та комісія не верифіковані платформою.</p>
+                        <p class="text-[#8e8e93] text-[11px] leading-relaxed">Наявність квартири підтверджено окремою перевіркою. Ціну, власника та комісію потрібно уточнювати незалежно.</p>
                     `;
                 } else {
                     const sourceName = escapeHtml(deal.source || 'Відкриті джерела');
@@ -2281,7 +2302,7 @@
             if (city === 'Київ') {
                 closeCityModal();
             } else {
-                showToast(`Радар у місті ${city} запускається найближчим часом.`);
+                showToast("Зараз пошук працює лише для Києва.");
                 closeCityModal();
             }
         }
