@@ -29,6 +29,7 @@ import hmac
 import html
 import uuid
 import re
+import ipaddress
 import hashlib
 import json
 import time
@@ -134,7 +135,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Shared SQLite Rate Limiter
+# Shared SQLite Rate Limiter (transactional even under concurrent workers).
 def check_rate_limit(key: str, max_requests: int, window_seconds: int) -> bool:
     now = time.time()
     cutoff = now - window_seconds
@@ -142,25 +143,42 @@ def check_rate_limit(key: str, max_requests: int, window_seconds: int) -> bool:
     try:
         conn = sqlite3.connect(DB_PATH, timeout=10.0)
         cur = conn.cursor()
+        # Lock before COUNT: otherwise concurrent requests can all pass before INSERT.
+        cur.execute("BEGIN IMMEDIATE")
         cur.execute("DELETE FROM rate_limits WHERE key = ? AND timestamp < ?", (key, cutoff))
         cur.execute("SELECT COUNT(*) FROM rate_limits WHERE key = ? AND timestamp >= ?", (key, cutoff))
-        count = cur.fetchone()[0]
-        if count >= max_requests:
+        if cur.fetchone()[0] >= max_requests:
+            conn.rollback()
             return False
         cur.execute("INSERT INTO rate_limits (key, timestamp) VALUES (?, ?)", (key, now))
         conn.commit()
         return True
-    except sqlite3.Error as e:
-        logger.error(f"Rate limiter database error for key '{key}': {e}")
+    except sqlite3.Error as error:
+        if conn:
+            conn.rollback()
+        logger.error("Rate limiter database failure: %s", type(error).__name__)
         API_METRICS["db_errors"] += 1
-        API_METRICS["last_error"] = f"DB Rate Limit Error: {str(e)}"
+        API_METRICS["last_error"] = "Rate limiter database unavailable"
+        # Fail closed; do not allow unlimited requests when the database is unavailable.
         return False
     finally:
         if conn:
-            try:
-                conn.close()
-            except Exception:
-                pass
+            conn.close()
+
+
+def client_ip_for_rate_limit(request: Request) -> str:
+    """Trust X-Forwarded-For only from the local Caddy reverse proxy.
+
+    Direct requests cannot spoof this header to evade an IP quota.
+    """
+    peer = request.client.host if request.client else "unknown"
+    if peer in ("127.0.0.1", "::1"):
+        forwarded = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+        try:
+            return str(ipaddress.ip_address(forwarded))
+        except ValueError:
+            pass
+    return peer
 
 # Telegram initData Cryptographic Signature & Expiry Validation
 def validate_telegram_init_data(init_data: str, max_age_seconds: int = 86400) -> Optional[dict]:
@@ -467,7 +485,7 @@ async def get_live_deals():
 
 @app.post("/api/reports")
 async def submit_report(req: ReportRequest, request: Request):
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = client_ip_for_rate_limit(request)
     if not check_rate_limit(f"report_{client_ip}", max_requests=10, window_seconds=600):
         raise HTTPException(status_code=429, detail="Забагато скарг. Спробуйте пізніше.")
 
@@ -633,10 +651,10 @@ async def upload_landlord_photos(
     request_bytes = request.headers.get("content-length")
     if request_bytes and request_bytes.isdigit() and int(request_bytes) > MAX_IMAGE_BATCH_BYTES + 1024 * 1024:
         raise HTTPException(status_code=413, detail="Перевищено максимальний обсяг завантаження")
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = client_ip_for_rate_limit(request)
     if not check_rate_limit(f"upload_user_{user_id}", max_requests=5, window_seconds=3600):
         raise HTTPException(status_code=429, detail="Забагато завантажень. Спробуйте пізніше")
-    if not check_rate_limit(f"upload_ip_{client_ip}", max_requests=20, window_seconds=3600):
+    if not check_rate_limit(f"upload_ip_{client_ip}", max_requests=80, window_seconds=3600):
         raise HTTPException(status_code=429, detail="Забагато запитів")
     if not 1 <= len(photos) <= 10:
         raise HTTPException(status_code=400, detail="Оберіть від 1 до 10 фотографій")
@@ -690,8 +708,8 @@ async def upload_landlord_photos(
 
 @app.post("/api/landlords/submit")
 async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
-    client_ip = request.client.host if request.client else "unknown"
-    if not check_rate_limit(f"landlord_{client_ip}", max_requests=5, window_seconds=3600):
+    client_ip = client_ip_for_rate_limit(request)
+    if not check_rate_limit(f"landlord_{client_ip}", max_requests=25, window_seconds=3600):
         raise HTTPException(status_code=429, detail="Забагато заявок з вашої адреси. Спробуйте пізніше.")
 
     if len(req.address.strip()) < 5:
