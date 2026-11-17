@@ -37,10 +37,24 @@ async def test_phone_first_view_shows_photos_not_full_screen_map():
           const rect = img.getBoundingClientRect();
           return rect.width > 100 && rect.height > 100 && getComputedStyle(img).visibility !== 'hidden';
         }""", timeout=10000)
-        assert await page.locator("#listViewContainer > div[onclick]").count() >= 10
-        first_card = await page.locator("#listViewContainer > div[onclick]").nth(0).bounding_box()
-        second_card = await page.locator("#listViewContainer > div[onclick]").nth(1).bounding_box()
-        assert first_card and second_card
+        # A live refresh can replace the card nodes between two Playwright calls.
+        # Wait for BOTH cards in one animation frame and sample their geometry
+        # atomically. Preserve the original non-overlap acceptance criterion.
+        await page.wait_for_function("""() => {
+          const cards = document.querySelectorAll("#listViewContainer > div[onclick]");
+          if (cards.length < 10) return false;
+          const first = cards[0].getBoundingClientRect();
+          const second = cards[1].getBoundingClientRect();
+          return first.width > 100 && first.height > 100 &&
+                 second.width > 100 && second.height > 100;
+        }""", timeout=10000)
+        first_card, second_card = await page.evaluate("""() => {
+          const cards = document.querySelectorAll("#listViewContainer > div[onclick]");
+          return [cards[0], cards[1]].map(card => {
+            const r = card.getBoundingClientRect();
+            return { x:r.x, y:r.y, width:r.width, height:r.height };
+          });
+        }""")
         assert second_card["y"] >= first_card["y"] + first_card["height"] + 6, "Apartment cards must never overlap"
         # Body itself must not scroll horizontally (filter strip scrolls within itself).
         over = await page.evaluate(
