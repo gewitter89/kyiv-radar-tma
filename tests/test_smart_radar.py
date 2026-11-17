@@ -118,7 +118,7 @@ async def test_older_api_claims_are_cleaned_before_rendering():
                 content_type="application/json",
                 headers={"access-control-allow-origin": "*"},
                 body='{"success":true,"deals":[{"id":999,"title":"Тестове житло",'
-                     '"price":10000,"rooms":1,"source":"OLX","phone":null,'
+                     '"price":10000,"rooms":1,"source":"Київ Радар (Пряма заявка)","phone":null,'
                      '"images":[],"lat":null,"lng":null,'
                      '"desc":"Здається реальна квартира від власника без посередників. '
                      'Лише інформація з джерела. '
