@@ -716,10 +716,10 @@ async def submit_landlord_deal(req: LandlordSubmitRequest, request: Request):
         raise HTTPException(status_code=400, detail="Вкажіть повну адресу квартири (вулиця, номер будинку)")
     if not req.phone or len(req.phone.strip()) < 9:
         raise HTTPException(status_code=400, detail="Вкажіть коректний номер телефону")
-    digits = re.sub(r"\\D", "", req.phone)
-    if not re.fullmatch(r"\\+?[0-9()\\s-]{9,20}", req.phone.strip()) or not 9 <= len(digits) <= 15:
+    digits = re.sub(r"\D", "", req.phone)
+    if not re.fullmatch(r"\+?[0-9()\s-]{9,20}", req.phone.strip()) or not 9 <= len(digits) <= 15:
         raise HTTPException(status_code=400, detail="Номер телефону має містити від 9 до 15 цифр")
-    normalized_price = re.sub(r"\\s", "", req.price)
+    normalized_price = re.sub(r"\s", "", req.price)
     if not normalized_price.isascii() or not normalized_price.isdigit() or int(normalized_price) <= 0:
         raise HTTPException(status_code=400, detail="Ціна оренди має бути додатним числом у гривнях")
     if not req.rightsConfirmed:
