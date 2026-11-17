@@ -834,7 +834,14 @@
         let currentActiveId = null;
         let currentModalDeal = null;
         let currentModalPhotoIdx = 0;
-        let FAVORITES = new Set(JSON.parse(localStorage.getItem('kr_favs') || '[]'));
+        let FAVORITES = new Set((() => {
+            try {
+                const saved = JSON.parse(localStorage.getItem('kr_favs') || '[]');
+                return Array.isArray(saved) ? saved : [];
+            } catch (error) {
+                return []; // Private mode or damaged saved data must not blank the app.
+            }
+        })());
 
         // Toast Helper
         function showToast(text) {
@@ -2194,7 +2201,8 @@
             } else {
                 FAVORITES.add(id);
             }
-            localStorage.setItem('kr_favs', JSON.stringify([...FAVORITES]));
+            try { localStorage.setItem('kr_favs', JSON.stringify([...FAVORITES])); }
+            catch (error) { showToast('Обране працює тимчасово; зберігання на пристрої недоступне'); }
             updateFavCount();
             renderCarousel(getFilteredListings());
         }
