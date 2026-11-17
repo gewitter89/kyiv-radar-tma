@@ -90,7 +90,7 @@ async def test_browser_mode_without_phone():
         await page.wait_for_timeout(1000)
 
         # Open deal #1 (already has phone = null)
-        await page.locator(".carousel-card").first.click()
+        await page.locator("#listViewContainer > div[onclick]").first.click()
         await page.wait_for_timeout(400)
         assert await page.is_visible("#dealModal")
 
@@ -126,7 +126,7 @@ async def test_telegram_mode_successful_delivery():
         await page.goto(TG_FILE_URL)
         await page.wait_for_timeout(1000)
 
-        await page.locator(".carousel-card").first.click()
+        await page.locator("#listViewContainer > div[onclick]").first.click()
         await page.wait_for_timeout(500)
 
         await page.click("#modalCallBtn")
@@ -159,7 +159,7 @@ async def test_telegram_mode_error_unmasked():
         await page.goto(TG_FILE_URL)
         await page.wait_for_timeout(1000)
 
-        await page.locator(".carousel-card").first.click()
+        await page.locator("#listViewContainer > div[onclick]").first.click()
         await page.wait_for_timeout(500)
 
         await page.click("#modalCallBtn")
