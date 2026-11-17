@@ -151,6 +151,9 @@ async def test_legacy_imports_are_not_reanimated_by_successful_old_api(hosted_ca
             {"id": 7003, "title": "SYNTHETIC FIXTURE ONLY", "source": "Київ Радар",
              "fixtureOnly": True, "price": 11000, "rooms": 1,
              "district": "Тестовий", "address": "Тест", "images": []},
+            {"id": 7005, "title": "UNAPPROVED FIRST-PARTY LABEL", "source": "Київ Радар",
+             "price": 11000, "rooms": 1, "images": [],
+             "district": "Тестовий", "address": "Тест"},
             {"id": 7004, "title": "FIRST-PARTY TEST APPROVED", "source": "Київ Радар (Пряма заявка)",
              "price": 11000, "rooms": 1, "images": [],
              "district": "Тестовий", "address": "Тест", "moderationStatus": "approved"}
