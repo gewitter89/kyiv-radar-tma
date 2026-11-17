@@ -126,6 +126,17 @@
   }
   window.krContactHandoff = contactHandoff;
   window.krContactError = contactError;
+  window.krLandlordHandoff = () => showDialog({
+    kicker: "Подати квартиру",
+    title: "Оголошення надсилаються через Telegram",
+    paragraphs: [
+      "Щоб подати квартиру, спочатку відкрийте «Київ Радар» у Telegram.",
+      "У боті натисніть /start, відкрийте застосунок, додайте правдиві характеристики й власні фотографії.",
+      "Заявку переглядає модератор. Публікація та перевірка права власності — різні дії; не обіцяємо автоматичного схвалення."
+    ],
+    actions: [{label:"Відкрити бота",url:BOT_URL,primary:true}]
+  });
+
   function updateStatus() {
     const n = document.getElementById("krResultsCount");
     const source = document.getElementById("krDataStatus");
