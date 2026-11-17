@@ -67,7 +67,13 @@ async def test_browser_to_telegram_contact_is_persistent_and_actionable():
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={"width": 390, "height": 844})
         await open_app(page)
-        await page.evaluate("() => openDealModalById(LISTINGS[0].id)")
+        # Synthetic first-party contact scenario, not a live imported listing.
+        await page.evaluate("""() => {
+          const fixture = LISTINGS[0];
+          fixture.source = "Київ Радар";
+          fixture.contactVerified = true;
+          openDealModalById(fixture.id);
+        }""")
         assert await page.locator("#modalCallLabel").inner_text() == "Відкрити Telegram"
         await page.locator("#modalCallBtn").click()
         dialog = page.get_by_role("dialog", name="Відкрийте квартиру в Telegram")
