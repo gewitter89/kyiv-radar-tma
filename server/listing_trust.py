@@ -88,6 +88,8 @@ def public_listing_view(
             continue
 
         deal = dict(source)
+        # Only this module issues evidence-backed status markers.
+        deal.pop("reviewedByRadar", None)
         imported = str(deal.get("source", "")).strip().upper() in IMPORTED_SOURCES
         if imported:
             # Imported text and site metadata are not our own verification.
