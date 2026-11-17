@@ -57,6 +57,7 @@ def iter_partner_xml(path: Path):
     scalar_parts: list[str] = []
     scalar_length = 0
     seen_root = False
+    used_price_alias = False
 
     def forbidden(*_args):
         raise UnsafePartnerXML("DTD, entity declarations and external references are forbidden")
@@ -66,7 +67,7 @@ def iter_partner_xml(path: Path):
             raise UnsafePartnerXML("Only UTF-8 XML partner feeds are supported")
 
     def start(name, attrs):
-        nonlocal row, offer_depth, current_field, scalar_parts, scalar_length, seen_root
+        nonlocal row, offer_depth, current_field, scalar_parts, scalar_length, seen_root, used_price_alias
         if len(stack) >= MAX_DEPTH or len(attrs) > MAX_ATTRIBUTES:
             raise UnsafePartnerXML("XML depth or attribute bound exceeded")
         if any(len(k) > 128 or len(v) > 4096 for k, v in attrs.items()):
@@ -82,6 +83,7 @@ def iter_partner_xml(path: Path):
             if row is not None or not allowed:
                 raise UnsafePartnerXML("Unexpected or nested offer")
             row = {}
+            used_price_alias = False
             offer_depth = len(stack)
             if "id" in attrs:
                 row["external_id"] = attrs["id"]
@@ -92,6 +94,8 @@ def iter_partner_xml(path: Path):
                 candidate = attrs.get("name") if name == "param" else name
                 mapped = FIELD_MAP.get(candidate)
                 if mapped:
+                    if candidate == "price":
+                        used_price_alias = True
                     current_field = mapped
                     scalar_parts = []
                     scalar_length = 0
@@ -119,6 +123,8 @@ def iter_partner_xml(path: Path):
         if name == "offer":
             if row is None or len(stack) != offer_depth:
                 raise UnsafePartnerXML("Invalid offer structure")
+            if used_price_alias and row.get("_currency") != "UAH":
+                raise UnsafePartnerXML("Price alias requires explicit UAH currency")
             if "_currency" in row and row["_currency"] != "UAH":
                 raise UnsafePartnerXML("Unconverted non-UAH price")
             if stack[0] == "yml_catalog" and "price_uah" in row and row.get("_currency") != "UAH":
