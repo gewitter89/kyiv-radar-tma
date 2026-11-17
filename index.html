@@ -1089,6 +1089,14 @@
                 Array.isArray(KYIV_DEALS_INIT)
                 ? staticCatalogWithoutPartners(KYIV_DEALS_INIT) : [];
 
+            // Revoke all previously rendered cards *before* an async refresh.
+            // An old open tab must not keep clickable stale rows while the
+            // new API request is pending or times out.
+            if (!localFixture) {
+                refreshFavoriteKeys();
+                renderAll();
+            }
+
             const controller = new AbortController();
             const abortTimer = setTimeout(() => controller.abort(), 6000);
             try {
@@ -1501,14 +1509,15 @@
 
             if (items.length === 0) {
                 const catalogError = window.KR_CATALOG_MODE === 'error';
+                const catalogLoading = window.KR_CATALOG_MODE === 'loading';
                 const emptyCatalog = LISTINGS.length === 0;
                 const noSaved = !emptyCatalog && ACTIVE_FILTERS.favs && FAVORITES.size === 0;
                 const savedMissing = !emptyCatalog && ACTIVE_FILTERS.favs &&
                     FAVORITES.size > 0 && !LISTINGS.some(item => FAVORITES.has(favoriteKey(item)));
                 listEl.innerHTML = legacyFavoritesNotice() + `
                     <div class="kr-empty-state" role="status" aria-live="polite">
-                        <div class="text-white font-semibold text-base">${catalogError ? 'Не вдалося завантажити оголошення' : emptyCatalog ? 'Зараз немає доступних оголошень' : noSaved ? 'Обраних квартир поки немає' : savedMissing ? 'Збережені оголошення зараз недоступні' : 'Нічого не знайдено'}</div>
-                        <p class="mt-2 text-sm text-[#aebdd0]">${catalogError ? 'Зараз немає зв’язку з каталогом. Архівні оголошення не показуємо як актуальні. Перевірте інтернет і спробуйте ще раз.' : emptyCatalog ? 'Опубліковані пропозиції тимчасово відсутні. Не показуємо зняті оголошення.' : noSaved ? 'Натисніть сердечко на квартирі, щоб зберегти її тут. Обрані залишаються лише у цьому браузері.' : savedMissing ? 'Ці квартири наразі відсутні в доступному каталозі. Ми не показуємо зняті або недоступні оголошення як активні.' : 'Змініть район, бюджет або інші умови.'}</p>
+                        <div class="text-white font-semibold text-base">${catalogError ? 'Не вдалося завантажити оголошення' : catalogLoading ? 'Завантажуємо оголошення…' : emptyCatalog ? 'Зараз немає доступних оголошень' : noSaved ? 'Обраних квартир поки немає' : savedMissing ? 'Збережені оголошення зараз недоступні' : 'Нічого не знайдено'}</div>
+                        <p class="mt-2 text-sm text-[#aebdd0]">${catalogError ? 'Зараз немає зв’язку з каталогом. Архівні оголошення не показуємо як актуальні. Перевірте інтернет і спробуйте ще раз.' : catalogLoading ? 'Перевіряємо доступні пропозиції. Не показуємо старі записи під час оновлення.' : emptyCatalog ? 'Опубліковані пропозиції тимчасово відсутні. Не показуємо зняті оголошення.' : noSaved ? 'Натисніть сердечко на квартирі, щоб зберегти її тут. Обрані залишаються лише у цьому браузері.' : savedMissing ? 'Ці квартири наразі відсутні в доступному каталозі. Ми не показуємо зняті або недоступні оголошення як активні.' : 'Змініть район, бюджет або інші умови.'}</p>
                         ${catalogError ? '<button type="button" id="krCatalogRetry" onclick="loadDeals()" class="kr-reset mt-4">Спробувати знову</button>' : emptyCatalog ? '' : '<button type="button" onclick="setFilter(\'all\')" class="kr-reset mt-4">Скинути фільтри</button>'}
                     </div>
                 `;
