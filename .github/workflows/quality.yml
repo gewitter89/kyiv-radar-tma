@@ -57,6 +57,7 @@ jobs:
             tests/test_smart_filters_v113.py \
             tests/test_simple_first_view.py \
             tests/test_catalog_integrity_v116.py \
+            tests/test_reviewer_queue_v117.py \
             tests/test_rental_safety_v116.py \
             tests/test_listing_light_contrast_v116.py \
             tests/test_catalog_claims.py \
