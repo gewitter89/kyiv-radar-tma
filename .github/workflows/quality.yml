@@ -55,6 +55,7 @@ jobs:
             tests/test_first_visit_v17.py \
             tests/test_favorites_v128.py \
             tests/test_favorites_shortcut_v129.py \
+            tests/test_public_catalog_outage_v131.py \
             tests/test_kyiv_signal_theme_v112.py \
             tests/test_smart_filters_v113.py \
             tests/test_simple_first_view.py \
