@@ -86,7 +86,8 @@ def enforce_partner_visibility(
             source, external, source_url = identity
             try:
                 match = conn.execute(
-                    "SELECT i.source_url, i.price_uah FROM inventory AS i "
+                    "SELECT i.source_url, i.price_uah, i.city, i.operation, i.property_type, "
+                    "i.district, i.rooms, i.area_m2 FROM inventory AS i "
                     "JOIN source_rights AS r ON r.source=i.source "
                     "WHERE i.source=? AND i.external_id=? "
                     "AND i.review_status='approved' "
@@ -100,9 +101,21 @@ def enforce_partner_visibility(
             price = item.get("price")
             # Public-facing price must be the reviewed private price, never an
             # arbitrary partner/client-supplied override.
-            if (match is not None and source_url == match[0]
-                    and type(price) is int and price > 0 and price == match[1]):
-                result.append(item)
+            if match is None or source_url != match[0] or (
+                    type(price) is not int or price <= 0 or price != match[1]):
+                continue
+            # The current interface describes Kyiv monthly apartment rent.
+            # A forged catalog must not silently substitute sale/other cities.
+            if (match[2], match[3], match[4]) != ("Київ", "rent", "apartment"):
+                continue
+            district, rooms, area = item.get("district"), item.get("rooms"), item.get("area")
+            if district is not None and district not in (match[5], "Район уточнюється"):
+                continue
+            if rooms is not None and (type(rooms) is not int or rooms != match[6]):
+                continue
+            if area is not None and (type(area) not in (int, float) or area != match[7]):
+                continue
+            result.append(item)
     finally:
         if conn is not None:
             conn.close()
