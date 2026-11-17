@@ -35,7 +35,6 @@ async def test_api_outage_does_not_resurrect_partner_from_static_json():
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={"width": 390, "height": 844})
-        await page.route("**/api/deals*", lambda route: route.abort())
         fixture = [
             {"id": 9101, "source": "partner:agency_one",
              "partnerSourceKey": "agency_one", "partnerExternalId": "P-1",
@@ -44,12 +43,20 @@ async def test_api_outage_does_not_resurrect_partner_from_static_json():
             {"id": 9102, "source": "OLX", "title": "Legacy test only",
              "district": "Дарницький", "price": 15000, "rooms": 1}
         ]
-
-        async def inject_static(route):
-            await route.fulfill(status=200, content_type="application/json",
-                                body=json.dumps(fixture))
-
-        await page.route("**/data/deals.json*", inject_static)
+        # Intercept JS fetch itself, including file:// URLs (browser network
+        # routing may not intercept local file requests).
+        script = (
+            "(() => { const original = window.fetch.bind(window); "
+            "const rows = " + json.dumps(fixture, ensure_ascii=False) + "; "
+            "window.fetch = async (input, options) => { "
+            " const url = String(input); "
+            " if (url.includes('/api/deals')) throw new Error('API unavailable'); "
+            " if (url.startsWith('data/deals.json')) "
+            "   return { ok: true, json: async () => rows }; "
+            " return original(input, options); "
+            "}; })();"
+        )
+        await page.add_init_script(script=script)
         await page.goto(URL, wait_until="domcontentloaded")
         await page.wait_for_function("window.KR_CATALOG_MODE === 'static'", timeout=15000)
         ids = await page.evaluate("LISTINGS.map(x => x.id)")
