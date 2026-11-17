@@ -558,7 +558,7 @@
 
                 <!-- Blackout Equipment Checklist (Apple Inset Grouped) -->
                 <div class="p-3.5 rounded-2xl bg-[#2c2c2e]/70 border border-white/[0.06] space-y-2">
-                    <div class="text-[11px] font-semibold text-[#8e8e93] uppercase tracking-wider">Автономність при блекаутах</div>
+                    <div class="text-[11px] font-semibold text-[#8e8e93] uppercase tracking-wider">Умови під час відключень</div>
                     <div class="grid grid-cols-2 gap-2" id="modalEquipment">
                         <!-- Populated by JS -->
                     </div>
@@ -2061,12 +2061,12 @@
             if (eqContainer) {
                 eqContainer.innerHTML = `
                     <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full ${deal.gpon ? 'bg-[#30d158]' : 'bg-[#636366]'}"></span>
-                        <span class="text-white/80 text-[11px]">GPON: <b>${deal.gpon ? 'Заявлено' : 'Не вказано'}</b></span>
+                        <span class="w-2 h-2 rounded-full ${deal.gpon ? 'bg-[#ffcf85]' : 'bg-[#636366]'}"></span>
+                        <span class="text-white/80 text-[11px]">Інтернет під час відключень: <b>${deal.gpon ? 'Оптоволокно (заявлено)' : 'Немає даних'}</b><small class="kr-equipment-explanation" style="display:block;margin-top:5px">GPON — оптоволокно. Для роботи без світла потрібні живлення роутера й оптичного термінала та резервне живлення у провайдера.</small></span>
                     </div>
                     <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full ${deal.generator ? 'bg-[#ff9f0a]' : 'bg-[#636366]'}"></span>
-                        <span class="text-white/80 text-[11px]">Генератор: <b>${deal.generator ? 'Заявлено' : 'Не вказано'}</b></span>
+                        <span class="text-white/80 text-[11px]">Електрика в будинку: <b>${deal.generator ? 'Є генератор (заявлено)' : 'Немає даних'}</b><small class="kr-equipment-explanation" style="display:block;margin-top:5px">Уточніть, чи живить генератор саме квартиру, ліфт, воду та опалення.</small></span>
                     </div>
                     <div class="p-2.5 rounded-xl bg-[#1c1c1e] border border-white/[0.06] flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full ${deal.pets ? 'bg-[#30d158]' : 'bg-[#636366]'}"></span>
