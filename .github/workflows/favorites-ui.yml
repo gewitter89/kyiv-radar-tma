@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - "index.html"
+      - "favorite-identity.js"
+      - "tests/test_favorite_identity_v130.py"
       - "kyiv-smart-filters.js"
       - "unified-toolbar.css"
       - "tests/test_favorites_shortcut_v129.py"
@@ -33,4 +35,4 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Test real favorites controls on mobile and desktop
         run: |
-          python -m pytest -q tests/test_favorites_v128.py tests/test_favorites_shortcut_v129.py
+          python -m pytest -q tests/test_favorites_v128.py tests/test_favorites_shortcut_v129.py tests/test_favorite_identity_v130.py
