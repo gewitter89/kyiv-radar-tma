@@ -12,6 +12,7 @@
     <title>Київ Радар — оренда з урахуванням автономності</title>
     <link rel="stylesheet" href="./experience.css?v=1.7.0">
     <link rel="stylesheet" href="./simple-view.css?v=1.7.2">
+    <link rel="stylesheet" href="./trust-experience.css?v=1.8.0">
     <meta name="description" content="Київ Радар — мапа та каталог оренди квартир у Києві. Пошук за районом, бюджетом і заявленими можливостями автономності. Джерела та рівень перевірки вказані в оголошеннях.">
     <!-- Open Graph / Telegram Card -->
     <meta property="og:title" content="Київ Радар 🇺🇦 — Каталог та мапа оренди квартир у Києві">
@@ -1031,7 +1032,7 @@
                 );
                 if (res.ok) {
                     const data = await res.json();
-                    if (data && data.success && Array.isArray(data.deals) && data.deals.length > 0) {
+                    if (data && data.success && Array.isArray(data.deals)) {
                         LISTINGS = data.deals;
                         window.KR_CATALOG_MODE = "live";
                     }
@@ -1414,9 +1415,12 @@
             if (!listEl) return;
 
             if (items.length === 0) {
+                const emptyCatalog = LISTINGS.length === 0;
                 listEl.innerHTML = `
-                    <div class="py-12 px-4 text-center text-[#8e8e93] bg-[#1c1c1e] border border-white/[0.08] rounded-2xl w-full">
-                        Нічого не знайдено за вашим фільтром. Спробуйте змінити критерії.
+                    <div class="kr-empty-state">
+                        <div class="text-white font-semibold text-base">${emptyCatalog ? 'Зараз немає доступних оголошень' : 'Нічого не знайдено'}</div>
+                        <p class="mt-2 text-sm text-[#aebdd0]">${emptyCatalog ? 'Опубліковані пропозиції тимчасово відсутні. Не показуємо зняті оголошення.' : 'Змініть район, бюджет або інші умови.'}</p>
+                        ${emptyCatalog ? '' : '<button type="button" onclick="setFilter(\'all\')" class="kr-reset mt-4">Скинути фільтри</button>'}
                     </div>
                 `;
                 return;
@@ -2231,41 +2235,51 @@
         
         // REPORT / ACCURACY FEEDBACK
         function openReportModal() {
+            const status = document.getElementById('krReportStatus');
+            if (status) status.textContent = "";
             document.getElementById('reportModal')?.classList.remove('hidden');
         }
         function closeReportModal() {
             document.getElementById('reportModal')?.classList.add('hidden');
         }
-                        async function submitReport(reason) {
-            if (!currentModalDeal) return;
+        let reportSubmissionPending = false;
+        async function submitReport(reason) {
+            if (!currentModalDeal || reportSubmissionPending) return false;
             const dealId = currentModalDeal.id;
+            const status = document.getElementById('krReportStatus');
+            const controls = [...document.querySelectorAll('#reportModal button[onclick^="submitReport"]')];
             const initData = window.Telegram?.WebApp?.initData || "";
-
-            showToast("Надсилаємо скаргу модератору...");
-
+            const controller = new AbortController();
+            reportSubmissionPending = true;
+            controls.forEach(button => button.disabled = true);
+            if (status) status.textContent = "Надсилаємо повідомлення…";
+            const abortId = setTimeout(() => controller.abort(), 12000);
             try {
                 const res = await fetch("https://vmi3445944.contaboserver.net/api/reports", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        dealId: dealId,
-                        reason: reason,
-                        initData: initData
-                    })
+                    body: JSON.stringify({dealId, reason, initData}),
+                    signal: controller.signal
                 });
-                const data = await res.json();
+                let data = {};
+                try { data = await res.json(); } catch (_) {}
                 if (res.ok && data.success) {
-                    if (window.Telegram?.WebApp?.HapticFeedback) {
-                        window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-                    }
+                    if (status) status.textContent = "Повідомлення отримано. Дякуємо.";
+                    window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred?.("success");
                     closeReportModal();
-                    showToast(`✓ Скаргу #${data.id} прийнято на перевірку`);
-                } else {
-                    showToast(data.detail || "Помилка надсилання скарги");
+                    showToast("Повідомлення передано модератору");
+                    return true;
                 }
-            } catch (e) {
-                console.error("Report submit error:", e);
-                showToast("Помилка з'єднання із сервером. Спробуйте ще раз.");
+                if (status) status.textContent = typeof data.detail === "string"
+                    ? data.detail : "Не вдалося надіслати. Спробуйте ще раз.";
+                return false;
+            } catch (_) {
+                if (status) status.textContent = "Немає зв’язку із сервером. Спробуйте ще раз.";
+                return false;
+            } finally {
+                clearTimeout(abortId);
+                controls.forEach(button => button.disabled = false);
+                reportSubmissionPending = false;
             }
         }
 
@@ -2508,6 +2522,7 @@
     <script src="./experience.js?v=1.7.0"></script>
     <script src="./mobile-media.js?v=1.7.0"></script>
     <script src="./simple-view.js?v=1.7.2"></script>
+    <script src="./trust-experience.js?v=1.8.0"></script>
 
     <!-- ==========================================
          REPORT PROBLEM MODAL (Apple Action Sheet)
@@ -2524,28 +2539,41 @@
             <div class="p-3.5 space-y-2 text-xs">
                 <p class="text-[#8e8e93] mb-2">Оберіть проблему для перевірки модератором:</p>
                 <button onclick="submitReport('Квартира вже здана')" class="w-full py-2.5 px-3 rounded-xl bg-[#2c2c2e] hover:bg-[#3a3a3c] text-white text-left flex items-center justify-between">
-                    <span>🏠 Квартира вже здана / неактуальна</span>
+                    <span>Квартира вже здана або неактуальна</span>
                     <svg class="w-4 h-4 text-[#8e8e93]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6"/></svg>
                 </button>
                 <button onclick="submitReport('Ціна не відповідає оголошенню')" class="w-full py-2.5 px-3 rounded-xl bg-[#2c2c2e] hover:bg-[#3a3a3c] text-white text-left flex items-center justify-between">
-                    <span>💰 Ціна змінилась або вимагають заставу</span>
+                    <span>Ціна або додаткові платежі інші</span>
                     <svg class="w-4 h-4 text-[#8e8e93]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6"/></svg>
                 </button>
                 <button onclick="submitReport('Виявився рієлтор / комісія')" class="w-full py-2.5 px-3 rounded-xl bg-[#2c2c2e] hover:bg-[#3a3a3c] text-white text-left flex items-center justify-between">
-                    <span>🕵️ Виявився рієлтор (вимагають 50%)</span>
+                    <span>Неочікувана комісія або посередник</span>
+                    <svg class="w-4 h-4 text-[#8e8e93]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+                <button onclick="submitReport('Неточні умови світла / інтернету')" class="w-full py-2.5 px-3 rounded-xl bg-[#2c2c2e] hover:bg-[#3a3a3c] text-white text-left flex items-center justify-between">
+                    <span>Неправильні дані про світло або інтернет</span>
+                    <svg class="w-4 h-4 text-[#8e8e93]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+                <button onclick="submitReport('Неправильна адреса або опис')" class="w-full py-2.5 px-3 rounded-xl bg-[#2c2c2e] hover:bg-[#3a3a3c] text-white text-left flex items-center justify-between">
+                    <span>Неправильна адреса або опис квартири</span>
+                    <svg class="w-4 h-4 text-[#8e8e93]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+                <button onclick="submitReport('Матеріали використано без згоди')" class="w-full py-2.5 px-3 rounded-xl bg-[#2c2c2e] hover:bg-[#3a3a3c] text-white text-left flex items-center justify-between">
+                    <span>Фото або дані використали без дозволу</span>
                     <svg class="w-4 h-4 text-[#8e8e93]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6"/></svg>
                 </button>
                 <button onclick="submitReport('Не беруть слухавку / спам')" class="w-full py-2.5 px-3 rounded-xl bg-[#2c2c2e] hover:bg-[#3a3a3c] text-white text-left flex items-center justify-between">
-                    <span>📵 Недійсний номер або не беруть слухавку</span>
+                    <span>Контакт недійсний або не відповідають</span>
                     <svg class="w-4 h-4 text-[#8e8e93]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6"/></svg>
                 </button>
+                <p id="krReportStatus" role="status" aria-live="polite"></p>
             </div>
         </div>
     </div>
 
 
     <!-- ==========================================
-         FLOATING APPLE MAPS VIEW TOGGLE (Map vs List)
+         MAP / LIST VIEW TOGGLE (Map vs List)
     ========================================== -->
     <div id="floatingViewToggle" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center p-1 rounded-full bg-[#1c1c1e]/90 backdrop-blur-2xl border border-white/[0.12] shadow-2xl transition-all">
         <button id="viewModeMapBtn" onclick="setViewMode('map')" class="px-3.5 py-1.5 rounded-full bg-white text-black font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm active:scale-95">

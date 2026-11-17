@@ -43,6 +43,11 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 from fastapi import FastAPI, Request, HTTPException, Depends, Header, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+
+try:
+    from .listing_trust import load_private_register, public_listing_view
+except ImportError:
+    from listing_trust import load_private_register, public_listing_view
 from pydantic import BaseModel, Field
 
 # Configure structured logging
@@ -78,6 +83,8 @@ _load_env_file()
 APP_ENV = os.getenv("APP_ENV", "production")
 DB_PATH = os.getenv("KYIV_RADAR_DB_PATH", "/opt/resell-radar-ukraine/data/rent_deals.db")
 DEALS_JSON_PATH = os.getenv("KYIV_RADAR_DEALS_PATH", "/opt/kyiv-radar-tma/data/deals.json")
+# An operator-maintained file outside public GitHub Pages; never publish proof.
+REVIEW_REGISTER_PATH = os.getenv("KYIV_RADAR_PRIVATE_REVIEW_PATH", "")
 PRIVATE_CONTACTS_PATH = os.getenv(
     "KYIV_RADAR_PRIVATE_CONTACTS_PATH",
     os.path.abspath(os.path.join(os.path.dirname(__file__), "data", "private_contacts.json"))
@@ -111,7 +118,7 @@ if not BOT_TOKEN and APP_ENV != "test":
 app = FastAPI(
     title="Kyiv Radar API",
     description="Listings and moderation API",
-    version="1.6.0"
+    version="1.8.0"
 )
 
 # Photos stay private on disk; /api/media/{id} serves only approved files.
@@ -463,6 +470,14 @@ def load_trusted_deals() -> List[Dict[str, Any]]:
             API_METRICS["db_errors"] += 1
     return []
 
+
+def load_effective_deals() -> List[Dict[str, Any]]:
+    """Apply trusted listing moderation without changing the source catalog."""
+    return public_listing_view(
+        load_trusted_deals(),
+        load_private_register(REVIEW_REGISTER_PATH),
+    )
+
 # Helper: Look up private landlord contact from secure vault
 def get_private_contact(deal_id: int) -> Optional[dict]:
     # 1. Check SQLite private_deal_contacts table
@@ -545,11 +560,11 @@ class SendContactRequest(BaseModel):
 
 @app.api_route("/api/health", methods=["GET", "HEAD"])
 async def health():
-    deals = load_trusted_deals()
+    deals = load_effective_deals()
     return {
         "status": "healthy",
         "service": "kyiv-radar-api",
-        "version": "1.6.0",
+        "version": "1.8.0",
         "deals_count": len(deals),
         "timestamp": int(time.time())
     }
@@ -561,9 +576,9 @@ async def get_live_deals():
     Serves synchronized listings from the verified catalog.
     Raw landlord phone numbers are strictly stripped for privacy protection.
     """
-    deals = load_trusted_deals()
+    deals = load_effective_deals()
     sanitized = []
-    public_fields = frozenset(["id","title","district","address","metro","walkMin","price","realtorCommissionSaved","area","floor","totalFloors","lat","lng","generator","gpon","gas","lowFloor","pets","url","images","desc","rooms","source","status","verifiedAt","isOwnerVerified","cleanAddress","verificationStatus","statusLabel","contactVerified","actualityConfirmed","commissionVerified","commissionNote","phoneMasked"])
+    public_fields = frozenset(["id","title","district","address","metro","walkMin","price","realtorCommissionSaved","area","floor","totalFloors","lat","lng","generator","gpon","gas","lowFloor","pets","url","images","desc","rooms","source","status","verifiedAt","isOwnerVerified","cleanAddress","verificationStatus","statusLabel","reviewedByRadar","contactVerified","actualityConfirmed","commissionVerified","commissionNote","phoneMasked"])
     for d in deals:
         if not isinstance(d, dict):
             continue
@@ -598,7 +613,7 @@ async def submit_report(req: ReportRequest, request: Request):
         raise HTTPException(status_code=400, detail="Вкажіть причину скарги")
 
     user_data = validate_telegram_init_data(req.initData) if req.initData else None
-    user_label = f"@{user_data.get('username', 'anon')} (TG ID: {user_data.get('id')})" if user_data else f"Веб (IP: {client_ip})"
+    user_label = f"Telegram ID: {user_data.get('id')}" if user_data else "Веб"
 
     comp_id = 0
     try:
@@ -612,7 +627,7 @@ async def submit_report(req: ReportRequest, request: Request):
         conn.commit()
         conn.close()
     except Exception as e:
-        logger.error(f"DB Error saving complaint: {e}")
+        logger.error("Unable to save a report (%s)", type(e).__name__)
         raise HTTPException(status_code=500, detail="Помилка збереження скарги на сервері")
 
     safe_reason = html.escape(req.reason.strip())
@@ -972,7 +987,7 @@ async def send_contact(req: SendContactRequest):
         )
 
     # Server-side lookup of deal by dealId
-    deals = load_trusted_deals()
+    deals = load_effective_deals()
     deal = next((d for d in deals if d.get("id") == req.dealId), None)
     if not deal:
         raise HTTPException(status_code=404, detail=f"Оголошення #{req.dealId} не знайдено у базі даних.")
