@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mass intake for permissioned Ukrainian real-estate feeds.
+"""Mass intake for permissioned Ukrainian real-estate feeds (JSON/CSV/XML).
 
 PRIVATE staging only. No scraping, website requests, media copying, contacts,
 automated approval, publish/export, notifications, or production DB mutation.
@@ -197,8 +197,14 @@ def read_rows(path: Path):
         if not isinstance(data, list):
             raise ValueError("JSON feed must contain an array")
         yield from data
+    elif path.suffix.lower() in (".xml", ".yml"):
+        try:
+            from .partner_xml import iter_partner_xml
+        except ImportError:
+            from partner_xml import iter_partner_xml
+        yield from iter_partner_xml(path)
     else:
-        raise ValueError("Only JSONL, JSON and CSV permissioned feeds are supported")
+        raise ValueError("Only JSONL, JSON, CSV and XML/YRL permissioned feeds are supported")
 
 
 def ingest(feed_path: Path, agreement_path: Path, database_path: Path,
