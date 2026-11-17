@@ -64,6 +64,7 @@ jobs:
             tests/test_source_first_contact_v119.py \
             tests/test_landlord_consent_v121.py \
             tests/test_market_inventory_v122.py \
+            tests/test_partner_feed_preflight_v130.py \
             tests/test_partner_xml_v123.py \
             tests/test_partner_yrl_v127a.py \
             tests/test_source_rights_v124.py \
