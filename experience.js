@@ -80,7 +80,7 @@
       kicker: "Як це працює",
       title: "Вибирайте за умовами, а не обіцянками",
       paragraphs: [
-        "1. Вкажіть бюджет, район або метро й потрібні умови: генератор, GPON, тварини.",
+        "1. Вкажіть бюджет, район або назву квартири й потрібні умови: генератор, GPON, тварини.",
         "2. Порівнюйте характеристики, але пам’ятайте: імпортовані оголошення не пройшли незалежну перевірку.",
         "3. Перевірте оригінальне джерело. Контакт через бот доступний після входу в Telegram.",
         "«Мій радар» зберігає пошуки на цьому пристрої. Автоматичні повідомлення поки не підключені."
@@ -449,7 +449,7 @@
     const intro = el("div","kr-hero-copy");
     intro.append(el("p","kr-hero-eyebrow","Оренда в умовах відключень"));
     intro.append(el("h1","","Квартира під ваші умови. Без здогадок."));
-    intro.append(el("p","","Ціна, метро та заявлені умови автономності. Перевірку кожного оголошення позначаємо окремо."));
+    intro.append(el("p","","Ціна, район і заявлені умови автономності. Перевірку кожного оголошення позначаємо окремо."));
     const actions = el("div","kr-hero-actions");
     const searchBtn = button("Знайти квартиру", () => document.getElementById("searchInput")?.focus(), "primary");
     searchBtn.id = "krStart";
@@ -502,7 +502,7 @@
       mapEl.parentElement?.append(tip);
     }
     const searchField=document.getElementById("searchInput");
-    if (searchField) searchField.setAttribute("aria-label","Пошук квартири за районом, вулицею або метро");
+    if (searchField) searchField.setAttribute("aria-label","Пошук квартири за районом, вулицею або назвою оголошення");
     installMapDistrictSummary();
     try {
       const mode=localStorage.getItem(VALID_VIEW);
