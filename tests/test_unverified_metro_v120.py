@@ -40,6 +40,10 @@ async def test_embedded_fallback_renders_district_without_station_or_travel_minu
         assert stats["anyMinutes"] is False
         await page.evaluate("id => openDealModalById(id)",stats["id"])
         assert await page.locator("#modalMetro").inner_text() == stats["district"]
+        # Search should promise only supported, non-invented listing fields.
+        placeholder = await page.locator("#searchInput").get_attribute("placeholder")
+        assert "Район" in placeholder
+        assert "Метро" not in placeholder
         await browser.close()
 
 
