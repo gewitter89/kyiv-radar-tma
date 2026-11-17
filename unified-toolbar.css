@@ -1170,3 +1170,20 @@ html.kr-unified-111.kr-simple[data-kr-theme] #modalPhotoIndex {
   background:rgba(10,19,30,.8) !important;
   color:#fff !important;
 }
+
+
+/* Explicit light surfaces override legacy dark palette values injected
+   into the original per-listing equipment section. Avoid inherited dark
+   component tokens; enforce actual light colors in the light theme. */
+html.kr-unified-111.kr-simple[data-kr-theme="light"] #dealModal #krDealScroll #modalEquipment > div {
+  background:#E8EFF5 !important;
+  background-color:#E8EFF5 !important;
+  border-color:rgba(54,85,117,.17) !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme="light"] #dealModal #krDealScroll #modalEquipment > div span:not(.w-2),
+html.kr-unified-111.kr-simple[data-kr-theme="light"] #dealModal #krDealScroll #modalEquipment > div b {
+  color:#19283A !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme="light"] #dealModal #krDealScroll #modalEquipment > div small {
+  color:#526579 !important;
+}
