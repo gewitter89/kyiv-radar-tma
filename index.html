@@ -816,6 +816,7 @@
     <!-- ==========================================
          APPLICATION LOGIC JAVASCRIPT
     ========================================== -->
+        <script src="./favorite-identity.js?v=1.30.0"></script>
         <script>
         // XSS Sanitizer Helper (Strict character escaping)
         function escapeHtml(str) {
@@ -856,17 +857,41 @@
         let currentActiveId = null;
         let currentModalDeal = null;
         let currentModalPhotoIdx = 0;
-        let FAVORITES = new Set((() => {
-            try {
-                const saved = JSON.parse(localStorage.getItem('kr_favs') || '[]');
-                // Older builds sometimes stored IDs as strings. Normalize them so
-                // the same apartment stays selected after refresh/API reload.
-                return Array.isArray(saved) ? saved.map(Number)
-                    .filter(id => Number.isSafeInteger(id) && id > 0).slice(0, 2000) : [];
-            } catch (error) {
-                return []; // Private mode or damaged saved data must not blank the app.
+        const INITIAL_SAVED = window.KRFavoriteIdentity?.load() || {keys:new Set(),legacy:new Set()};
+        let FAVORITES = INITIAL_SAVED.keys;
+        let LEGACY_FAVORITE_IDS = INITIAL_SAVED.legacy;
+        let FAVORITE_KEY_COUNTS = new Map();
+        function refreshFavoriteKeys() {
+            const count = new Map();
+            for (const item of LISTINGS) {
+                const key = window.KRFavoriteIdentity?.stableKey(item);
+                if (key) count.set(key, (count.get(key) || 0) + 1);
             }
-        })());
+            FAVORITE_KEY_COUNTS = count;
+        }
+        function favoriteKey(item) {
+            const key = window.KRFavoriteIdentity?.stableKey(item);
+            return key && FAVORITE_KEY_COUNTS.get(key) === 1 ? key : null;
+        }
+        function legacyFavoritesNotice() {
+            if (!ACTIVE_FILTERS.favs || !LEGACY_FAVORITE_IDS.size) return '';
+            return '<div class="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-[#f4d9a7]" role="status">' +
+                '<strong>Є ' + LEGACY_FAVORITE_IDS.size + ' старих збережень.</strong> ' +
+                'У попередній версії зберігався лише номер. Після оновлення бази це може бути інша квартира, ' +
+                'тому ми не підставляємо її автоматично. Знайдіть потрібне оголошення та збережіть знову через сердечко. ' +
+                '<button type="button" class="underline font-semibold ml-1" onclick="discardLegacyFavorites(event)">Видалити старі номери</button></div>';
+        }
+        function discardLegacyFavorites(e) {
+            if (e) {e.preventDefault();e.stopPropagation();}
+            if (!window.confirm('Видалити старі числові збереження? Нові обрані залишаться.')) return;
+            if (!window.KRFavoriteIdentity?.discardLegacy()) {
+                showToast('Не вдалося очистити старі збереження в цьому браузері');
+                return;
+            }
+            LEGACY_FAVORITE_IDS.clear();
+            renderAll();
+            showToast('Старі номери видалено. Нові обрані збережено.');
+        }
 
         // Toast Helper
         function showToast(text) {
@@ -1055,47 +1080,46 @@
 
         // 3. LOAD DEALS (High-speed load with live VPS API synchronization)
         async function loadDeals() {
-            window.KR_CATALOG_MODE = "cached";
-            if (typeof KYIV_DEALS_INIT !== 'undefined' && Array.isArray(KYIV_DEALS_INIT)) {
-                LISTINGS = staticCatalogWithoutPartners(KYIV_DEALS_INIT);
-            }
+            // Bundled historic records may be used only in local file:// QA.
+            // A deployed website must never silently reanimate archival records
+            // when the live API fails or an approved feed is withdrawn.
+            const localFixture = window.location.protocol === 'file:';
+            window.KR_CATALOG_MODE = localFixture ? "cached" : "loading";
+            LISTINGS = localFixture && typeof KYIV_DEALS_INIT !== 'undefined' &&
+                Array.isArray(KYIV_DEALS_INIT)
+                ? staticCatalogWithoutPartners(KYIV_DEALS_INIT) : [];
 
-            // A slow API must not freeze the first visit; fall back to static/offline data.
             const controller = new AbortController();
             const abortTimer = setTimeout(() => controller.abort(), 6000);
-            // Sync with live production HTTPS API so newly approved landlord deals appear immediately
             try {
                 const res = await fetch(
                     'https://vmi3445944.contaboserver.net/api/deals?v=' + Date.now(),
                     { signal: controller.signal, cache: 'no-store' }
                 );
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && data.success && Array.isArray(data.deals)) {
-                        LISTINGS = data.deals;
-                        window.KR_CATALOG_MODE = "live";
-                    }
+                if (!res.ok) throw new Error("Catalog request failed");
+                const data = await res.json();
+                if (!data || data.success !== true || !Array.isArray(data.deals))
+                    throw new Error("Invalid catalog response");
+                LISTINGS = data.deals;
+                window.KR_CATALOG_MODE = "live"; // An empty approved array is a valid response.
+            } catch (error) {
+                if (localFixture) {
+                    // Keep explicit file:// preview and offline browser test fixtures.
+                    // These are never evidence of availability, permission or real stock.
+                    try {
+                        const resJson = await fetch('data/deals.json?v=' + Date.now());
+                        if (resJson.ok) {
+                            const dataJson = await resJson.json();
+                            if (Array.isArray(dataJson) && dataJson.length > 0) {
+                                LISTINGS = staticCatalogWithoutPartners(dataJson);
+                                window.KR_CATALOG_MODE = "static";
+                            }
+                        }
+                    } catch (err) { /* Local fixture remains the embedded snapshot. */ }
                 } else {
-                    const resJson = await fetch('data/deals.json?v=' + Date.now());
-                    if (resJson.ok) {
-                        const dataJson = await resJson.json();
-                        if (Array.isArray(dataJson) && dataJson.length > 0) {
-                            LISTINGS = staticCatalogWithoutPartners(dataJson);
-                            window.KR_CATALOG_MODE = "static";
-                        }
-                    }
+                    LISTINGS = [];
+                    window.KR_CATALOG_MODE = "error";
                 }
-            } catch (e) {
-                try {
-                    const resJson = await fetch('data/deals.json?v=' + Date.now());
-                    if (resJson.ok) {
-                        const dataJson = await resJson.json();
-                        if (Array.isArray(dataJson) && dataJson.length > 0) {
-                            LISTINGS = staticCatalogWithoutPartners(dataJson);
-                            window.KR_CATALOG_MODE = "static";
-                        }
-                    }
-                } catch (err) {}
             } finally {
                 clearTimeout(abortTimer);
             }
@@ -1111,8 +1135,8 @@
                 return cleanDesc === item.desc ? item : { ...item, desc: cleanDesc };
             });
 
-            // Flag uncertain imported metadata; do not substitute guessed values.
             if (typeof window.krQualityCatalog === "function") LISTINGS = window.krQualityCatalog(LISTINGS);
+            refreshFavoriteKeys();
             document.getElementById('filterAll').innerText = `Всі (${LISTINGS.length})`;
             document.getElementById('activeListingsCount').innerText = `Оголошення: ${LISTINGS.length}`;
             renderAll();
@@ -1335,7 +1359,7 @@
                 if (ACTIVE_FILTERS.gpon && !item.gpon) return false;
                 if (ACTIVE_FILTERS.lowFloor && (!Number.isInteger(Number(item.floor)) || Number(item.floor) < 1 || Number(item.floor) > 4)) return false;
                 if (ACTIVE_FILTERS.pets && !item.pets) return false;
-                if (ACTIVE_FILTERS.favs && !FAVORITES.has(item.id)) return false;
+                if (ACTIVE_FILTERS.favs && !FAVORITES.has(favoriteKey(item))) return false;
                 return true;
             });
 
@@ -1464,26 +1488,29 @@
             if (!listEl) return;
 
             if (items.length === 0) {
+                const catalogError = window.KR_CATALOG_MODE === 'error';
                 const emptyCatalog = LISTINGS.length === 0;
                 const noSaved = !emptyCatalog && ACTIVE_FILTERS.favs && FAVORITES.size === 0;
                 const savedMissing = !emptyCatalog && ACTIVE_FILTERS.favs &&
-                    FAVORITES.size > 0 && !LISTINGS.some(item => FAVORITES.has(Number(item.id)));
-                listEl.innerHTML = `
-                    <div class="kr-empty-state">
-                        <div class="text-white font-semibold text-base">${emptyCatalog ? 'Зараз немає доступних оголошень' : noSaved ? 'Обраних квартир поки немає' : savedMissing ? 'Збережені оголошення зараз недоступні' : 'Нічого не знайдено'}</div>
-                        <p class="mt-2 text-sm text-[#aebdd0]">${emptyCatalog ? 'Опубліковані пропозиції тимчасово відсутні. Не показуємо зняті оголошення.' : noSaved ? 'Натисніть сердечко на квартирі, щоб зберегти її тут. Обрані залишаються лише у цьому браузері.' : savedMissing ? 'Ці квартири наразі відсутні в доступному каталозі. Ми не показуємо зняті або недоступні оголошення як активні.' : 'Змініть район, бюджет або інші умови.'}</p>
-                        ${emptyCatalog ? '' : '<button type="button" onclick="setFilter(\'all\')" class="kr-reset mt-4">Скинути фільтри</button>'}
+                    FAVORITES.size > 0 && !LISTINGS.some(item => FAVORITES.has(favoriteKey(item)));
+                listEl.innerHTML = legacyFavoritesNotice() + `
+                    <div class="kr-empty-state" role="status" aria-live="polite">
+                        <div class="text-white font-semibold text-base">${catalogError ? 'Не вдалося завантажити оголошення' : emptyCatalog ? 'Зараз немає доступних оголошень' : noSaved ? 'Обраних квартир поки немає' : savedMissing ? 'Збережені оголошення зараз недоступні' : 'Нічого не знайдено'}</div>
+                        <p class="mt-2 text-sm text-[#aebdd0]">${catalogError ? 'Зараз немає зв’язку з каталогом. Архівні оголошення не показуємо як актуальні. Перевірте інтернет і спробуйте ще раз.' : emptyCatalog ? 'Опубліковані пропозиції тимчасово відсутні. Не показуємо зняті оголошення.' : noSaved ? 'Натисніть сердечко на квартирі, щоб зберегти її тут. Обрані залишаються лише у цьому браузері.' : savedMissing ? 'Ці квартири наразі відсутні в доступному каталозі. Ми не показуємо зняті або недоступні оголошення як активні.' : 'Змініть район, бюджет або інші умови.'}</p>
+                        ${catalogError ? '<button type="button" id="krCatalogRetry" onclick="loadDeals()" class="kr-reset mt-4">Спробувати знову</button>' : emptyCatalog ? '' : '<button type="button" onclick="setFilter(\'all\')" class="kr-reset mt-4">Скинути фільтри</button>'}
                     </div>
                 `;
                 return;
             }
 
-            listEl.innerHTML = items.map(item => {
+            listEl.innerHTML = legacyFavoritesNotice() + items.map(item => {
                 const cover = Array.isArray(item.images) && item.images.length ? safePhotoUrl(item.images[0]) : '';
                 const hasPhotos = Boolean(cover);
                 const photosCount = hasPhotos ? item.images.length : 0;
                 const hasPower = item.generator || item.gpon;
-                const isFav = FAVORITES.has(item.id);
+                const key = favoriteKey(item);
+                const isFav = key && FAVORITES.has(key);
+                const canSave = Boolean(key);
 
                 const roomStr = item.rooms ? `${item.rooms} кімн` : 'Кімнати не вказано';
                 const areaStr = item.area ? `${item.area} м²` : 'Площа не вказана';
@@ -1514,7 +1541,7 @@
                                 ${item.gpon ? '<span class="px-2 py-0.5 rounded-full bg-[#1b324b]/95 text-[#d3e5ff] border border-[#6d90b8]/40 text-[10px] font-semibold">🌐 Інтернет · заявлено</span>' : ''}
                             </div>
 
-                            <button type="button" data-favorite-id="${item.id}" onclick="toggleFavorite(event, ${item.id})" aria-pressed="${isFav}" aria-label="${isFav ? 'Прибрати з обраного' : 'Додати в обрані'}" title="${isFav ? 'Прибрати з обраного' : 'Додати в обрані'}" class="absolute top-2 right-2 w-11 h-11 rounded-full bg-black/65 backdrop-blur-md text-white flex items-center justify-center transition-all active:scale-95 z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0a84ff]">
+                            <button type="button" data-favorite-id="${item.id}" onclick="toggleFavorite(event, ${item.id})" aria-pressed="${Boolean(isFav)}" ${canSave ? '' : 'disabled'} aria-label="${!canSave ? 'Немає надійного посилання: не можна зберегти' : isFav ? 'Прибрати з обраного' : 'Додати в обрані'}" title="${!canSave ? 'Потрібне однозначне посилання на об’єкт' : isFav ? 'Прибрати з обраного' : 'Додати в обрані'}" class="absolute top-2 right-2 w-11 h-11 rounded-full bg-black/65 backdrop-blur-md text-white flex items-center justify-center transition-all active:scale-95 z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0a84ff]">
                                 <svg aria-hidden="true" class="w-5 h-5 ${isFav ? 'text-[#ff453a]' : 'text-white/90'}" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2.2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                             </button>
 
@@ -1619,7 +1646,9 @@
             }
 
             track.innerHTML = items.map((item) => {
-                const isFav = FAVORITES.has(item.id);
+                const key = favoriteKey(item);
+                const isFav = key && FAVORITES.has(key);
+                const canSave = Boolean(key);
                 const hasPower = item.generator || item.gpon;
                 const mainPhoto = Array.isArray(item.images) && item.images.length ? safePhotoUrl(item.images[0]) : '';
                 const hasPhotos = Boolean(mainPhoto);
@@ -1661,7 +1690,7 @@
                                 <div class="text-[11px] font-medium text-[#8e8e93] truncate">
                                     ${item.metro ? `${escapeHtml(item.metro)}${typeof item.walkMin === 'number' && item.walkMin > 0 ? ` · ${item.walkMin} хв (за джерелом)` : ''}` : escapeHtml(item.district || 'Київ')}
                                 </div>
-                                <button type="button" data-favorite-id="${item.id}" onclick="toggleFavorite(event, ${item.id})" aria-pressed="${isFav}" aria-label="${isFav ? 'Прибрати з обраного' : 'Додати в обрані'}" title="${isFav ? 'Прибрати з обраного' : 'Додати в обрані'}" class="w-11 h-11 inline-flex items-center justify-center rounded-full text-[#8e8e93] hover:text-[#ff453a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0a84ff] transition-colors shrink-0">
+                                <button type="button" data-favorite-id="${item.id}" onclick="toggleFavorite(event, ${item.id})" aria-pressed="${Boolean(isFav)}" ${canSave ? '' : 'disabled'} aria-label="${!canSave ? 'Немає надійного посилання: не можна зберегти' : isFav ? 'Прибрати з обраного' : 'Додати в обрані'}" title="${!canSave ? 'Потрібне однозначне посилання на об’єкт' : isFav ? 'Прибрати з обраного' : 'Додати в обрані'}" class="w-11 h-11 inline-flex items-center justify-center rounded-full text-[#8e8e93] hover:text-[#ff453a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0a84ff] transition-colors shrink-0">
                                     <svg aria-hidden="true" class="w-5 h-5 ${isFav ? 'text-[#ff453a]' : 'text-[#a8a8ad]'}" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                                 </button>
                             </div>
@@ -2329,28 +2358,23 @@
         function toggleFavorite(e, id) {
             if (e) { e.preventDefault(); e.stopPropagation(); }
             const numericId = Number(id);
-            if (!Number.isSafeInteger(numericId) || numericId <= 0 ||
-                !LISTINGS.some(item => Number(item.id) === numericId)) return;
-            const added = !FAVORITES.has(numericId);
-            if (added) FAVORITES.add(numericId);
-            else FAVORITES.delete(numericId);
-            let stored = true;
-            try {
-                localStorage.setItem('kr_favs', JSON.stringify([...FAVORITES]));
-            } catch (error) {
-                stored = false; // Keep favorites functional within the current session.
+            const item = LISTINGS.find(row => Number(row.id) === numericId);
+            if (!Number.isSafeInteger(numericId) || numericId <= 0 || !item) return;
+            const key = favoriteKey(item);
+            if (!key) {
+                showToast('Не вдалося зберегти: посилання на об’єкт неоднозначне');
+                return;
             }
-
-            // Both the full list and carousel render their own heart buttons.
-            // Updating only the carousel left mobile-list hearts visually unchanged.
+            const added = !FAVORITES.has(key);
+            if (added) FAVORITES.add(key);
+            else FAVORITES.delete(key);
+            const stored = window.KRFavoriteIdentity?.save(FAVORITES) === true;
             const list = document.getElementById('listViewContainer');
             const track = document.getElementById('carousel-track');
             const listPosition = list ? list.scrollTop : 0;
             const carouselPosition = track ? track.scrollLeft : 0;
             const restoreFocus = document.activeElement?.hasAttribute('data-favorite-id');
-            if (ACTIVE_FILTERS.favs && currentActiveId === numericId && !added) {
-                currentActiveId = null;
-            }
+            if (ACTIVE_FILTERS.favs && currentActiveId === numericId && !added) currentActiveId = null;
             renderAll();
             if (list) list.scrollTop = listPosition;
             if (track) track.scrollLeft = carouselPosition;
@@ -2359,10 +2383,10 @@
                     ?.querySelector('[data-favorite-id="' + numericId + '"]');
                 if (replacement) replacement.focus({ preventScroll: true });
             }
-            showToast(!stored ? 'Обране збережено лише до закриття застосунку' :
+            showToast(!stored ? 'Обране доступне лише до закриття цього браузера' :
                 added ? 'Додано в обрані' : 'Прибрано з обраного');
             try { window.Telegram?.WebApp?.HapticFeedback?.selectionChanged(); }
-            catch (error) { /* Haptics are optional in browsers and older Telegram. */ }
+            catch (error) { /* Optional haptics. */ }
         }
 
         function updateFavCount() {
@@ -2693,7 +2717,7 @@
     <!-- v1.6: optional local-first saved searches and apartment comparison -->
     <script src="./smart-radar.js?v=1.6.0"></script>
     <script src="./catalog-quality.js?v=1.7.0"></script>
-    <script src="./experience.js?v=1.11.0"></script>
+    <script src="./experience.js?v=1.32.0"></script>
     <script src="./mobile-media.js?v=1.7.0"></script>
     <script src="./simple-view.js?v=1.11.0"></script>
     <script src="./trust-experience.js?v=1.8.0"></script>

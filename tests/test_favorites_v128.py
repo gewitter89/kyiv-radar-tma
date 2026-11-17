@@ -42,12 +42,13 @@ async def test_heart_taps_save_and_remove_without_opening_listing(width, height)
         assert await selected.get_attribute("aria-pressed") == "true"
         assert await selected.get_attribute("aria-label") == "Прибрати з обраного"
         assert await page.locator("#favCount").inner_text() == "1"
-        saved = await page.evaluate("JSON.parse(localStorage.getItem('kr_favs'))")
-        assert saved == [fav_id]
+        saved = await page.evaluate("JSON.parse(localStorage.getItem('kr_favs_v2'))")
+        expected_key = await page.evaluate("(id) => favoriteKey(LISTINGS.find(x => x.id === id))", fav_id)
+        assert saved == {"version": 2, "keys": [expected_key]}
         await selected.click()
         assert await page.locator("#favCount").inner_text() == "0"
         assert await page.locator(f'#listViewContainer [data-favorite-id="{fav_id}"]').get_attribute("aria-pressed") == "false"
-        assert await page.evaluate("JSON.parse(localStorage.getItem('kr_favs'))") == []
+        assert await page.evaluate("JSON.parse(localStorage.getItem('kr_favs_v2'))") == {"version": 2, "keys": []}
         await browser.close()
 
 
@@ -103,7 +104,7 @@ async def test_mobile_list_scroll_position_preserved_and_carousel_heart_updated(
 
 
 @pytest.mark.asyncio
-async def test_saved_string_ids_normalized_and_corrupt_data_is_ignored():
+async def test_unverifiable_old_numeric_ids_are_quarantined_and_not_assigned_to_a_new_property():
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={"width": 390, "height": 844})
@@ -112,9 +113,13 @@ async def test_saved_string_ids_normalized_and_corrupt_data_is_ignored():
           catch (e) {}
         })();""")
         await open_apartments(page)
-        assert await page.evaluate("FAVORITES.has(1) && FAVORITES.has(2)") is True
-        assert await page.evaluate("FAVORITES.has('1')") is False
-        assert await page.locator("#favCount").inner_text() == "2"
+        assert await page.evaluate("LEGACY_FAVORITE_IDS.has(1) && LEGACY_FAVORITE_IDS.has(2)") is True
+        assert await page.evaluate("FAVORITES.size") == 0
+        assert await page.locator("#favCount").inner_text() == "0"
+        await page.evaluate("setFilter('favs')")
+        assert await page.locator("#listViewContainer").get_by_text("2 старих збережень", exact=False).is_visible()
+        assert await page.evaluate("getFilteredListings().length") == 0
+        assert await page.evaluate("JSON.parse(localStorage.getItem('kr_favs'))") == ['1', '2', 'bad', -8]
         await browser.close()
 
 

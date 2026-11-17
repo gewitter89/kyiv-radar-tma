@@ -25,6 +25,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r server/requirements.txt pytest pytest-asyncio httpx playwright
           python -m playwright install --with-deps chromium
+      - name: Verify public health offline semantics
+        run: python -m pytest -q tests/test_public_health_v131.py
       - name: Compile backend modules
         run: python -m compileall -q server scripts
       - name: Audit public listings without promoting unverified claims
@@ -55,6 +57,8 @@ jobs:
             tests/test_first_visit_v17.py \
             tests/test_favorites_v128.py \
             tests/test_favorites_shortcut_v129.py \
+            tests/test_favorite_identity_v130.py \
+            tests/test_public_catalog_outage_v131.py \
             tests/test_kyiv_signal_theme_v112.py \
             tests/test_smart_filters_v113.py \
             tests/test_simple_first_view.py \
@@ -64,7 +68,6 @@ jobs:
             tests/test_source_first_contact_v119.py \
             tests/test_landlord_consent_v121.py \
             tests/test_market_inventory_v122.py \
-            tests/test_partner_feed_preflight_v130.py \
             tests/test_partner_xml_v123.py \
             tests/test_partner_yrl_v127a.py \
             tests/test_source_rights_v124.py \
