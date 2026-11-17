@@ -1472,12 +1472,9 @@
 
                         <div class="p-3 text-xs">
                             <h4 class="font-semibold text-white truncate text-[13px] mb-1">${escapeHtml(item.title || item.address || 'Квартира в оренду')}</h4>
-                            <p class="text-[#8e8e93] text-[11px] flex items-center gap-1.5 mb-2">
-                                <span>📍 ${item.metro ? `${escapeHtml(item.metro)} · ${escapeHtml(item.district || 'Київ')}` : escapeHtml(item.district || 'Київ')}</span>
-                                <span>•</span>
-                                <span>${specLine}</span>
-                            </p>
-                            <div class="flex items-center justify-between pt-2 border-t border-white/[0.06]">
+                            <p class="kr-card-location">📍 ${escapeHtml(item.district || 'Київ')}${item.metro ? ` · ${escapeHtml(item.metro)}` : ''}</p>
+                            <p class="kr-card-specs">${specLine}</p>
+                            <div class="kr-card-actions">
                                 <button type="button" class="kr-open-detail" onclick="event.stopPropagation(); openDealModalById(${item.id})" aria-label="Переглянути квартиру">
                                     Переглянути квартиру <span aria-hidden="true">→</span>
                                 </button>
