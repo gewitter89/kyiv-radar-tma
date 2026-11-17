@@ -382,6 +382,12 @@
       if (mode === "list" && typeof setViewMode === "function") setViewMode("list");
     } catch (_) {}
     enhanceFunctions();
+    // First meaningful paint: do not wait for the remote API. A checked
+    // embedded snapshot is already available and is clearly labelled stale.
+    if (Array.isArray(LISTINGS) && LISTINGS.length > 0) {
+      if (typeof window.krQualityCatalog === "function") LISTINGS = window.krQualityCatalog(LISTINGS);
+      if (typeof window.renderAll === "function") window.renderAll();
+    }
     updateStatus();
   }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start);
