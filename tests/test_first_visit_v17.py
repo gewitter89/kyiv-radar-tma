@@ -249,7 +249,7 @@ async def test_graphite_masthead_has_brand_mark_not_decorative_wave():
         await open_app(page)
         header = page.locator("header.kr-unified-header")
         assert await header.is_visible()
-        assert await page.locator('meta[name="theme-color"]').get_attribute("content") == "#10151D"
+        assert await page.locator('meta[name="theme-color"]').get_attribute("content") == "#161E29"
         assert await page.locator("header .kr-native-seam").count() == 0
         assert await page.locator("#krHero .kr-ukraine-curve").count() == 0
         assert await page.locator("#krHero .kr-kyiv-skyline svg").count() == 1

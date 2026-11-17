@@ -5,7 +5,7 @@
   const KEY = "kr_theme_mode_v1";
   const MODES = ["dark", "light", "auto"];
   const COLORS = {
-    dark: {header:"#10151D", background:"#10151D"},
+    dark: {header:"#161E29", background:"#10151D"},
     light: {header:"#EDF2F7", background:"#F5F7F9"}
   };
   let mode = "dark";
@@ -30,6 +30,9 @@
     const colors = COLORS[resolved];
     document.documentElement.setAttribute("data-kr-theme", resolved);
     document.documentElement.style.colorScheme = resolved;
+    // The native Telegram bar and the first pixel of the HTML masthead
+    // must use exactly the same opaque color (not merely nearby shades).
+    document.documentElement.style.setProperty("--kr-header", colors.header);
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute("content", colors.header);
     const tg = window.Telegram?.WebApp;

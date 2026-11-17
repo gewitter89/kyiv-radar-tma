@@ -379,7 +379,11 @@ html.kr-unified-111.kr-compact.kr-simple[data-kr-theme] header.kr-compact-masthe
   border:0 !important;
 }
 html.kr-unified-111.kr-simple[data-kr-theme] header.kr-compact-masthead::before {
-  background:radial-gradient(ellipse at 79% 0%,rgba(99,168,236,.055),transparent 58%) !important;
+  /* Native Telegram has a solid-color header. Fade visual texture in only
+     below the boundary, so the first CSS pixel matches it precisely. */
+  background:radial-gradient(ellipse at 79% 45%,rgba(99,168,236,.055),transparent 58%) !important;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0px,transparent 10px,#000 30px);
+  mask-image:linear-gradient(to bottom,transparent 0px,transparent 10px,#000 30px);
 }
 html.kr-unified-111.kr-simple[data-kr-theme] header.kr-compact-masthead #krHero::before {
   background:none !important;
@@ -659,6 +663,9 @@ html.kr-focused-filter-ui.kr-simple[data-kr-theme] header.kr-compact-masthead::a
   opacity:.14;
   filter:grayscale(35%);
   transform:rotate(-10deg);
+  /* The pin belongs to the HTML region; it may not extend into the native bar. */
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0px,rgba(0,0,0,.2) 21px,#000 46px);
+  mask-image:linear-gradient(to bottom,transparent 0px,rgba(0,0,0,.2) 21px,#000 46px);
 }
 html.kr-focused-filter-ui.kr-simple[data-kr-theme="light"] header.kr-compact-masthead::after {
   opacity:.085;
