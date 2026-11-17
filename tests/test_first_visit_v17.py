@@ -258,10 +258,10 @@ async def test_graphite_masthead_has_brand_mark_not_decorative_wave():
         assert await page.locator('#krRadarSlot .kr-radar-mini-mark').count() == 1
         bg = await header.evaluate("(node) => getComputedStyle(node).backgroundColor")
         assert bg == "rgb(22, 30, 41)"
-        rings = await page.locator("#krHero").evaluate(
+        watermark = await header.evaluate(
             "(node) => getComputedStyle(node,'::after').backgroundImage"
         )
-        assert "repeating-radial-gradient" in rings
+        assert "kyiv-radar-mark.svg" in watermark
         assert await page.locator("#krHero").is_visible()
         await page.locator("#searchInput").click()
         assert await page.evaluate("document.activeElement.id") == "searchInput"
