@@ -32,6 +32,10 @@ async def test_phone_first_view_shows_photos_not_full_screen_map():
         assert await page.locator("#listViewContainer img").first.is_visible()
         assert await page.locator("#listViewContainer img").first.bounding_box() is not None
         assert await page.locator("#listViewContainer > div[onclick]").count() >= 10
+        first_card = await page.locator("#listViewContainer > div[onclick]").nth(0).bounding_box()
+        second_card = await page.locator("#listViewContainer > div[onclick]").nth(1).bounding_box()
+        assert first_card and second_card
+        assert second_card["y"] >= first_card["y"] + first_card["height"] + 6, "Apartment cards must never overlap"
         # Body itself must not scroll horizontally (filter strip scrolls within itself).
         over = await page.evaluate(
             "() => Math.max(document.body.scrollWidth, document.documentElement.scrollWidth)-window.innerWidth"
