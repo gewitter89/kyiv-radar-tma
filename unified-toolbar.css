@@ -1171,6 +1171,18 @@ html.kr-unified-111.kr-simple[data-kr-theme] #modalPhotoIndex {
   color:#fff !important;
 }
 
+/* The photo fallback remains dark in BOTH themes. Do not recolor its text
+   with the global light-theme modal typography override. */
+html.kr-unified-111.kr-simple[data-kr-theme] #modalPhotoPlaceholder .kr-modal-photo-message {
+  color:#F5F8FD !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalPhotoPlaceholder .kr-modal-photo-hint {
+  color:#C6D1DF !important;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #modalPhotoPlaceholder svg {
+  color:#AFBDCB !important;
+}
+
 
 /* Explicit light surfaces override legacy dark palette values injected
    into the original per-listing equipment section. Avoid inherited dark
