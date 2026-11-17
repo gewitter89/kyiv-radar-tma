@@ -148,9 +148,9 @@
     n.textContent = "Знайдено " + items.length + " із " + total;
     const mode = window.KR_CATALOG_MODE || "loading";
     const messages = {
-      live: "Дані з API · актуальність не підтверджена",
-      static: "Резервний каталог · актуальність не перевірена",
-      cached: "Офлайн-копія · актуальність не перевірена",
+      live: "Актуальність не перевірена",
+      static: "Збережено · не перевірено",
+      cached: "Збережено · не перевірено",
       loading: "Завантажуємо оголошення…"
     };
     if (source) source.textContent = messages[mode] || messages.cached;
