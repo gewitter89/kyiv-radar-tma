@@ -22,6 +22,8 @@ async def test_rental_safety_disclosure_is_optional_accessible_and_scrollable(wi
         summary=safety.locator("summary")
         assert await summary.is_visible()
         assert not await safety.evaluate("(el) => el.open")
+        before=await page.evaluate(
+            "() => JSON.stringify(LISTINGS.map(x => [x.id,x.isOwnerVerified,x.commissionVerified]))")
         await summary.click()
         assert await safety.evaluate("(el) => el.open")
         content=await safety.inner_text()
@@ -29,8 +31,9 @@ async def test_rental_safety_disclosure_is_optional_accessible_and_scrollable(wi
             assert phrase in content
         assert await page.locator("#modalOriginalLink").count()==1
         # Advice is independent from the catalog metadata and changes no deal.
-        assert await page.evaluate("LISTINGS.every(x => x.isOwnerVerified !== true)")
-        assert await page.evaluate("LISTINGS.every(x => x.commissionVerified !== true)")
+        after=await page.evaluate(
+            "() => JSON.stringify(LISTINGS.map(x => [x.id,x.isOwnerVerified,x.commissionVerified]))")
+        assert after==before, "Advice must not mutate verification records"
         await summary.click()
         assert not await safety.evaluate("(el) => el.open")
         await browser.close()
