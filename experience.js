@@ -288,7 +288,13 @@
         const x=old.call(this,id);
         const secure = Boolean(window.Telegram?.WebApp?.initData);
         const action = document.getElementById("modalCallLabel");
-        if (action) action.textContent = secure ? "Отримати контакт у чат" : "Відкрити Telegram";
+        if (action) action.textContent = secure ? "Запросити контакт у чат" : "Відкрити Telegram";
+        const primary = document.getElementById("modalCallBtn");
+        if (primary) {
+          primary.style.backgroundColor = secure ? "#30d158" : "#85b5ff";
+          const phoneIcon = primary.querySelector("svg");
+          if (phoneIcon) phoneIcon.style.display = secure ? "" : "none";
+        }
         const secondary = document.getElementById("modalChatBtn");
         if (secondary) secondary.hidden = true;
         return x;
