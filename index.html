@@ -551,7 +551,6 @@
                         </div>
                         <span class="text-[11px] leading-snug text-right text-[#b2b7c3] max-w-[120px]">Якщо контакт доступний, надішлемо його в Telegram</span>
                     </div>
-                    <p id="krContactStatus" class="kr-contact-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
                 </div>
 
                 <!-- Address (Apple Inset Row) -->
@@ -603,6 +602,8 @@
                 </div>
 
                 </div>
+            <!-- Always visible next to the CTA, even if the long listing is scrolled. -->
+            <p id="krContactStatus" class="kr-contact-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
 
             <!-- Modal Action Buttons (Apple Action Bar) -->
             <div id="krDealActionBar" class="p-3 border-t border-white/[0.08] bg-[#1c1c1e]/95 backdrop-blur-2xl flex items-center gap-2 shrink-0">
