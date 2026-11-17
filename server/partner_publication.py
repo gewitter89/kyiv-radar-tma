@@ -212,6 +212,8 @@ def read_private_export(export_path: str | None, authorization_path: str | None,
                 or blob.get("authorization_sha256") != signature):
             return []
         generated = datetime.fromisoformat(blob["generated_at"])
+        if generated.tzinfo is None:
+            return []
         age = now - generated.astimezone(timezone.utc)
         if age < -timedelta(minutes=5) or age > MAX_AGE:
             return []
@@ -227,11 +229,31 @@ def read_private_export(export_path: str | None, authorization_path: str | None,
         for item in items:
             if not isinstance(item, dict) or not set(item).issubset(fields):
                 return []
-            if (item.get("source") != f"partner:{receipt['source_key']}"
+            external = item.get("partnerExternalId")
+            if (not isinstance(external, str)
+                    or not 1 <= len(external) <= 128
+                    or any(ord(ch) < 32 or ord(ch) == 127 for ch in external)
+                    or item.get("source") != f"partner:{receipt['source_key']}"
                     or item.get("partnerSourceKey") != receipt["source_key"]
-                    or type(item.get("id")) is not int or item["id"] <= 0
+                    or type(item.get("id")) is not int
+                    or item["id"] != stable_id(receipt["source_key"], external)
                     or item["id"] in used
-                    or item.get("images") != []):
+                    or item.get("images") != []
+                    or item.get("title") != "Квартира — Київ"
+                    or item.get("status") != "Пропозиція партнера"):
+                return []
+            scope = set(receipt["permitted_fields"])
+            if ("rooms" in item and "rooms" not in scope) or (
+                "area" in item and "area_m2" not in scope):
+                return []
+            district = item.get("district")
+            address = item.get("address")
+            if "district" not in scope:
+                if district != "Район уточнюється" or address != "Київ":
+                    return []
+            elif (not isinstance(district, str)
+                  or not 1 <= len(district) <= 100
+                  or address not in ("Київ", "Київ, " + district)):
                 return []
             if any(item.get(field) is True for field in (
                 "contactVerified", "isOwnerVerified", "commissionVerified",
