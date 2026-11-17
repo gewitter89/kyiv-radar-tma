@@ -26,7 +26,7 @@ jobs:
           python -m pip install -r server/requirements.txt pytest pytest-asyncio httpx playwright
           python -m playwright install --with-deps chromium
       - name: Compile backend modules
-        run: python -m compileall -q server
+        run: python -m compileall -q server scripts
       - name: Audit public listings without promoting unverified claims
         run: |
           python scripts/audit_catalog.py --output artifacts/catalog-quality.json
@@ -61,6 +61,8 @@ jobs:
             tests/test_truthful_listing_ux_v118.py \
             tests/test_source_first_contact_v119.py \
             tests/test_landlord_consent_v121.py \
+            tests/test_market_inventory_v122.py \
+            tests/test_dim_ria_discovery_v122.py \
             tests/test_unverified_metro_v120.py \
             tests/test_rental_safety_v116.py \
             tests/test_listing_light_contrast_v116.py \

@@ -18,3 +18,14 @@ __pycache__/
 server/data/
 uploads/
 scripts_verify_privacy.py
+
+# Never commit private agency feeds, review grants, real estate staging, or provider quotas
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+private-inventory/
+partner-feeds/
+private-agreements/
