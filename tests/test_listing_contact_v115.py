@@ -148,3 +148,36 @@ async def test_contact_handoff_outside_telegram_does_not_pretend_to_send():
         assert "лише в Telegram" in await page.locator("#krContactStatus").inner_text()
         assert await page.get_by_role("dialog", name="Відкрийте квартиру в Telegram").is_visible()
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_switching_apartment_during_pending_request_clears_stale_progress():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width":390,"height":844},
+                                      is_mobile=True,has_touch=True)
+        started, unblock = asyncio.Event(), asyncio.Event()
+
+        async def handler(route):
+            started.set()
+            await unblock.wait()
+            await route.fulfill(status=200,content_type="application/json",
+                                body=json.dumps({"success":True}))
+
+        await page.route("**/api/send_contact",handler)
+        await ready(page,telegram=True)
+        first_id = await page.evaluate("currentModalDeal.id")
+        await page.evaluate("() => {sendContactToBotChat();}")
+        await asyncio.wait_for(started.wait(),timeout=6)
+        await page.evaluate("""() => {
+          const other=LISTINGS.find(x => x.id!==currentModalDeal.id);
+          if (!other) throw new Error('Need two listings');
+          openDealModalById(other.id);
+        }""")
+        assert await page.evaluate("currentModalDeal.id") != first_id
+        assert "попередній" in (await page.locator("#krContactStatus").inner_text()).lower()
+        unblock.set()
+        await page.wait_for_function("contactRequestPending === false")
+        assert await page.locator("#krContactStatus").is_hidden()
+        assert await page.locator("#modalCallBtn").is_enabled()
+        await browser.close()
