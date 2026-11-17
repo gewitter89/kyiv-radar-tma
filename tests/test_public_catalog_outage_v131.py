@@ -4,6 +4,7 @@
 Uses an ephemeral loopback HTTP server and fully synthetic, intercepted API
 responses. No production contacts, external feed access or backend mutation.
 """
+import asyncio
 import json
 import threading
 from functools import partial
@@ -181,5 +182,41 @@ async def test_old_api_with_only_unlicensed_rows_is_legitimately_empty(hosted_ca
         await page.goto(hosted_catalog, wait_until="domcontentloaded")
         await page.wait_for_function("window.KR_CATALOG_MODE === 'live'", timeout=15000)
         assert await page.evaluate("LISTINGS.length") == 0
+        assert await page.get_by_text("Зараз немає доступних оголошень").is_visible()
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_live_refresh_hides_previous_cards_before_api_finishes(hosted_catalog):
+    async with async_playwright() as playwright:
+        browser = await playwright.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844})
+        count = [0]
+        first = {"id": 7001, "source": "Київ Радар (Пряма заявка)",
+                 "title": "EPHEMERAL FIRST PARTY FIXTURE", "rooms": 1,
+                 "price": 12500, "images": [], "district": "Тест", "address": "Тест"}
+
+        async def api_handler(route):
+            count[0] += 1
+            if count[0] == 1:
+                await route.fulfill(status=200, content_type="application/json",
+                                    body=json.dumps({"success": True, "deals": [first]}))
+            else:
+                await asyncio.sleep(1)
+                await route.fulfill(status=200, content_type="application/json",
+                                    body='{"success":true,"deals":[]}')
+
+        await page.route(API_PATTERN, api_handler)
+        await page.goto(hosted_catalog, wait_until="domcontentloaded")
+        await page.wait_for_function("LISTINGS.length === 1 && window.KR_CATALOG_MODE === 'live'")
+        assert await page.locator("#listViewContainer > div[onclick]").count() == 1
+
+        task = asyncio.create_task(page.evaluate("loadDeals()"))
+        await page.wait_for_function("window.KR_CATALOG_MODE === 'loading'")
+        assert await page.evaluate("LISTINGS.length") == 0
+        assert await page.locator("#listViewContainer > div[onclick]").count() == 0
+        assert await page.get_by_text("Завантажуємо оголошення…").is_visible()
+        await task
+        assert await page.evaluate("window.KR_CATALOG_MODE") == "live"
         assert await page.get_by_text("Зараз немає доступних оголошень").is_visible()
         await browser.close()
