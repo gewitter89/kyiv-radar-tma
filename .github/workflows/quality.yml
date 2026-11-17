@@ -78,6 +78,7 @@ jobs:
             tests/test_partner_yrl_v127a.py \
             tests/test_source_rights_v124.py \
             tests/test_partner_visibility_v125.py \
+            tests/test_public_eligibility_v133.py \
             tests/test_partner_publication_v126.py \
             tests/test_partner_fallback_browser_v125.py \
             tests/test_dim_ria_discovery_v122.py \
