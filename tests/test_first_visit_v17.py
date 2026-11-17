@@ -28,7 +28,7 @@ async def test_first_visit_explains_product_and_has_visible_search():
         page = await browser.new_page(viewport={"width": 390, "height": 844},
                                       is_mobile=True, has_touch=True)
         await open_app(page)
-        assert await page.get_by_role("heading", name="Квартири в Києві").is_visible()
+        assert await page.get_by_role("heading", name="Знайти квартиру").is_visible()
         assert await page.locator("#krDataStatus").count() == 1
         assert await page.locator("#krResultsCount").count() == 1
         assert await page.locator("#smartRadarOpen").is_visible()
@@ -48,7 +48,9 @@ async def test_filter_count_reset_and_source_uncertainty():
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={"width": 390, "height": 844})
         await open_app(page)
-        await page.locator("#filterRooms1").click()
+        await page.locator("#krRoomsTrigger").click()
+        await page.locator('#krRoomsOptions button[data-room="1"]').click()
+        await page.locator("#krFiltersApply").click()
         assert "оголошень" in await page.inner_text("#krResultsCount")
         assert await page.locator("#krReset").is_visible()
         assert await page.evaluate("ACTIVE_FILTERS.rooms") == 1
@@ -282,7 +284,7 @@ async def test_compact_apple_masthead_removes_duplicate_brand_without_losing_act
         await page.wait_for_selector("header.kr-compact-masthead")
         header = page.locator("header.kr-compact-masthead")
         assert await page.locator("header > #krHero").count() == 1
-        assert await page.get_by_role("heading", name="Квартири в Києві").is_visible()
+        assert await page.get_by_role("heading", name="Знайти квартиру").is_visible()
         assert await page.locator("header .kr-brand-label").is_hidden()
         assert await page.locator("header .kr-compact-search-row #searchInput").is_visible()
         assert await page.locator("header .kr-brand-mark img").is_visible()
@@ -326,14 +328,14 @@ async def test_unified_toolbar_integrates_filters_radar_and_view_toggle(width, h
                                       is_mobile=True, has_touch=True)
         await open_app(page)
         await page.wait_for_selector("html.kr-unified-111")
-        assert await page.get_by_role("heading",name="Квартири в Києві").is_visible()
+        assert await page.get_by_role("heading",name="Знайти квартиру").is_visible()
         assert await page.locator("#krHero #floatingViewToggle").count() == 1
         assert await page.locator("#krResultsBar #floatingViewToggle").count() == 0
         assert await page.locator("#krRadarSlot #smartRadarOpen").is_visible()
-        assert await page.locator("#filterRooms1").is_visible()
-        assert await page.locator("#filterRooms2").is_visible()
-        assert await page.locator("#krMoreFilters").is_visible()
-        assert await page.locator("#filterAll").is_visible()
+        assert await page.locator("#krRoomsTrigger").is_visible()
+        assert await page.locator("#krPriceTrigger").is_visible()
+        assert await page.locator("#krConditionsTrigger").is_visible()
+        assert await page.locator("#filterRooms1").is_hidden()
         assert await page.locator("#krSimpleInfo").is_visible()
         assert "не перевірено" in await page.locator("#krDataStatus").inner_text()
         f = await page.locator("#filterBarWrapper").bounding_box()
@@ -349,10 +351,14 @@ async def test_unified_toolbar_integrates_filters_radar_and_view_toggle(width, h
         assert await page.locator("#searchInput").evaluate(
             "(el) => el.getBoundingClientRect().height"
         ) >= 44
-        await page.locator("#filterRooms1").click()
+        await page.locator("#krRoomsTrigger").click()
+        await page.locator('#krRoomsOptions button[data-room="1"]').click()
+        await page.locator("#krFiltersApply").click()
         assert await page.evaluate("ACTIVE_FILTERS.rooms") == 1
-        await page.locator("#krMoreFilters").click()
-        assert await page.locator("#filterPower").is_visible()
+        assert "1 кімн" in await page.locator("#krRoomsTrigger").inner_text()
+        await page.locator("#krConditionsTrigger").click()
+        assert await page.locator('#krConditionOptions input[data-key="generator"]').is_visible()
+        await page.locator("#krFiltersClose").click()
         await browser.close()
 
 
