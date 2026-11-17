@@ -1081,3 +1081,63 @@ html.kr-unified-111.kr-simple[data-kr-theme] #dealModal button:focus-visible {
     padding-inline:8px !important;
   }
 }
+
+
+/* v1.16: safety literacy without claiming this listing is vetted. */
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety {
+  padding:0;
+  border:1px solid var(--kr-border);
+  border-radius:13px;
+  background:var(--kr-raised);
+  color:var(--kr-ink);
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety > summary {
+  list-style:none;
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:12px 38px 12px 13px;
+  min-height:44px;
+  cursor:pointer;
+  font-size:12px;
+  line-height:1.35;
+  font-weight:660;
+  color:var(--kr-ink);
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety > summary::-webkit-details-marker {
+  display:none;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety > summary::after {
+  content:"⌄";
+  position:absolute;
+  right:13px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:18px;
+  font-weight:400;
+  color:var(--kr-muted);
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety[open] > summary::after {
+  transform:translateY(-50%) rotate(180deg);
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety > summary:focus-visible {
+  outline:2px solid var(--kr-focus);
+  outline-offset:2px;
+  border-radius:11px;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety .kr-rental-safety-copy {
+  padding:0 13px 13px;
+  display:grid;
+  gap:8px;
+  font-size:12px;
+  line-height:1.5;
+  color:var(--kr-muted);
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety .kr-rental-safety-copy p {
+  margin:0;
+}
+html.kr-unified-111.kr-simple[data-kr-theme] #krRentalSafety .kr-rental-safety-copy small {
+  font-size:11px;
+  color:var(--kr-hint);
+}
