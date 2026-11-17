@@ -2279,23 +2279,31 @@
             const indexBadge = document.getElementById('modalPhotoIndex');
 
             let placeholder = document.getElementById('modalPhotoPlaceholder');
-
-            if (!hasPhotos) {
-                imgEl.src = '';
-                imgEl.classList.add('hidden');
+            function showPhotoFallback(title, message) {
                 if (!placeholder) {
                     placeholder = document.createElement('div');
                     placeholder.id = 'modalPhotoPlaceholder';
-                    placeholder.className = 'w-full h-full flex flex-col items-center justify-center bg-[#242426] text-[#8e8e93] p-4 text-center select-none';
-                    placeholder.innerHTML = `
-                        <svg class="w-12 h-12 mb-2 opacity-30 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                        <p class="text-xs font-medium text-white/80">Фотографії очікуються</p>
-                        <p class="text-[10px] text-white/50 mt-0.5">Фото до цього оголошення поки немає</p>
-                    `;
+                    placeholder.className = 'absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#242426] p-4 text-center select-none';
+                    placeholder.setAttribute('role', 'status');
+                    placeholder.setAttribute('aria-live', 'polite');
+                    placeholder.innerHTML =
+                        '<svg class="w-12 h-12 mb-2 opacity-40 text-[#d4dce9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">' +
+                        '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>' +
+                        '<p class="kr-modal-photo-message text-sm font-semibold text-white/90"></p>' +
+                        '<p class="kr-modal-photo-hint text-xs text-white/65 mt-1"></p>';
                     document.getElementById('modalPhotoContainer').appendChild(placeholder);
-                } else {
-                    placeholder.classList.remove('hidden');
                 }
+                placeholder.querySelector('.kr-modal-photo-message').textContent = title;
+                placeholder.querySelector('.kr-modal-photo-hint').textContent = message;
+                placeholder.classList.remove('hidden');
+            }
+
+            if (!hasPhotos) {
+                imgEl.onload = null;
+                imgEl.onerror = null;
+                imgEl.removeAttribute('src');
+                imgEl.classList.add('hidden');
+                showPhotoFallback('Фотографій поки немає', 'Фото до цього оголошення не додано');
                 if (prevBtn) prevBtn.classList.add('hidden');
                 if (nextBtn) nextBtn.classList.add('hidden');
                 if (dotsContainer) dotsContainer.classList.add('hidden');
@@ -2303,11 +2311,24 @@
                 return;
             }
 
-            if (placeholder) placeholder.classList.add('hidden');
-            imgEl.classList.remove('hidden');
+            const photoUrl = photos[currentModalPhotoIdx];
+            imgEl.classList.add('hidden');
+            showPhotoFallback('Завантажуємо фото…', 'Перевіряємо зображення');
             imgEl.referrerPolicy = 'no-referrer';
-            imgEl.src = photos[currentModalPhotoIdx];
+            // Register listeners before assigning src; a cached error may fire
+            // immediately. Ignore callbacks for a photo the user has left.
+            imgEl.onload = () => {
+                if (imgEl.src !== photoUrl) return;
+                imgEl.classList.remove('hidden');
+                placeholder?.classList.add('hidden');
+            };
+            imgEl.onerror = () => {
+                if (imgEl.src !== photoUrl) return;
+                imgEl.classList.add('hidden');
+                showPhotoFallback('Фото тимчасово недоступне', 'Спробуйте інше фото або перегляньте джерело');
+            };
             imgEl.alt = `Фото квартири ${currentModalPhotoIdx + 1} з ${photos.length}`;
+            imgEl.src = photoUrl;
 
             if (photos.length <= 1) {
                 if (prevBtn) prevBtn.classList.add('hidden');
