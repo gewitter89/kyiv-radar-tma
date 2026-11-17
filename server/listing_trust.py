@@ -90,7 +90,10 @@ def public_listing_view(
         deal = dict(source)
         # Only this module issues evidence-backed status markers.
         deal.pop("reviewedByRadar", None)
-        imported = str(deal.get("source", "")).strip().upper() in IMPORTED_SOURCES
+        source_name = str(deal.get("source", "")).strip().upper()
+        imported = (source_name in IMPORTED_SOURCES or source_name.startswith("PARTNER:")
+                    or deal.get("partnerSourceKey") is not None
+                    or deal.get("partnerExternalId") is not None)
         if imported:
             # Imported text and site metadata are not our own verification.
             deal["actualityConfirmed"] = False
