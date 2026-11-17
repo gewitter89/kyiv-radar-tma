@@ -131,7 +131,7 @@ def test_photo_upload_valid_exif_stripped(privacy_test_env):
         ("photos", ("living_room.jpg", io.BytesIO(jpeg_bytes), "image/jpeg"))
     ]
     auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=123456)
-    resp = client.post("/api/landlords/upload_photos", data={"initData": auth}, files=files)
+    resp = client.post("/api/landlords/upload_photos", data={"initData": auth, "rightsConfirmed": "true", "consentVersion": kyiv_radar_api.LANDLORD_CONSENT_VERSION}, files=files)
     assert resp.status_code == 200
     data = resp.json()
     assert data["success"] is True
@@ -157,7 +157,7 @@ def test_photo_upload_rejects_non_images(privacy_test_env):
         ("photos", ("malicious.jpg", io.BytesIO(fake_file), "image/jpeg"))
     ]
     auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=123456)
-    resp = client.post("/api/landlords/upload_photos", data={"initData": auth}, files=files)
+    resp = client.post("/api/landlords/upload_photos", data={"initData": auth, "rightsConfirmed": "true", "consentVersion": kyiv_radar_api.LANDLORD_CONSENT_VERSION}, files=files)
     assert resp.status_code == 400
     assert "Пошкоджене" in resp.json()["detail"] or "непідтримуване" in resp.json()["detail"]
 
@@ -170,7 +170,7 @@ def test_photo_upload_rejects_too_many(privacy_test_env):
         for i in range(11)
     ]
     auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=123456)
-    resp = client.post("/api/landlords/upload_photos", data={"initData": auth}, files=files)
+    resp = client.post("/api/landlords/upload_photos", data={"initData": auth, "rightsConfirmed": "true", "consentVersion": kyiv_radar_api.LANDLORD_CONSENT_VERSION}, files=files)
     assert resp.status_code == 400
     assert "1 до 10 фотографій" in resp.json()["detail"]
 
@@ -207,7 +207,7 @@ def test_anonymous_media_upload_and_injected_references_are_rejected(privacy_tes
     submit = client.post("/api/landlords/submit", json={
         "address": "вул. Глибочицька, 9, Київ",
         "price": "14000", "rooms": 1, "phone": "+380501234567",
-        "initData": auth, "rightsConfirmed": True, "photos": ["javascript:alert(1)"]
+        "initData": auth, "rightsConfirmed": True, "consentVersion": kyiv_radar_api.LANDLORD_CONSENT_VERSION, "photos": ["javascript:alert(1)"]
     })
     assert submit.status_code == 400
     assert "фотографій" in submit.json()["detail"].lower()
@@ -222,7 +222,7 @@ def test_photo_ownership_and_moderated_public_access(privacy_test_env):
     other_auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=30003)
     response = client.post(
         "/api/landlords/upload_photos",
-        data={"initData": owner_auth},
+        data={"initData": owner_auth, "rightsConfirmed": "true", "consentVersion": kyiv_radar_api.LANDLORD_CONSENT_VERSION},
         files=[("photos", ("room.jpg", io.BytesIO(create_test_image()), "image/jpeg"))]
     )
     assert response.status_code == 200, response.text
@@ -232,7 +232,7 @@ def test_photo_ownership_and_moderated_public_access(privacy_test_env):
     payload = {
         "address": "вул. Глибочицька, 12, Київ",
         "price": "17500", "rooms": 1,
-        "phone": "+380671234567", "rightsConfirmed": True, "photos": [photo_id]
+        "phone": "+380671234567", "rightsConfirmed": True, "consentVersion": kyiv_radar_api.LANDLORD_CONSENT_VERSION, "photos": [photo_id]
     }
     with patch("server.kyiv_radar_api.send_telegram_alert", new_callable=AsyncMock) as alert, \
          patch("server.kyiv_radar_api.send_landlord_photo_previews", new_callable=AsyncMock) as previews:
@@ -301,7 +301,7 @@ def test_rejected_submission_cannot_be_approved(privacy_test_env):
         response = client.post("/api/landlords/submit", json={
             "address": "вул. Кирилівська, 12, Київ", "price": "16000",
             "rooms": 1, "phone": "+380671122334", "photos": [],
-            "rightsConfirmed": True, "initData": auth
+            "rightsConfirmed": True, "consentVersion": kyiv_radar_api.LANDLORD_CONSENT_VERSION, "initData": auth
         })
     assert response.status_code == 200
     sub_id = response.json()["id"]
@@ -360,7 +360,7 @@ def test_invalid_rent_price_and_phone_are_rejected(privacy_test_env):
     auth = generate_valid_init_data(TEST_BOT_TOKEN, user_id=456789)
     valid = {
         "address": "вул. Саксаганського, 20, Київ", "price": "20 000",
-        "rooms": 1, "phone": "+380671234567", "rightsConfirmed": True,
+        "rooms": 1, "phone": "+380671234567", "rightsConfirmed": True, "consentVersion": kyiv_radar_api.LANDLORD_CONSENT_VERSION,
         "initData": auth, "photos": []
     }
     for bad in ("за домовленістю", "-10", "0"):
