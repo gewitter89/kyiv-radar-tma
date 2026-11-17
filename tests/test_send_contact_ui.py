@@ -89,7 +89,12 @@ async def test_browser_mode_without_phone():
         await page.goto(BASE_FILE_URL)
         await page.wait_for_timeout(1000)
 
-        # Open deal #1 (already has phone = null)
+        # Contact handoff applies only to the isolated first-party fixture.
+        await page.evaluate("""() => {
+            const fixture = getFilteredListings()[0];
+            fixture.source = "Київ Радар";
+            fixture.contactVerified = true;
+        }""")
         await page.locator("#listViewContainer .kr-open-detail").first.click()
         await page.wait_for_timeout(400)
         assert await page.is_visible("#dealModal")
@@ -125,7 +130,12 @@ async def test_telegram_mode_successful_delivery():
         # Navigate using Telegram WebApp hash
         await page.goto(TG_FILE_URL)
         await page.wait_for_timeout(1000)
-
+        # Isolated contact fixture, never published to the imported catalog.
+        await page.evaluate("""() => {
+            const fixture = getFilteredListings()[0];
+            fixture.source = "Київ Радар";
+            fixture.contactVerified = true;
+        }""")
         await page.locator("#listViewContainer .kr-open-detail").first.click()
         await page.wait_for_timeout(500)
 
@@ -158,7 +168,12 @@ async def test_telegram_mode_error_unmasked():
         # Navigate using Telegram WebApp hash
         await page.goto(TG_FILE_URL)
         await page.wait_for_timeout(1000)
-
+        # Isolated contact fixture, never published to the imported catalog.
+        await page.evaluate("""() => {
+            const fixture = getFilteredListings()[0];
+            fixture.source = "Київ Радар";
+            fixture.contactVerified = true;
+        }""")
         await page.locator("#listViewContainer .kr-open-detail").first.click()
         await page.wait_for_timeout(500)
 
