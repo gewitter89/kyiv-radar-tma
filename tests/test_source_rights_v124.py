@@ -200,3 +200,23 @@ def test_legacy_approved_inventory_is_demoted_on_first_rights_registration(tmp_p
             "SELECT review_status FROM inventory WHERE external_id='old'"
         ).fetchone()[0] == "needs_review"
     assert get_rights(db)[0][-1] == "active"
+
+
+def test_sql_accidental_rights_reopen_deletion_and_audit_tampering_blocked(tmp_path):
+    db = tmp_path / "private.sqlite"
+    ingest(make_feed(tmp_path), make_grant(tmp_path), db, now=NOW)
+    with sqlite3.connect(db) as conn:
+        with pytest.raises(sqlite3.IntegrityError, match="extension"):
+            conn.execute("UPDATE source_rights SET valid_until='2099-01-01'")
+        with pytest.raises(sqlite3.IntegrityError, match="deletion"):
+            conn.execute("DELETE FROM source_rights WHERE source='agency_one'")
+    revoke_source(db, "agency_one", "partner_request", now=NOW)
+    with sqlite3.connect(db) as conn:
+        with pytest.raises(sqlite3.IntegrityError, match="reactivated"):
+            conn.execute("UPDATE source_rights SET status='active' WHERE source='agency_one'")
+        with pytest.raises(sqlite3.IntegrityError, match="deletion"):
+            conn.execute("DELETE FROM source_rights_audit")
+        with pytest.raises(sqlite3.IntegrityError, match="modification"):
+            conn.execute("UPDATE source_rights_audit SET reason_code='changed'")
+    assert get_rights(db)[0][-1] == "revoked"
+    assert audit_count(db) == 2
