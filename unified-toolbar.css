@@ -1,6 +1,6 @@
 /* Kyiv Radar 1.11 — one hierarchy, fewer competing chrome elements.
    Native Telegram header is solid navy; decorative radar only exists below it.
-   iOS system typography, 8px rhythm, subtle blue/gold <= one accent per section. */
+   iOS system typography, 8px rhythm, restrained accents. */
 html.kr-unified-111.kr-compact.kr-simple {
   --kr-ui-ink:#f3f7fc;
   --kr-ui-secondary:#a5b8d0;
@@ -51,9 +51,6 @@ html.kr-unified-111.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-
 }
 html.kr-unified-111.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-kyiv-skyline {
   z-index:1;opacity:.18 !important;right:15%;
-}
-html.kr-unified-111.kr-compact.kr-simple header.kr-compact-masthead #krHero .kr-ukraine-curve {
-  z-index:2;bottom:-1px;opacity:.38 !important;
 }
 html.kr-unified-111.kr-compact.kr-simple #floatingViewToggle {
   position:relative !important;
