@@ -1,5 +1,5 @@
-/* Kyiv Radar 1.9 — real in-app Kyiv skyline, blue/yellow curve and listing photo gallery.
-   Works on top of the existing catalog: no source records or Telegram credentials are changed. */
+/* Kyiv Radar — real photo gallery and clean identity. The in-app brand uses
+   one SVG logo. Native Telegram controls and source records remain untouched. */
 (() => {
   "use strict";
 
@@ -11,56 +11,37 @@
     '<path fill="#d0a954" opacity=".52" d="M272 98v-7h28v9h-28Z"/>' +
     '</svg>';
 
-  const wave = '<svg viewBox="0 0 400 18" preserveAspectRatio="none" focusable="false" aria-hidden="true">' +
-    '<defs><linearGradient id="krUaWave19" x1="0%" y1="0%" x2="100%" y2="0%">' +
-    '<stop offset="0%" stop-color="#22a5ff"/><stop offset="49%" stop-color="#3488e5"/>' +
-    '<stop offset="77%" stop-color="#f1cd57"/><stop offset="100%" stop-color="#f5d464"/>' +
-    '</linearGradient></defs>' +
-    '<path d="M0 12 C67 -2 136 12 202 13 S323 3 400 11" fill="none" stroke="url(#krUaWave19)" stroke-width="2.6" stroke-linecap="round"/>' +
-    '</svg>';
-
-  const topSeam = '<svg viewBox="0 0 400 12" preserveAspectRatio="none" focusable="false" aria-hidden="true">' +
-    '<defs><linearGradient id="krUaTopWave20" x1="0%" y1="0%" x2="100%" y2="0%">' +
-    '<stop offset="0%" stop-color="#1f9cf7"/><stop offset="48%" stop-color="#3984d9"/>' +
-    '<stop offset="74%" stop-color="#e6c452"/><stop offset="100%" stop-color="#f3d669"/>' +
-    '</linearGradient></defs>' +
-    '<path d="M0 8 C64 1 110 2 179 7 S319 10 400 3" fill="none" stroke="url(#krUaTopWave20)" stroke-width="2.25" stroke-linecap="round"/>' +
-    '</svg>';
-
-  const logo = '<svg viewBox="0 0 32 32" fill="none" focusable="false" aria-hidden="true">' +
-    '<circle cx="16" cy="16" r="12.5" stroke="#78b8fb" stroke-width="2"/>' +
-    '<circle cx="16" cy="16" r="7.8" stroke="#78b8fb" stroke-width="1.7"/>' +
-    '<circle cx="16" cy="16" r="3.3" fill="#8fc7ff"/>' +
-    '<path d="M16 16 23.4 8.6" stroke="#9ed0ff" stroke-width="1.6" stroke-linecap="round"/>' +
-    '<circle cx="23.5" cy="8.5" r="2.6" fill="#f3ce60"/>' +
-    '</svg>';
-
+  // The native Telegram header is solid-color by platform design. No decorative
+  // lines are injected around it: our location-pin mark carries the visual identity.
   function initKyivIdentity() {
     const header = document.querySelector("header");
-    if (header && !header.querySelector(".kr-native-seam")) {
+    if (header) {
       header.classList.add("kr-unified-header");
-      const seam = document.createElement("div");
-      seam.className = "kr-native-seam";
-      seam.setAttribute("aria-hidden", "true");
-      seam.innerHTML = topSeam;
-      header.prepend(seam);
+      header.querySelector(".kr-native-seam")?.remove();
     }
     const hero = document.getElementById("krHero");
-    if (hero && !hero.querySelector(".kr-ukraine-curve")) {
-      const city = document.createElement("div");
-      city.className = "kr-kyiv-skyline";
-      city.setAttribute("aria-hidden", "true");
-      city.innerHTML = skyline;
-      const line = document.createElement("div");
-      line.className = "kr-ukraine-curve";
-      line.setAttribute("aria-hidden", "true");
-      line.innerHTML = wave;
-      hero.append(city, line);
+    if (hero) {
+      hero.querySelector(".kr-ukraine-curve")?.remove();
+      if (!hero.querySelector(".kr-kyiv-skyline")) {
+        const city = document.createElement("div");
+        city.className = "kr-kyiv-skyline";
+        city.setAttribute("aria-hidden", "true");
+        city.innerHTML = skyline;
+        hero.append(city);
+      }
     }
     const brand = document.querySelector(".kr-brand-label strong");
     if (brand) brand.textContent = "Київ Радар";
     const mark = document.querySelector(".kr-brand-mark");
-    if (mark) mark.innerHTML = logo;
+    if (mark) {
+      const img = document.createElement("img");
+      img.src = "./kyiv-radar-mark.svg";
+      img.alt = "";
+      img.width = 30;
+      img.height = 30;
+      img.decoding = "async";
+      mark.replaceChildren(img);
+    }
     const status = document.getElementById("krDataStatus");
     if (status) status.title = "Дані з джерел. Актуальність кожної квартири перевіряється окремо.";
   }
