@@ -7,7 +7,7 @@
  const btn=(title,id,className)=>{const b=document.createElement("button");b.type="button";b.textContent=title;if(id)b.id=id;if(className)b.className=className;return b};
  function countRoom(value){
   const data=typeof LISTINGS!=="undefined"&&Array.isArray(LISTINGS)?LISTINGS:[];
-  return data.filter(a=>a.roomConflict!==true&&Number.isInteger(Number(a.rooms))&&(value===5?Number(a.rooms)>=5:Number(a.rooms)===value)).length;
+  return data.filter(a=>{const n=Number(a.rooms)||(typeof getDealRooms==="function"?getDealRooms(a):null);return a.roomConflict!==true&&Number.isInteger(n)&&(value===5?n>=5:n===value)}).length;
  }
  function hasConditions(f){return choices.some(([key])=>Boolean(f[key]))}
  function refreshChips(){
