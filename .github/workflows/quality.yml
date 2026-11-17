@@ -59,4 +59,5 @@ jobs:
             tests/test_vps_release_snapshot.py \
             tests/test_public_catalog_privacy.py \
             tests/test_photo_swipe.py \
+            tests/test_listing_contact_v115.py \
             tests/test_send_contact_ui.py

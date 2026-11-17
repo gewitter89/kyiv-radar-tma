@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="./trust-experience.css?v=1.8.0">
     <link rel="stylesheet" href="./premium-polish.css?v=1.12.0">
     <link rel="stylesheet" href="./compact-masthead.css?v=1.12.0">
-    <link rel="stylesheet" href="./unified-toolbar.css?v=1.14.0">
+    <link rel="stylesheet" href="./unified-toolbar.css?v=1.15.0">
     <meta name="description" content="Київ Радар — мапа та каталог оренди квартир у Києві. Пошук за районом, бюджетом і заявленими можливостями автономності. Джерела та рівень перевірки вказані в оголошеннях.">
     <!-- Open Graph / Telegram Card -->
     <meta property="og:title" content="Київ Радар 🇺🇦 — Каталог та мапа оренди квартир у Києві">
@@ -486,7 +486,7 @@
     <!-- ==========================================
          DEAL DETAIL MODAL (Apple iOS Native Bottom Sheet)
     ========================================== -->
-    <div id="dealModal" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity duration-200">
+    <div id="dealModal" role="dialog" aria-modal="true" aria-label="Деталі квартири" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity duration-200">
         <div class="bg-[#1c1c1e] border border-white/[0.08] w-full sm:max-w-lg lg:max-w-xl rounded-t-[28px] sm:rounded-[28px] max-h-[92vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in">
             <!-- iOS Grabber Handle -->
             <div class="w-9 h-1 rounded-full bg-white/25 mx-auto mt-2.5 mb-1 shrink-0"></div>
@@ -497,13 +497,13 @@
                     <span id="modalCommissionBadge" class="px-2.5 py-0.5 rounded-full bg-white/10 text-white/90 text-[11px] font-semibold">Комісія уточнюється</span>
                     <span id="modalMetro" class="text-xs text-[#8e8e93] font-medium">Печерська</span>
                 </div>
-                <button onclick="closeDealModal()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/15 text-[#8e8e93] hover:text-white flex items-center justify-center transition-colors">
+                <button type="button" aria-label="Закрити деталі квартири" onclick="closeDealModal()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/15 text-[#8e8e93] hover:text-white flex items-center justify-center transition-colors">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </button>
             </div>
 
             <!-- Modal Content (Scrollable Inset Grouped layout) -->
-            <div class="p-3.5 overflow-y-auto space-y-3 custom-scroll text-xs">
+            <div id="krDealScroll" class="p-3.5 overflow-y-auto space-y-3 custom-scroll text-xs">
                 <!-- Apartment photo gallery -->
                 <div class="relative h-60 sm:h-80 rounded-[22px] overflow-hidden bg-black select-none group" id="modalPhotoContainer" role="region" aria-label="Фотографії квартири">
                     <img id="modalImage" src="" alt="Фото квартири" draggable="false" class="w-full h-full object-cover transition-opacity duration-200">
@@ -602,10 +602,12 @@
                 </div>
 
                 </div>
+            <!-- Always visible next to the CTA, even if the long listing is scrolled. -->
+            <p id="krContactStatus" class="kr-contact-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
 
             <!-- Modal Action Buttons (Apple Action Bar) -->
-            <div class="p-3 border-t border-white/[0.08] bg-[#1c1c1e]/95 backdrop-blur-2xl flex items-center gap-2 shrink-0">
-                <button id="modalCallBtn" onclick="handleCallClick(event)" class="flex-1 h-12 px-4 rounded-full bg-[#30d158] hover:bg-[#30d158]/90 text-black font-bold text-[14px] flex items-center justify-center gap-2 transition-all shadow-lg active:scale-98">
+            <div id="krDealActionBar" class="p-3 border-t border-white/[0.08] bg-[#1c1c1e]/95 backdrop-blur-2xl flex items-center gap-2 shrink-0">
+                <button type="button" aria-describedby="krContactStatus" id="modalCallBtn" onclick="handleCallClick(event)" class="flex-1 h-12 px-4 rounded-full bg-[#30d158] hover:bg-[#30d158]/90 text-black font-bold text-[14px] flex items-center justify-center gap-2 transition-all shadow-lg active:scale-98">
                     <svg class="w-4 h-4 shrink-0 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
                     <span id="modalCallLabel">Отримати контакт</span>
                 </button>
@@ -613,7 +615,7 @@
                     <svg class="w-4 h-4 text-[#0a84ff] shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
                     <span>Telegram</span>
                 </button>
-                <button id="modalChatBtn" onclick="sendContactToBotChat()" class="h-12 px-4 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] border border-white/[0.08] text-white font-medium text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 shrink-0" title="Надіслати номер у мій чат Telegram">
+                <button type="button" id="modalChatBtn" onclick="sendContactToBotChat()" class="h-12 px-4 rounded-full bg-[#2c2c2e] hover:bg-[#3a3a3c] border border-white/[0.08] text-white font-medium text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 shrink-0" title="Надіслати номер у мій чат Telegram">
                     <svg class="w-4 h-4 text-[#30d158] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
                     <span>У чат</span>
                 </button>
@@ -1697,54 +1699,83 @@
             });
         }
 
+        // Contact state is retained in the listing view, beyond a transient toast.
+        // Never say "sent" before the authenticated server returns success.
+        let contactRequestPending = false;
+        let contactRequestDealId = null;
+        function updateContactRequestControls() {
+            for (const id of ['modalCallBtn', 'modalChatBtn']) {
+                const button = document.getElementById(id);
+                if (!button) continue;
+                button.disabled = contactRequestPending;
+                button.setAttribute('aria-busy', String(contactRequestPending));
+            }
+        }
+        function showContactRequestStatus(kind, message, dealId) {
+            if (dealId !== undefined && currentModalDeal?.id !== dealId) return;
+            const node = document.getElementById('krContactStatus');
+            if (!node) return;
+            node.textContent = message || '';
+            node.hidden = !message;
+            node.dataset.state = kind;
+        }
+
         async function sendContactToBotChat() {
-            if (!currentModalDeal) return;
+            if (!currentModalDeal || contactRequestPending) return;
             const deal = currentModalDeal;
             const realPhone = deal.phone && deal.phone.trim().length > 0 ? deal.phone.trim() : null;
             const initData = window.Telegram?.WebApp?.initData || "";
 
-            // 1. If inside Telegram WebApp, send directly to Telegram chat via backend
             if (initData) {
-                showToast("Надсилаємо контакт у Telegram...");
+                contactRequestPending = true;
+                contactRequestDealId = deal.id;
+                updateContactRequestControls();
+                showContactRequestStatus('pending', 'Надсилаємо запит у Telegram…', deal.id);
                 try {
                     const res = await fetch("https://vmi3445944.contaboserver.net/api/send_contact", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            dealId: deal.id,
-                            initData: initData
-                        })
+                        body: JSON.stringify({dealId: deal.id, initData: initData})
                     });
                     const data = await res.json().catch(() => ({}));
                     if (res.ok && data.success) {
-                        if (window.Telegram?.WebApp?.HapticFeedback) {
-                            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-                        }
+                        window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred?.('success');
+                        showContactRequestStatus('success', 'Контакт надіслано. Перевірте приватний чат із ботом у Telegram.', deal.id);
                         showToast("✓ Контакт надіслано у ваш Telegram-чат!");
-                        return;
                     } else {
-                        if (window.Telegram?.WebApp?.HapticFeedback) {
-                            window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
-                        }
-                        const errReason = data.detail || (res.status === 502 ? "Запустіть бота @prostov_shrink_bot (/start)" : "Помилка сервера");
-                        if (typeof window.krContactError === "function") window.krContactError(errReason);
-                        else showToast(`⚠️ Не вдалося надіслати контакт: ${errReason}`);
-                        return;
+                        window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred?.('error');
+                        const reason = typeof data.detail === 'string'
+                            ? data.detail.slice(0, 240)
+                            : res.status === 502
+                                ? "Запустіть бота @prostov_shrink_bot (/start)"
+                                : "Не вдалося отримати відповідь сервера";
+                        showContactRequestStatus('error', 'Не вдалося надіслати контакт. Перевірте, чи запущений бот, і повторіть запит.', deal.id);
+                        if (typeof window.krContactError === "function") window.krContactError(reason);
+                        else showToast("⚠️ Не вдалося надіслати контакт: " + reason);
                     }
-                } catch (e) {
-                    console.error("sendContact network error:", e);
-                    if (window.Telegram?.WebApp?.HapticFeedback) {
-                        window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
-                    }
+                } catch (error) {
+                    console.error("sendContact network error:", error);
+                    window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred?.('error');
+                    showContactRequestStatus('error', 'Немає зв’язку із сервером. Спробуйте пізніше.', deal.id);
                     if (typeof window.krContactError === "function")
                         window.krContactError("Помилка з'єднання з сервером. Спробуйте пізніше.");
                     else showToast("⚠️ Помилка з'єднання з сервером. Спробуйте пізніше.");
-                    return;
+                } finally {
+                    if (contactRequestDealId === deal.id) {
+                        contactRequestPending = false;
+                        contactRequestDealId = null;
+                        updateContactRequestControls();
+                        // A previous apartment must not leave a stale spinner
+                        // on a different apartment opened during the request.
+                        if (currentModalDeal?.id !== deal.id && currentModalDeal)
+                            showContactRequestStatus('idle', '', currentModalDeal.id);
+                    }
                 }
+                return;
             }
 
-            // 2. Regular Web Browser (outside Telegram WebApp)
             if (!realPhone) {
+                showContactRequestStatus('info', 'Захищений контакт можна запросити лише в Telegram.', deal.id);
                 if (typeof window.krContactHandoff === "function") {
                     window.krContactHandoff(deal.id, deal.title);
                 } else {
@@ -1755,12 +1786,13 @@
 
             try {
                 await navigator.clipboard.writeText(realPhone);
-                showToast(`✓ Номер орендодавця скопійовано: ${realPhone}`);
+                showContactRequestStatus('success', 'Номер із цього оголошення скопійовано.', deal.id);
+                showToast("✓ Номер орендодавця скопійовано: " + realPhone);
             } catch (err) {
-                showToast(`Номер орендодавця: ${realPhone}`);
+                showContactRequestStatus('info', 'Номер із цього оголошення доступний для копіювання.', deal.id);
+                showToast("Номер орендодавця: " + realPhone);
             }
         }
-
 
                 // 4.5. FILTER BAR PC MOUSE INTERACTIONS (Wheel & Grab Drag)
         
@@ -1897,6 +1929,11 @@
 
             currentModalDeal = deal;
             currentModalPhotoIdx = 0;
+            showContactRequestStatus(contactRequestPending ? 'pending' : 'idle',
+                contactRequestPending ? 'Завершуємо попередній запит…' : '', deal.id);
+            updateContactRequestControls();
+            const detailScroll = document.getElementById('krDealScroll');
+            if (detailScroll) detailScroll.scrollTop = 0;
 
             document.getElementById('modalMetro').innerText = deal.metro ? `${deal.metro} · ${deal.district}` : (deal.district || 'Київ');
             document.getElementById('modalPrice').innerText = deal.price ? `${deal.price.toLocaleString('uk-UA')} ₴/міс` : 'Ціна уточнюється';
