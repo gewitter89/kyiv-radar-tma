@@ -105,3 +105,28 @@ async def test_corrupted_storage_does_not_break_panel():
         assert "Поки що немає" in await page.inner_text("#smartRadarSearches")
         assert await page.is_visible("#smartRadarPanel")
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_older_api_claims_are_cleaned_before_rendering():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        async def older_api(route):
+            await route.fulfill(
+                status=200,
+                content_type="application/json",
+                headers={"access-control-allow-origin": "*"},
+                body='{"success":true,"deals":[{"id":999,"title":"Тестове житло",'
+                     '"price":10000,"rooms":1,"source":"OLX","phone":null,'
+                     '"images":[],"lat":null,"lng":null,'
+                     '"desc":"Здається реальна квартира від власника без посередників. '
+                     'Лише інформація з джерела. '
+                     'Повний комплект меблів та техніки, інтернет працює стабільно."}]}'
+            )
+        await page.route("**/api/deals*", older_api)
+        await page.goto(URL, wait_until="domcontentloaded")
+        await page.wait_for_function("LISTINGS.length === 1 && LISTINGS[0].id === 999")
+        desc = await page.evaluate("LISTINGS[0].desc")
+        assert desc == "Лише інформація з джерела."
+        await browser.close()
