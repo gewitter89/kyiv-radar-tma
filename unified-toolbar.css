@@ -1038,7 +1038,8 @@ html.kr-unified-111.kr-simple[data-kr-theme] #krContactStatus[hidden] {
   display:none !important;
 }
 html.kr-unified-111.kr-simple[data-kr-theme] #krContactStatus {
-  margin:0;
+  flex:0 0 auto;
+  margin:0 12px 8px;
   padding:10px 12px;
   border-radius:11px;
   background:var(--kr-quiet);
