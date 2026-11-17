@@ -127,6 +127,102 @@ if APP_ENV == "development":
         "http://localhost:8000"
     ])
 
+# Limit the incoming HTTP body BEFORE FastAPI/Starlette parse multipart forms.
+# The endpoint's per-file and batch checks remain a separate line of defense.
+# The extra 1 MiB accommodates multipart fields/headers around 32 MiB of images.
+MAX_UPLOAD_REQUEST_BYTES = MAX_IMAGE_BATCH_BYTES + 1024 * 1024
+
+
+class UploadBodyLimitExceeded(Exception):
+    """Request stream exceeds the pre-multipart upload cap."""
+
+
+class UploadBodyLimitMiddleware:
+    """A small pure-ASGI gate for photo uploads, including chunked requests.
+
+    Starlette's multipart parser can swallow errors raised by receive() and
+    turn them into a 400. In that case rewrite the response to the correct
+    413; no route handler or file write is allowed to proceed.
+    """
+
+    UPLOAD_PATH = "/api/landlords/upload_photos"
+    ERROR_BODY = b'{"detail":"Upload request body exceeds the 33 MiB limit"}'
+
+    def __init__(self, app, max_body_bytes: int = MAX_UPLOAD_REQUEST_BYTES):
+        self.app = app
+        self.max_body_bytes = max_body_bytes
+
+    async def __call__(self, scope, receive, send):
+        if (scope["type"] != "http"
+                or scope.get("method") != "POST"
+                or scope.get("path") != self.UPLOAD_PATH):
+            return await self.app(scope, receive, send)
+
+        response_headers = [
+            (b"content-type", b"application/json"),
+            (b"content-length", str(len(self.ERROR_BODY)).encode("ascii")),
+        ]
+
+        async def reject():
+            await send({
+                "type": "http.response.start",
+                "status": 413,
+                "headers": response_headers,
+            })
+            await send({
+                "type": "http.response.body",
+                "body": self.ERROR_BODY,
+            })
+
+        headers = {key.lower(): value for key, value in scope.get("headers", [])}
+        content_length = headers.get(b"content-length", b"")
+        if content_length.isdigit() and int(content_length) > self.max_body_bytes:
+            return await reject()
+
+        consumed = 0
+        over_limit = False
+        response_started = False
+
+        async def receive_capped():
+            nonlocal consumed, over_limit
+            message = await receive()
+            if message["type"] == "http.request":
+                consumed += len(message.get("body", b""))
+                if consumed > self.max_body_bytes:
+                    over_limit = True
+                    raise UploadBodyLimitExceeded()
+            return message
+
+        async def send_capped(message):
+            nonlocal response_started
+            if message["type"] == "http.response.start":
+                response_started = True
+                if over_limit:
+                    message = {
+                        "type": "http.response.start",
+                        "status": 413,
+                        "headers": response_headers,
+                    }
+            elif message["type"] == "http.response.body" and over_limit:
+                # The multipart parser may have caught UploadBodyLimitExceeded.
+                message = {
+                    "type": "http.response.body",
+                    "body": self.ERROR_BODY,
+                    "more_body": False,
+                }
+            await send(message)
+
+        try:
+            await self.app(scope, receive_capped, send_capped)
+        except UploadBodyLimitExceeded:
+            if response_started:
+                # Never attempt a second response after headers were sent.
+                raise
+            await reject()
+
+
+app.add_middleware(UploadBodyLimitMiddleware)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
