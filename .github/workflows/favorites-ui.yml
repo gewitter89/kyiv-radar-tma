@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - "index.html"
+      - "kyiv-smart-filters.js"
+      - "unified-toolbar.css"
+      - "tests/test_favorites_shortcut_v129.py"
       - "tests/test_favorites_v128.py"
       - ".github/workflows/favorites-ui.yml"
   workflow_dispatch:
@@ -30,4 +33,4 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Test real favorites controls on mobile and desktop
         run: |
-          python -m pytest -q tests/test_favorites_v128.pypython -m pytest -q tests/test_favorites_v128.py tests/test_favorites_shortcut_v129.py
+          python -m pytest -q tests/test_favorites_v128.py tests/test_favorites_shortcut_v129.py
