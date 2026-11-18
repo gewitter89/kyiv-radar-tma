@@ -44,7 +44,6 @@ async def test_reused_numeric_id_never_binds_comparison_to_other_apartment():
           const other={...LISTINGS[1],id:original.id,title:"NOT THE ORIGINAL APARTMENT"};
           LISTINGS=[other];
           refreshFavoriteKeys();
-          Kyoto=undefined;
           KyivRadarSmart.open();
         }""", original)
         assert await page.evaluate("KyivRadarSmart.compareCount()") == 1
