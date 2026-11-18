@@ -75,6 +75,9 @@ def isolated_app():
         deals_data = [
             {
                 "id": 1,
+                "source": "Київ Радар (Пряма заявка)",
+                "submission_id": 101,
+                "moderationStatus": "approved",
                 "title": "1-кімнатна на Хрещатику",
                 "address": "вул. Хрещатик, 15",
                 "price": 20000,
@@ -86,6 +89,9 @@ def isolated_app():
             },
             {
                 "id": 2,
+                "source": "Київ Радар (Пряма заявка)",
+                "submission_id": 102,
+                "moderationStatus": "approved",
                 "title": "2-кімнатна на Подолі",
                 "address": "вул. Спаська, 10",
                 "price": 25000,

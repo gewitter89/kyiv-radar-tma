@@ -44,6 +44,12 @@ async def screenshot(browser, name: str, width: int, height: int, mobile=False):
     await page.evaluate("""() => openDealModalById(LISTINGS[0].id)""")
     await page.wait_for_timeout(450)
     await page.screenshot(path=str(OUTPUT / (name + "-listing.png")))
+    # Capture the real expanded evidence passport for mobile/tablet/desktop QA.
+    if await page.locator("#krListingPassport").count():
+        await page.locator("#krListingPassport summary").click()
+        await page.locator("#krPassportRows").scroll_into_view_if_needed()
+        await page.screenshot(path=str(OUTPUT / (name + "-passport.png")))
+        await page.locator("#krListingPassport summary").click()
     if await page.locator("#krOriginalAction").is_visible():
         # The import's safe first action is an outgoing source URL, not a bot
         # contact request. Do not navigate to a third-party website in QA.
@@ -89,6 +95,10 @@ async def screenshot_light(browser):
     await page.evaluate("() => openDealModalById(LISTINGS[0].id)")
     await page.wait_for_selector("#dealModal:not(.hidden)")
     await page.screenshot(path=str(OUTPUT / "phone-light-listing-v115.png"))
+    await page.locator("#krListingPassport summary").click()
+    await page.locator("#krPassportRows").scroll_into_view_if_needed()
+    await page.screenshot(path=str(OUTPUT / "phone-light-passport.png"))
+    await page.locator("#krListingPassport summary").click()
     await page.evaluate("() => closeDealModal()")
     await page.locator("#krSimpleInfo").click()
     await page.screenshot(path=str(OUTPUT / "phone-light-theme-settings.png"))

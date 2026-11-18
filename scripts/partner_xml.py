@@ -26,6 +26,9 @@ FIELD_MAP = {
     "price_uah": "price_uah",
     "price": "price_uah",
     "rooms": "rooms",
+    # Transient only: detect contradictory room claims then discard before DB.
+    "title": "title",
+    "description": "description",
     "area_m2": "area_m2",
     "unit_key": "unit_key",
     "currencyId": "_currency",
@@ -37,7 +40,7 @@ class UnsafePartnerXML(ValueError):
 
 
 def iter_partner_xml(path: Path):
-    """Yield only whitelisted metadata from a local XML/YML document.
+    """Yield only whitelisted metadata plus transient room-claim text for validation.
 
     Supported paths (NOT a general-purpose YRL/Yandex Realty Language parser):
       realty-feed/offer with canonical field names;

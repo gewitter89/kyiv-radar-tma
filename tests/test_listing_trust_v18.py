@@ -132,7 +132,9 @@ def test_api_hides_withdrawn_and_does_not_export_moderator_evidence(monkeypatch,
     monkeypatch.setattr(api, "REVIEW_REGISTER_PATH", str(doc))
     monkeypatch.setattr(api, "load_trusted_deals", lambda: [
         {**imported(7), "phone": "+380123456789", "ownerName": "private"},
-        {**imported(8), "phone": "+380123456789", "ownerName": "private"},
+        {**imported(8), "source": "Київ Радар (Пряма заявка)",
+         "submission_id": 808, "moderationStatus": "approved",
+         "phone": "+380123456789", "ownerName": "private"},
     ])
     resp = TestClient(api.app).get("/api/deals")
     assert resp.status_code == 200

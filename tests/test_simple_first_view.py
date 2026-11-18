@@ -21,26 +21,52 @@ async def test_phone_first_view_shows_photos_not_full_screen_map():
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={"width": 390, "height": 844},
                                       is_mobile=True, has_touch=True)
+        # CI fixtures use intentionally nonexistent photo hosts. Serve a
+        # clearly synthetic SVG without external network to verify the actual
+        # image layout, rather than assuming original OLX photos exist.
+        async def synthetic_photo(route):
+            await route.fulfill(
+                status=200, content_type="image/svg+xml",
+                body='<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="800" height="600" fill="#777"/></svg>'
+            )
+        await page.route("https://images.example.invalid/**", synthetic_photo)
         await ready(page)
         assert await page.get_by_role("heading", name="Знайти квартиру").is_visible()
+        assert await page.locator(".kr-hero-eyebrow").inner_text() == "Житло по суті"
         assert await page.locator("#map").is_hidden()
         assert await page.locator("#listViewContainer").is_visible()
         assert await page.locator("#smartRadarOpen").is_visible()
         assert await page.locator("#krRoomsTrigger").is_visible()
         assert await page.locator("#filterPower").is_hidden()
         assert await page.locator("#filterRooms3").is_hidden()
-        # Catalog may re-render while its live snapshot is being refreshed.
-        # Wait for an actual, sized image frame instead of sampling mid-repaint.
+        # Synthetic CI image URLs deliberately never fetch real photos.
+        # Demand a sized photo container with either an image or the truthful
+        # recoverable placeholder; do not depend on external photo networks.
         await page.wait_for_function("""() => {
-          const img = document.querySelector("#listViewContainer img.kr-gallery-image");
-          if (!img) return false;
-          const rect = img.getBoundingClientRect();
-          return rect.width > 100 && rect.height > 100 && getComputedStyle(img).visibility !== 'hidden';
+          const frame = document.querySelector("#listViewContainer > div[onclick] > .relative.h-48");
+          if (!frame || !frame.querySelector("img, .kr-gallery-fallback")) return false;
+          const rect = frame.getBoundingClientRect();
+          return rect.width > 100 && rect.height > 100 &&
+                 getComputedStyle(frame).display !== 'none';
         }""", timeout=10000)
-        assert await page.locator("#listViewContainer > div[onclick]").count() >= 10
-        first_card = await page.locator("#listViewContainer > div[onclick]").nth(0).bounding_box()
-        second_card = await page.locator("#listViewContainer > div[onclick]").nth(1).bounding_box()
-        assert first_card and second_card
+        # A live refresh can replace the card nodes between two Playwright calls.
+        # Wait for BOTH cards in one animation frame and sample their geometry
+        # atomically. Preserve the original non-overlap acceptance criterion.
+        await page.wait_for_function("""() => {
+          const cards = document.querySelectorAll("#listViewContainer > div[onclick]");
+          if (cards.length < 10) return false;
+          const first = cards[0].getBoundingClientRect();
+          const second = cards[1].getBoundingClientRect();
+          return first.width > 100 && first.height > 100 &&
+                 second.width > 100 && second.height > 100;
+        }""", timeout=10000)
+        first_card, second_card = await page.evaluate("""() => {
+          const cards = document.querySelectorAll("#listViewContainer > div[onclick]");
+          return [cards[0], cards[1]].map(card => {
+            const r = card.getBoundingClientRect();
+            return { x:r.x, y:r.y, width:r.width, height:r.height };
+          });
+        }""")
         assert second_card["y"] >= first_card["y"] + first_card["height"] + 6, "Apartment cards must never overlap"
         # Body itself must not scroll horizontally (filter strip scrolls within itself).
         over = await page.evaluate(
