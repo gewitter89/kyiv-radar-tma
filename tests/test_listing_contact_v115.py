@@ -71,7 +71,7 @@ async def test_one_slow_telegram_request_disables_duplicate_calls_and_recovers()
         unblock.set()
         await page.wait_for_function("""() => document.querySelector('#krContactStatus').dataset.state === 'success'""")
         assert await page.locator("#modalCallBtn").is_enabled()
-        assert "Перевірте приватний чат" in await status.inner_text()
+        assert "Перевірте особисті повідомлення" in await status.inner_text()
         assert len(requests) == 1
         await browser.close()
 
