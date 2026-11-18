@@ -1898,23 +1898,25 @@
                     const data = await res.json().catch(() => ({}));
                     if (res.ok && data.success) {
                         window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred?.('success');
-                        showContactRequestStatus('success', 'Контакт надіслано. Перевірте приватний чат із ботом у Telegram.', deal.id);
+                        showContactRequestStatus('success', 'Контакт надіслано. Перевірте особисті повідомлення у Telegram.', deal.id);
                         showToast("✓ Контакт надіслано у ваш Telegram-чат!");
                     } else {
                         window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred?.('error');
-                        const reason = typeof data.detail === 'string'
-                            ? data.detail.slice(0, 240)
-                            : res.status === 502
-                                ? "Запустіть бота @prostov_shrink_bot (/start)"
+                        // Avoid rendering obsolete provider strings returned by the
+                        // older API until the coordinated backend deployment.
+                        const reason = res.status === 502
+                            ? "Відкрийте «Київ Радар» у Telegram і натисніть «Старт» (/start)"
+                            : res.status === 401
+                                ? "Сесія Telegram недійсна. Поверніться до застосунку."
                                 : "Не вдалося отримати відповідь сервера";
                         const contactMessage = res.status === 404
                             ? 'Контакт цього оголошення поки недоступний. Перевірте оригінал у картці.'
                             : res.status === 429
                                 ? 'Ліміт запитів вичерпано. Спробуйте після його поновлення.'
                                 : res.status === 401
-                                    ? 'Сесія Telegram недійсна. Відкрийте застосунок через бота.'
+                                    ? 'Сесія Telegram недійсна. Відкрийте «Київ Радар» у Telegram повторно.'
                                     : res.status === 502
-                                        ? 'Не вдалося доставити повідомлення. Відкрийте чат із ботом і натисніть /start.'
+                                        ? 'Не вдалося доставити повідомлення. Відкрийте «Київ Радар» у Telegram і натисніть «Старт» (/start).'
                                         : 'Сервер не підтвердив надсилання контакту. Спробуйте пізніше.';
                         showContactRequestStatus('error', contactMessage, deal.id);
                         if (typeof window.krContactError === "function") window.krContactError(reason, res.status);
@@ -1946,7 +1948,7 @@
                 if (typeof window.krContactHandoff === "function") {
                     window.krContactHandoff(deal.id, deal.title);
                 } else {
-                    showToast("Відкрийте @prostov_shrink_bot у Telegram та знайдіть це оголошення");
+                    showToast("Відкрийте «Київ Радар» у Telegram та знайдіть це оголошення");
                 }
                 return;
             }
@@ -2545,7 +2547,7 @@
         function openLandlordModal() {
             if (!window.Telegram?.WebApp?.initData) {
                 if (typeof window.krLandlordHandoff === "function") window.krLandlordHandoff();
-                else showToast('Для подання заявки відкрийте Київ Радар через @prostov_shrink_bot');
+                else showToast('Для подання заявки відкрийте «Київ Радар» у Telegram');
                 return;
             }
             document.getElementById('landlordModal').classList.remove('hidden');
@@ -2695,7 +2697,7 @@
             }
             const initData = window.Telegram?.WebApp?.initData || '';
             if (!initData) {
-                showToast('Подати оголошення можна через @prostov_shrink_bot у Telegram');
+                showToast('Подати оголошення можна через «Київ Радар» у Telegram');
                 return;
             }
             if (landlordSubmitPending) return;
