@@ -1,0 +1,145 @@
+# -*- coding: utf-8 -*-
+"""Telegram full-screen launch regression — only simulated native WebApp API.
+
+A native Telegram label is NOT DOM and cannot be suppressed by CSS. The tests
+verify a safe API request, event-confirmed CSS state, viewport inset, manual
+fallback and continued operation on unsupported clients.
+"""
+from pathlib import Path
+
+import pytest
+from playwright.async_api import async_playwright
+
+URL = (Path(__file__).resolve().parents[1] / "index.html").as_uri()
+MOCK = r"""() => {
+  const handlers = {};
+  window.__nativeEvents = handlers;
+  window.__fullRequests = 0;
+  window.__fullExits = 0;
+  window.Telegram = {WebApp: {
+    platform: 'android', initData: 'synthetic-test-init-only',
+    isFullscreen: false,
+    ready() {}, expand() {},
+    setHeaderColor() {}, setBackgroundColor() {},
+    onEvent(name, listener) { handlers[name] = listener; },
+    requestFullscreen() {
+      window.__fullRequests++;
+      // Telegram confirms actual fullscreen asynchronously, not here.
+    },
+    exitFullscreen() {
+      window.__fullExits++;
+      this.isFullscreen = false;
+      handlers.fullscreenChanged?.();
+    }
+  }};
+}"""
+
+
+@pytest.mark.asyncio
+async def test_fullscreen_only_after_native_confirmation_and_respects_insets():
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width":390,"height":844},is_mobile=True,has_touch=True)
+        await page.route("https://telegram.org/js/telegram-web-app.js",lambda route: route.abort())
+        await page.add_init_script(MOCK)
+        await page.goto(URL, wait_until="domcontentloaded")
+        await page.wait_for_function("!!window.KyivRadarTelegramShell")
+        assert await page.evaluate("__fullRequests") == 1
+        assert not await page.evaluate(
+            "document.documentElement.classList.contains('kr-telegram-fullscreen')")
+        await page.evaluate("""() => {
+            document.documentElement.style.setProperty('--tg-content-safe-area-inset-top','62px');
+            Telegram.WebApp.isFullscreen = true;
+            __nativeEvents.fullscreenChanged();
+        }""")
+        assert await page.evaluate(
+            "document.documentElement.classList.contains('kr-telegram-fullscreen')")
+        top = await page.evaluate("getComputedStyle(document.body).paddingTop")
+        assert top == "62px"
+        head_y = await page.locator("body > header").evaluate(
+            "element => element.getBoundingClientRect().top")
+        assert head_y >= 61
+        assert await page.locator("body > header").is_visible()
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_manual_exit_works_and_respects_user_preference_on_reopen():
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(headless=True)
+        page = await browser.new_page()
+        await page.route("https://telegram.org/js/telegram-web-app.js",lambda route: route.abort())
+        await page.add_init_script(MOCK)
+        await page.goto(URL,wait_until="domcontentloaded")
+        await page.wait_for_function("document.querySelector('#krSimpleInfo') !== null")
+        await page.evaluate("""() => {
+            Telegram.WebApp.isFullscreen = true;
+            __nativeEvents.fullscreenChanged();
+        }""")
+        await page.locator("#krSimpleInfo").click()
+        button=page.locator("#krTelegramFullscreenToggle")
+        assert await button.is_visible()
+        assert await button.get_attribute("aria-pressed") == "true"
+        await button.click()
+        assert await page.evaluate("__fullExits") == 1
+        assert await page.evaluate(
+            "localStorage.getItem('kr_tg_fullscreen_choice_v1')") == "off"
+        assert not await page.evaluate(
+            "document.documentElement.classList.contains('kr-telegram-fullscreen')")
+        await page.reload(wait_until="domcontentloaded")
+        await page.wait_for_function("!!window.KyivRadarTelegramShell")
+        assert await page.evaluate("__fullRequests") == 0
+        await page.locator("#krSimpleInfo").click()
+        button=page.locator("#krTelegramFullscreenToggle")
+        assert "Відкрити на весь екран" in await button.inner_text()
+        await button.click()
+        assert await page.evaluate("__fullRequests") == 1
+        assert await page.evaluate(
+            "localStorage.getItem('kr_tg_fullscreen_choice_v1')") == "on"
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_unsupported_telegram_does_not_change_layout():
+    async with async_playwright() as pw:
+        browser=await pw.chromium.launch(headless=True)
+        page=await browser.new_page(viewport={"width":390,"height":844})
+        await page.route("https://telegram.org/js/telegram-web-app.js",lambda route: route.abort())
+        await page.add_init_script("""() => {
+            window.Telegram={WebApp:{
+               initData:'', platform:'web', requestFullscreen(){throw Error('unsupported');},
+               ready(){}, expand(){}, onEvent(){} }};
+        }""")
+        await page.goto(URL, wait_until="domcontentloaded")
+        await page.wait_for_function("!!window.KyivRadarTelegramShell")
+        assert await page.evaluate("KyivRadarTelegramShell.supported") is False
+        assert await page.evaluate(
+            "document.documentElement.classList.contains('kr-telegram-fullscreen')") is False
+        await page.locator("#krSimpleInfo").click()
+        assert await page.locator("#krTelegramFullscreenToggle").count() == 0
+        assert await page.locator("#krSimpleHelp").is_visible()
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_native_request_failure_leaves_normal_view_usable():
+    async with async_playwright() as pw:
+        browser=await pw.chromium.launch(headless=True)
+        page=await browser.new_page(viewport={"width":390,"height":844})
+        await page.route("https://telegram.org/js/telegram-web-app.js",lambda route: route.abort())
+        await page.add_init_script("""() => {
+           window.Telegram={WebApp:{
+             initData:'synthetic', platform:'ios', isFullscreen:false,
+             ready(){},expand(){},onEvent(){},
+             requestFullscreen(){throw Error('native unsupported');}
+           }};
+        }""")
+        await page.goto(URL, wait_until="domcontentloaded")
+        await page.wait_for_function("!!window.KyivRadarTelegramShell")
+        assert await page.evaluate(
+            "document.documentElement.classList.contains('kr-telegram-fullscreen')") is False
+        await page.locator("#krSimpleInfo").click()
+        assert await page.locator("#krTelegramFullscreenToggle").is_visible()
+        assert await page.locator("#krSimpleHelp").is_visible()
+        assert await page.locator("#krHero").is_visible()
+        await browser.close()
