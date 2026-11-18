@@ -11,6 +11,28 @@
     ["ios", "android"].includes(String(tg.platform || "").toLowerCase()) &&
     typeof tg.initData === "string" && tg.initData.length > 0);
   const listeners = new Set();
+  const SWIPE_KEY = "kr_tg_prevent_unintentional_minimize_v1";
+  const swipeControl = !!(tg && typeof tg.disableVerticalSwipes === "function" &&
+    typeof tg.enableVerticalSwipes === "function" &&
+    ["ios", "android"].includes(String(tg.platform || "").toLowerCase()) &&
+    typeof tg.initData === "string" && tg.initData.length > 0);
+
+  function preventMinimizeChoice() {
+    // User specifically wants to avoid the native minimized @username bar.
+    // Suppress *content-area vertical swipes* only; Telegram still controls
+    // the native header and can always minimize through its own interface.
+    try { return localStorage.getItem(SWIPE_KEY) !== "off"; }
+    catch (_) { return true; }
+  }
+  function setPreventMinimize(prevent) {
+    if (!swipeControl) return false;
+    try {
+      if (prevent) tg.disableVerticalSwipes();
+      else tg.enableVerticalSwipes();
+      try { localStorage.setItem(SWIPE_KEY, prevent ? "on" : "off"); } catch (_) {}
+      return true;
+    } catch (_) { return false; }
+  }
   // Native close removes the Mini App session. A swipe to minimize instead
   // leaves Telegram's own Mini App Bar with the bot @username visible.
   // Never attempt to manipulate Telegram's native bar with CSS.
@@ -70,6 +92,14 @@
   }
   function init() {
     sync();
+    // Vertical-swipe control is independent of the full-screen capability.
+    // Some clients offer it even without requestFullscreen.
+    if (swipeControl) {
+      try {
+        if (preventMinimizeChoice()) tg.disableVerticalSwipes();
+        else tg.enableVerticalSwipes();
+      } catch (_) {}
+    }
     if (!supported) return;
     try {
       tg.onEvent?.("fullscreenChanged", sync);
@@ -83,6 +113,7 @@
   }
   window.KyivRadarTelegramShell = Object.freeze({
     supported, request, exit, listen, sync, canClose, closeCompletely,
+    swipeControl, preventMinimizeChoice, setPreventMinimize,
     isFullscreen: () => !!(supported && tg.isFullscreen === true)
   });
   if (document.readyState === "loading") {
