@@ -1,4 +1,4 @@
-/* Kyiv Radar v1.37: supported Telegram immersive mode, NEVER CSS overlays
+/* Kyiv Radar v1.39: native Telegram immersive mode, NEVER CSS overlays
  * over a native Telegram surface. Unsupported clients retain normal UI.
  * No token, authentication or server changes.
  */
@@ -11,10 +11,16 @@
   // empty initData. Never use signed auth data as a UX bridge feature gate.
   // Platform + official native WebApp methods are sufficient for these
   // non-privileged client-side UI operations; backend auth stays unchanged.
+  const nativePlatform = String(tg?.platform || "").toLowerCase();
   const nativeMobile = !!(tg &&
-    ["ios", "android"].includes(String(tg.platform || "").toLowerCase()) &&
+    ["ios", "android"].includes(nativePlatform) &&
     typeof tg.ready === "function");
-  const supported = nativeMobile && typeof tg.requestFullscreen === "function";
+  // Telegram Desktop has its own native footer label ('@' + bot.username).
+  // Its native UI hides that footer while the WebView is fullscreen.
+  const nativeDesktop = !!(tg && nativePlatform === "tdesktop" &&
+    typeof tg.ready === "function");
+  const supported = (nativeMobile || nativeDesktop) &&
+    typeof tg.requestFullscreen === "function";
   const listeners = new Set();
   const SWIPE_KEY = "kr_tg_prevent_unintentional_minimize_v1";
   const swipeControl = nativeMobile &&
@@ -110,13 +116,15 @@
       tg.onEvent?.("contentSafeAreaChanged", sync);
       tg.onEvent?.("safeAreaChanged", sync);
     } catch (_) { /* no native event bridge; normal view is safe */ }
-    // Historical v1.14 used Telegram.expand() without forcing fullscreen.
-    // Keep that stable launch shape by default. Fullscreen is opt-in only;
-    // remember an explicit user choice without changing backend auth.
-    if (preference() === "on") request();
+    // Telegram Desktop's native WebView footer contains the bot's username.
+    // Source-backed mitigation: enter native fullscreen on desktop only,
+    // where Telegram hides that footer. Normal mobile launches remain intact.
+    // Explicit opt-out persists; the ⓘ control can return to normal view.
+    const choice = preference();
+    if (choice === "on" || (nativeDesktop && choice !== "off")) request();
   }
   window.KyivRadarTelegramShell = Object.freeze({
-    supported, request, exit, listen, sync, canClose, closeCompletely,
+    supported, nativeDesktop, request, exit, listen, sync, canClose, closeCompletely,
     swipeControl, preventMinimizeChoice, setPreventMinimize,
     isFullscreen: () => !!(supported && tg.isFullscreen === true)
   });
