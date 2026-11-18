@@ -51,7 +51,7 @@ async def test_fullscreen_only_after_native_confirmation_and_respects_insets():
             document.documentElement.style.setProperty('--tg-content-safe-area-inset-top','62px');
             Telegram.WebApp.isFullscreen = true;
             __nativeEvents.fullscreenChanged();
-        })()""")
+        }""")
         assert await page.evaluate(
             "document.documentElement.classList.contains('kr-telegram-fullscreen')")
         top = await page.evaluate("getComputedStyle(document.body).paddingTop")
@@ -75,7 +75,7 @@ async def test_manual_exit_works_and_respects_user_preference_on_reopen():
         await page.evaluate("""() => {
             Telegram.WebApp.isFullscreen = true;
             __nativeEvents.fullscreenChanged();
-        })()""")
+        }""")
         await page.locator("#krSimpleInfo").click()
         button=page.locator("#krTelegramFullscreenToggle")
         assert await button.is_visible()
