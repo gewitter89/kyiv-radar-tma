@@ -1108,7 +1108,7 @@ async def send_contact(req: SendContactRequest):
     if not sent:
         raise HTTPException(
             status_code=502,
-            detail="Не вдалося доставити контакт у ваш Telegram-чат. Будь ласка, відкрийте діалог з нашим ботом (@prostov_shrink_bot) та натисніть /start."
+            detail="Не вдалося доставити контакт у Telegram. Відкрийте «Київ Радар» у Telegram, натисніть «Старт» (/start) і повторіть запит."
         )
 
     return {
