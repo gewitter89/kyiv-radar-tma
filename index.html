@@ -1594,6 +1594,9 @@
                 renderListView(items);
             }
             updateFavCount();
+            // Refresh the comparison panel on live-source revocation/reload,
+            // so an already-open panel cannot keep a withdrawn listing.
+            window.KyivRadarSmart?.refresh?.();
 
             if (items.length > 0 && !currentActiveId) {
                 focusDeal(items[0].id, false, false);
@@ -2755,7 +2758,7 @@
         });
     </script>
     <!-- v1.6: optional local-first saved searches and apartment comparison -->
-    <script src="./smart-radar.js?v=1.34.0"></script>
+    <script src="./smart-radar.js?v=1.35.0"></script>
     <script src="./catalog-quality.js?v=1.34.0"></script>
     <script src="./experience.js?v=1.32.0"></script>
     <script src="./mobile-media.js?v=1.7.0"></script>
