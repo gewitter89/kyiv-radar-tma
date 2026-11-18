@@ -161,7 +161,7 @@ async def test_isolated_verified_first_party_retains_contact_request():
         await page.wait_for_function("""() =>
           document.querySelector('#krContactStatus').dataset.state === 'success'""")
         assert len(calls) == 1
-        assert "Перевірте приватний чат" in await page.locator("#krContactStatus").inner_text()
+        assert "Перевірте особисті повідомлення" in await page.locator("#krContactStatus").inner_text()
         await browser.close()
 
 
