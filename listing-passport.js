@@ -155,6 +155,12 @@
   }
 
   function init() {
+    const reportButton = document.getElementById("krPassportReport");
+    if (reportButton) {
+      reportButton.addEventListener("click", () => {
+        if (typeof openReportModal === "function") openReportModal();
+      });
+    }
     const original = window.openDealModalById;
     if (typeof original === "function") {
       window.openDealModalById = function(id) {
