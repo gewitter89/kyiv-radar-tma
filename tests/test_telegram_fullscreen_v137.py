@@ -231,3 +231,56 @@ async def test_no_swipe_control_in_non_telegram_browser():
         await page.locator("#krSimpleInfo").click()
         assert await page.locator("#krTelegramMinimizeSwipeToggle").count() == 0
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_native_telegram_keyboard_launch_with_empty_init_data_keeps_swipe_protection():
+    # Official Telegram keyboard-button and inline launches may have empty initData.
+    # This is a UX-only native bridge; it must not be tied to authentication data.
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(headless=True)
+        page = await browser.new_page(
+            viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True
+        )
+        await page.route(
+            "https://telegram.org/js/telegram-web-app.js",
+            lambda route: route.abort(),
+        )
+        empty_init_mock = MOCK.replace(
+            "initData: 'synthetic-test-init-only'", "initData: ''"
+        )
+        await page.add_init_script(f"({empty_init_mock})()")
+        await page.goto(URL, wait_until="domcontentloaded")
+        await page.wait_for_function("!!window.KyivRadarTelegramShell")
+        assert await page.evaluate("KyivRadarTelegramShell.supported") is True
+        assert await page.evaluate("KyivRadarTelegramShell.swipeControl") is True
+        assert await page.evaluate("KyivRadarTelegramShell.canClose") is True
+        assert await page.evaluate("__swipeDisables") == 1
+        assert await page.evaluate("__fullRequests") == 1
+        await page.locator("#krSimpleInfo").click()
+        assert await page.locator("#krTelegramCloseCompletely").is_visible()
+        assert await page.locator("#krTelegramMinimizeSwipeToggle").is_visible()
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_fake_mobile_platform_without_native_ready_does_not_enable_bridge():
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844})
+        await page.route(
+            "https://telegram.org/js/telegram-web-app.js",
+            lambda route: route.abort(),
+        )
+        await page.add_init_script("""(() => {
+            window.Telegram = {WebApp: {
+                platform: 'android', initData: '', requestFullscreen() {},
+                close() {}, disableVerticalSwipes() {}, enableVerticalSwipes() {}
+            }};
+        })()""")
+        await page.goto(URL, wait_until="domcontentloaded")
+        await page.wait_for_function("!!window.KyivRadarTelegramShell")
+        assert await page.evaluate("KyivRadarTelegramShell.swipeControl") is False
+        assert await page.evaluate("KyivRadarTelegramShell.canClose") is False
+        assert await page.evaluate("KyivRadarTelegramShell.supported") is False
+        await browser.close()
