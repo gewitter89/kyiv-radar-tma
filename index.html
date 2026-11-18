@@ -1107,6 +1107,10 @@
             LISTINGS = localFixture && typeof KYIV_DEALS_INIT !== 'undefined' &&
                 Array.isArray(KYIV_DEALS_INIT)
                 ? staticCatalogWithoutPartners(KYIV_DEALS_INIT) : [];
+            // Source/permalink identity must be ready BEFORE the first card
+            // renders. Otherwise a fast tap on comparison/favorites silently
+            // fails while the asynchronous catalog request is pending.
+            refreshFavoriteKeys();
 
             // Revoke all previously rendered cards *before* an async refresh.
             // An old open tab must not keep clickable stale rows while the
