@@ -111,7 +111,7 @@ async def test_report_reasons_have_clear_specific_choices():
         assert "Фото або дані використали без дозволу" in text
         assert "вимагають 50%" not in text
         assert await page.locator("#krReportStatus").get_attribute("role") == "status"
-        assert await page.locator("#reportModal button[onclick^='submitReport']").count() == 7
+        assert await page.locator("#reportModal button[onclick^='submitReport']").count() == 8
         await browser.close()
 
 

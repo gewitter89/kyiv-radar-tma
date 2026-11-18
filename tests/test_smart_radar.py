@@ -53,8 +53,9 @@ async def test_new_matches_count_is_truthful_and_resettable():
             id: 99887711, title: 'Нова тестова квартира', district: 'Дарницький',
             address: 'Київ', metro: 'Позняки', price: 10000, rooms: 1,
             images: [], generator: false, gpon: false, pets: false,
-            isOwnerVerified: false, source: 'Тест', phone: null
+            isOwnerVerified: false, source: 'Тест', phone: null, url: 'https://agency.example.ua/offer/synthetic-new-99887711'
         })""")
+        await page.evaluate("refreshFavoriteKeys()")
         await page.keyboard.press("Escape")
         await page.locator("#smartRadarOpen").click()
         assert "1 нових" in await page.inner_text("#smartRadarSearches")
@@ -77,7 +78,8 @@ async def test_comparison_does_not_claim_unverified_features_or_expose_contacts(
             LISTINGS[0].gpon = false;
         }""")
         await page.locator("#smartRadarOpen").click()
-        await page.locator("#smartRadarCompareSelect").select_option("1")
+        await page.locator("#smartRadarCompareSelect").select_option(
+            await page.locator("#smartRadarCompareSelect option").nth(1).get_attribute("value"))
         await page.get_by_role("button", name="Додати", exact=True).click()
         content = await page.inner_text("#smartRadarComparison")
         assert "Генератор у будинку: не вказано" in content
@@ -118,7 +120,7 @@ async def test_older_api_claims_are_cleaned_before_rendering():
                 content_type="application/json",
                 headers={"access-control-allow-origin": "*"},
                 body='{"success":true,"deals":[{"id":999,"title":"Тестове житло",'
-                     '"price":10000,"rooms":1,"source":"OLX","phone":null,'
+                     '"price":10000,"rooms":1,"source":"Київ Радар (Пряма заявка)","phone":null,'
                      '"images":[],"lat":null,"lng":null,'
                      '"desc":"Здається реальна квартира від власника без посередників. '
                      'Лише інформація з джерела. '

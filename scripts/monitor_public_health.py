@@ -61,8 +61,8 @@ def verify_public_api(health: dict, catalog: dict) -> int:
     if not isinstance(catalog, dict) or catalog.get("success") is not True:
         raise AssertionError("Catalog API returned an unsuccessful response")
     listings = catalog.get("deals")
-    if not isinstance(listings, list) or not listings:
-        raise AssertionError("Public catalog has no visible listings")
+    if not isinstance(listings, list):
+        raise AssertionError("Catalog API must contain a deals array, even when legitimately empty")
     ids = set()
     for row in listings:
         if not isinstance(row, dict) or type(row.get("id")) is not int:
@@ -86,6 +86,9 @@ def main() -> int:
     verify_pages_html(page)
     print("PASS: public API, private fields, published HTML; listings =", count,
           "; api_version =", health["version"])
+    if count == 0:
+        print("WARNING: zero public listings. API may be functioning in safe empty mode; "
+              "review feed rights, ingestion and moderation before claiming a healthy inventory.")
     # The health endpoint doesn't certify freshness, origin or contact delivery.
     return 0
 

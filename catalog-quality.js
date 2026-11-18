@@ -10,12 +10,38 @@
     "Васильківська", "Теремки", "Голосіївська", "Нивки",
     "Печерська", "Берестейська", "Іподром", "Мінська", "Оболонь"
   ];
-  function roomCountFromTitle(title) {
-    const text = String(title || "").toLocaleLowerCase("uk-UA");
+  // We may inspect explicit counts inside *already permitted* source metadata.
+  // Never infer room count from "studio", "окрема спальня" or a guessed floor.
+  // This is an internal consistency check, NOT verification of a live OLX page.
+  const numericRoomPattern = /(?:^|[^\p{L}\d])((?:1[0-5]|[1-9]))\s*(?:[-–‑]?\s*[хx]\s*)?[-–‑]?\s*(?:к(?![\p{L}\d])|кімн(?:ат\p{L}*)?\.?|комн(?:ат\p{L}*)?\.?)/giu;
+  const lexicalRoomPatterns = [
+    [1, /(?:^|[^\p{L}])(?:однокімнатн\p{L}*|однокомнатн\p{L}*|однушк\p{L}*)/iu],
+    [2, /(?:^|[^\p{L}])(?:двокімнатн\p{L}*|двохкімнатн\p{L}*|двухкомнатн\p{L}*|двушк\p{L}*)/iu],
+    [3, /(?:^|[^\p{L}])(?:трикімнатн\p{L}*|трьохкімнатн\p{L}*|трехкомнатн\p{L}*|трёхкомнатн\p{L}*)/iu],
+    [4, /(?:^|[^\p{L}])(?:чотирикімнатн\p{L}*|чотирьохкімнатн\p{L}*|четырехкомнатн\p{L}*|четырёхкомнатн\p{L}*)/iu],
+    [5, /(?:^|[^\p{L}])(?:пятикомнатн\p{L}*|п'ятикімнатн\p{L}*|п’ятикімнатн\p{L}*)/iu]
+  ];
+  function explicitRoomClaims(...parts) {
     const results = new Set();
-    const pattern = /(^|[^\d])([1-5])\s*(?:[-‑]\s*(?:х\s*)?)?(?:к(?![а-яіїєґa-z])|к(?=\s*кварт)|кімн|комн)/giu;
-    for (const match of text.matchAll(pattern)) results.add(Number(match[2]));
-    return results.size === 1 ? [...results][0] : null;
+    for (const part of parts) {
+      if (typeof part !== 'string') continue;
+      const text = part.slice(0, 8192).toLocaleLowerCase("uk-UA");
+      for (const match of text.matchAll(numericRoomPattern)) results.add(Number(match[1]));
+      for (const [count, pattern] of lexicalRoomPatterns) {
+        if (pattern.test(text)) results.add(count);
+      }
+    }
+    return [...results].sort((a,b) => a-b);
+  }
+  function roomCountFromTitle(title) {
+    const claims = explicitRoomClaims(title);
+    return claims.length === 1 ? claims[0] : null;
+  }
+  function countFromMetadata(value) {
+    // Avoid treating "2x", "2 rooms?" or Boolean true as trusted metadata.
+    if (typeof value === "number" && Number.isSafeInteger(value) && value >= 1 && value <= 100) return value;
+    if (typeof value === "string" && /^[1-9]\d?$/u.test(value.trim())) return Number(value.trim());
+    return null;
   }
   function titleMetro(title) {
     const text = String(title || "").toLocaleLowerCase("uk-UA");
@@ -32,11 +58,13 @@
     if (!Array.isArray(list)) return [];
     return list.filter(x => x && typeof x === "object").map(item => {
       const badAddress = item.addressConflict === true || junk.test(String(item.address || ""));
-      const roomFromTitle = roomCountFromTitle(item.title);
-      const roomsConflict = item.roomConflict === true || (Number.isInteger(roomFromTitle) &&
-        Number.isInteger(Number(item.rooms)) &&
-        Number(item.rooms) > 0 && roomFromTitle !== Number(item.rooms) &&
-        item.isOwnerVerified !== true);
+      const sourceClaims = explicitRoomClaims(item.title, item.desc);
+      const structuredRooms = countFromMetadata(item.rooms);
+      // Ownership verification does not override a contradiction in room data.
+      const roomsConflict = item.roomConflict === true ||
+        sourceClaims.length > 1 ||
+        (structuredRooms !== null && sourceClaims.length === 1 &&
+         sourceClaims[0] !== structuredRooms);
       // A model-derived station or walk time is not a sourced routing fact.
       // Imports with no independently verified location cannot assert either.
       const locationVerified = item.locationVerified === true && !badAddress;
@@ -53,7 +81,7 @@
         // A masked number is not evidence that a real contact is available.
         phoneMasked: item.contactVerified === true ? item.phoneMasked || null : null,
         address: badAddress ? "Адреса уточнюється" : item.address,
-        rooms: roomsConflict ? null : item.rooms,
+        rooms: roomsConflict ? null : structuredRooms,
         metro: importedUnverified ? null : metroConflict ? "Метро уточнюється" : item.metro,
         walkMin: importedUnverified ? null : item.walkMin,
         roomConflict: Boolean(roomsConflict),
@@ -64,5 +92,5 @@
     });
   }
   window.krQualityCatalog = scrub;
-  window.krQualityRules = {roomCountFromTitle,titleMetro};
+  window.krQualityRules = {roomCountFromTitle,explicitRoomClaims,countFromMetadata,titleMetro};
 })();

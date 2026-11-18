@@ -34,8 +34,9 @@
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   }
   function closeDialog() {
-    const root = document.getElementById("krHandoff");
-    if (root) { root.hidden = true; root.replaceChildren(); }
+    // Never retain hidden overlays with duplicate IDs. They break keyboard
+    // focus, dialog selection and later contact-error accessibility.
+    document.querySelectorAll("#krHandoff").forEach(root => root.remove());
     document.removeEventListener("keydown", trapInDialog);
     lastDialogFocus?.focus?.();
   }
@@ -82,7 +83,7 @@
       paragraphs: [
         "1. Вкажіть бюджет, район або назву квартири й потрібні умови: генератор, GPON, тварини.",
         "2. Порівнюйте характеристики, але пам’ятайте: імпортовані оголошення не пройшли незалежну перевірку.",
-        "3. Перевірте оригінальне джерело. Контакт через бот доступний після входу в Telegram.",
+        "3. Перевірте оригінальне джерело. Контакт можна отримати в особистих повідомленнях Telegram після входу.",
         "«Мій радар» зберігає пошуки на цьому пристрої. Автоматичні повідомлення поки не підключені."
       ]
     });
@@ -94,13 +95,13 @@
       title: "Відкрийте квартиру в Telegram",
       paragraphs: [
         "Номер власника чи контактної особи не відкривається на публічному сайті.",
-        "1. Відкрийте бота, натисніть «Старт» (/start), а тоді відкрийте застосунок «Київ Радар».",
+        "1. Відкрийте «Київ Радар» у Telegram, за потреби натисніть «Старт» (/start), а потім відкрийте каталог.",
         "2. У каталозі знайдіть оголошення №" + (Number.isInteger(safeId) ? safeId : "?") + " та натисніть «Отримати контакт».",
         title ? "Ви дивилися: " + String(title).slice(0, 115) : "",
         "Доступність номера та актуальність оголошення не гарантовані."
       ].filter(Boolean),
       actions: [
-        { label: "Відкрити бота", url: BOT_URL, primary: true },
+        { label: "Відкрити «Київ Радар»", url: BOT_URL, primary: true },
         { label: "Скопіювати № оголошення", action: () => {
           const value = String(Number.isInteger(safeId) ? safeId : "");
           if (navigator.clipboard?.writeText) {
@@ -125,8 +126,8 @@
     const guidance = missing
       ? "Для цієї квартири немає доступного контакту. Перевірте оригінальне оголошення за посиланням у картці, якщо воно є."
       : limited ? "Не повторюйте запити поспіль. Поверніться після поновлення ліміту."
-      : unauthorized ? "Відкрийте бота та застосунок заново, щоб оновити авторизацію."
-      : delivery ? "Відкрийте чат із ботом і натисніть /start, потім повторіть запит."
+      : unauthorized ? "Відкрийте «Київ Радар» у Telegram повторно, щоб оновити вхід."
+      : delivery ? "У Telegram відкрийте чат «Київ Радар», натисніть «Старт» (/start) і повторіть запит."
       : "Перевірте з’єднання та спробуйте пізніше. Результат попереднього запиту не підтверджений.";
     showDialog({
       kicker: "Контакт не надіслано",
@@ -136,7 +137,7 @@
         guidance,
         "Номер не вигадуємо, а відсутність контакту не вважаємо успішною доставкою."
       ],
-      actions: unauthorized || delivery ? [{label: "Відкрити бота", url: BOT_URL, primary: true}] : []
+      actions: unauthorized || delivery ? [{label: "Відкрити «Київ Радар»", url: BOT_URL, primary: true}] : []
     });
   }
   window.krContactHandoff = contactHandoff;
@@ -146,10 +147,10 @@
     title: "Оголошення надсилаються через Telegram",
     paragraphs: [
       "Щоб подати квартиру, спочатку відкрийте «Київ Радар» у Telegram.",
-      "У боті натисніть /start, відкрийте застосунок, додайте правдиві характеристики й власні фотографії.",
+      "У Telegram натисніть «Старт» (/start), відкрийте каталог, додайте правдиві характеристики й власні фотографії.",
       "Заявку переглядає модератор. Публікація та перевірка права власності — різні дії; не обіцяємо автоматичного схвалення."
     ],
-    actions: [{label:"Відкрити бота",url:BOT_URL,primary:true}]
+    actions: [{label:"Відкрити «Київ Радар»",url:BOT_URL,primary:true}]
   });
 
   function updateStatus() {
@@ -168,7 +169,8 @@
       live: "не перевірено",
       static: "копія · не перевірено",
       cached: "копія · не перевірено",
-      loading: "завантаження…"
+      loading: "завантаження…",
+      error: "немає зв’язку з каталогом"
     };
     if (source) source.textContent = messages[mode] || messages.cached;
     if (retry) retry.hidden = mode === "live" || mode === "loading";
@@ -447,7 +449,7 @@
     }
     const hero = el("section","kr-hero"); hero.id = "krHero";
     const intro = el("div","kr-hero-copy");
-    intro.append(el("p","kr-hero-eyebrow","Оренда в умовах відключень"));
+    intro.append(el("p","kr-hero-eyebrow","Житло по суті"));
     intro.append(el("h1","","Квартира під ваші умови. Без здогадок."));
     intro.append(el("p","","Ціна, район і заявлені умови автономності. Перевірку кожного оголошення позначаємо окремо."));
     const actions = el("div","kr-hero-actions");

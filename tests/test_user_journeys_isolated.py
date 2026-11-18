@@ -20,7 +20,7 @@ Tested Scenarios:
    - Dispatches contact directly to tenant's Telegram chat ID
    - Handles Telegram Bot API confirmation (HTTP 200)
 4. Tenant Contact Delivery - Bot Blocked / Chat Not Found:
-   - Returns HTTP 502 with clear instructions to open @prostov_shrink_bot and press /start
+   - Returns HTTP 502 with clear branded instructions to open Kyiv Radar in Telegram
 """
 
 import os
@@ -75,6 +75,9 @@ def isolated_app():
         deals_data = [
             {
                 "id": 1,
+                "source": "Київ Радар (Пряма заявка)",
+                "submission_id": 101,
+                "moderationStatus": "approved",
                 "title": "1-кімнатна на Хрещатику",
                 "address": "вул. Хрещатик, 15",
                 "price": 20000,
@@ -86,6 +89,9 @@ def isolated_app():
             },
             {
                 "id": 2,
+                "source": "Київ Радар (Пряма заявка)",
+                "submission_id": 102,
+                "moderationStatus": "approved",
                 "title": "2-кімнатна на Подолі",
                 "address": "вул. Спаська, 10",
                 "price": 25000,
@@ -278,5 +284,6 @@ def test_tenant_contact_delivery_telegram_failure_handling(isolated_app):
         resp = client.post("/api/send_contact", json=req_payload)
         assert resp.status_code == 502
         data = resp.json()
-        assert "Не вдалося доставити контакт у ваш Telegram-чат" in data["detail"]
-        assert "@prostov_shrink_bot" in data["detail"]
+        assert "Не вдалося доставити контакт у Telegram" in data["detail"]
+        assert "Київ Радар" in data["detail"]
+        assert "@prostov_shrink_bot" not in data["detail"]

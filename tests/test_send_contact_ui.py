@@ -184,7 +184,8 @@ async def test_telegram_mode_error_unmasked():
         assert await dialog.is_visible()
         content = await dialog.inner_text()
         assert "не вдалося отримати контакт" in content.lower()
-        assert "@prostov_shrink_bot" in content or "Запустіть" in content
+        assert "Київ Радар" in content
+        assert "@prostov_shrink_bot" not in content
         assert "скопійовано" not in content, "Failure MUST NOT be masked by a false success!"
 
         await browser.close()
