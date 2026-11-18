@@ -26,7 +26,9 @@ jobs:
           python -m pip install -r server/requirements.txt pytest pytest-asyncio httpx playwright
           python -m playwright install --with-deps chromium
       - name: Validate Telegram native bridge JavaScript syntax
-        run: node --check telegram-shell.js
+        run: |
+          node --check telegram-shell.js
+          node --check kyiv-signal-theme.js
       - name: Compile backend modules
         run: python -m compileall -q server scripts
       - name: Audit public listings without promoting unverified claims
@@ -85,4 +87,5 @@ jobs:
             tests/test_photo_swipe.py \
             tests/test_listing_contact_v115.py \
             tests/test_send_contact_ui.py \
-            tests/test_telegram_fullscreen_v137.py
+            tests/test_telegram_fullscreen_v137.py \
+            tests/test_telegram_bottom_bar_v138.py
