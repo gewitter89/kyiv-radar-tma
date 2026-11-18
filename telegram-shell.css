@@ -1,0 +1,23 @@
+/* Kyiv Radar v1.37 — content-safe-area in Telegram's confirmed fullscreen.
+   Preserve native close/back/status controls; never visually cover them. */
+html.kr-telegram-fullscreen body {
+  padding-top: max(
+    var(--tg-content-safe-area-inset-top, 0px),
+    env(safe-area-inset-top, 0px)
+  ) !important;
+  padding-bottom: max(
+    var(--tg-content-safe-area-inset-bottom, 0px),
+    env(safe-area-inset-bottom, 0px)
+  ) !important;
+  padding-left: max(
+    var(--tg-content-safe-area-inset-left, 0px),
+    env(safe-area-inset-left, 0px)
+  ) !important;
+  padding-right: max(
+    var(--tg-content-safe-area-inset-right, 0px),
+    env(safe-area-inset-right, 0px)
+  ) !important;
+}
+html.kr-telegram-fullscreen body > header {
+  flex-shrink: 0 !important;
+}
