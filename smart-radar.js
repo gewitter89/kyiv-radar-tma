@@ -65,8 +65,9 @@
   function safeFilters(raw) {
     const x = raw && typeof raw === "object" ? raw : {};
     return {
-      rooms: [1, 2, 3].includes(x.rooms) ? x.rooms : null,
-      maxPrice: [15000, 20000].includes(x.maxPrice) ? x.maxPrice : null,
+      rooms: [1, 2, 3, 4, 5].includes(x.rooms) ? x.rooms : null,
+      maxPrice: Number.isSafeInteger(x.maxPrice) && x.maxPrice > 0 && x.maxPrice <= 1_000_000_000
+        ? x.maxPrice : null,
       generator: x.generator === true, gpon: x.gpon === true,
       lowFloor: x.lowFloor === true, pets: x.pets === true,
       favs: x.favs === true
@@ -85,7 +86,7 @@
     // Imported room-count conflicts are unknown, not safe filter matches.
     if (f.rooms != null && deal.roomConflict === true) return false;
     const rooms = typeof getDealRooms === "function" ? getDealRooms(deal) : null;
-    if (f.rooms != null && !(f.rooms === 3 ? rooms >= 3 : rooms === f.rooms)) return false;
+    if (f.rooms != null && !(f.rooms === 5 ? rooms >= 5 : rooms === f.rooms)) return false;
     if (f.maxPrice != null && !(Number(deal.price) <= f.maxPrice)) return false;
     if (f.generator && deal.generator !== true) return false;
     if (f.gpon && deal.gpon !== true) return false;
@@ -362,6 +363,7 @@
     open,
     addFromCard,
     compareCount: () => compareKeys.length,
+    refresh: () => { const panel=document.getElementById("smartRadarPanel"); if (panel && !panel.hidden) render(); },
   };
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
