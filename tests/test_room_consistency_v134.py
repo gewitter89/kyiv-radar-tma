@@ -142,3 +142,30 @@ def test_ambiguous_title_and_description_are_not_automatically_corrected():
     assert explicit_room_claims("Оренда 1-кімн / 2-кімн") == {1,2}
     assert has_room_conflict(2,"Оренда 1-кімн / 2-кімн")
     assert not has_room_conflict(None,"Студія","Окрема спальня")
+
+
+def test_mismatching_second_record_rolls_back_the_entire_private_batch(tmp_path):
+    import sqlite3
+    from datetime import datetime, timezone
+    private_grant={
+        "source_key":"agency_a","agreement_ref":"contract_2026",
+        "operator_rights_reviewed":True,"metadata_display_permitted":True,
+        "valid_until":"2027-06-30",
+        "allowed_source_hosts":["agency.example.ua"],
+        "full_snapshot_allowed":False,
+    }
+    agreement=tmp_path/"authorization.json"
+    agreement.write_text(json.dumps(private_grant),encoding="utf-8")
+    feed=tmp_path/"feed.jsonl"
+    first=row(external_id="synthetic-1",title="Двокімнатна квартира")
+    second=row(external_id="synthetic-2",
+               source_url="https://agency.example.ua/offer/synthetic-2",
+               rooms=1,title="2-кімнатна квартира")
+    feed.write_text("\n".join(json.dumps(x,ensure_ascii=False)
+                                for x in (first,second))+"\n",encoding="utf-8")
+    db=tmp_path/"private.sqlite"
+    with pytest.raises(ValueError,match="Room count conflicts"):
+        ingest(feed,agreement,db,now=datetime(2026,11,18,tzinfo=timezone.utc))
+    with sqlite3.connect(db) as conn:
+        assert conn.execute("SELECT COUNT(*) FROM inventory").fetchone()[0]==0
+        assert conn.execute("SELECT COUNT(*) FROM batches").fetchone()[0]==0
