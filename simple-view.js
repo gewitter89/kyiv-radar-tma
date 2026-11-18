@@ -49,6 +49,24 @@
       refresh(shell.isFullscreen());
       dialog.append(full);
     }
+    // Telegram's @username bar is the NATIVE minimized Mini App Bar.
+    // Provide a real close action instead of misleading fullscreen/CSS tricks.
+    // The button is available only to an authenticated native Telegram app.
+    if (shell?.canClose) {
+      const explanation = document.createElement("p");
+      explanation.textContent = "Щоб не залишати застосунок у нижній панелі Telegram, закрийте його повністю, а не згортайте. Незбережені дані форми можуть загубитися.";
+      explanation.style.cssText = "font-size:12px;line-height:1.5;color:#c1cede;margin:4px 0 10px;";
+      const close = createButton("Закрити застосунок повністю", () => {
+        const finished = shell.closeCompletely();
+        if (!finished) {
+          if (typeof showToast === "function") showToast("Не вдалося закрити. Закрийте застосунок через меню Telegram.");
+        }
+      });
+      close.id = "krTelegramCloseCompletely";
+      close.setAttribute("aria-label", "Повністю закрити Київ Радар, а не залишати у панелі Telegram");
+      close.style.cssText = "min-height:48px;background:#4c2530;color:#fff1f4;border:1px solid #b87b87;padding:10px 14px;border-radius:11px;font-size:13px;font-weight:700;width:100%;margin:0 0 12px;";
+      dialog.append(explanation, close);
+    }
     const done = createButton("Зрозуміло", () => dialog.close());
     done.style.cssText = "min-height:44px;background:#e5eeff;color:#152945;padding:9px 20px;border-radius:11px;font-size:14px;font-weight:700;width:100%;";
     dialog.append(done);
