@@ -121,3 +121,24 @@ def test_permissioned_yrl_adapter_passes_ephemeral_description(tmp_path):
     assert len(parsed)==1 and parsed[0]["description"]=="Однокімнатна квартира"
     with pytest.raises(ValueError,match="Room count conflicts"):
         normalise(parsed[0],PARTNER)
+
+
+def test_privacy_safe_integrity_audit_counts_disputes_without_text_leak():
+    from scripts.catalog_integrity import analyze_integrity
+    examples=[
+        {"id":1, "source":"OLX", "title":"Двокімнатна квартира",
+         "rooms":1,"desc":"Звертайтесь +380500001111"},
+        {"id":2, "source":"OLX", "title":"Оренда квартири",
+         "rooms":2,"desc":"Приватні умови, +380500002222"},
+    ]
+    report=analyze_integrity(examples)
+    assert report["room_conflict_count"]==1
+    assert report["room_conflict_ids_for_manual_review"]==[1]
+    public=json.dumps(report,ensure_ascii=False)
+    assert "+380" not in public and "Двокімнатна" not in public
+
+
+def test_ambiguous_title_and_description_are_not_automatically_corrected():
+    assert explicit_room_claims("Оренда 1-кімн / 2-кімн") == {1,2}
+    assert has_room_conflict(2,"Оренда 1-кімн / 2-кімн")
+    assert not has_room_conflict(None,"Студія","Окрема спальня")
