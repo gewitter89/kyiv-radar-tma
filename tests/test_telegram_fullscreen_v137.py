@@ -17,6 +17,8 @@ MOCK = r"""() => {
   window.__fullRequests = 0;
   window.__fullExits = 0;
   window.__closeCalls = 0;
+  window.__swipeDisables = 0;
+  window.__swipeEnables = 0;
   window.Telegram = {WebApp: {
     platform: 'android', initData: 'synthetic-test-init-only',
     isFullscreen: false,
@@ -28,6 +30,8 @@ MOCK = r"""() => {
       // Telegram confirms actual fullscreen asynchronously, not here.
     },
     close() { window.__closeCalls++; },
+    disableVerticalSwipes() { window.__swipeDisables++; },
+    enableVerticalSwipes() { window.__swipeEnables++; },
     exitFullscreen() {
       window.__fullExits++;
       this.isFullscreen = false;
@@ -178,4 +182,52 @@ async def test_close_action_not_exposed_to_an_ordinary_browser():
         await page.wait_for_function("document.querySelector('#krSimpleInfo') !== null")
         await page.locator("#krSimpleInfo").click()
         assert await page.locator("#krTelegramCloseCompletely").count() == 0
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_vertical_content_swipes_disabled_to_prevent_native_minimize_bar():
+    async with async_playwright() as pw:
+        browser=await pw.chromium.launch(headless=True)
+        page=await browser.new_page(viewport={"width":390,"height":844},is_mobile=True,has_touch=True)
+        await page.route("https://telegram.org/js/telegram-web-app.js",
+                         lambda route: route.abort())
+        await page.add_init_script(f'({MOCK})()')
+        await page.goto(URL,wait_until="domcontentloaded")
+        await page.wait_for_function("!!window.KyivRadarTelegramShell")
+        assert await page.evaluate("KyivRadarTelegramShell.swipeControl") is True
+        assert await page.evaluate("__swipeDisables") == 1
+        assert await page.evaluate("__swipeEnables") == 0
+        await page.locator("#krSimpleInfo").click()
+        control=page.locator("#krTelegramMinimizeSwipeToggle")
+        assert await control.is_visible()
+        assert await control.get_attribute("aria-pressed") == "true"
+        # Deliberate opt-out: let user swipe to minimize using webview area.
+        await control.click()
+        assert await page.evaluate("__swipeEnables") == 1
+        assert await control.get_attribute("aria-pressed") == "false"
+        assert await page.evaluate(
+            "localStorage.getItem('kr_tg_prevent_unintentional_minimize_v1')") == "off"
+        await page.reload(wait_until="domcontentloaded")
+        await page.wait_for_function("!!window.KyivRadarTelegramShell")
+        assert await page.evaluate("__swipeDisables") == 0
+        assert await page.evaluate("__swipeEnables") == 1
+        await page.locator("#krSimpleInfo").click()
+        await page.locator("#krTelegramMinimizeSwipeToggle").click()
+        assert await page.evaluate("__swipeDisables") == 1
+        assert await page.evaluate(
+            "localStorage.getItem('kr_tg_prevent_unintentional_minimize_v1')") == "on"
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_no_swipe_control_in_non_telegram_browser():
+    async with async_playwright() as pw:
+        browser=await pw.chromium.launch(headless=True)
+        page=await browser.new_page(viewport={"width":390,"height":844})
+        await page.goto(URL,wait_until="domcontentloaded")
+        await page.wait_for_function("!!window.KyivRadarTelegramShell")
+        assert await page.evaluate("KyivRadarTelegramShell.swipeControl") is False
+        await page.locator("#krSimpleInfo").click()
+        assert await page.locator("#krTelegramMinimizeSwipeToggle").count() == 0
         await browser.close()
