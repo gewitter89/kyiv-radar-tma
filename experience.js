@@ -34,8 +34,9 @@
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   }
   function closeDialog() {
-    const root = document.getElementById("krHandoff");
-    if (root) { root.hidden = true; root.replaceChildren(); }
+    // Never retain hidden overlays with duplicate IDs. They break keyboard
+    // focus, dialog selection and later contact-error accessibility.
+    document.querySelectorAll("#krHandoff").forEach(root => root.remove());
     document.removeEventListener("keydown", trapInDialog);
     lastDialogFocus?.focus?.();
   }
