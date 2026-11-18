@@ -67,6 +67,28 @@
       close.style.cssText = "min-height:48px;background:#4c2530;color:#fff1f4;border:1px solid #b87b87;padding:10px 14px;border-radius:11px;font-size:13px;font-weight:700;width:100%;margin:0 0 12px;";
       dialog.append(explanation, close);
     }
+    // Avoid accidentally creating Telegram's native minimized @username bar
+    // during an ordinary vertical scroll through listings and details.
+    // Native header drag is still handled entirely by Telegram.
+    if (shell?.swipeControl) {
+      const swipe = createButton("", () => {
+        const next = !shell.preventMinimizeChoice();
+        if (shell.setPreventMinimize(next)) {
+          updateSwipeLabel();
+        }
+      });
+      const updateSwipeLabel = () => {
+        const prevented = shell.preventMinimizeChoice();
+        swipe.textContent = prevented
+          ? "Дозволити згортання свайпом"
+          : "Заборонити випадкове згортання";
+        swipe.setAttribute("aria-pressed", String(prevented));
+      };
+      swipe.id = "krTelegramMinimizeSwipeToggle";
+      swipe.style.cssText = "min-height:44px;background:transparent;color:#dceaff;border:1px solid #5c7394;padding:9px 14px;border-radius:11px;font-size:13px;font-weight:650;width:100%;margin:0 0 12px;";
+      updateSwipeLabel();
+      dialog.append(swipe);
+    }
     const done = createButton("Зрозуміло", () => dialog.close());
     done.style.cssText = "min-height:44px;background:#e5eeff;color:#152945;padding:9px 20px;border-radius:11px;font-size:14px;font-weight:700;width:100%;";
     dialog.append(done);
