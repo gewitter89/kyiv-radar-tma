@@ -158,3 +158,61 @@ async def test_old_search_numeric_baseline_does_not_fake_new_matches():
         stored=await page.evaluate("JSON.parse(localStorage.getItem('kr_saved_searches_v1'))")
         assert isinstance(stored[0]["knownKeys"],list)
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_open_comparison_panel_immediately_hides_withdrawn_offer():
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width":390,"height":844})
+        await ready(page)
+        await page.evaluate("""() => KyivRadarSmart.addFromCard(LISTINGS[0].id)""")
+        await page.locator("#smartRadarOpen").click()
+        container=page.locator("#smartRadarComparison")
+        assert await container.get_by_text("Збережене порівняння недоступне").count() == 0
+        # A rights revocation or empty new API response removes this offer
+        # while the compare panel remains open.
+        await page.evaluate("""() => {
+          LISTINGS=[];
+          refreshFavoriteKeys();
+          renderAll();
+        }""")
+        assert await container.get_by_text("Збережене порівняння недоступне").is_visible()
+        assert await page.evaluate("KyivRadarSmart.compareCount()") == 1
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_saved_search_keeps_exact_four_and_five_plus_room_filters():
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width":390,"height":844})
+        await ready(page)
+        await page.evaluate("""() => {
+          const original=LISTINGS[0];
+          LISTINGS=[
+            {...original,id:44551,source:"synthetic-partner",rooms:4,
+             title:"FOUR ROOMS",url:"https://example.org/rooms/four",price:22000},
+            {...original,id:44552,source:"synthetic-partner",rooms:6,
+             title:"SIX ROOMS",url:"https://example.org/rooms/six",price:23000}
+          ];
+          refreshFavoriteKeys();
+          ACTIVE_FILTERS.rooms=4;
+          ACTIVE_FILTERS.maxPrice=25000;
+          searchQuery="";
+        }""")
+        await page.locator("#smartRadarOpen").click()
+        await page.get_by_role("button",name="Зберегти поточні фільтри").click()
+        assert "1 зараз підходить" in await page.inner_text("#smartRadarSearches")
+        snapshot=await page.evaluate("JSON.parse(localStorage.getItem('kr_saved_searches_v1'))")
+        assert snapshot[0]["criteria"]["filters"]["rooms"] == 4
+        assert snapshot[0]["criteria"]["filters"]["maxPrice"] == 25000
+        await page.evaluate("ACTIVE_FILTERS.rooms=5")
+        await page.get_by_role("button",name="Зберегти поточні фільтри").click()
+        assert await page.locator("#smartRadarSearches > div").count() == 2
+        snapshot=await page.evaluate("JSON.parse(localStorage.getItem('kr_saved_searches_v1'))")
+        assert snapshot[1]["criteria"]["filters"]["rooms"] == 5
+        assert len(snapshot[0]["knownKeys"]) == 1
+        assert len(snapshot[1]["knownKeys"]) == 1
+        assert snapshot[0]["knownKeys"][0] != snapshot[1]["knownKeys"][0]
+        await browser.close()
