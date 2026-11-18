@@ -154,7 +154,9 @@
     if (matches.length === 1 &&
         typeof window.openDealModalById === "function") {
       // Source identity is stable; refresh all visible claims and contacts
-      // from the new authorized row, never keep stale detail object.
+      // from the new authorized row, never keep stale detail object. Any
+      // draft report must be reopened after reviewing changed characteristics.
+      if (typeof closeReportModal === "function") closeReportModal();
       window.openDealModalById(matches[0].id);
       return;
     }
