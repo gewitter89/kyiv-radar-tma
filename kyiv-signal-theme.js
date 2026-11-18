@@ -5,8 +5,8 @@
   const KEY = "kr_theme_mode_v1";
   const MODES = ["dark", "light", "auto"];
   const COLORS = {
-    dark: {header:"#161E29", background:"#10151D"},
-    light: {header:"#EDF2F7", background:"#F5F7F9"}
+    dark: {header:"#161E29", background:"#10151D", bottom:"#0E2037"},
+    light: {header:"#EDF2F7", background:"#F5F7F9", bottom:"#EDF2F7"}
   };
   let mode = "dark";
   try {
@@ -39,6 +39,9 @@
     try {
       tg?.setHeaderColor?.(colors.header);
       tg?.setBackgroundColor?.(colors.background);
+      // The *open* Mini App bottom bar is a Telegram native surface.
+      // This is NOT the separate minimized-app tab, whose label is native.
+      tg?.setBottomBarColor?.(colors.bottom);
     } catch (_) { /* Telegram clients differ in supported API versions. */ }
     refreshButtons();
     return resolved;

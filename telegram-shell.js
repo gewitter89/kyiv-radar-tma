@@ -110,9 +110,10 @@
       tg.onEvent?.("contentSafeAreaChanged", sync);
       tg.onEvent?.("safeAreaChanged", sync);
     } catch (_) { /* no native event bridge; normal view is safe */ }
-    // The bot's @username in native UI cannot be hidden by page CSS. Ask
-    // Telegram to use its official immersive mode on eligible phones.
-    if (preference() !== "off") request();
+    // Historical v1.14 used Telegram.expand() without forcing fullscreen.
+    // Keep that stable launch shape by default. Fullscreen is opt-in only;
+    // remember an explicit user choice without changing backend auth.
+    if (preference() === "on") request();
   }
   window.KyivRadarTelegramShell = Object.freeze({
     supported, request, exit, listen, sync, canClose, closeCompletely,
