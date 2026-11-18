@@ -62,7 +62,8 @@ async def test_only_current_independent_availability_review_gets_timestamp():
         }""")
         passport=await open_passport(page)
         assert await passport.get_by_text("Дані частково перевірено").is_visible()
-        availability=passport.locator(".kr-passport-row").filter(has_text="Наявність")
+        availability=passport.locator(".kr-passport-row").filter(
+            has=passport.locator("dt.kr-passport-label").get_by_text("Наявність", exact=True))
         assert "Перевіряли" in await availability.inner_text()
         # Availability review must NOT certify independent room/price/ownership.
         room=passport.locator(".kr-passport-row").filter(has_text="Кімнатність")
@@ -73,7 +74,8 @@ async def test_only_current_independent_availability_review_gets_timestamp():
         }""")
         passport=page.locator("#krListingPassport")
         await passport.locator("summary").click()
-        availability=passport.locator(".kr-passport-row").filter(has_text="Наявність")
+        availability=passport.locator(".kr-passport-row").filter(
+            has=passport.locator("dt.kr-passport-label").get_by_text("Наявність", exact=True))
         assert "Не підтверджена" in await availability.inner_text()
         await browser.close()
 
