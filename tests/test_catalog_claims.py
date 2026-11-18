@@ -34,9 +34,24 @@ def test_json_and_embedded_catalogue_have_zero_fabricated_template_claims():
                 assert claim not in str(deal.get("desc", ""))
 
 
-def test_api_removes_historic_template_claims_when_disk_catalog_is_stale(monkeypatch):
+def test_historical_unlicensed_import_is_not_published_even_if_api_works(monkeypatch):
+    """A stale OLX import must not reach public JSON via a server-side fallback."""
     monkeypatch.setattr(api, "load_trusted_deals", lambda: [{
         "id": 7, "source": "OLX", "isOwnerVerified": False,
+        "desc": "Здається реальна квартира від власника без посередників. ",
+        "phone": "+380631234567", "ownerName": "private person",
+    }])
+    resp = TestClient(api.app).get("/api/deals")
+    assert resp.status_code == 200
+    assert resp.json()["deals"] == []
+
+
+def test_api_removes_templates_and_raw_phone_for_moderated_first_party(monkeypatch):
+    """Positive privacy regression uses a synthetic, approved direct submission."""
+    monkeypatch.setattr(api, "load_trusted_deals", lambda: [{
+        "id": 7, "source": "Київ Радар (Пряма заявка)",
+        "submission_id": 707, "moderationStatus": "approved",
+        "isOwnerVerified": False,
         "desc": "Здається реальна квартира від власника без посередників. "
                 "Оригінальна назва. "
                 "Повний комплект меблів та техніки, інтернет працює стабільно.",
@@ -44,7 +59,9 @@ def test_api_removes_historic_template_claims_when_disk_catalog_is_stale(monkeyp
     }])
     resp = TestClient(api.app).get("/api/deals")
     assert resp.status_code == 200
-    deal = resp.json()["deals"][0]
+    rows = resp.json()["deals"]
+    assert len(rows) == 1
+    deal = rows[0]
     assert deal["desc"] == "Оригінальна назва."
     assert deal["phone"] is None
     assert "ownerName" not in deal
