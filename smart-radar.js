@@ -151,9 +151,11 @@
   function markRead(id) {
     const item = searches.find(s => s.id === id);
     if (!item) return;
-    const updated = searches.map(s => s.id === id
-      ? { ...s, knownKeys: identitySet(matchesFor(item.criteria)) }
-      : s);
+    const updated = searches.map(s => {
+      if (s.id !== id) return s;
+      const { knownIds, ...clean } = s;
+      return { ...clean, knownKeys: identitySet(matchesFor(item.criteria)) };
+    });
     if (persist(SEARCH_KEY, updated)) { searches = updated; render(); }
   }
   function addCompare() {
