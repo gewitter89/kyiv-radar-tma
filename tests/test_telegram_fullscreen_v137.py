@@ -16,6 +16,7 @@ MOCK = r"""() => {
   window.__nativeEvents = handlers;
   window.__fullRequests = 0;
   window.__fullExits = 0;
+  window.__closeCalls = 0;
   window.Telegram = {WebApp: {
     platform: 'android', initData: 'synthetic-test-init-only',
     isFullscreen: false,
@@ -26,6 +27,7 @@ MOCK = r"""() => {
       window.__fullRequests++;
       // Telegram confirms actual fullscreen asynchronously, not here.
     },
+    close() { window.__closeCalls++; },
     exitFullscreen() {
       window.__fullExits++;
       this.isFullscreen = false;
@@ -142,4 +144,38 @@ async def test_native_request_failure_leaves_normal_view_usable():
         assert await page.locator("#krTelegramFullscreenToggle").is_visible()
         assert await page.locator("#krSimpleHelp").is_visible()
         assert await page.locator("#krHero").is_visible()
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_close_completely_calls_real_native_webapp_close_not_minimize():
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width":390,"height":844},is_mobile=True,has_touch=True)
+        await page.route("https://telegram.org/js/telegram-web-app.js",lambda route: route.abort())
+        await page.add_init_script(f'({MOCK})()')
+        await page.goto(URL,wait_until="domcontentloaded")
+        await page.wait_for_function("document.querySelector('#krSimpleInfo') !== null")
+        assert await page.evaluate("KyivRadarTelegramShell.canClose") is True
+        await page.locator("#krSimpleInfo").click()
+        btn=page.locator("#krTelegramCloseCompletely")
+        assert await btn.is_visible()
+        assert "Закрити застосунок повністю" in await btn.inner_text()
+        assert await page.evaluate("__closeCalls") == 0
+        await btn.click()
+        # Native bridge is stubbed; a real Telegram client closes the Mini App.
+        assert await page.evaluate("__closeCalls") == 1
+        assert await page.evaluate("__fullExits") == 0
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_close_action_not_exposed_to_an_ordinary_browser():
+    async with async_playwright() as pw:
+        browser=await pw.chromium.launch(headless=True)
+        page=await browser.new_page(viewport={"width":390,"height":844})
+        await page.goto(URL,wait_until="domcontentloaded")
+        await page.wait_for_function("document.querySelector('#krSimpleInfo') !== null")
+        await page.locator("#krSimpleInfo").click()
+        assert await page.locator("#krTelegramCloseCompletely").count() == 0
         await browser.close()
