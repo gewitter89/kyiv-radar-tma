@@ -141,16 +141,30 @@
     const modal = document.getElementById("dealModal");
     if (!modal || modal.classList.contains("hidden") ||
         typeof currentModalDeal === "undefined" || !currentModalDeal) return;
-    // If an API refresh recreated the catalog, the old object is no longer
-    // authoritative—even if an unrelated listing reused the numeric ID.
-    // Drop all potentially stale detail/contact actions immediately.
-    if (!Array.isArray(LISTINGS) || !LISTINGS.includes(currentModalDeal)) {
-      if (typeof closeReportModal === "function") closeReportModal();
-      if (typeof closeDealModal === "function") closeDealModal();
-      currentModalDeal = null;
-      if (typeof showToast === "function") {
-        showToast("Оголошення змінилося або стало недоступним. Оновіть пошук.");
-      }
+    // A redraw may replace JS objects while retaining the exact same,
+    // unique HTTPS source identity. Rehydrate that listing instead of
+    // closing a legitimate detail modal mid-interaction. NEVER use the
+    // transient numeric ID to select a replacement.
+    const current = Array.isArray(LISTINGS) ? LISTINGS : [];
+    if (current.includes(currentModalDeal)) return;
+    const key = typeof window.favoriteKey === "function"
+      ? window.favoriteKey(currentModalDeal) : null;
+    const matches = key ? current.filter(item =>
+      window.favoriteKey(item) === key) : [];
+    if (matches.length === 1 &&
+        typeof window.openDealModalById === "function") {
+      // Source identity is stable; refresh all visible claims and contacts
+      // from the new authorized row, never keep stale detail object.
+      window.openDealModalById(matches[0].id);
+      return;
+    }
+    // Withdrawn, malformed, duplicate or replaced source: close both the
+    // details and pending report rather than exposing stale contact actions.
+    if (typeof closeReportModal === "function") closeReportModal();
+    if (typeof closeDealModal === "function") closeDealModal();
+    currentModalDeal = null;
+    if (typeof showToast === "function") {
+      showToast("Оголошення змінилося або стало недоступним. Оновіть пошук.");
     }
   }
 
