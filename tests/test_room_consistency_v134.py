@@ -48,7 +48,7 @@ def test_explicit_ukrainian_and_russian_labels(text,count):
 
 @pytest.mark.parametrize("text", [
     "Окрема спальня", "студія", "смарт-квартира",
-    "2-х санвузлів", "2 поверх", "35 м²", "2-кімн у сусідньому будинку"[:0]
+    "2-х санвузлів", "2 поверх", "35 м²"
 ])
 def test_do_not_guess_rooms_from_amenities(text):
     assert explicit_room_claims(text) == set()
