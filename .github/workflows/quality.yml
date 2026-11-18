@@ -88,4 +88,5 @@ jobs:
             tests/test_listing_contact_v115.py \
             tests/test_send_contact_ui.py \
             tests/test_telegram_fullscreen_v137.py \
-            tests/test_telegram_bottom_bar_v138.py
+            tests/test_telegram_bottom_bar_v138.py \
+            tests/test_telegram_branding.py
