@@ -1,5 +1,14 @@
 # Telegram Mini App branding: native minimized bar, no token rotation
 
+## Telegram Desktop source-backed footer behavior (v1.39)
+
+Verified against official `telegramdesktop/tdesktop` source:
+- `inline_bots/bot_attach_web_view.cpp` passes `.bottom = rpl::single('@' + _bot->username())`.
+- `ui/chat/attach/attach_bot_webview.cpp` hides the native footer if `_fullscreen.current()`, via `_webviewBottom->setVisible(!any && !_fullscreen.current() && !_layerShown)`.
+- Telegram Desktop supports the `web_app_request_fullscreen` bridge event; v1.39 now requests native fullscreen on the `tdesktop` platform (only on supported clients), with an opt-out in `ⓘ Про дані`. This may enlarge the whole Telegram Mini App window; exiting restores the username bar.
+- UI-only Playwright mocks verify the request and opt-out. They **do not prove** actual Telegram Desktop window rendering: verify on a real Desktop client.
+- Mobile launch behavior and backend auth remain unchanged.
+
 ## Verified distinction
 
 - The HTML browser title is **Київ Радар** (short legacy title restored).
