@@ -194,3 +194,55 @@ async def test_api_revocation_closes_stale_open_detail_and_report():
         assert await page.locator("#reportModal").is_hidden()
         assert await page.evaluate("currentModalDeal === null") is True
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_same_unique_source_url_rebinds_live_detail_without_stale_contact():
+    """A redraw with the SAME public identity may update its catalog ID."""
+    async with async_playwright() as pw:
+        browser=await pw.chromium.launch(headless=True)
+        page=await browser.new_page(viewport={"width":390,"height":844})
+        await ready(page)
+        await open_passport(page)
+        result=await page.evaluate("""() => {
+          const old=currentModalDeal;
+          const oldKey=favoriteKey(old);
+          if (!oldKey) throw Error('Missing synthetic stable source URL');
+          const changed={...old,id:999991,price:old.price+111};
+          LISTINGS=LISTINGS.map(d => d===old?changed:d);
+          refreshFavoriteKeys();
+          renderAll();
+          return {
+            oldKey,
+            nextKey:favoriteKey(currentModalDeal),
+            id:currentModalDeal?.id,
+            price:currentModalDeal?.price,
+            expectedPrice:changed.price,
+            modalOpen:!document.getElementById('dealModal').classList.contains('hidden')
+          };
+        }""")
+        assert result["oldKey"] == result["nextKey"]
+        assert result["id"] == 999991
+        assert result["price"] == result["expectedPrice"]
+        assert result["modalOpen"]
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_source_identity_changed_same_numeric_id_never_rebinds():
+    async with async_playwright() as pw:
+        browser=await pw.chromium.launch(headless=True)
+        page=await browser.new_page(viewport={"width":390,"height":844})
+        await ready(page)
+        await open_passport(page)
+        await page.evaluate("""() => {
+          const old=currentModalDeal;
+          const fake={...old,title:"DIFFERENT HOME",source:"new-partner",
+                     url:"https://example.org/offer/unrelated"};
+          LISTINGS=LISTINGS.map(d => d===old?fake:d);
+          refreshFavoriteKeys();
+          renderAll();
+        }""")
+        assert await page.locator("#dealModal").is_hidden()
+        assert await page.evaluate("currentModalDeal === null") is True
+        await browser.close()
