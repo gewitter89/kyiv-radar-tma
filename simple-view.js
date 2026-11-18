@@ -42,14 +42,22 @@
       full.id = "krTelegramFullscreenToggle";
       full.style.cssText = "min-height:44px;background:transparent;color:#dceaff;border:1px solid #5c7394;padding:9px 14px;border-radius:11px;font-size:13px;font-weight:650;width:100%;margin:4px 0 12px;";
       const refresh = active => {
-        full.textContent = active ? "Повернути звичайний вигляд" : "Відкрити на весь екран";
+        full.textContent = active ? "Повернути звичайний вигляд" :
+          shell.nativeDesktop ? "Приховати підпис бота · повний екран" :
+          "Відкрити на весь екран";
         full.setAttribute("aria-pressed", String(active));
       };
       shell.listen(refresh);
       refresh(shell.isFullscreen());
       dialog.append(full);
+      if (shell.nativeDesktop) {
+        const hint = document.createElement("p");
+        hint.textContent = "У Telegram Desktop системний підпис @username видно у звичайному вікні. Повноекранний режим приховує його; повернення до звичайного вікна знову покаже підпис.";
+        hint.style.cssText = "font-size:12px;line-height:1.5;color:#c1cede;margin:0 0 10px";
+        dialog.append(hint);
+      }
     }
-    // Telegram's @username bar is the NATIVE minimized Mini App Bar.
+    // Telegram's native username surfaces are not HTML/CSS elements.
     // Provide a real close action instead of misleading fullscreen/CSS tricks.
     // The button is available only to an authenticated native Telegram app.
     if (shell?.canClose) {

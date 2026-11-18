@@ -309,3 +309,97 @@ async def test_fullscreen_remains_opt_in_across_relaunch_not_forced_on_first_ope
         await page.wait_for_function("!!window.KyivRadarTelegramShell")
         assert await page.evaluate("__fullRequests") == 1
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_telegram_desktop_requests_real_fullscreen_to_hide_native_footer():
+    # Telegram Desktop source renders '@'+bot.username as a native footer
+    # only outside fullscreen; our WebApp requests the real native mode.
+    desktop_mock = MOCK.replace("platform: 'android'", "platform: 'tdesktop'")
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 400, "height": 900})
+        await page.route("https://telegram.org/js/telegram-web-app.js",
+                         lambda route: route.abort())
+        await page.add_init_script(f'({desktop_mock})()')
+        await page.goto(URL, wait_until="domcontentloaded")
+        await page.wait_for_function("!!window.KyivRadarTelegramShell")
+        assert await page.evaluate("KyivRadarTelegramShell.nativeDesktop") is True
+        assert await page.evaluate("KyivRadarTelegramShell.supported") is True
+        assert await page.evaluate("__fullRequests") == 1
+        assert await page.evaluate("__swipeDisables") == 0
+        # Don't fake success before Telegram confirms the actual native mode.
+        assert not await page.evaluate(
+            "document.documentElement.classList.contains('kr-telegram-fullscreen')")
+        await page.evaluate("""() => {
+            Telegram.WebApp.isFullscreen = true;
+            __nativeEvents.fullscreenChanged();
+        }""")
+        assert await page.evaluate(
+            "document.documentElement.classList.contains('kr-telegram-fullscreen')")
+        await page.locator("#krSimpleInfo").click()
+        button = page.locator("#krTelegramFullscreenToggle")
+        assert await button.is_visible()
+        assert "Повернути звичайний вигляд" in await button.inner_text()
+        assert await page.locator("#krSimpleHelp").get_by_text(
+            "системний підпис @username", exact=False).is_visible()
+        await button.click()
+        assert await page.evaluate("__fullExits") == 1
+        assert await page.evaluate(
+            "localStorage.getItem('kr_tg_fullscreen_choice_v1')") == "off"
+        await page.reload(wait_until="domcontentloaded")
+        await page.wait_for_function("!!window.KyivRadarTelegramShell")
+        assert await page.evaluate("__fullRequests") == 0
+        await page.locator("#krSimpleInfo").click()
+        button = page.locator("#krTelegramFullscreenToggle")
+        assert "Приховати підпис бота" in await button.inner_text()
+        await button.click()
+        assert await page.evaluate("__fullRequests") == 1
+        assert await page.evaluate(
+            "localStorage.getItem('kr_tg_fullscreen_choice_v1')") == "on"
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_telegram_web_and_unsupported_desktop_do_not_force_fullscreen():
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(headless=True)
+        for platform in ("web", "desktop", "unknown"):
+            page = await browser.new_page(viewport={"width": 400, "height": 900})
+            await page.route("https://telegram.org/js/telegram-web-app.js",
+                             lambda route: route.abort())
+            platform_mock = MOCK.replace("platform: 'android'",
+                                         "platform: '" + platform + "'")
+            await page.add_init_script(f'({platform_mock})()')
+            await page.goto(URL, wait_until="domcontentloaded")
+            await page.wait_for_function("!!window.KyivRadarTelegramShell")
+            assert await page.evaluate("__fullRequests") == 0
+            assert await page.evaluate("KyivRadarTelegramShell.supported") is False
+            await page.close()
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_telegram_desktop_rejected_fullscreen_keeps_usable_ordinary_window():
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 400, "height": 900})
+        await page.route("https://telegram.org/js/telegram-web-app.js",
+                         lambda route: route.abort())
+        await page.add_init_script("""(() => {
+          window.Telegram = {WebApp: {
+            platform:'tdesktop', initData:'test', isFullscreen:false,
+            ready(){}, expand(){}, onEvent(){}, setHeaderColor(){},
+            setBackgroundColor(){}, requestFullscreen(){
+              throw Error('not supported on this desktop build');
+            }
+          }};
+        })()""")
+        await page.goto(URL, wait_until="domcontentloaded")
+        await page.wait_for_function("!!window.KyivRadarTelegramShell")
+        assert await page.evaluate("KyivRadarTelegramShell.supported") is True
+        assert not await page.evaluate(
+            "document.documentElement.classList.contains('kr-telegram-fullscreen')")
+        assert await page.locator("#krSimpleInfo").is_visible()
+        assert await page.locator("#krHero").is_visible()
+        await browser.close()
