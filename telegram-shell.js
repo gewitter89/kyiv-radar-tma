@@ -11,6 +11,19 @@
     ["ios", "android"].includes(String(tg.platform || "").toLowerCase()) &&
     typeof tg.initData === "string" && tg.initData.length > 0);
   const listeners = new Set();
+  // Native close removes the Mini App session. A swipe to minimize instead
+  // leaves Telegram's own Mini App Bar with the bot @username visible.
+  // Never attempt to manipulate Telegram's native bar with CSS.
+  const canClose = !!(tg && typeof tg.close === "function" &&
+    typeof tg.initData === "string" && tg.initData.length > 0);
+  function closeCompletely() {
+    if (!canClose) return false;
+    try {
+      // Only call from an explicit "Close app" button user gesture.
+      tg.close();
+      return true;
+    } catch (_) { return false; }
+  }
 
   function preference() {
     try { return localStorage.getItem(KEY); } catch (_) { return null; }
@@ -69,7 +82,7 @@
     if (preference() !== "off") request();
   }
   window.KyivRadarTelegramShell = Object.freeze({
-    supported, request, exit, listen, sync,
+    supported, request, exit, listen, sync, canClose, closeCompletely,
     isFullscreen: () => !!(supported && tg.isFullscreen === true)
   });
   if (document.readyState === "loading") {
