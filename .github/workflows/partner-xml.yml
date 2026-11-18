@@ -8,6 +8,8 @@ on:
       - "scripts/partner_yrl.py"
       - "tests/test_partner_yrl_v127a.py"
       - "scripts/market_inventory.py"
+      - "scripts/room_claims.py"
+      - "tests/test_room_consistency_v134.py"
       - "scripts/source_rights.py"
       - "server/partner_visibility.py"
       - "server/partner_publication.py"
@@ -29,14 +31,20 @@ jobs:
   partner-xml-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 8
+    env:
+      APP_ENV: test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Block historical records in publishable source
+        run: python scripts/check_public_distribution.py
+      - name: Generate disposable synthetic browser test catalog
+        run: python scripts/prepare_ci_fixtures.py
       - name: Install isolated test dependencies (no provider calls)
         run: python -m pip install -r server/requirements.txt pytest httpx
       - name: Compile strict parser
-        run: python -m compileall -q scripts/partner_xml.py scripts/partner_yrl.py scripts/market_inventory.py scripts/source_rights.py server/partner_visibility.py server/partner_publication.py
+        run: python -m compileall -q scripts/partner_xml.py scripts/partner_yrl.py scripts/market_inventory.py scripts/room_claims.py scripts/source_rights.py server/partner_visibility.py server/partner_publication.py
       - name: Run XML and legacy bulk intake regression tests
-        run: python -m pytest -q tests/test_partner_xml_v123.py tests/test_partner_yrl_v127a.py tests/test_market_inventory_v122.py tests/test_source_rights_v124.py tests/test_partner_visibility_v125.py tests/test_partner_publication_v126.py
+        run: python -m pytest -q tests/test_partner_xml_v123.py tests/test_partner_yrl_v127a.py tests/test_room_consistency_v134.py tests/test_market_inventory_v122.py tests/test_source_rights_v124.py tests/test_partner_visibility_v125.py tests/test_partner_publication_v126.py

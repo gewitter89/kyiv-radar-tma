@@ -46,7 +46,7 @@
     if (query && !haystack.includes(query)) return false;
     // Imported room-count conflicts are unknown, not safe filter matches.
     if (f.rooms != null && deal.roomConflict === true) return false;
-    const rooms = Number(deal.rooms || (typeof getDealRooms === "function" ? getDealRooms(deal) : 0));
+    const rooms = typeof getDealRooms === "function" ? getDealRooms(deal) : null;
     if (f.rooms != null && !(f.rooms === 3 ? rooms >= 3 : rooms === f.rooms)) return false;
     if (f.maxPrice != null && !(Number(deal.price) <= f.maxPrice)) return false;
     if (f.generator && deal.generator !== true) return false;
@@ -178,7 +178,7 @@
       const card = elem("div", "rounded-2xl bg-[#252528] border border-white/10 p-3 space-y-2");
       card.append(elem("p", "text-sm font-semibold text-white", d.title || d.address || "Квартира"));
       const lines = [
-        formatPrice(d.price), d.rooms ? d.rooms + " кімн." : "Кімнати не вказані",
+        formatPrice(d.price), d.roomConflict ? "Кімнатність уточнюється" : (d.rooms ? d.rooms + " кімн." : "Кімнати не вказані"),
         d.area ? d.area + " м²" : "Площа не вказана",
         "Генератор у будинку: " + (d.generator ? "заявлено" : "не вказано"),
         "Інтернет під час відключень: " + (d.gpon ? "заявлено" : "не вказано"),
