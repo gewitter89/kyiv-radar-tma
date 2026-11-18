@@ -7,15 +7,19 @@
   const KEY = "kr_tg_fullscreen_choice_v1";
   const root = document.documentElement;
   const tg = window.Telegram?.WebApp;
-  const supported = !!(tg && typeof tg.requestFullscreen === "function" &&
+  // A keyboard-button/inline launch can be a real Telegram WebView with
+  // empty initData. Never use signed auth data as a UX bridge feature gate.
+  // Platform + official native WebApp methods are sufficient for these
+  // non-privileged client-side UI operations; backend auth stays unchanged.
+  const nativeMobile = !!(tg &&
     ["ios", "android"].includes(String(tg.platform || "").toLowerCase()) &&
-    typeof tg.initData === "string" && tg.initData.length > 0);
+    typeof tg.ready === "function");
+  const supported = nativeMobile && typeof tg.requestFullscreen === "function";
   const listeners = new Set();
   const SWIPE_KEY = "kr_tg_prevent_unintentional_minimize_v1";
-  const swipeControl = !!(tg && typeof tg.disableVerticalSwipes === "function" &&
-    typeof tg.enableVerticalSwipes === "function" &&
-    ["ios", "android"].includes(String(tg.platform || "").toLowerCase()) &&
-    typeof tg.initData === "string" && tg.initData.length > 0);
+  const swipeControl = nativeMobile &&
+    typeof tg.disableVerticalSwipes === "function" &&
+    typeof tg.enableVerticalSwipes === "function";
 
   function preventMinimizeChoice() {
     // User specifically wants to avoid the native minimized @username bar.
@@ -36,8 +40,7 @@
   // Native close removes the Mini App session. A swipe to minimize instead
   // leaves Telegram's own Mini App Bar with the bot @username visible.
   // Never attempt to manipulate Telegram's native bar with CSS.
-  const canClose = !!(tg && typeof tg.close === "function" &&
-    typeof tg.initData === "string" && tg.initData.length > 0);
+  const canClose = nativeMobile && typeof tg.close === "function";
   function closeCompletely() {
     if (!canClose) return false;
     try {
