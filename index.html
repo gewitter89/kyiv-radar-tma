@@ -1835,7 +1835,7 @@
                         const reason = typeof data.detail === 'string'
                             ? data.detail.slice(0, 240)
                             : res.status === 502
-                                ? "Запустіть бота @prostov_shrink_bot (/start)"
+                                ? "Відкрийте чат бота застосунку в Telegram і натисніть /start"
                                 : "Не вдалося отримати відповідь сервера";
                         const contactMessage = res.status === 404
                             ? 'Контакт цього оголошення поки недоступний. Перевірте оригінал у картці.'
@@ -1876,7 +1876,7 @@
                 if (typeof window.krContactHandoff === "function") {
                     window.krContactHandoff(deal.id, deal.title);
                 } else {
-                    showToast("Відкрийте @prostov_shrink_bot у Telegram та знайдіть це оголошення");
+                    showToast("Відкрийте чат бота застосунку в Telegram та знайдіть це оголошення");
                 }
                 return;
             }
@@ -2452,7 +2452,7 @@
         function openLandlordModal() {
             if (!window.Telegram?.WebApp?.initData) {
                 if (typeof window.krLandlordHandoff === "function") window.krLandlordHandoff();
-                else showToast('Для подання заявки відкрийте Київ Радар через @prostov_shrink_bot');
+                else showToast('Для подання заявки відкрийте Київ Радар через Telegram-бота');
                 return;
             }
             document.getElementById('landlordModal').classList.remove('hidden');
@@ -2602,7 +2602,7 @@
             }
             const initData = window.Telegram?.WebApp?.initData || '';
             if (!initData) {
-                showToast('Подати оголошення можна через @prostov_shrink_bot у Telegram');
+                showToast('Подати оголошення можна після відкриття застосунку через Telegram-бота');
                 return;
             }
             if (landlordSubmitPending) return;
@@ -2702,7 +2702,7 @@
     <script src="./premium-polish.js?v=1.12.0"></script>
     <script src="./compact-masthead.js?v=1.10.0"></script>
     <script src="./unified-toolbar.js?v=1.12.0"></script>
-    <script src="./kyiv-signal-theme.js?v=1.14.0"></script>
+    <script src="./kyiv-signal-theme.js?v=1.38.0"></script>
     <script src="./kyiv-smart-filters.js?v=1.29.1"></script>
 
     <!-- ==========================================
