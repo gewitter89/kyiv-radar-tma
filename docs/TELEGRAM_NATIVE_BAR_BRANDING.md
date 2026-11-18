@@ -29,7 +29,7 @@ From the owning Telegram account open [@BotFather](https://t.me/BotFather), run 
 
 1. **Edit Bot → Name**: should be `Київ Радар`.
 2. **Configure Mini App / Edit Mini App**: check the actual Mini App title and launch link; use `Київ Радар` as the title without changing URL.
-3. **Username**: if the Telegram client explicitly shows `@prostov_shrink_bot` in its native minimized tab, changing **display name** may not remove it. Username changes require bot-owner control through BotFather and can break old links, so must be planned, not guessed.
+3. **Username**: if Telegram explicitly shows `@prostov_shrink_bot` in the native minimized tab, changing **display name** will not change that username. Telegram documents that an existing bot's username cannot normally be changed later. Eliminating this identifier may require a **new bot plus a controlled migration** (links, users, server integration) or special intervention from Telegram Support. Neither is authorized or performed here.
 4. Reopen from the same launch route; compare the expanded app against the minimized bar on real Telegram Android/iOS.
 
 A browser automation test cannot certify a native minimized tab's appearance. Do not mark this issue resolved on CI alone.
