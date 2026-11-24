@@ -1,7 +1,7 @@
 import json
 import pytest
 from scripts.prozorro_target_probe import inspect, BASE
-from test_prozorro_auction_candidates import payload
+from test_prozorro_auction_candidates import payload, NOW
 
 PID = "a"*24
 AID = "ALE001-UA-20261124-00000"
@@ -13,10 +13,10 @@ def test_schema_flags_without_private_fields():
     def request(url):
         assert url == BASE+PID
         return json.dumps(p).encode()
-    result = inspect(procedure_id=PID, auction_id=AID, request_fn=request)
+    result = inspect(procedure_id=PID, auction_id=AID, request_fn=request, now=NOW)
     assert result["identity_confirmed"] and result["ale_method"]
     assert result["cav_apartment"] and result["kyiv_locality"]
-    assert not result["current_adapter_accepts"]
+    assert result["current_adapter_accepts"]
     assert result["publications"] == 0
     assert "PRIVATE" not in repr(result)
 
