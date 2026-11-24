@@ -1057,10 +1057,35 @@
         // Public catalog never upgrades archived open-source imports into live offers.
         // Genuine permissioned partner + owner items require evidence-backed backend review.
         function approvedHostedListing(item) {
-            if (!item || typeof item !== 'object') return false;
+            if (!item || typeof item !== 'object' || Array.isArray(item)) return false;
+            // An older live API may still serve an unlicensed source with a
+            // forged "verified" flag. Only the backend's reviewed owner/partner
+            // source identities can appear, never arbitrary source labels.
             const source = String(item.source || '').trim().toLowerCase();
-            if (['olx', 'dom.ria', 'dim.ria', 'dim_ria'].includes(source)) return false;
-            if (item.verificationStatus === 'imported') return false;
+            const owner = source === 'київ радар (пряма заявка)';
+            const partner = /^partner:[a-z0-9][a-z0-9_.-]{1,63}$/.test(source);
+            if (!owner && !partner) return false;
+            if (item.verificationStatus === 'imported' || item.fixtureOnly === true) return false;
+            // Old backend versions must not leak raw contact information via
+            // the listing object. Reject the record rather than rendering it.
+            if (item.phone != null || item.phoneRaw != null ||
+                item.ownerName != null || item.reporter_info != null) return false;
+            if (partner) {
+                // The approved partner export currently contains NO images:
+                // photograph republication has not been granted by default.
+                if (item.phoneMasked != null ||
+                    (item.images != null && (!Array.isArray(item.images) || item.images.length))) return false;
+                try {
+                    const original = new URL(item.url);
+                    if (original.protocol !== 'https:' || original.username || original.password) return false;
+                } catch (_) { return false; }
+            } else if (item.images != null) {
+                // Owner photos can only be served by our moderated media gate.
+                if (!Array.isArray(item.images) || !item.images.every(url =>
+                    typeof url === 'string' &&
+                    /^https:\/\/vmi3445944\.contaboserver\.net\/api\/media\/[0-9a-f]{32}$/.test(url)
+                )) return false;
+            }
             return item.actualityConfirmed === true && item.reviewedByRadar === true;
         }
 
