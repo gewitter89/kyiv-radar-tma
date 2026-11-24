@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Fail-closed source rights regression for all shared public server read paths."""
+import sqlite3
 from fastapi.testclient import TestClient
 
 from server import kyiv_radar_api as api
@@ -38,7 +39,12 @@ def test_legacy_never_reaches_catalog_health_or_contact(monkeypatch):
     assert contacted.status_code == 404
 
 
-def test_moderated_direct_submission_is_retained_and_sanitized(monkeypatch):
+def test_moderated_direct_submission_is_retained_and_sanitized(monkeypatch, tmp_path):
+    db = tmp_path / "owner_status.sqlite"
+    with sqlite3.connect(db) as conn:
+        conn.execute("CREATE TABLE landlord_submissions (id INTEGER PRIMARY KEY, status TEXT NOT NULL)")
+        conn.execute("INSERT INTO landlord_submissions VALUES (222, 'published')")
+    monkeypatch.setattr(api, "DB_PATH", str(db))
     synthetic = {"id": 778, "source": "Київ Радар (Пряма заявка)",
                  "submission_id": 222, "moderationStatus": "approved",
                  "title": "Synthetic owner listing", "price": 10000,
