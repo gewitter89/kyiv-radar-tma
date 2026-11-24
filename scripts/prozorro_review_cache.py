@@ -7,6 +7,7 @@ import json
 import os
 import re
 import sqlite3
+import stat
 from datetime import timedelta
 from pathlib import Path
 
@@ -15,6 +16,9 @@ from .prozorro_auction_candidates import candidate, _aware, _utc, MAX_FRESHNESS
 ROOT = Path(__file__).resolve().parents[1]
 ID = re.compile(r"CSE001-UA-[0-9]{8}-[0-9]{5}")
 MAX_ROWS = 30
+MAX_CACHE_ROWS = 2000
+MAX_DB_BYTES = 16 * 1024 * 1024
+RETAIN = timedelta(days=2)
 SCHEMA = """CREATE TABLE IF NOT EXISTS auction_review (
     auction_id TEXT PRIMARY KEY,
     modified TEXT NOT NULL,
@@ -27,7 +31,7 @@ def _stamp(dt):
     return _aware(dt).isoformat(timespec="microseconds")
 
 
-def _connect(directory):
+def private_directory(directory):
     # Only a dedicated, pre-existing private directory, never the public repo.
     directory = Path(directory)
     if directory.is_symlink():
@@ -35,20 +39,30 @@ def _connect(directory):
     directory = directory.resolve()
     if directory.is_relative_to(ROOT) or not directory.is_dir():
         raise ValueError("Private directory required")
-    if os.name != "posix" or directory.stat().st_mode & 0o077:
-        raise ValueError("Private directory mode 0700 required")
+    info = directory.stat()
+    if os.name != "posix" or info.st_mode & 0o077 or info.st_uid != os.geteuid():
+        raise ValueError("Owned private directory mode 0700 required")
+    return directory
+
+
+def _connect(directory):
+    directory = private_directory(directory)
     path = directory / "auction-review.sqlite"
     flags = os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW
     fd = os.open(path, flags, 0o600)
     try:
-        import stat
         info = os.fstat(fd)
-        if not stat.S_ISREG(info.st_mode) or info.st_mode & 0o077 or info.st_nlink != 1:
+        if (not stat.S_ISREG(info.st_mode) or info.st_mode & 0o077 or info.st_nlink != 1
+                or info.st_uid != os.geteuid() or info.st_size > MAX_DB_BYTES):
             raise ValueError("Private regular database required")
     finally:
         os.close(fd)
     conn = sqlite3.connect(path, timeout=3)
     try:
+        page_size = conn.execute("PRAGMA page_size").fetchone()[0]
+        if page_size <= 0 or page_size > MAX_DB_BYTES:
+            raise ValueError("Invalid database page size")
+        conn.execute(f"PRAGMA max_page_count={MAX_DB_BYTES // page_size}")
         conn.execute(SCHEMA)
     except Exception:
         conn.close()
@@ -87,6 +101,8 @@ def apply_page(directory, procedures, *, observed_at, now):
     try:
         with conn:
             conn.execute("BEGIN IMMEDIATE")
+            # Keep withdrawal markers longer than the accepted feed lookback.
+            conn.execute("DELETE FROM auction_review WHERE observed < ?", (_stamp(now - RETAIN),))
             for key, (modified, result) in updates.items():
                 existing = conn.execute(
                     "SELECT modified, observed, payload FROM auction_review WHERE auction_id=?",
@@ -108,6 +124,8 @@ def apply_page(directory, procedures, *, observed_at, now):
                     "ON CONFLICT(auction_id) DO UPDATE SET modified=excluded.modified,"
                     "observed=excluded.observed,payload=excluded.payload",
                     (key, modified, _stamp(observed), data))
+            if conn.execute("SELECT COUNT(*) FROM auction_review").fetchone()[0] > MAX_CACHE_ROWS:
+                raise ValueError("Private cache row limit exceeded")
         return {"observations": len(procedures), "publications": 0}
     finally:
         conn.close()
