@@ -13,7 +13,7 @@ URL = (Path(__file__).resolve().parents[1] / "index.html").as_uri()
 BAD = "https://qa-images.example.test/photo-failed.png"
 GOOD = "https://qa-images.example.test/photo-loaded.png"
 PNG = base64.b64decode(
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/RqwAAAAASUVORK5CYII="
+    "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGOUsIhiYGBgYmBgYGBgAAAH4ACufvx7kQAAAABJRU5ErkJggg=="
 )
 
 
