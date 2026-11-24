@@ -37,3 +37,25 @@ fake apartments or blindly deploy new catalog files.
   Do not claim a successful live audit without its actual workflow result.
 
 No new hosting, paid API keys, production writes or private data.
+
+## v1.48 observed event behavior and fallback
+
+On 24 Nov 2026, the GitHub Pages workflow for commit
+`8d112b16a52d2fc8a9b341704c7441672f2821c1` completed successfully,
+but the GitHub Actions run list contained **zero** `workflow_run` events
+afterwards. The Pages job uses GitHub's generated `dynamic` event. We
+must therefore treat the new `workflow_run` trigger as **unverified for this
+repository**, not as proof of automatic live monitoring.
+
+The v1.48 change adds a read-only `push` trigger on `main`, scoped to
+published HTML, JS, CSS, static catalog, monitoring code and monitoring
+workflow changes. It will run even if the Pages-generated dynamic event
+does not invoke `workflow_run`. The daily check and manual run remain.
+
+A push-triggered check is **not an atomic post-deploy attestation**: it may
+run before the Pages CDN has served the new commit. A successful run
+confirms only the public invariants observed at the time of that run.
+A failed run may be caused by a real privacy/source violation, a stale
+CDN response or temporary network/API unavailability. Investigate and
+repeat after the Pages deployment; never overwrite production data merely
+to make a green check.
