@@ -380,7 +380,7 @@
                 <svg class="w-3 h-3 text-[#0a84ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
                 <span id="sortFilterLabel">Сортування ⌄</span>
             </button>
-            <button onclick="setFilter('all')" id="filterAll" class="px-2.5 py-1 rounded-full bg-white text-black font-semibold shadow-sm transition-all">Всі (150)</button>
+            <button onclick="setFilter('all')" id="filterAll" class="px-2.5 py-1 rounded-full bg-white text-black font-semibold shadow-sm transition-all">Всі (—)</button>
             <button onclick="setFilter('rooms1')" id="filterRooms1" class="px-2.5 py-1 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] border border-white/[0.08] font-medium text-[#8e8e93] hover:text-white transition-all flex items-center gap-1">
                 <span>1-кімн</span>
             </button>
@@ -447,8 +447,8 @@
         <!-- Floating Counter Badge (Top Left: Apple Capsule) -->
         <div id="activeListingsBadge" class="absolute left-3 top-3 z-20 pointer-events-none transition-opacity duration-200">
             <div class="px-3 py-1.5 rounded-full bg-[#1c1c1e]/90 border border-white/10 text-[11px] font-medium text-white/90 backdrop-blur-2xl flex items-center gap-2 shadow-xl">
-                <span class="w-2 h-2 rounded-full bg-[#30d158]"></span>
-                <span id="activeListingsCount">Оголошення: 150</span>
+                <span id="catalogStatusDot" class="w-2 h-2 rounded-full bg-[#8e8e93]"></span>
+                <span id="activeListingsCount">Оголошення: —</span>
             </div>
         </div>
     </div>
@@ -1054,49 +1054,55 @@
                 !String(item.source || "").toLowerCase().startsWith("partner:"));
         }
 
-        // 3. LOAD DEALS (High-speed load with live VPS API synchronization)
-        async function loadDeals() {
-            window.KR_CATALOG_MODE = "cached";
-            if (typeof KYIV_DEALS_INIT !== 'undefined' && Array.isArray(KYIV_DEALS_INIT)) {
-                LISTINGS = staticCatalogWithoutPartners(KYIV_DEALS_INIT);
-            }
+        // Public catalog never upgrades archived open-source imports into live offers.
+        // Genuine permissioned partner + owner items require evidence-backed backend review.
+        function approvedHostedListing(item) {
+            if (!item || typeof item !== 'object') return false;
+            const source = String(item.source || '').trim().toLowerCase();
+            if (['olx', 'dom.ria', 'dim.ria', 'dim_ria'].includes(source)) return false;
+            if (item.verificationStatus === 'imported') return false;
+            return item.actualityConfirmed === true && item.reviewedByRadar === true;
+        }
 
-            // A slow API must not freeze the first visit; fall back to static/offline data.
+        // 3. LOAD DEALS: HTTPS is fail-closed; file:// keeps isolated legacy
+        // test fixtures until synthetic browser fixtures are migrated (#55).
+        async function loadDeals() {
+            const localFixturePreview = window.location.protocol === 'file:';
+            window.KR_CATALOG_MODE = localFixturePreview ? "cached" : "loading";
+            LISTINGS = localFixturePreview && Array.isArray(KYIV_DEALS_INIT)
+                ? staticCatalogWithoutPartners(KYIV_DEALS_INIT) : [];
+
             const controller = new AbortController();
             const abortTimer = setTimeout(() => controller.abort(), 6000);
-            // Sync with live production HTTPS API so newly approved landlord deals appear immediately
             try {
                 const res = await fetch(
                     'https://vmi3445944.contaboserver.net/api/deals?v=' + Date.now(),
                     { signal: controller.signal, cache: 'no-store' }
                 );
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && data.success && Array.isArray(data.deals)) {
-                        LISTINGS = data.deals;
-                        window.KR_CATALOG_MODE = "live";
-                    }
-                } else {
-                    const resJson = await fetch('data/deals.json?v=' + Date.now());
-                    if (resJson.ok) {
-                        const dataJson = await resJson.json();
-                        if (Array.isArray(dataJson) && dataJson.length > 0) {
-                            LISTINGS = staticCatalogWithoutPartners(dataJson);
-                            window.KR_CATALOG_MODE = "static";
-                        }
-                    }
+                if (!res.ok) throw new Error('catalog_http_error');
+                const data = await res.json();
+                if (!data || data.success !== true || !Array.isArray(data.deals)) {
+                    throw new Error('catalog_invalid_response');
                 }
-            } catch (e) {
-                try {
-                    const resJson = await fetch('data/deals.json?v=' + Date.now());
-                    if (resJson.ok) {
-                        const dataJson = await resJson.json();
-                        if (Array.isArray(dataJson) && dataJson.length > 0) {
-                            LISTINGS = staticCatalogWithoutPartners(dataJson);
-                            window.KR_CATALOG_MODE = "static";
+                LISTINGS = localFixturePreview
+                    ? data.deals : data.deals.filter(approvedHostedListing);
+                window.KR_CATALOG_MODE = "live";
+            } catch (error) {
+                if (localFixturePreview) {
+                    try {
+                        const resJson = await fetch('data/deals.json?v=' + Date.now());
+                        if (resJson.ok) {
+                            const dataJson = await resJson.json();
+                            if (Array.isArray(dataJson)) {
+                                LISTINGS = staticCatalogWithoutPartners(dataJson);
+                                window.KR_CATALOG_MODE = "static";
+                            }
                         }
-                    }
-                } catch (err) {}
+                    } catch (ignored) { /* test fixture unavailable */ }
+                } else {
+                    LISTINGS = [];
+                    window.KR_CATALOG_MODE = "unavailable";
+                }
             } finally {
                 clearTimeout(abortTimer);
             }
@@ -1114,8 +1120,14 @@
 
             // Flag uncertain imported metadata; do not substitute guessed values.
             if (typeof window.krQualityCatalog === "function") LISTINGS = window.krQualityCatalog(LISTINGS);
-            document.getElementById('filterAll').innerText = `Всі (${LISTINGS.length})`;
-            document.getElementById('activeListingsCount').innerText = `Оголошення: ${LISTINGS.length}`;
+            const unavailable = window.KR_CATALOG_MODE === 'unavailable';
+            document.getElementById('filterAll').innerText = unavailable ? 'Всі (—)' : `Всі (${LISTINGS.length})`;
+            document.getElementById('activeListingsCount').innerText = unavailable ? 'Оголошення: —' : `Оголошення: ${LISTINGS.length}`;
+            const dot = document.getElementById('catalogStatusDot');
+            if (dot) {
+                dot.style.backgroundColor = !unavailable && LISTINGS.length > 0
+                    ? '#30d158' : '#8e8e93';
+            }
             renderAll();
         }
 
@@ -1466,14 +1478,15 @@
 
             if (items.length === 0) {
                 const emptyCatalog = LISTINGS.length === 0;
+                const catalogUnavailable = emptyCatalog && window.KR_CATALOG_MODE === 'unavailable';
                 const noSaved = !emptyCatalog && ACTIVE_FILTERS.favs && FAVORITES.size === 0;
                 const savedMissing = !emptyCatalog && ACTIVE_FILTERS.favs &&
                     FAVORITES.size > 0 && !LISTINGS.some(item => FAVORITES.has(Number(item.id)));
                 listEl.innerHTML = `
                     <div class="kr-empty-state">
-                        <div class="text-white font-semibold text-base">${emptyCatalog ? 'Зараз немає доступних оголошень' : noSaved ? 'Обраних квартир поки немає' : savedMissing ? 'Збережені оголошення зараз недоступні' : 'Нічого не знайдено'}</div>
-                        <p class="mt-2 text-sm text-[#aebdd0]">${emptyCatalog ? 'Опубліковані пропозиції тимчасово відсутні. Не показуємо зняті оголошення.' : noSaved ? 'Натисніть сердечко на квартирі, щоб зберегти її тут. Обрані залишаються лише у цьому браузері.' : savedMissing ? 'Ці квартири наразі відсутні в доступному каталозі. Ми не показуємо зняті або недоступні оголошення як активні.' : 'Змініть район, бюджет або інші умови.'}</p>
-                        ${emptyCatalog ? '' : '<button type="button" onclick="setFilter(\'all\')" class="kr-reset mt-4">Скинути фільтри</button>'}
+                        <div class="text-white font-semibold text-base">${catalogUnavailable ? 'Каталог тимчасово недоступний' : emptyCatalog ? 'Зараз немає доступних оголошень' : noSaved ? 'Обраних квартир поки немає' : savedMissing ? 'Збережені оголошення зараз недоступні' : 'Нічого не знайдено'}</div>
+                        <p class="mt-2 text-sm text-[#aebdd0]">${catalogUnavailable ? 'Не вдалося отримати актуальні дані. Старі оголошення приховано, щоб не показувати зняті квартири як доступні.' : emptyCatalog ? 'Опубліковані пропозиції тимчасово відсутні. Не показуємо зняті оголошення.' : noSaved ? 'Натисніть сердечко на квартирі, щоб зберегти її тут. Обрані залишаються лише у цьому браузері.' : savedMissing ? 'Ці квартири наразі відсутні в доступному каталозі. Ми не показуємо зняті або недоступні оголошення як активні.' : 'Змініть район, бюджет або інші умови.'}</p>
+                        ${catalogUnavailable ? '<button type="button" onclick="loadDeals()" class="kr-reset mt-4">Спробувати ще раз</button>' : emptyCatalog ? '' : '<button type="button" onclick="setFilter(\'all\')" class="kr-reset mt-4">Скинути фільтри</button>'}
                     </div>
                 `;
                 return;

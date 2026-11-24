@@ -83,6 +83,7 @@ jobs:
             tests/test_listing_trust_v18.py \
             tests/test_trust_experience_v18.py \
             tests/test_vps_release_snapshot.py \
+            tests/test_hosted_catalog_fail_closed_v140.py \
             tests/test_public_catalog_privacy.py \
             tests/test_photo_swipe.py \
             tests/test_listing_contact_v115.py \
