@@ -98,3 +98,14 @@ def test_retention_purges_expired_cache_on_next_success(tmp_path):
     assert sync_once(tmp_path, now=later, request_fn=fetch([]))["private_review_count"] == 0
     with sqlite3.connect(tmp_path/"auction-review.sqlite") as conn:
         assert conn.execute("SELECT COUNT(*) FROM auction_review").fetchone()[0] == 0
+
+
+def test_ale_candidate_reaches_private_cache(tmp_path):
+    tmp_path.chmod(0o700)
+    p = row(auctionId="ALE001-UA-20261124-00000", sellingMethod="alienation-english")
+    p["items"][0]["address"] = {
+        "countryName": {"uk_UA": "Україна"}, "locality": {"uk_UA": "Київ"},
+        "region": {"uk_UA": "м. Київ"},
+    }
+    assert sync_once(tmp_path, now=NOW, request_fn=fetch([p]))["private_review_count"] == 1
+    assert review_candidates(tmp_path, now=NOW)[0]["auction_id"] == p["auctionId"]
