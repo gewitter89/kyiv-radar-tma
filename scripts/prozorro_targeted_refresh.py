@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 from .prozorro_auction_candidates import AUCTION_ID, METHODS, _aware, _utc
 from .prozorro_probe import read_page, MAX_BYTES
-from .prozorro_review_cache import apply_page, review_candidates, private_directory
+from .prozorro_review_cache import apply_page, review_candidates, private_directory, recheck_ids
 from .prozorro_review_sync import exclusive_sync
 
 BASE = "https://procedure.prozorro.sale/api/search/procedures/"
@@ -58,9 +58,8 @@ def refresh(directory, *, now, request_fn=read_page):
     """Atomic bounded private refresh; no claim of full discovery or coverage."""
     now = _aware(now)
     with exclusive_sync(directory) as directory:
-        known = review_candidates(directory, now=now)
-        # Existing eligible objects first; expired entries remain hidden.
-        ids = [r["auction_id"] for r in sorted(known, key=lambda r: r["observed_at"])[:MAX_RECHECK]]
+        # Oldest retained entries first, even if hidden due to stale observation.
+        ids = recheck_ids(directory, now=now, limit=MAX_RECHECK)
         rows = discover(now=now, request_fn=request_fn)
         rows.extend(recheck(key, now=now, request_fn=request_fn) for key in ids)
         apply_page(directory, rows, observed_at=now, now=now)
