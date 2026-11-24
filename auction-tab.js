@@ -1,7 +1,6 @@
-/* Isolated staging & production tab. No requests or navigation when flag is off. */
+/* Isolated staging & production tab with authoritative availability discovery. */
 (() => {
   'use strict';
-  if (window.KR_AUCTIONS_STAGING !== true && window.KR_AUCTIONS_ENABLED !== true) return;
   const ID = /^(?:ALE001|CSE001)-UA-\d{8}-\d{5}$/;
   const KEY = 'kr_auction_favs_v1';
   const fmt = new Intl.NumberFormat('uk-UA', {style:'currency',currency:'UAH',maximumFractionDigits:2});
@@ -12,12 +11,18 @@
     Object.entries(attrs).forEach(([k,v]) => node.setAttribute(k,v));
     return node;
   };
+
+  const API_ENDPOINT = (window.location.origin === 'https://gewitter89.github.io')
+    ? 'https://vmi3445944.contaboserver.net/api/auctions'
+    : '/api/auctions';
+
   let saved = new Set();
   try {
     const value = JSON.parse(localStorage.getItem(KEY) || '[]');
     if (Array.isArray(value)) saved = new Set(value.filter(x=>typeof x==='string' && ID.test(x)).slice(0,2000));
   } catch (_) {}
-  let rows = [], seq = 0, refreshTimer, expiryTimer;
+
+  let rows = [], seq = 0, refreshTimer, expiryTimer, isMounted = false;
   const nav = el('button','Аукціони',{type:'button',id:'krAuctionsNav','aria-haspopup':'dialog'});
   const panel = el('dialog',undefined,{id:'krAuctionDialog','aria-labelledby':'krAuctionTitle'});
   const title = el('h2','Аукціони',{id:'krAuctionTitle'});
@@ -36,13 +41,6 @@
   const status = el('p','',{role:'status','aria-live':'polite'});
   const list = el('div',undefined,{id:'krAuctionList'});
   panel.append(header,note,filters,status,list);
-  const host = document.querySelector('body > header');
-  if (!host || typeof panel.showModal !== 'function') return;
-  host.append(nav); document.body.append(panel);
-
-  const API_ENDPOINT = (window.location.origin === 'https://gewitter89.github.io')
-    ? 'https://vmi3445944.contaboserver.net/api/auctions'
-    : '/api/auctions';
 
   function normalize(r) {
     if (!r || typeof r.auction_id!=='string' || !ID.test(r.auction_id) ||
@@ -57,6 +55,7 @@
           now<valid && valid<=now+60000)) return null;
     return {id:r.auction_id,url:r.source_url,price,end,seen,valid,vat:r.vat_included};
   }
+
   function render() {
     clearTimeout(expiryTimer);
     rows=rows.filter(r=>r.valid>Date.now());
@@ -81,7 +80,7 @@
           try{tg.openLink(r.url);event.preventDefault();}catch(_){}
         }
       });
-      const vatText = r.vat ? 'з ПДВ' : 'без ПДВ (ПДВ нараховується додатково)';
+      const vatText = r.vat ? 'з ПДВ' : 'без ПДВ; умови ПДВ та зборів перевіряйте на джерелі';
       card.append(el('p','Київ · Квартира'),el('h3',fmt.format(r.price)),
         el('p','Стартова ціна · '+vatText),
         el('p','Додаткові збори сплачуються окремо'),
@@ -92,6 +91,7 @@
     status.textContent=visible.length?'Показано: '+visible.length:'Немає підтверджених об’єктів за умовами вибірки.';
     if(rows.length) expiryTimer=setTimeout(render,Math.max(0,Math.min(...rows.map(r=>r.valid))-Date.now()+5));
   }
+
   async function refresh(){
     const n=++seq;
     rows=[]; list.replaceChildren(); status.textContent='Оновлення…';
@@ -110,9 +110,69 @@
     }catch(_){if(n===seq&&panel.open){rows=[];list.replaceChildren();status.textContent='Дані тимчасово недоступні.';}}
     finally{clearTimeout(timeout);}
   }
-  nav.addEventListener('click',()=>{clearInterval(refreshTimer);clearTimeout(expiryTimer);panel.showModal();refresh();refreshTimer=setInterval(()=>{if(!document.hidden)refresh();},20000);});
-  close.addEventListener('click',()=>panel.close());
-  panel.addEventListener('close',()=>{if(panel.open)return;seq++;clearInterval(refreshTimer);clearTimeout(expiryTimer);rows=[];list.replaceChildren();nav.focus();});
-  for(const input of [max,sort,only])input.addEventListener('input',render);
-  document.addEventListener('visibilitychange',()=>{if(!panel.open)return;seq++;rows=[];list.replaceChildren();if(!document.hidden)refresh();});
+
+  function mountUI(initialAuctions) {
+    if (isMounted) return;
+    const host = document.querySelector('body > header');
+    if (!host || typeof panel.showModal !== 'function') return;
+    isMounted = true;
+    host.append(nav);
+    document.body.append(panel);
+
+    nav.addEventListener('click',()=>{
+      clearInterval(refreshTimer);
+      clearTimeout(expiryTimer);
+      panel.showModal();
+      refresh();
+      refreshTimer=setInterval(()=>{if(!document.hidden)refresh();},20000);
+    });
+    close.addEventListener('click',()=>panel.close());
+    panel.addEventListener('close',()=>{if(panel.open)return;seq++;clearInterval(refreshTimer);clearTimeout(expiryTimer);rows=[];list.replaceChildren();nav.focus();});
+    for(const input of [max,sort,only])input.addEventListener('input',render);
+    document.addEventListener('visibilitychange',()=>{if(!panel.open)return;seq++;rows=[];list.replaceChildren();if(!document.hidden)refresh();});
+
+    if (Array.isArray(initialAuctions) && initialAuctions.length > 0) {
+      const normalized = initialAuctions.map(normalize).filter(Boolean);
+      if (normalized.length > 0) {
+        rows = normalized;
+      }
+    }
+  }
+
+  let discoveryAttempts = 0;
+  const MAX_DISCOVERY_ATTEMPTS = 2;
+
+  async function discoverAvailability() {
+    if (isMounted || discoveryAttempts >= MAX_DISCOVERY_ATTEMPTS) return;
+    discoveryAttempts++;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    try {
+      const res = await fetch(API_ENDPOINT, {
+        method: 'GET',
+        cache: 'no-store',
+        signal: controller.signal,
+        redirect: 'error'
+      });
+      if (!res.ok) return;
+      const body = await res.json();
+      if (body && body.available === true) {
+        mountUI(body.auctions);
+      }
+    } catch (_) {
+      if (!isMounted && discoveryAttempts < MAX_DISCOVERY_ATTEMPTS) {
+        setTimeout(discoverAvailability, 30000);
+      }
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  // If isolated staging explicitly sets KR_AUCTIONS_STAGING, mount immediately.
+  // Otherwise perform authoritative availability discovery (default-off).
+  if (window.KR_AUCTIONS_STAGING === true) {
+    mountUI();
+  } else {
+    discoverAvailability();
+  }
 })();

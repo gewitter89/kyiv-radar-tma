@@ -86,7 +86,9 @@ def _load_env_file(filepath: str = "/opt/agent-bot/.env"):
 
 _load_env_file()
 
-APP_ENV = os.getenv("APP_ENV", "production")
+VALID_ENVS = {"production", "staging", "test"}
+raw_app_env = os.getenv("APP_ENV", "production")
+APP_ENV = raw_app_env if raw_app_env in VALID_ENVS else "production"
 DB_PATH = os.getenv("KYIV_RADAR_DB_PATH", "/opt/resell-radar-ukraine/data/rent_deals.db")
 DEALS_JSON_PATH = os.getenv("KYIV_RADAR_DEALS_PATH", "/opt/kyiv-radar-tma/data/deals.json")
 # Private staging source rights: never a public file or client-controlled path.
@@ -250,7 +252,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "HEAD", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -680,17 +682,12 @@ async def get_live_deals(response: Response):
 
 @app.api_route("/api/auctions", methods=["GET", "HEAD", "OPTIONS"])
 async def staged_auctions(request: Request):
-    if request.method == "OPTIONS":
-        return Response(status_code=204, headers={
-            "Allow": "GET, HEAD, OPTIONS",
-            "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Cache-Control": "no-store"
-        })
     # Production release gate: strictly gated by KYIV_RADAR_AUCTIONS_RELEASE.
     # Staging/test allows KYIV_RADAR_AUCTIONS_PREVIEW or KYIV_RADAR_AUCTIONS_RELEASE.
     # Default deny: 404 if gate is not explicitly enabled.
-    is_prod = (APP_ENV == "production")
+    valid_envs = ("production", "staging", "test")
+    effective_env = APP_ENV if APP_ENV in valid_envs else "production"
+    is_prod = (effective_env == "production")
     release_enabled = (os.getenv("KYIV_RADAR_AUCTIONS_RELEASE") == "1")
     preview_enabled = (os.getenv("KYIV_RADAR_AUCTIONS_PREVIEW") == "1")
 
@@ -700,6 +697,12 @@ async def staged_auctions(request: Request):
     else:
         if not (preview_enabled or release_enabled):
             raise HTTPException(status_code=404, detail="Not found", headers={"Cache-Control": "no-store"})
+
+    if request.method == "OPTIONS":
+        return Response(status_code=204, headers={
+            "Allow": "GET, HEAD, OPTIONS",
+            "Cache-Control": "no-store"
+        })
 
     from datetime import datetime, timezone
     from fastapi.responses import JSONResponse

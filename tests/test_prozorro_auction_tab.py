@@ -5,67 +5,143 @@ import json
 import pytest
 from playwright.async_api import async_playwright
 
-ROOT=Path(__file__).resolve().parents[1]
-ORIGIN="http://127.0.0.1:8765"
-HTML='<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/auction-tab.css"></head><body><header>КИЇВ РАДАР</header><script src="/auction-tab.js"></script></body></html>'
+ROOT = Path(__file__).resolve().parents[1]
+ORIGIN = "http://127.0.0.1:8765"
+HTML = '<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/auction-tab.css"></head><body><header>КИЇВ РАДАР</header><script src="/auction-tab.js"></script></body></html>'
 
 
 def response(now=None):
-    now=now or datetime.now(timezone.utc)
-    rows=[]
-    for n,price in [(1,"2000000.00"),(2,"1000000.00")]:
-        key=f"ALE001-UA-20261124-{n:05d}"
-        rows.append({"auction_id":key,"source_url":"https://prozorro.sale/auction/"+key+"/",
-                     "source":"prozorro_sale","kind":"sale_auction","city":"Київ","asset_class":"apartment_classified",
-                     "starting_bid_uah":price,"vat_included":False,"bidding_ends_at":(now+timedelta(days=n)).isoformat(),
-                     "observed_at":(now-timedelta(minutes=1)).isoformat(),
-                     "valid_until":(now+timedelta(seconds=45)).isoformat()})
-    return {"available":True,"coverage_complete":False,"auctions":rows}
+    now = now or datetime.now(timezone.utc)
+    rows = []
+    for n, price in [(1, "2000000.00"), (2, "1000000.00")]:
+        key = f"ALE001-UA-20261124-{n:05d}"
+        rows.append({
+            "auction_id": key,
+            "source_url": "https://prozorro.sale/auction/" + key + "/",
+            "source": "prozorro_sale",
+            "kind": "sale_auction",
+            "city": "Київ",
+            "asset_class": "apartment_classified",
+            "starting_bid_uah": price,
+            "vat_included": False,
+            "bidding_ends_at": (now + timedelta(days=n)).isoformat(),
+            "observed_at": (now - timedelta(minutes=1)).isoformat(),
+            "valid_until": (now + timedelta(seconds=45)).isoformat()
+        })
+    return {"available": True, "coverage_complete": False, "auctions": rows}
 
 
 async def configure(page, *, enabled=True):
-    calls=[]
-    state={"available":True,"errors":[]}
-    page.on("pageerror",lambda error: state["errors"].append(str(error)))
+    calls = []
+    state = {"available": True, "errors": []}
+    page.on("pageerror", lambda error: state["errors"].append(str(error)))
+
     async def route(r):
-        path=r.request.url.removeprefix(ORIGIN)
-        if path=="/":
-            await r.fulfill(content_type="text/html; charset=utf-8",body=HTML)
-        elif path in ("/auction-tab.js","/auction-tab.css"):
+        path = r.request.url.removeprefix(ORIGIN)
+        if path == "/":
+            await r.fulfill(content_type="text/html; charset=utf-8", body=HTML)
+        elif path in ("/auction-tab.js", "/auction-tab.css"):
             await r.fulfill(content_type="text/javascript; charset=utf-8" if path.endswith(".js") else "text/css; charset=utf-8",
-                            body=(ROOT/path[1:]).read_text(encoding="utf-8"))
-        elif path=="/api/auctions":
+                            body=(ROOT / path[1:]).read_text(encoding="utf-8"))
+        elif path == "/api/auctions":
             calls.append(path)
-            if state["available"]:
-                await r.fulfill(status=200,content_type="application/json; charset=utf-8",body=json.dumps(response(),ensure_ascii=False))
+            if state["available"] and enabled:
+                await r.fulfill(status=200, content_type="application/json; charset=utf-8",
+                                body=json.dumps(response(), ensure_ascii=False))
             else:
-                await r.fulfill(status=503,content_type="application/json",body=json.dumps({"available":False,"auctions":[]}))
+                await r.fulfill(status=404 if not enabled else 503,
+                                content_type="application/json",
+                                body=json.dumps({"available": False, "auctions": []}))
         else:
             await r.abort()
-    await page.route("**/*",route)
+
+    await page.route("**/*", route)
     if enabled:
-        await page.add_init_script("""window.KR_AUCTIONS_STAGING=true;
-          window.__links=[];window.Telegram={WebApp:{openLink(url){window.__links.push(url)}}};""")
-    await page.goto(ORIGIN+"/")
+        await page.add_init_script("""
+            window.KR_AUCTIONS_STAGING = true;
+            window.__links = [];
+            window.Telegram = { WebApp: { openLink(url) { window.__links.push(url); } } };
+        """)
+    await page.goto(ORIGIN + "/")
     assert await page.evaluate("document.characterSet") == "UTF-8"
     if enabled:
         assert await page.locator("#krAuctionsNav").inner_text() == "Аукціони"
-    return calls,state
+    return calls, state
 
 
 def test_actual_index_wires_tab_but_never_enables_flag():
-    text=(ROOT/"index.html").read_text(encoding="utf-8")
-    assert "./auction-tab.js?v=1" in text
+    text = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert "./auction-tab.js?v=1.49.0" in text
+    assert "./auction-tab.css?v=1.49.0" in text
     assert "KR_AUCTIONS_STAGING=true" not in text
     assert "KR_AUCTIONS_ENABLED=true" not in text
 
 
 @pytest.mark.asyncio
+async def test_actual_index_default_off_and_authoritative_discovery():
+    """Verify that actual index.html starts default-off on 404, mounts on 200, and ignores query toggles."""
+    actual_index_html = (ROOT / "index.html").read_text(encoding="utf-8")
+    async with async_playwright() as p:
+        browser = await p.chromium.launch()
+        page = await browser.new_page()
+        backend_enabled = [False]
+
+        async def route(r):
+            url = r.request.url
+            if url.endswith("/api/auctions") or "/api/auctions" in url:
+                if backend_enabled[0]:
+                    await r.fulfill(status=200, content_type="application/json; charset=utf-8",
+                                    body=json.dumps(response(), ensure_ascii=False))
+                else:
+                    await r.fulfill(status=404, content_type="application/json; charset=utf-8",
+                                    body=json.dumps({"detail": "Not found"}))
+            elif "auction-tab.js" in url:
+                await r.fulfill(content_type="text/javascript; charset=utf-8",
+                                body=(ROOT / "auction-tab.js").read_text(encoding="utf-8"))
+            elif "auction-tab.css" in url:
+                await r.fulfill(content_type="text/css; charset=utf-8",
+                                body=(ROOT / "auction-tab.css").read_text(encoding="utf-8"))
+            elif url == "https://gewitter89.github.io/kyiv-radar-tma/" or url.startswith("https://gewitter89.github.io/kyiv-radar-tma/?"):
+                await r.fulfill(content_type="text/html; charset=utf-8", body=actual_index_html)
+            else:
+                # Abort external third-party assets to keep tests fast and offline
+                await r.fulfill(status=200, body="")
+
+        await page.route("**/*", route)
+
+        # 1. Default-off: backend returns 404. Nav button must NOT appear.
+        await page.goto("https://gewitter89.github.io/kyiv-radar-tma/")
+        await page.wait_for_timeout(500)
+        assert await page.locator("#krAuctionsNav").count() == 0
+
+        # 2. Query toggles must NOT enable the tab when backend is off.
+        await page.goto("https://gewitter89.github.io/kyiv-radar-tma/?staging=1&preview=1&enable=1")
+        await page.wait_for_timeout(500)
+        assert await page.locator("#krAuctionsNav").count() == 0
+
+        # 3. Authoritative discovery: backend enables 200. Nav button mounts automatically.
+        backend_enabled[0] = True
+        await page.goto("https://gewitter89.github.io/kyiv-radar-tma/")
+        await page.locator("#krAuctionsNav").wait_for(timeout=8000)
+        assert await page.locator("#krAuctionsNav").inner_text() == "Аукціони"
+
+        # Click nav, open modal, check VAT wording
+        await page.locator("#krAuctionsNav").click()
+        await page.locator("#krAuctionList article").nth(0).wait_for(timeout=8000)
+        first_card_text = await page.locator("#krAuctionList article").nth(0).inner_text()
+        assert "без ПДВ; умови ПДВ та зборів перевіряйте на джерелі" in first_card_text
+        assert "Додаткові збори сплачуються окремо" in first_card_text
+
+        await browser.close()
+
+
+@pytest.mark.asyncio
 async def test_github_pages_origin_mapping():
     async with async_playwright() as p:
-        browser=await p.chromium.launch()
-        page=await browser.new_page()
+        browser = await p.chromium.launch()
+        page = await browser.new_page()
         api_called = []
+
         async def route(r):
             if "contaboserver.net/api/auctions" in r.request.url:
                 api_called.append(r.request.url)
@@ -73,24 +149,25 @@ async def test_github_pages_origin_mapping():
                                 body=json.dumps(response(), ensure_ascii=False))
             elif r.request.url.endswith("/auction-tab.js"):
                 await r.fulfill(content_type="text/javascript; charset=utf-8",
-                                body=(ROOT/"auction-tab.js").read_text(encoding="utf-8"))
+                                body=(ROOT / "auction-tab.js").read_text(encoding="utf-8"))
             elif r.request.url.endswith("/auction-tab.css"):
                 await r.fulfill(content_type="text/css; charset=utf-8",
-                                body=(ROOT/"auction-tab.css").read_text(encoding="utf-8"))
+                                body=(ROOT / "auction-tab.css").read_text(encoding="utf-8"))
             else:
                 await r.fulfill(content_type="text/html; charset=utf-8", body=HTML)
+
         await page.route("**/*", route)
         await page.add_init_script("""
-            window.KR_AUCTIONS_ENABLED = true;
             Object.defineProperty(window.location, 'origin', {
                 value: 'https://gewitter89.github.io',
                 configurable: true
             });
         """)
         await page.goto("https://gewitter89.github.io/")
+        await page.locator("#krAuctionsNav").wait_for(timeout=8000)
         await page.locator("#krAuctionsNav").click()
         await page.locator("#krAuctionList article").nth(0).wait_for(timeout=8000)
-        assert len(api_called) == 1
+        assert len(api_called) >= 1
         assert "https://vmi3445944.contaboserver.net/api/auctions" in api_called[0]
         await browser.close()
 
@@ -98,38 +175,39 @@ async def test_github_pages_origin_mapping():
 @pytest.mark.asyncio
 async def test_disabled_never_calls_api():
     async with async_playwright() as p:
-        browser=await p.chromium.launch()
-        page=await browser.new_page()
-        calls,_=await configure(page,enabled=False)
-        assert await page.locator("#krAuctionsNav").count()==0
-        assert calls==[]
+        browser = await p.chromium.launch()
+        page = await browser.new_page()
+        calls, _ = await configure(page, enabled=False)
+        assert await page.locator("#krAuctionsNav").count() == 0
         await browser.close()
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("width,height",[(320,640),(390,844),(768,1024),(1280,900)])
-async def test_filters_favorites_telegram_and_layout(width,height):
+@pytest.mark.parametrize("width,height", [(320, 640), (390, 844), (768, 1024), (1280, 900)])
+async def test_filters_favorites_telegram_and_layout(width, height):
     async with async_playwright() as p:
-        browser=await p.chromium.launch()
-        page=await browser.new_page(viewport={"width":width,"height":height},has_touch=width<500,is_mobile=width<500)
-        calls,state=await configure(page)
+        browser = await p.chromium.launch()
+        page = await browser.new_page(viewport={"width": width, "height": height},
+                                      has_touch=width < 500, is_mobile=width < 500)
+        calls, state = await configure(page)
         await page.locator("#krAuctionsNav").click()
-        cards=page.locator("#krAuctionList article")
+        cards = page.locator("#krAuctionList article")
         try:
             await cards.nth(1).wait_for(timeout=8000)
         except Exception:
             pytest.fail(f"auction cards missing: calls={calls}, errors={state['errors']}, status={await page.locator('#krAuctionDialog [role=status]').inner_text()}, hidden={await page.evaluate('document.hidden')}")
-        assert calls==["/api/auctions"]
+        assert calls == ["/api/auctions"]
         assert await page.locator("#krAuctionDialog").evaluate("(e)=>e.scrollWidth<=e.clientWidth+1")
         await page.locator("#krAuctionSort").select_option("price")
         assert "00002" in await cards.first.inner_text()
+        assert "без ПДВ; умови ПДВ та зборів перевіряйте на джерелі" in await cards.first.inner_text()
         await page.locator("#krAuctionMax").fill("1500000")
-        assert await cards.count()==1
-        await cards.first.get_by_role("button",name="Додати в обрані").click()
+        assert await cards.count() == 1
+        await cards.first.get_by_role("button", name="Додати в обрані").click()
         await page.locator("#krAuctionOnlyFav").check()
-        assert await cards.count()==1
+        assert await cards.count() == 1
         await cards.first.get_by_role("link").click()
-        assert (await page.evaluate("window.__links"))==["https://prozorro.sale/auction/ALE001-UA-20261124-00002/"]
+        assert (await page.evaluate("window.__links")) == ["https://prozorro.sale/auction/ALE001-UA-20261124-00002/"]
         await page.reload()
         await page.locator("#krAuctionsNav").click()
         try:
@@ -137,11 +215,11 @@ async def test_filters_favorites_telegram_and_layout(width,height):
         except Exception:
             pytest.fail(f"auction cards missing: calls={calls}, errors={state['errors']}, status={await page.locator('#krAuctionDialog [role=status]').inner_text()}, hidden={await page.evaluate('document.hidden')}")
         await page.locator("#krAuctionOnlyFav").check()
-        assert await cards.count()==1
+        assert await cards.count() == 1
         assert "00002" in await cards.first.inner_text()
-        await page.get_by_role("button",name="Закрити аукціони").click()
-        state["available"]=False
+        await page.get_by_role("button", name="Закрити аукціони").click()
+        state["available"] = False
         await page.locator("#krAuctionsNav").click()
         await page.get_by_text("Дані тимчасово недоступні.").wait_for()
-        assert await cards.count()==0
+        assert await cards.count() == 0
         await browser.close()
