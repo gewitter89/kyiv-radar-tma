@@ -116,7 +116,7 @@ def test_100_call_free_tier_fails_closed_before_request(tmp_path):
     con = db_connect(database)
     # Spread calls over several hours to isolate 30-day budget from hourly cap.
     for i in range(100):
-        reserve_quota(con, NOW + timedelta(hours=i // 20))
+        reserve_quota(con, NOW + timedelta(hours=(i // 20) * 2))
     con.close()
     sent = []
     with pytest.raises(ValueError, match="budget exhausted"):
@@ -153,7 +153,7 @@ def test_rolling_hour_prevents_boundary_burst(tmp_path):
 def test_rolling_30_day_window_eventually_expires(tmp_path):
     con = db_connect(tmp_path / "private.sqlite")
     for i in range(100):
-        reserve_quota(con, NOW + timedelta(hours=i // 20))
+        reserve_quota(con, NOW + timedelta(hours=(i // 20) * 2))
     with pytest.raises(ValueError, match="budget exhausted"):
         reserve_quota(con, NOW + timedelta(days=29))
     reserve_quota(con, NOW + timedelta(days=32))
