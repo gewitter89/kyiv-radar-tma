@@ -1068,7 +1068,7 @@
         // test fixtures until synthetic browser fixtures are migrated (#55).
         async function loadDeals() {
             const localFixturePreview = window.location.protocol === 'file:';
-            window.KR_CATALOG_MODE = "loading";
+            window.KR_CATALOG_MODE = localFixturePreview ? "cached" : "loading";
             LISTINGS = localFixturePreview && Array.isArray(KYIV_DEALS_INIT)
                 ? staticCatalogWithoutPartners(KYIV_DEALS_INIT) : [];
 
@@ -1095,7 +1095,7 @@
                             const dataJson = await resJson.json();
                             if (Array.isArray(dataJson)) {
                                 LISTINGS = staticCatalogWithoutPartners(dataJson);
-                                window.KR_CATALOG_MODE = "fixture";
+                                window.KR_CATALOG_MODE = "static";
                             }
                         }
                     } catch (ignored) { /* test fixture unavailable */ }
