@@ -88,6 +88,7 @@ jobs:
             tests/test_prozorro_auction_candidates.py \
             tests/test_prozorro_probe.py \
             tests/test_prozorro_incremental_scan.py \
+            tests/test_prozorro_review_cache.py \
             tests/test_unverified_metro_v120.py \
             tests/test_rental_safety_v116.py \
             tests/test_listing_light_contrast_v116.py \
