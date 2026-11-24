@@ -15,7 +15,7 @@ import sqlite3
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import parse_qsl, urlsplit, urlunsplit
 
 try:
     from .room_claims import validate_feed_rooms
@@ -187,7 +187,20 @@ def canonical_url(value: object, allowed_hosts: list[str]) -> str:
             url.password or url.port not in (None, 443) or not url.path.startswith("/")):
             raise ValueError()
         path = url.path.rstrip("/") or "/"
-        # Never store tracking, auth, share tokens, or arbitrary query strings.
+        # Only discard explicitly recognised tracking parameters. Unknown
+        # parameters or fragments can be the actual listing identifier.
+        # A provider must supply an unambiguous stable, query-free permalink.
+        if url.fragment:
+            raise ValueError()
+        if url.query:
+            params = parse_qsl(url.query, keep_blank_values=True,
+                               strict_parsing=True, max_num_fields=40)
+            tracking = {"fbclid", "gclid", "yclid"}
+            if not params or any(
+                not (key.lower().startswith("utm_") or key.lower() in tracking)
+                for key, _ in params
+            ):
+                raise ValueError()
         return urlunsplit(("https", host, path, "", ""))
     except (ValueError, TypeError):
         raise ValueError("Source URL is not approved HTTPS host") from None
