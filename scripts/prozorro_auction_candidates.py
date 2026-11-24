@@ -8,7 +8,8 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 import re
 
-METHODS = {"commercialSell-english": "CSE001"}
+METHODS = {"commercialSell-english": "CSE001", "alienation-english": "ALE001"}
+AUCTION_ID = re.compile(r"(?:CSE001|ALE001)-UA-[0-9]{8}-[0-9]{5}")
 APARTMENT_CODES = {"04111000-9"}
 MAX_FRESHNESS = timedelta(hours=1)
 
@@ -26,6 +27,20 @@ def _aware(value):
     if not isinstance(value, datetime) or value.tzinfo is None or value.utcoffset() is None:
         raise ValueError("Aware datetime required")
     return value.astimezone(timezone.utc)
+
+
+def address_label(value):
+    """CBD3 multiLang: only the documented Ukrainian entry is authoritative."""
+    if isinstance(value, dict):
+        value = value.get("uk_UA")
+    if not isinstance(value, str) or len(value) > 100:
+        return ""
+    return " ".join(value.casefold().split())
+
+
+KYIV = {"київ", "м. київ", "м.київ"}
+UKRAINE = {"україна", "ukraine"}
+KYIV_REGION = KYIV | {"київська область", "київська"}
 
 
 def candidate(procedure, *, observed_at, now):
@@ -64,9 +79,9 @@ def candidate(procedure, *, observed_at, now):
         if classification["scheme"] != "CAV" or classification["id"] not in APARTMENT_CODES:
             return None
         address = item["address"]
-        if (address["countryName"] not in ("Україна", "Ukraine")
-            or address["locality"] not in ("Київ", "м. Київ")
-            or address["region"] not in ("Київ", "м. Київ", "Київська область")):
+        if (address_label(address["countryName"]) not in UKRAINE
+            or address_label(address["locality"]) not in KYIV
+            or address_label(address["region"]) not in KYIV_REGION):
             return None
         value = procedure["value"]
         if value["currency"] != "UAH" or type(value["valueAddedTaxIncluded"]) is not bool:
