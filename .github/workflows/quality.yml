@@ -100,4 +100,5 @@ jobs:
             tests/test_telegram_fullscreen_v137.py \
             tests/test_telegram_bottom_bar_v138.py \
             tests/test_monitor_public_health_v141.py \
+            tests/test_public_health_trigger_v147.py \
             tests/test_telegram_branding.py
