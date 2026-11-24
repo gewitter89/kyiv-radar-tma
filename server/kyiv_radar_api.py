@@ -48,10 +48,12 @@ try:
     from .listing_trust import load_private_register, public_listing_view
     from .partner_visibility import enforce_partner_visibility, is_partner_item
     from .partner_publication import read_private_export
+    from .owner_visibility import enforce_owner_submission_visibility
 except ImportError:
     from listing_trust import load_private_register, public_listing_view
     from partner_visibility import enforce_partner_visibility, is_partner_item
     from partner_publication import read_private_export
+    from owner_visibility import enforce_owner_submission_visibility
 from pydantic import BaseModel, Field
 
 # Configure structured logging
@@ -541,7 +543,11 @@ def load_effective_deals() -> List[Dict[str, Any]]:
         load_trusted_deals(),
         load_private_register(REVIEW_REGISTER_PATH),
     )
-    authorized = enforce_partner_visibility(reviewed, PARTNER_RIGHTS_DB_PATH)
+    # A stale approved JSON card is not proof its original landlord submission
+    # is still published. Read the private SQLite status on every request,
+    # before partner rights checks and any public/contact serialization.
+    active_owner = enforce_owner_submission_visibility(reviewed, DB_PATH)
+    authorized = enforce_partner_visibility(active_owner, PARTNER_RIGHTS_DB_PATH)
     return [row for row in authorized if _is_public_catalog_eligible(row)]
 
 # Helper: Look up private landlord contact from secure vault
