@@ -1,6 +1,7 @@
 """Operator CLI for isolated staging, with no remote endpoints or real grants by default."""
 import argparse
 import json
+import os
 from datetime import datetime,timezone
 from pathlib import Path
 
@@ -11,7 +12,8 @@ from server.auction_snapshot import read_file, MAX_BYTES
 
 
 def read_candidates(path):
-    rows=json.loads(read_file(path,MAX_BYTES))
+    owner = os.getenv('KYIV_RADAR_COLLECTOR_UID')
+    rows=json.loads(read_file(path,MAX_BYTES,owner_uid=int(owner) if owner is not None else None))
     if not isinstance(rows,list) or len(rows)>MAX_ITEMS or any(not isinstance(r,dict) for r in rows):
         raise ValueError("Invalid candidate handoff")
     return rows
