@@ -14,7 +14,7 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 try:
@@ -24,14 +24,16 @@ except ImportError:
 
 URL = "https://developers.ria.com/dom/search"
 HOURLY_LIMIT = 30
-MONTHLY_LIMIT = 1000
+SAFE_30_DAY_LIMIT = 100  # provider can grant only 100, not necessarily 1,000
+# Conservative rolling window: safe across calendar-month and clock-hour boundaries.
 MAX_PAGES_PER_RUN = 25
 
 DDL = """
 CREATE TABLE IF NOT EXISTS quota (
     hour_utc TEXT NOT NULL,
     month_utc TEXT NOT NULL,
-    consumed INTEGER NOT NULL CHECK (consumed = 1)
+    consumed INTEGER NOT NULL CHECK (consumed = 1),
+    requested_at_utc TEXT
 );
 CREATE INDEX IF NOT EXISTS ix_quota_hour ON quota(hour_utc);
 CREATE INDEX IF NOT EXISTS ix_quota_month ON quota(month_utc);
@@ -64,21 +66,56 @@ def db_connect(path: Path):
     finally:
         os.umask(umask)
     conn.executescript(DDL)
+    # Older private quota databases have only month_utc/hour_utc. Preserve
+    # these reservations; never silently discard old usage on migration.
+    columns = {row[1] for row in conn.execute("PRAGMA table_info(quota)")}
+    if "requested_at_utc" not in columns:
+        conn.execute("ALTER TABLE quota ADD COLUMN requested_at_utc TEXT")
+    conn.execute("CREATE INDEX IF NOT EXISTS ix_quota_request_time ON quota(requested_at_utc)")
     conn.commit()
     return conn
 
 
 def reserve_quota(conn: sqlite3.Connection, now: datetime):
-    utc = now.astimezone(timezone.utc).isoformat()
-    hour, month = utc[:13], utc[:7]
+    """Reserve one potentially billable request before transport (including 429).
+
+    The free package may allow only 100 calls per 30 days. Always use the
+    smaller published tier until the account owner separately confirms more.
+    Count a rolling hour and 30 days, not calendar periods. Legacy rows have
+    coarse timestamps: conservatively count their entire month/hour buckets.
+    """
+    now_utc = now.astimezone(timezone.utc)
+    request_at = now_utc.isoformat(timespec="microseconds")
+    hour = now_utc.strftime("%Y-%m-%dT%H")
+    month = now_utc.strftime("%Y-%m")
+    hour_window = (now_utc - timedelta(hours=1)).isoformat(timespec="microseconds")
+    thirty_day_window = (now_utc - timedelta(days=30)).isoformat(timespec="microseconds")
+    # A prior schema knows only months/hours. Count buckets that may
+    # overlap the rolling period rather than guessing the original date.
+    legacy_30d_month = (now_utc - timedelta(days=30)).strftime("%Y-%m")
+    legacy_prev_hour = (now_utc - timedelta(hours=1)).strftime("%Y-%m-%dT%H")
+
     conn.execute("BEGIN IMMEDIATE")
     try:
-        count_hour = conn.execute("SELECT COUNT(*) FROM quota WHERE hour_utc=?", (hour,)).fetchone()[0]
-        count_month = conn.execute("SELECT COUNT(*) FROM quota WHERE month_utc=?", (month,)).fetchone()[0]
-        if count_hour >= HOURLY_LIMIT or count_month >= MONTHLY_LIMIT:
+        count_hour = conn.execute(
+            "SELECT COUNT(*) FROM quota WHERE "
+            "(requested_at_utc IS NOT NULL AND requested_at_utc>=?) OR "
+            "(requested_at_utc IS NULL AND hour_utc IN (?,?))",
+            (hour_window, legacy_prev_hour, hour),
+        ).fetchone()[0]
+        count_30d = conn.execute(
+            "SELECT COUNT(*) FROM quota WHERE "
+            "(requested_at_utc IS NOT NULL AND requested_at_utc>=?) OR "
+            "(requested_at_utc IS NULL AND month_utc>=?)",
+            (thirty_day_window, legacy_30d_month),
+        ).fetchone()[0]
+        if count_hour >= HOURLY_LIMIT or count_30d >= SAFE_30_DAY_LIMIT:
             raise ValueError("Local official API request budget exhausted")
-        conn.execute("INSERT INTO quota(hour_utc,month_utc,consumed) VALUES (?,?,1)", (hour, month))
-        conn.commit()  # Reserve BEFORE request, including timeouts and 429.
+        conn.execute(
+            "INSERT INTO quota(hour_utc,month_utc,consumed,requested_at_utc) VALUES (?,?,1,?)",
+            (hour, month, request_at),
+        )
+        conn.commit()  # Reserve BEFORE provider request, including timeouts/429.
     except Exception:
         conn.rollback()
         raise
