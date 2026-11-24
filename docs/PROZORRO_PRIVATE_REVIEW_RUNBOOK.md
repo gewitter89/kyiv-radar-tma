@@ -29,3 +29,13 @@ The command makes at most three official GET requests, reads at most ten procedu
 3. Add bounded cache retention, per-ID revalidation and independent review/publication authorization.
 4. Test read-only UI in staging (auction price and deadline labels, empty/stale state).
 5. Authorize deployment separately after backup and rollback rehearsal.
+
+
+## Runtime guardrails added 2026-11-24
+- Private directory must belong to the current Unix account; lock and DB reject symlinks, hardlinks and group/world access.
+- Nonblocking process lock covers the entire network-to-cache cycle. A second process must exit before sending any GET.
+- Main SQLite file capped at 16 MiB via max_page_count and an existing-file check; SQLite journal and other filesystem overhead are additional. Cache limited to 2,000 records; oversized batch rolls back.
+- Successful refresh removes observations older than two days (including obsolete withdrawal markers). This exceeds the one-day permitted feed lookback; it is not a historical archive.
+- Network failures release the lock. Next invocation retries a recent slice, not a guaranteed catch-up of all missing records.
+- Live integrated CI run 45418333908: 30 procedures in three requests, 0 eligible, 0 publications, 0 raw records saved. Positive real auction persistence is still a release blocker.
+- The pilot is Linux-only. No system timer is installed. Before activation, measure actual resource usage and confirm source-specific schema and positive sample.
