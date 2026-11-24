@@ -149,3 +149,19 @@ def review_candidates(directory, *, now):
         return output
     finally:
         conn.close()
+
+
+def recheck_ids(directory, *, now, limit=5):
+    """Oldest retained candidates, including hidden stale rows, for direct lookup."""
+    now = _aware(now)
+    if type(limit) is not int or not 1 <= limit <= 5:
+        raise ValueError("Invalid recheck limit")
+    conn = _connect(directory)
+    try:
+        return [key for (key,) in conn.execute(
+            "SELECT auction_id FROM auction_review "
+            "WHERE payload IS NOT NULL AND observed >= ? AND observed <= ? "
+            "ORDER BY observed, auction_id LIMIT ?",
+            (_stamp(now-RETAIN), _stamp(now), limit)) if ID.fullmatch(key)]
+    finally:
+        conn.close()
