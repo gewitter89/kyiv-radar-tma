@@ -79,7 +79,7 @@ async def test_hosted_api_filters_legacy_even_with_forged_verified_flags(hosted_
 @pytest.mark.asyncio
 async def test_hosted_catalog_renders_server_evidence_backed_owner_listing(hosted_url):
     eligible = {"id": 999999, "title": "Тестове житло", "district": "Дарницький",
-                "source": "owner", "price": 12500, "area": 42, "rooms": 1,
+                "source": "Київ Радар (Пряма заявка)", "price": 12500, "area": 42, "rooms": 1,
                 "actualityConfirmed": True, "reviewedByRadar": True}
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
@@ -93,4 +93,40 @@ async def test_hosted_catalog_renders_server_evidence_backed_owner_listing(hoste
         await page.wait_for_function("window.KR_CATALOG_MODE === 'live'", timeout=15000)
         assert await page.evaluate("LISTINGS.length") == 1
         assert await page.evaluate("LISTINGS[0].id") == 999999
+        await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_hosted_client_rejects_old_server_unlicensed_and_private_rows(hosted_url):
+    # All of these responses are synthetic and intercepted in the browser.
+    # A third-party source cannot become "verified" by setting two booleans.
+    base = {"title": "Тест", "price": 12500, "actualityConfirmed": True,
+            "reviewedByRadar": True}
+    owner = dict(base, id=9001, source="Київ Радар (Пряма заявка)")
+    bad = [
+        dict(base, id=9002, source="owner"),
+        dict(base, id=9003, source="OLX"),
+        dict(base, id=9004, source="unlicensed_market"),
+        dict(owner, id=9005, phone="+380501112233"),
+        dict(owner, id=9006, ownerName="Private"),
+        dict(owner, id=9007, fixtureOnly=True),
+        dict(owner, id=9008, images=["https://thirdparty.example/test.jpg"]),
+        dict(base, id=9009, source="partner:agency", url="http://example.test/p/9", images=[]),
+        dict(base, id=9010, source="partner:agency", url="https://example.test/p/10",
+             images=["https://example.test/10.jpg"]),
+        dict(base, id=9011, source="partner:agency", url="https://example.test/p/11",
+             phoneMasked="+38050***", images=[]),
+    ]
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844})
+        async def source(route):
+            await route.fulfill(status=200, content_type="application/json",
+                headers={"Access-Control-Allow-Origin": "*"},
+                body=json.dumps({"success": True, "deals": bad + [owner]}))
+        await page.route("https://vmi3445944.contaboserver.net/api/deals*", source)
+        await page.goto(hosted_url, wait_until="domcontentloaded")
+        await page.wait_for_function("window.KR_CATALOG_MODE === 'live'", timeout=15000)
+        assert await page.evaluate("LISTINGS.length") == 1
+        assert await page.evaluate("LISTINGS[0].id") == 9001
         await browser.close()
