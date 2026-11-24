@@ -33,6 +33,10 @@ jobs:
         run: |
           node --check telegram-shell.js
           node --check kyiv-signal-theme.js
+          node --check auction-tab.js
+      - name: Verify auction staging pipeline and browser flows
+        run: |
+          python -m pytest -q tests/test_prozorro_review_projection.py tests/test_prozorro_auction_preview.py tests/test_prozorro_staging_pipeline.py tests/test_prozorro_auction_tab.py
       - name: Compile backend modules
         run: python -m compileall -q server scripts
       - name: Audit public listings without promoting unverified claims
@@ -93,8 +97,6 @@ jobs:
             tests/test_prozorro_target_probe.py \
             tests/test_prozorro_review_html.py \
             tests/test_prozorro_targeted_refresh.py \
-            tests/test_prozorro_review_projection.py \
-            tests/test_prozorro_auction_preview.py \
             tests/test_unverified_metro_v120.py \
             tests/test_rental_safety_v116.py \
             tests/test_listing_light_contrast_v116.py \
