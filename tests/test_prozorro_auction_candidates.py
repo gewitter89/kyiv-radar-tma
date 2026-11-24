@@ -105,3 +105,34 @@ def test_protected_or_test_procedure_is_never_a_candidate(field, value):
     p = payload()
     p[field] = value
     assert convert(p) is None
+
+
+def test_ale_multilingual_address():
+    p = payload()
+    p.update(auctionId="ALE001-UA-20261124-00000", sellingMethod="alienation-english")
+    p["items"][0]["address"] = {
+        "countryName": {"uk_UA": "Україна"},
+        "locality": {"uk_UA": "м. Київ"},
+        "region": {"uk_UA": "Київ"},
+    }
+    result = convert(p)
+    assert result["city"] == "Київ"
+    assert result["auction_id"].startswith("ALE001")
+    assert result["publication_allowed"] is False
+
+
+@pytest.mark.parametrize("locality", [
+    {"uk_UA": "Буча", "en_US": "Kyiv"}, {"en_US": "Kyiv"},
+    {"uk_UA": "Київська область"}, {"uk_UA": ["Київ"]},
+    "Київська", "*****",
+])
+def test_ambiguous_multilingual_city_is_rejected(locality):
+    p = payload()
+    p["items"][0]["address"]["locality"] = locality
+    assert convert(p) is None
+
+
+def test_ale_prefix_mismatch_is_rejected():
+    p = payload()
+    p["sellingMethod"] = "alienation-english"
+    assert convert(p) is None
