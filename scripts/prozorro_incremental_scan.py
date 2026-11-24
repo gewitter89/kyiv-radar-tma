@@ -12,7 +12,7 @@ except ImportError:
     from prozorro_auction_candidates import candidate, _aware, _utc
 
 
-def scan(*, since, now, limit=10, pages=3, request_fn=read_page):
+def scan(*, since, now, limit=10, pages=3, request_fn=read_page, consume_batch=None):
     now, cursor = _aware(now), _aware(since)
     if not timedelta(0) <= now - cursor <= timedelta(days=1):
         raise ValueError("Recent window required")
@@ -21,6 +21,7 @@ def scan(*, since, now, limit=10, pages=3, request_fn=read_page):
     if type(pages) is not int or not 1 <= pages <= 3:
         raise ValueError("At most three requests")
     seen = {}
+    batch = []  # Bounded transient payloads; never logged or saved as raw JSON.
     requests = count = 0
     stop = "page_budget"
     for _ in range(pages):
@@ -44,6 +45,8 @@ def scan(*, since, now, limit=10, pages=3, request_fn=read_page):
         if stamps != sorted(stamps):
             raise ValueError("Unordered feed")
         count += len(rows)
+        if consume_batch is not None:
+            batch.extend(rows)
         for row, stamp in zip(rows, stamps):
             key = row.get("auctionId")
             # Only canonical public IDs are held transiently; never log them.
@@ -63,6 +66,9 @@ def scan(*, since, now, limit=10, pages=3, request_fn=read_page):
             stop = "cursor_stalled"
             break
         cursor = stamps[-1]
+    if consume_batch is not None:
+        # Only commit after every requested page has passed validation.
+        consume_batch(batch)
     return {"requests": requests, "procedures_seen": count,
             "unique_review_candidates": sum(v[1] is not None for v in seen.values()),
             "stop_reason": stop, "coverage_complete": False,
