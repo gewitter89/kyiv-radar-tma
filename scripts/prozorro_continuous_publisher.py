@@ -9,7 +9,7 @@ from scripts.prozorro_atomic_publish import publish
 
 
 def run_continuous_publisher(candidates_path, decisions_path, key_path, output_path,
-                             *, interval=30.0, kill_switch_path=None, max_runs=None, enabled=False, collector_dir=None):
+                             *, interval=30.0, kill_switch_path=None, max_runs=None, enabled=False):
     """Periodically publish sealed snapshot while reusing verified candidates."""
     out = Path(output_path)
     if enabled is not True:
@@ -36,13 +36,6 @@ def run_continuous_publisher(candidates_path, decisions_path, key_path, output_p
                 except OSError:
                     pass
             return "kill_switch_triggered"
-
-        if collector_dir:
-            try:
-                from scripts.prozorro_candidate_handoff import export_handoff
-                export_handoff(collector_dir, candidates_path)
-            except Exception:
-                pass
 
         try:
             count, size = publish(candidates_path, decisions_path, key_path, output_path,
@@ -74,7 +67,6 @@ def main():
     parser.add_argument("--output", required=True)
     parser.add_argument("--interval", type=float, default=30.0, help="Publishing interval in seconds (default: 30)")
     parser.add_argument("--kill-switch", default=None, help="Path to kill switch file")
-    parser.add_argument("--collector-dir", default=None, help="Optional collector directory for automated handoff export")
     parser.add_argument("--max-runs", type=int, default=None, help="Maximum publishing iterations before stopping")
     parser.add_argument("--release", action="store_true", help="Explicitly enable approved auctions")
     args = parser.parse_args()
