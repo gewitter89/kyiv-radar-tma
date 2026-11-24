@@ -47,10 +47,12 @@ def export_handoff(collector_dir, destination_path, *, now=None, reader_gid=None
         raise ValueError("Target directory must exist and cannot be a symlink")
 
     parent_stat = parent.stat()
-    if (parent_stat.st_mode & 0o022) or (parent_stat.st_mode & 0o007):
+    if parent_stat.st_uid != os.geteuid() or (parent_stat.st_mode & 0o022) or (parent_stat.st_mode & 0o007):
         raise ValueError("Unsafe target directory permissions")
 
-    payload = json.dumps(rows, ensure_ascii=True, sort_keys=True, indent=2).encode("utf-8")
+    payload = json.dumps(rows, ensure_ascii=True, sort_keys=True, separators=(',', ':')).encode('utf-8')
+    if len(payload) > 1024 * 1024:
+        raise ValueError('Handoff exceeds bounded size')
 
     lock_path = parent / ".handoff.lock"
     lock_fd = os.open(lock_path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK, 0o600)
