@@ -678,6 +678,28 @@ async def get_live_deals(response: Response):
         "timestamp": int(time.time())
     }
 
+@app.get("/api/auctions")
+async def staged_auctions():
+    # Separate read-only staging route. No public enablement in this release.
+    if APP_ENV not in ("staging", "test") or os.getenv("KYIV_RADAR_AUCTIONS_PREVIEW") != "1":
+        raise HTTPException(status_code=404, detail="Not found", headers={"Cache-Control":"no-store"})
+    from datetime import datetime, timezone
+    from fastapi.responses import JSONResponse
+    try:
+        try:
+            from .auction_snapshot import load
+        except ImportError:
+            from auction_snapshot import load
+        rows = load(os.getenv("KYIV_RADAR_AUCTION_SNAPSHOT"),
+                    os.getenv("KYIV_RADAR_AUCTION_KEY"), now=datetime.now(timezone.utc))
+    except Exception:
+        # Do not leak filesystem paths, signatures or private state.
+        return JSONResponse({"available":False,"auctions":[]},status_code=503,
+                            headers={"Cache-Control":"no-store"})
+    return JSONResponse({"available":True,"auctions":rows,"coverage_complete":False},
+                        headers={"Cache-Control":"no-store"})
+
+
 @app.post("/api/reports")
 async def submit_report(req: ReportRequest, request: Request):
     client_ip = client_ip_for_rate_limit(request)
