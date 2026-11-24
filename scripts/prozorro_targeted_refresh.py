@@ -2,6 +2,7 @@
 import argparse
 import json
 from datetime import datetime, timezone
+from pathlib import Path
 
 from .prozorro_auction_candidates import AUCTION_ID, METHODS, _aware, _utc
 from .prozorro_probe import read_page, MAX_BYTES
