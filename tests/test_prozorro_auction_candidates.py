@@ -94,3 +94,14 @@ def test_malformed_record_and_naive_observation():
     assert convert(None) is None
     with pytest.raises(ValueError):
         convert(payload(), NOW.replace(tzinfo=None))
+
+
+@pytest.mark.parametrize("field,value", [
+    ("_protected", True), ("_protected", "false"),
+    ("_protect_level", "medium"), ("_protect_level", "hight"),
+    ("mode", "test"),
+])
+def test_protected_or_test_procedure_is_never_a_candidate(field, value):
+    p = payload()
+    p[field] = value
+    assert convert(p) is None
