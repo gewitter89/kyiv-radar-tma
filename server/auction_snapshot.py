@@ -102,13 +102,13 @@ def _trusted_publisher_uids():
     return uids
 
 
-def read_file(value, limit):
+def read_file(value, limit, *, owner_uid=None):
     if not value:
         raise ValueError("Private path required")
     path = Path(value)
     if not path.is_absolute() or path.resolve()!=path or path.is_relative_to(ROOT):
         raise ValueError("Unsafe path")
-    trusted_uids = _trusted_publisher_uids()
+    trusted_uids = _trusted_publisher_uids() if owner_uid is None else {owner_uid}
     parent = path.parent.stat()
     if (parent.st_mode & 0o022) or (parent.st_mode & 0o007) or parent.st_uid not in trusted_uids:
         raise ValueError("Unsafe directory")
