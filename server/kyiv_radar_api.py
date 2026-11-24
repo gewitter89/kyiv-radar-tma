@@ -46,11 +46,11 @@ from fastapi.responses import FileResponse
 
 try:
     from .listing_trust import load_private_register, public_listing_view
-    from .partner_visibility import enforce_partner_visibility
+    from .partner_visibility import enforce_partner_visibility, is_partner_item
     from .partner_publication import read_private_export
 except ImportError:
     from listing_trust import load_private_register, public_listing_view
-    from partner_visibility import enforce_partner_visibility
+    from partner_visibility import enforce_partner_visibility, is_partner_item
     from partner_publication import read_private_export
 from pydantic import BaseModel, Field
 
@@ -493,7 +493,12 @@ def load_trusted_deals() -> List[Dict[str, Any]]:
             with open(DEALS_JSON_PATH, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 if isinstance(data, list):
-                    base = data
+                    # Static/legacy catalogs are NOT a publication channel for
+                    # partner content, even when a matching private rights DB
+                    # and review entry exist. Only read_private_export() may
+                    # introduce a partner listing after private authorization.
+                    base = [row for row in data
+                            if isinstance(row, dict) and not is_partner_item(row)]
         except Exception as e:
             logger.error("Unable to load source catalog: %s", type(e).__name__)
             API_METRICS["db_errors"] += 1
