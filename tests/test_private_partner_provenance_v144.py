@@ -2,6 +2,7 @@
 """Partner metadata must originate from private authorization, never static JSON."""
 import json
 import os
+import sqlite3
 
 os.environ.setdefault("APP_ENV", "test")
 os.environ.setdefault("BOT_TOKEN", "123456789:LOCAL_PROVENANCE_TEST")
@@ -26,6 +27,12 @@ def partner(item_id=20):
 
 
 def test_static_json_cannot_inject_partner_even_with_review_flags(tmp_path, monkeypatch):
+    # A true owner publication has a current SQLite status, not just a JSON flag.
+    db = tmp_path / "owner.sqlite"
+    with sqlite3.connect(db) as conn:
+        conn.execute("CREATE TABLE landlord_submissions (id INTEGER PRIMARY KEY, status TEXT)")
+        conn.execute("INSERT INTO landlord_submissions VALUES (300, 'published')")
+    monkeypatch.setattr(api, "DB_PATH", str(db))
     static = tmp_path / "catalog.json"
     fake = partner()
     stealth = dict(direct_owner(21), partnerExternalId="P-21")
