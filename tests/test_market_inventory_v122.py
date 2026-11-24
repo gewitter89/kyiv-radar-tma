@@ -232,3 +232,29 @@ def test_csv_source_and_no_copied_contacts(tmp_path):
     out = ingest(path, a, tmp_path / "private.db", now=NOW)
     assert out["accepted"] == 1
     assert out["contacts_copied"] == 0
+
+
+@pytest.mark.parametrize("suffix", [
+    "?id=123", "?listing=456&utm_source=test", "?token=secret",
+    "#/offer/123", "?utm_source", "?%69d=123",
+])
+def test_ambiguous_permalink_is_rejected_not_rewritten(suffix):
+    with pytest.raises(ValueError, match="Source URL"):
+        canonical_url("https://example-agency.ua/offer" + suffix, ["example-agency.ua"])
+
+
+def test_tracking_only_permalink_is_canonical():
+    assert canonical_url(
+        "https://example-agency.ua/offer/123?utm_source=test&gclid=xyz",
+        ["example-agency.ua"],
+    ) == "https://example-agency.ua/offer/123"
+
+
+def test_ambiguous_second_permalink_rolls_back_first_row(tmp_path):
+    a = agreement(tmp_path / "grant.json")
+    db = tmp_path / "private.db"
+    f = feed(tmp_path / "feed.jsonl", [item(1), item(2, source_url=
+        "https://example-agency.ua/offer?id=2")])
+    with pytest.raises(ValueError, match="Source URL"):
+        ingest(f, a, db, now=NOW)
+    assert not db_rows(db)
