@@ -1120,8 +1120,9 @@
 
             // Flag uncertain imported metadata; do not substitute guessed values.
             if (typeof window.krQualityCatalog === "function") LISTINGS = window.krQualityCatalog(LISTINGS);
-            document.getElementById('filterAll').innerText = `Всі (${LISTINGS.length})`;
-            document.getElementById('activeListingsCount').innerText = `Оголошення: ${LISTINGS.length}`;
+            const unavailable = window.KR_CATALOG_MODE === 'unavailable';
+            document.getElementById('filterAll').innerText = unavailable ? 'Всі (—)' : `Всі (${LISTINGS.length})`;
+            document.getElementById('activeListingsCount').innerText = unavailable ? 'Оголошення: —' : `Оголошення: ${LISTINGS.length}`;
             renderAll();
         }
 
@@ -1472,14 +1473,15 @@
 
             if (items.length === 0) {
                 const emptyCatalog = LISTINGS.length === 0;
+                const catalogUnavailable = emptyCatalog && window.KR_CATALOG_MODE === 'unavailable';
                 const noSaved = !emptyCatalog && ACTIVE_FILTERS.favs && FAVORITES.size === 0;
                 const savedMissing = !emptyCatalog && ACTIVE_FILTERS.favs &&
                     FAVORITES.size > 0 && !LISTINGS.some(item => FAVORITES.has(Number(item.id)));
                 listEl.innerHTML = `
                     <div class="kr-empty-state">
-                        <div class="text-white font-semibold text-base">${emptyCatalog ? 'Зараз немає доступних оголошень' : noSaved ? 'Обраних квартир поки немає' : savedMissing ? 'Збережені оголошення зараз недоступні' : 'Нічого не знайдено'}</div>
-                        <p class="mt-2 text-sm text-[#aebdd0]">${emptyCatalog ? 'Опубліковані пропозиції тимчасово відсутні. Не показуємо зняті оголошення.' : noSaved ? 'Натисніть сердечко на квартирі, щоб зберегти її тут. Обрані залишаються лише у цьому браузері.' : savedMissing ? 'Ці квартири наразі відсутні в доступному каталозі. Ми не показуємо зняті або недоступні оголошення як активні.' : 'Змініть район, бюджет або інші умови.'}</p>
-                        ${emptyCatalog ? '' : '<button type="button" onclick="setFilter(\'all\')" class="kr-reset mt-4">Скинути фільтри</button>'}
+                        <div class="text-white font-semibold text-base">${catalogUnavailable ? 'Каталог тимчасово недоступний' : emptyCatalog ? 'Зараз немає доступних оголошень' : noSaved ? 'Обраних квартир поки немає' : savedMissing ? 'Збережені оголошення зараз недоступні' : 'Нічого не знайдено'}</div>
+                        <p class="mt-2 text-sm text-[#aebdd0]">${catalogUnavailable ? 'Не вдалося отримати актуальні дані. Старі оголошення приховано, щоб не показувати зняті квартири як доступні.' : emptyCatalog ? 'Опубліковані пропозиції тимчасово відсутні. Не показуємо зняті оголошення.' : noSaved ? 'Натисніть сердечко на квартирі, щоб зберегти її тут. Обрані залишаються лише у цьому браузері.' : savedMissing ? 'Ці квартири наразі відсутні в доступному каталозі. Ми не показуємо зняті або недоступні оголошення як активні.' : 'Змініть район, бюджет або інші умови.'}</p>
+                        ${catalogUnavailable ? '<button type="button" onclick="loadDeals()" class="kr-reset mt-4">Спробувати ще раз</button>' : emptyCatalog ? '' : '<button type="button" onclick="setFilter(\'all\')" class="kr-reset mt-4">Скинути фільтри</button>'}
                     </div>
                 `;
                 return;
