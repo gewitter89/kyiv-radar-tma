@@ -10,6 +10,7 @@ on:
       - scripts/prozorro_review_cache.py
       - scripts/prozorro_review_sync.py
       - scripts/prozorro_auction_candidates.py
+      - ops/prozorro-pilot/**
       - .github/workflows/prozorro-probe.yml
 permissions:
   contents: read
@@ -19,7 +20,7 @@ concurrency:
 jobs:
   public-endpoint:
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 4
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,3 +51,8 @@ jobs:
           trap 'rm -rf -- "$dir"' EXIT
           chmod 700 "$dir"
           python3 -m scripts.prozorro_targeted_refresh --live-private-review --private-dir "$dir"
+          # Second cycle against the same isolated database verifies direct recheck.
+          python3 -m scripts.prozorro_targeted_refresh --live-private-review --private-dir "$dir"
+
+      - name: Check staged service and timer syntax (no installation)
+        run: systemd-analyze verify ops/prozorro-pilot/kyiv-radar-auction-pilot.service ops/prozorro-pilot/kyiv-radar-auction-pilot.timer
