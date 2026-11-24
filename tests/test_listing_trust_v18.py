@@ -165,19 +165,32 @@ def test_catalog_audit_rejects_duplicates_and_private_contacts():
     assert len(report["fatal"]) >= 2
 
 
-def test_monitor_accepts_actual_product_title_not_only_old_exact_title():
-    verify_pages_html("<!doctype html><html><head><title>Київ Радар — оренда з урахуванням автономності</title></head></html>")
+def test_monitor_accepts_actual_product_title_with_empty_static_catalog():
+    page = (
+        "<!doctype html><html><head><title>Київ Радар — оренда з урахуванням автономності</title></head>"
+        "<body><script>const KYIV_DEALS_INIT = []; "
+        "function approvedHostedListing(item){}</script></body></html>"
+    )
+    verify_pages_html(page)
     with pytest.raises(AssertionError):
-        verify_pages_html("<html><title>Unrelated site</title></html>")
+        verify_pages_html(page.replace("Київ Радар", "Unrelated site"))
 
 
 def test_monitor_catches_public_data_exposure_and_malformed_api():
-    health = {"status": "healthy", "version": "1.6.0"}
-    assert verify_public_api(health, {"success": True, "deals": [{"id": 1, "phone": None}]}) == 1
+    health = {"status": "healthy", "version": "1.6.0", "deals_count": 1}
+    row = {"id": 1, "source": "Київ Радар (Пряма заявка)", "phone": None}
+    assert verify_public_api(health, {"success": True, "deals": [row]}) == 1
     with pytest.raises(AssertionError):
-        verify_public_api(health, {"success": True, "deals": [{"id": 1, "phone": "+380501111111"}]})
+        verify_public_api(health, {"success": True, "deals": [
+            dict(row, phone="+380501111111")
+        ]})
     with pytest.raises(AssertionError):
-        verify_public_api(health, {"success": True, "deals": [{"id": 1}, {"id": 1}]})
+        verify_public_api(dict(health, deals_count=2), {"success": True,
+                                                        "deals": [row, row]})
+    with pytest.raises(AssertionError):
+        verify_public_api(health, {"success": True, "deals": [
+            {"id": 1, "source": "OLX", "phone": None}
+        ]})
 
 
 def test_hidden_listing_contact_is_rejected_even_with_valid_telegram_auth(monkeypatch, tmp_path):
