@@ -2,8 +2,11 @@
 import argparse
 import json
 import re
+import tempfile
+from pathlib import Path
 from datetime import datetime, timezone
 from .prozorro_probe import read_page, MAX_BYTES
+from .prozorro_review_cache import apply_page, review_candidates
 from .prozorro_auction_candidates import candidate, address_label, KYIV, UKRAINE, KYIV_REGION
 
 BASE = "https://procedure.prozorro.sale/api/procedures/"
@@ -32,6 +35,14 @@ def inspect(*, procedure_id, auction_id, request_fn=read_page, now=None):
     value = row.get("value")
     period = row.get("tenderPeriod")
     now = now or datetime.now(timezone.utc)
+    accepted = candidate(row, observed_at=now, now=now) is not None
+    stored = False
+    if accepted:
+        with tempfile.TemporaryDirectory() as directory:
+            cache = Path(directory)
+            apply_page(cache, [row], observed_at=now, now=now)
+            records = review_candidates(cache, now=now)
+            stored = len(records) == 1 and records[0]["auction_id"] == auction_id and records[0]["publication_allowed"] is False
     return {
         "identity_confirmed": True,
         "ale_method": row.get("sellingMethod") == "alienation-english",
@@ -44,7 +55,8 @@ def inspect(*, procedure_id, auction_id, request_fn=read_page, now=None):
         "uah": isinstance(value, dict) and value.get("currency") == "UAH",
         "vat_boolean": isinstance(value, dict) and type(value.get("valueAddedTaxIncluded")) is bool,
         "tender_window_present": isinstance(period, dict) and all(isinstance(period.get(k), str) for k in ("startDate", "endDate")),
-        "current_adapter_accepts": candidate(row, observed_at=now, now=now) is not None,
+        "current_adapter_accepts": accepted,
+        "private_cache_verified": stored,
         "publications": 0,
     }
 
