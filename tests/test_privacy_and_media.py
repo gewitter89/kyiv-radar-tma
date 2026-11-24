@@ -54,7 +54,7 @@ def privacy_test_env():
             {
                 "id": 1,
                 "source": "Київ Радар (Пряма заявка)",
-                "submission_id": 1,
+                "submission_id": 990001,
                 "moderationStatus": "approved",
                 "title": "Квартира #1",
                 "address": "вул. Хрещатик, 1",
