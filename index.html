@@ -1054,49 +1054,55 @@
                 !String(item.source || "").toLowerCase().startsWith("partner:"));
         }
 
-        // 3. LOAD DEALS (High-speed load with live VPS API synchronization)
-        async function loadDeals() {
-            window.KR_CATALOG_MODE = "cached";
-            if (typeof KYIV_DEALS_INIT !== 'undefined' && Array.isArray(KYIV_DEALS_INIT)) {
-                LISTINGS = staticCatalogWithoutPartners(KYIV_DEALS_INIT);
-            }
+        // Public catalog never upgrades archived open-source imports into live offers.
+        // Genuine permissioned partner + owner items require evidence-backed backend review.
+        function approvedHostedListing(item) {
+            if (!item || typeof item !== 'object') return false;
+            const source = String(item.source || '').trim().toLowerCase();
+            if (['olx', 'dom.ria', 'dim.ria', 'dim_ria'].includes(source)) return false;
+            if (item.verificationStatus === 'imported') return false;
+            return item.actualityConfirmed === true && item.reviewedByRadar === true;
+        }
 
-            // A slow API must not freeze the first visit; fall back to static/offline data.
+        // 3. LOAD DEALS: HTTPS is fail-closed; file:// keeps isolated legacy
+        // test fixtures until synthetic browser fixtures are migrated (#55).
+        async function loadDeals() {
+            const localFixturePreview = window.location.protocol === 'file:';
+            window.KR_CATALOG_MODE = "loading";
+            LISTINGS = localFixturePreview && Array.isArray(KYIV_DEALS_INIT)
+                ? staticCatalogWithoutPartners(KYIV_DEALS_INIT) : [];
+
             const controller = new AbortController();
             const abortTimer = setTimeout(() => controller.abort(), 6000);
-            // Sync with live production HTTPS API so newly approved landlord deals appear immediately
             try {
                 const res = await fetch(
                     'https://vmi3445944.contaboserver.net/api/deals?v=' + Date.now(),
                     { signal: controller.signal, cache: 'no-store' }
                 );
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && data.success && Array.isArray(data.deals)) {
-                        LISTINGS = data.deals;
-                        window.KR_CATALOG_MODE = "live";
-                    }
-                } else {
-                    const resJson = await fetch('data/deals.json?v=' + Date.now());
-                    if (resJson.ok) {
-                        const dataJson = await resJson.json();
-                        if (Array.isArray(dataJson) && dataJson.length > 0) {
-                            LISTINGS = staticCatalogWithoutPartners(dataJson);
-                            window.KR_CATALOG_MODE = "static";
-                        }
-                    }
+                if (!res.ok) throw new Error('catalog_http_error');
+                const data = await res.json();
+                if (!data || data.success !== true || !Array.isArray(data.deals)) {
+                    throw new Error('catalog_invalid_response');
                 }
-            } catch (e) {
-                try {
-                    const resJson = await fetch('data/deals.json?v=' + Date.now());
-                    if (resJson.ok) {
-                        const dataJson = await resJson.json();
-                        if (Array.isArray(dataJson) && dataJson.length > 0) {
-                            LISTINGS = staticCatalogWithoutPartners(dataJson);
-                            window.KR_CATALOG_MODE = "static";
+                LISTINGS = localFixturePreview
+                    ? data.deals : data.deals.filter(approvedHostedListing);
+                window.KR_CATALOG_MODE = "live";
+            } catch (error) {
+                if (localFixturePreview) {
+                    try {
+                        const resJson = await fetch('data/deals.json?v=' + Date.now());
+                        if (resJson.ok) {
+                            const dataJson = await resJson.json();
+                            if (Array.isArray(dataJson)) {
+                                LISTINGS = staticCatalogWithoutPartners(dataJson);
+                                window.KR_CATALOG_MODE = "fixture";
+                            }
                         }
-                    }
-                } catch (err) {}
+                    } catch (ignored) { /* test fixture unavailable */ }
+                } else {
+                    LISTINGS = [];
+                    window.KR_CATALOG_MODE = "unavailable";
+                }
             } finally {
                 clearTimeout(abortTimer);
             }
