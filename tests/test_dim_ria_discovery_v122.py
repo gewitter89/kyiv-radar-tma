@@ -3,7 +3,7 @@
 import json
 import sqlite3
 import urllib.parse
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -109,3 +109,71 @@ def test_empty_page_ends_discovery_early(tmp_path):
     outcome=execute(tmp_path,request)
     assert outcome["pages_requested"]==1
     assert len(calls)==1
+
+
+def test_100_call_free_tier_fails_closed_before_request(tmp_path):
+    database = tmp_path / "private.sqlite"
+    con = db_connect(database)
+    # Spread calls over several hours to isolate 30-day budget from hourly cap.
+    for i in range(100):
+        reserve_quota(con, NOW + timedelta(hours=(i // 20) * 2))
+    con.close()
+    sent = []
+    with pytest.raises(ValueError, match="budget exhausted"):
+        discover(grant(tmp_path / "a.json"), database, api_key=KEY,
+                 category=1, realty_type=2, operation_type=1,
+                 state_id=10, city_id=10, pages=1,
+                 now=NOW + timedelta(days=1),
+                 request_fn=lambda url: sent.append(url) or b'{"items":[]}')
+    assert not sent
+
+
+def test_new_calendar_month_does_not_reset_rolling_30_days(tmp_path):
+    database = tmp_path / "private.sqlite"
+    con = db_connect(database)
+    last_day = datetime(2026, 11, 30, 23, 40, tzinfo=timezone.utc)
+    for i in range(100):
+        reserve_quota(con, last_day - timedelta(hours=5) + timedelta(minutes=3 * i))
+    with pytest.raises(ValueError, match="budget exhausted"):
+        reserve_quota(con, datetime(2026, 12, 1, 8, 0, tzinfo=timezone.utc))
+    con.close()
+
+
+def test_rolling_hour_prevents_boundary_burst(tmp_path):
+    con = db_connect(tmp_path / "private.sqlite")
+    near_boundary = datetime(2026, 11, 17, 12, 58, tzinfo=timezone.utc)
+    for _ in range(30):
+        reserve_quota(con, near_boundary)
+    with pytest.raises(ValueError, match="budget exhausted"):
+        reserve_quota(con, datetime(2026, 11, 17, 13, 1, tzinfo=timezone.utc))
+    reserve_quota(con, datetime(2026, 11, 17, 14, 0, tzinfo=timezone.utc))
+    con.close()
+
+
+def test_rolling_30_day_window_eventually_expires(tmp_path):
+    con = db_connect(tmp_path / "private.sqlite")
+    for i in range(100):
+        reserve_quota(con, NOW + timedelta(hours=(i // 20) * 2))
+    with pytest.raises(ValueError, match="budget exhausted"):
+        reserve_quota(con, NOW + timedelta(days=29))
+    reserve_quota(con, NOW + timedelta(days=32))
+    con.close()
+
+
+def test_legacy_quota_schema_preserved_fail_closed(tmp_path):
+    database = tmp_path / "private.sqlite"
+    with sqlite3.connect(database) as conn:
+        conn.execute("CREATE TABLE quota (hour_utc TEXT NOT NULL, "
+                     "month_utc TEXT NOT NULL, consumed INTEGER NOT NULL)")
+        conn.executemany("INSERT INTO quota VALUES (?,?,1)",
+                         [("2026-11-10T12", "2026-11")] * 100)
+    con = db_connect(database)
+    assert "requested_at_utc" in {
+        r[1] for r in con.execute("PRAGMA table_info(quota)")}
+    assert con.execute("SELECT COUNT(*) FROM quota").fetchone()[0] == 100
+    with pytest.raises(ValueError, match="budget exhausted"):
+        reserve_quota(con, NOW)
+    # Old coarse buckets remain counted across the calendar boundary.
+    with pytest.raises(ValueError, match="budget exhausted"):
+        reserve_quota(con, datetime(2026, 12, 1, tzinfo=timezone.utc))
+    con.close()
