@@ -93,6 +93,7 @@ jobs:
             tests/test_prozorro_target_probe.py \
             tests/test_prozorro_review_html.py \
             tests/test_prozorro_targeted_refresh.py \
+            tests/test_prozorro_review_projection.py \
             tests/test_unverified_metro_v120.py \
             tests/test_rental_safety_v116.py \
             tests/test_listing_light_contrast_v116.py \
