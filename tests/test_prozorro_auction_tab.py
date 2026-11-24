@@ -6,12 +6,12 @@ import pytest
 from playwright.async_api import async_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
-ORIGIN="https://auction-test.invalid"
+ORIGIN="http://127.0.0.1:8765"
 HTML='<!doctype html><html lang="uk"><head><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/auction-tab.css"></head><body><header>КИЇВ РАДАР</header><script src="/auction-tab.js"></script></body></html>'
 
 
-def response():
-    now=datetime.now(timezone.utc)
+def response(now=None):
+    now=now or datetime.now(timezone.utc)
     rows=[]
     for n,price in [(1,"2000000.00"),(2,"1000000.00")]:
         key=f"ALE001-UA-20261124-{n:05d}"
@@ -25,7 +25,8 @@ def response():
 
 async def configure(page, *, enabled=True):
     calls=[]
-    state={"available":True}
+    state={"available":True,"errors":[]}
+    page.on("pageerror",lambda error: state["errors"].append(str(error)))
     async def route(r):
         path=r.request.url.removeprefix(ORIGIN)
         if path=="/":
@@ -36,9 +37,9 @@ async def configure(page, *, enabled=True):
         elif path=="/api/auctions":
             calls.append(path)
             if state["available"]:
-                await r.fulfill(json=response())
+                await r.fulfill(status=200,content_type="application/json",body=json.dumps(response(),ensure_ascii=False))
             else:
-                await r.fulfill(status=503,json={"available":False,"auctions":[]})
+                await r.fulfill(status=503,content_type="application/json",body=json.dumps({"available":False,"auctions":[]}))
         else:
             await r.abort()
     await page.route("**/*",route)
@@ -75,7 +76,10 @@ async def test_filters_favorites_telegram_and_layout(width,height):
         calls,state=await configure(page)
         await page.locator("#krAuctionsNav").click()
         cards=page.locator("#krAuctionList article")
-        await cards.nth(1).wait_for()
+        try:
+            await cards.nth(1).wait_for(timeout=8000)
+        except Exception:
+            pytest.fail(f"auction cards missing: calls={calls}, errors={state['errors']}, status={await page.locator('#krAuctionDialog [role=status]').inner_text()}, hidden={await page.evaluate('document.hidden')}")
         assert calls==["/api/auctions"]
         assert await page.locator("#krAuctionDialog").evaluate("(e)=>e.scrollWidth<=e.clientWidth+1")
         await page.locator("#krAuctionSort").select_option("price")
@@ -89,7 +93,10 @@ async def test_filters_favorites_telegram_and_layout(width,height):
         assert (await page.evaluate("window.__links"))==["https://prozorro.sale/auction/ALE001-UA-20261124-00002/"]
         await page.reload()
         await page.locator("#krAuctionsNav").click()
-        await cards.nth(1).wait_for()
+        try:
+            await cards.nth(1).wait_for(timeout=8000)
+        except Exception:
+            pytest.fail(f"auction cards missing: calls={calls}, errors={state['errors']}, status={await page.locator('#krAuctionDialog [role=status]').inner_text()}, hidden={await page.evaluate('document.hidden')}")
         await page.locator("#krAuctionOnlyFav").check()
         assert await cards.count()==1
         assert "00002" in await cards.first.inner_text()
