@@ -14,6 +14,11 @@ from collections import defaultdict
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+try:
+    from .room_claims import has_room_conflict
+except ImportError:
+    from room_claims import has_room_conflict
+
 ROOT = Path(__file__).resolve().parents[1]
 IMPORTED = {"OLX", "DOM.RIA"}
 SOURCE_ID = re.compile(r"(?:-|/)(ID[A-Z0-9]{4,})(?:[./]|$)", re.I)
@@ -145,6 +150,12 @@ def analyze_integrity(records: object) -> dict:
         x["priority"] != "high_review",
         -x["shared_photo_count"], x["ids"]
     ))
+    # Derived leads only; never copy source descriptions, phones or pictures.
+    room_conflict_ids = [
+        r["id"] for r in valid if has_room_conflict(
+            r.get("rooms"), r.get("title"), r.get("desc")
+        ) or r.get("roomConflict") is True
+    ]
     imported = [r for r in valid if str(r.get("source", "")).strip().upper() in IMPORTED]
     return {
         "schema_version": 1,
@@ -152,6 +163,8 @@ def analyze_integrity(records: object) -> dict:
         "source_distribution": {name: sum(str(r.get("source", "")).strip().upper() == name
                                           for r in valid) for name in sorted(IMPORTED)},
         "imported_without_evidence_of_republish_rights": len(imported),
+        "room_conflict_count": len(room_conflict_ids),
+        "room_conflict_ids_for_manual_review": room_conflict_ids,
         "unconfirmed_availability": sum(r.get("actualityConfirmed") is not True for r in valid),
         "unconfirmed_owner": sum(r.get("isOwnerVerified") is not True for r in valid),
         "unconfirmed_zero_commission": sum(r.get("commissionVerified") is not True for r in valid),
@@ -187,6 +200,7 @@ def main() -> int:
             "total": report["total"],
             "candidate_pairs": report["candidate_pair_count"],
             "high_review_count": report["high_review_count"],
+            "room_conflicts": report["room_conflict_count"],
             "unknown_publication": report["missing_source_publication_timestamp"],
             "unknown_last_seen": report["missing_source_last_seen_timestamp"],
             "rights_needing_review": report["imported_without_evidence_of_republish_rights"],

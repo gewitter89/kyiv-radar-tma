@@ -17,6 +17,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
+try:
+    from .room_claims import validate_feed_rooms
+except ImportError:
+    from room_claims import validate_feed_rooms
+
 ROOT = Path(__file__).resolve().parents[1]
 OPERATIONS = {"rent", "sale", "daily_rent"}
 PROPERTY_TYPES = {"apartment", "room", "house", "townhouse", "commercial",
@@ -236,6 +241,9 @@ def normalise(row: object, agreement: dict) -> dict:
     if unit is not None and (not isinstance(unit, str) or len(unit) > 128 or
                              any(ord(ch) < 32 for ch in unit)):
         raise ValueError("Invalid unit_key")
+    checked_rooms = integer(row.get("rooms"), "rooms", 100)
+    # Transient authorized title/description: compare, never store private text.
+    validate_feed_rooms(row, checked_rooms)
     return {
         "external_id": key,
         "source_url": canonical_url(row.get("source_url"), agreement["allowed_source_hosts"]),
@@ -244,7 +252,7 @@ def normalise(row: object, agreement: dict) -> dict:
         "city": city.strip(),
         "district": district.strip() if district else None,
         "price_uah": integer(row.get("price_uah"), "price_uah", 10**12),
-        "rooms": integer(row.get("rooms"), "rooms", 100),
+        "rooms": checked_rooms,
         "area_m2": area,
         "unit_key": unit,
         # Titles, descriptions, owner information, phone, coordinates and photos
