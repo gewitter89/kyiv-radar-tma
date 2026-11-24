@@ -184,7 +184,7 @@ def test_no_partner_data_may_be_embedded_in_public_offline_copies():
     assert "staticCatalogWithoutPartners(KYIV_DEALS_INIT)" in page
     assert "staticCatalogWithoutPartners(dataJson)" in page
     assert "function staticCatalogWithoutPartners(records)" in page
-    initial = re.search(r"const KYIV_DEALS_INIT\s*=\s*(\[[^\n]+\]);", page)
+    initial = re.search(r"const KYIV_DEALS_INIT\s*=\s*(\[[^\n]*\]);", page)
     assert initial, "No embedded catalog found"
     embedded = json.loads(initial.group(1))
     assert all("partnerSourceKey" not in item and

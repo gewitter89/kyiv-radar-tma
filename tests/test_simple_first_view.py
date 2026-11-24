@@ -29,13 +29,15 @@ async def test_phone_first_view_shows_photos_not_full_screen_map():
         assert await page.locator("#krRoomsTrigger").is_visible()
         assert await page.locator("#filterPower").is_hidden()
         assert await page.locator("#filterRooms3").is_hidden()
-        # Catalog may re-render while its live snapshot is being refreshed.
-        # Wait for an actual, sized image frame instead of sampling mid-repaint.
+        # Test only the frame's geometry: synthetic QA photos are deliberately
+        # on example.invalid and must NOT be fetched as real estate media.
+        # A neutral missing-photo placeholder is a valid production design.
         await page.wait_for_function("""() => {
-          const img = document.querySelector("#listViewContainer img.kr-gallery-image");
-          if (!img) return false;
-          const rect = img.getBoundingClientRect();
-          return rect.width > 100 && rect.height > 100 && getComputedStyle(img).visibility !== 'hidden';
+          const first = document.querySelector('#listViewContainer > div[onclick]');
+          const media = first && first.querySelector('.relative.h-48');
+          if (!media) return false;
+          const rect = media.getBoundingClientRect();
+          return rect.width > 100 && rect.height > 100;
         }""", timeout=10000)
         assert await page.locator("#listViewContainer > div[onclick]").count() >= 10
         first_card = await page.locator("#listViewContainer > div[onclick]").nth(0).bounding_box()
