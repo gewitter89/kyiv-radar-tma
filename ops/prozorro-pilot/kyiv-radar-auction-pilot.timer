@@ -1,0 +1,12 @@
+[Unit]
+Description=Schedule isolated Kyiv Radar auction review pilot
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=20min
+RandomizedDelaySec=1min
+AccuracySec=30s
+Unit=kyiv-radar-auction-pilot.service
+
+[Install]
+WantedBy=timers.target

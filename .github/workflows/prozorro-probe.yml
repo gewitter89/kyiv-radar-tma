@@ -1,0 +1,58 @@
+name: Open-data read-only probe
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/prozorro_probe.py
+      - scripts/prozorro_target_probe.py
+      - scripts/prozorro_targeted_refresh.py
+      - scripts/prozorro_incremental_scan.py
+      - scripts/prozorro_review_cache.py
+      - scripts/prozorro_review_sync.py
+      - scripts/prozorro_auction_candidates.py
+      - ops/prozorro-pilot/**
+      - .github/workflows/prozorro-probe.yml
+permissions:
+  contents: read
+concurrency:
+  group: prozorro-probe-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  public-endpoint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: One bounded public GET; print aggregate counts only
+        run: python3 scripts/prozorro_probe.py --live-read-only --limit 3
+
+      - name: Bounded three-page incremental diagnostic
+        run: python3 scripts/prozorro_incremental_scan.py --live-read-only
+
+      - name: Live feed to disposable private SQLite (aggregate only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir="$(mktemp -d)"
+          trap 'rm -rf -- "$dir"' EXIT
+          chmod 700 "$dir"
+          python3 -m scripts.prozorro_review_sync --live-private-review --private-dir "$dir"
+
+      - name: Targeted public apartment schema check (one GET, no raw logs)
+        run: python3 -m scripts.prozorro_target_probe --live-read-only --procedure-id 6b05418490b317f67c94dd0f --auction-id ALE001-UA-20261124-04958
+
+      - name: Targeted discovery and private review refresh
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir="$(mktemp -d)"
+          trap 'rm -rf -- "$dir"' EXIT
+          chmod 700 "$dir"
+          python3 -m scripts.prozorro_targeted_refresh --live-private-review --private-dir "$dir"
+          # Second cycle against the same isolated database verifies direct recheck.
+          python3 -m scripts.prozorro_targeted_refresh --live-private-review --private-dir "$dir"
+
+      - name: Check staged service and timer syntax (no installation)
+        run: systemd-analyze verify ops/prozorro-pilot/kyiv-radar-auction-pilot.service ops/prozorro-pilot/kyiv-radar-auction-pilot.timer

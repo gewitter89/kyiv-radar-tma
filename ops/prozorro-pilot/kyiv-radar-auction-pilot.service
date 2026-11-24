@@ -1,0 +1,31 @@
+[Unit]
+Description=Kyiv Radar isolated Prozorro private review pilot
+Wants=network-online.target
+After=network-online.target
+ConditionPathExists=/opt/kyiv-radar-auction-pilot/scripts/prozorro_targeted_refresh.py
+
+[Service]
+Type=oneshot
+User=kyiv-radar-auction
+Group=kyiv-radar-auction
+StateDirectory=kyiv-radar-auction-pilot
+StateDirectoryMode=0700
+WorkingDirectory=/opt/kyiv-radar-auction-pilot
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -m scripts.prozorro_targeted_refresh --live-private-review --private-dir /var/lib/kyiv-radar-auction-pilot
+UMask=0077
+TimeoutStartSec=150
+MemoryMax=128M
+CPUQuota=25%
+TasksMax=16
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
