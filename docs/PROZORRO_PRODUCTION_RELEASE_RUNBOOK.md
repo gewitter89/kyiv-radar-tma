@@ -89,21 +89,30 @@ KYIV_RADAR_PUBLISHER_UID=1004  # UID of kyiv-radar-reviewer
 
 ---
 
-## 4. Continuous Publisher & Emergency Dual Kill-Switch
+## 4. Automated Candidate Handoff, Continuous Publisher & Dual Kill-Switch
 
-### Continuous Publisher Handoff
-Due to the 60-second TTL on HMAC-sealed snapshots, `scripts/prozorro_continuous_publisher.py` runs on the VPS under `kyiv-radar-reviewer` to refresh the snapshot every 30 seconds.
-- **Zero Poll Rule:** It reuses verified local observations from the decisions ledger and cache. It **never** polls the external Prozorro API every minute. External fetches happen strictly via `kyiv-radar-auction-pilot.timer` every 20 minutes.
+### Automated Candidate Handoff Pipeline
+1. **Collector Cadence (every 20 min via `kyiv-radar-auction-pilot.timer`):**
+   - Runs `scripts.prozorro_targeted_refresh --export-handoff /var/lib/kyiv-radar-handoff/candidates.json`.
+   - Atomically updates `/var/lib/kyiv-radar-auction-pilot/auction-review.sqlite` and writes sanitized export (`mode 0640`, group `kyiv-radar-reviewer`).
+   - Zero privilege widening: collector has zero write access to decisions ledger or transport dir.
+2. **Reviewer / Publisher Cadence (every 30 sec via `scripts.prozorro_continuous_publisher`):**
+   - Reads `/var/lib/kyiv-radar-handoff/candidates.json` and evaluates approvals against `auction-decisions.sqlite`.
+   - Generates HMAC-SHA256 snapshot with 60-second TTL stamp.
+   - **Zero Poll Rule:** Never queries Prozorro CDB API each minute; reuses verified local observations.
+3. **Automatic Expiry & Item Disappearance:**
+   - **Withdrawn / Closed Auctions:** Removed from collector cache; disappear from next handoff export; dropped from published snapshot within 30 seconds.
+   - **Stale Observation Fallback:** If collector stops, observations older than 1 hour fail validity check (`now - observed_at > 1h`), resulting in clean empty snapshot and 503 fallback.
 
 ### Dual Kill-Switch
-1. **Instant File Kill-Switch (< 1 second, no service restart):**
+1. **Instant File Kill-Switch (< 1 second, zero service restart):**
    ```bash
    touch /var/lib/kyiv-radar-transport/.kill_switch
    ```
    *Result:*
-   - The publisher daemon detects `.kill_switch`, immediately stops regeneration, and unlinks `/var/lib/kyiv-radar-transport/auction_snapshot.bin`.
-   - `/api/auctions` immediately returns HTTP 503 fallback (`{"available": false, "auctions": []}`).
-   - The client hides auction items and displays graceful offline state.
+   - The API checks `os.path.lexists(marker)` on every request: immediately fails closed (HTTP 503) without waiting for publisher.
+   - The publisher daemon detects `.kill_switch`, immediately stops regeneration, unlinks `auction_snapshot.bin`, and exits with `"kill_switch_triggered"`.
+   - The client hides auction tab and displays graceful offline state.
 
 2. **Configuration Route Kill-Switch:**
    ```bash

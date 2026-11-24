@@ -325,5 +325,184 @@ def test_real_os_separation_permissions(tmp_path, monkeypatch):
     transport_dir.chmod(0o770)
     with pytest.raises(ValueError, match="Unsafe directory"):
         read_file(str(test_file), 64)
+    transport_dir.chmod(0o750)
+
+    # 5. ACTUAL DISTINCT UIDs test (publisher UID != API reader euid)
+    real_uid = os.geteuid()
+    api_reader_uid = 988  # e.g. kyivradar
+    reader_gid = os.getegid()
+
+    monkeypatch.setenv("KYIV_RADAR_PUBLISHER_UID", str(real_uid))
+    monkeypatch.setattr(os, "geteuid", lambda: api_reader_uid)
+    monkeypatch.setattr(os, "getegid", lambda: reader_gid)
+    monkeypatch.setattr(os, "getgroups", lambda: [reader_gid])
+
+    # Intercept os.access for reader: reader has read access, but NOT write access
+    real_access = os.access
+    def mocked_access(path, mode, **kwargs):
+        if mode == os.W_OK:
+            return False
+        return real_access(path, mode, **kwargs)
+    monkeypatch.setattr(os, "access", mocked_access)
+
+    # 5a. Distinct publisher UID with 0640, reader group and read-only access succeeds
+    data_distinct = read_file(str(test_file), 64)
+    assert data_distinct == b"hello 32-byte secret key 1234567"
+
+    # 5b. Mode 0600 without group read fails for distinct publisher UID
+    test_file.chmod(0o600)
+    with pytest.raises(ValueError, match="Group read required for distinct publisher"):
+        read_file(str(test_file), 64)
+    test_file.chmod(0o640)
+
+    # 5c. Wrong reader group fails for distinct publisher UID
+    monkeypatch.setattr(os, "getegid", lambda: 99999)
+    monkeypatch.setattr(os, "getgroups", lambda: [99999])
+    with pytest.raises(ValueError, match="Reader group access required"):
+        read_file(str(test_file), 64)
+    monkeypatch.setattr(os, "getegid", lambda: reader_gid)
+    monkeypatch.setattr(os, "getgroups", lambda: [reader_gid])
+
+    # 5d. Writable access detected for API process fails closed
+    monkeypatch.setattr(os, "access", lambda path, mode, **kwargs: True)
+    with pytest.raises(ValueError, match="API process must have strictly read-only access"):
+        read_file(str(test_file), 64)
+
+
+def test_automated_atomic_handoff_and_cadence(tmp_path):
+    now = datetime.now(timezone.utc)
+    cache = tmp_path / "collector_cache"
+    cache.mkdir(mode=0o700)
+    p = payload()
+    p["dateModified"] = now.isoformat()
+    p["tenderPeriod"] = {"startDate": (now - timedelta(days=1)).isoformat(),
+                         "endDate": (now + timedelta(days=1)).isoformat()}
+    apply_page(cache, [p], observed_at=now, now=now)
+
+    handoff_dir = tmp_path / "handoff_spool"
+    handoff_dir.mkdir(mode=0o750)
+    destination = handoff_dir / "candidates.json"
+
+    from scripts.prozorro_candidate_handoff import export_handoff
+    count, size = export_handoff(cache, destination, now=now)
+    assert count == 1
+    assert size > 0
+    assert destination.exists()
+    assert (destination.stat().st_mode & 0o777) in (0o640, 0o600)
+
+    # Verify content is sanitized candidate list
+    loaded = json.loads(destination.read_text(encoding="utf-8"))
+    assert len(loaded) == 1
+    assert loaded[0]["auction_id"] == p["auctionId"]
+    assert loaded[0]["review_status"] == "pending_review"
+
+    # Integration with prozorro_targeted_refresh
+    from scripts.prozorro_targeted_refresh import refresh
+    def mock_request(url):
+        for method, prefix in (("commercialSell-english", "CSE001"), ("alienation-english", "ALE001")):
+            if method in url:
+                row = dict(p, sellingMethod=method, auctionId=f"{prefix}-UA-20261124-00000")
+                return json.dumps([row]).encode("utf-8")
+        return json.dumps(p).encode("utf-8")
+
+    refresh_res = refresh(cache, now=now, request_fn=mock_request, export_path=destination)
+    assert refresh_res["exported_candidates"] == 2
+    assert destination.exists()
+
+
+def test_repeated_handoffs_across_collector_cycles_and_disappearance(tmp_path, monkeypatch):
+    t0 = datetime.now(timezone.utc)
+    cache = tmp_path / "cache_multi"
+    cache.mkdir(mode=0o700)
+    ledger = tmp_path / "ledger_multi"
+    ledger.mkdir(mode=0o700)
+    grant(ledger, t0)
+
+    p1 = payload()
+    p1["auctionId"] = "CSE001-UA-20261124-00001"
+    p1["dateModified"] = t0.isoformat()
+    p1["tenderPeriod"] = {"startDate": (t0 - timedelta(days=1)).isoformat(),
+                         "endDate": (t0 + timedelta(days=2)).isoformat()}
+    apply_page(cache, [p1], observed_at=t0, now=t0)
+
+    from scripts.prozorro_candidate_handoff import export_handoff
+    spool_dir = tmp_path / "spool_multi"
+    spool_dir.mkdir(mode=0o750)
+    cand_file = spool_dir / "candidates.json"
+    export_handoff(cache, cand_file, now=t0)
+
+    # Reviewer approves item 1
+    cands1 = json.loads(cand_file.read_text(encoding="utf-8"))
+    approve(ledger, cands1, t0)
+
+    transport_dir = tmp_path / "transport_multi"
+    transport_dir.mkdir(mode=0o750)
+    snap_file = transport_dir / "snapshot.bin"
+    key_file = transport_dir / "secret.key"
+    key_file.write_bytes(KEY)
+    key_file.chmod(0o640)
+
+    from scripts.prozorro_continuous_publisher import run_continuous_publisher
+
+    monkeypatch.setenv("KYIV_RADAR_AUCTION_SNAPSHOT", str(snap_file))
+    monkeypatch.setenv("KYIV_RADAR_AUCTION_KEY", str(key_file))
+    monkeypatch.setattr(api, "APP_ENV", "production")
+    monkeypatch.setenv("KYIV_RADAR_AUCTIONS_RELEASE", "1")
+    client = TestClient(api.app)
+
+    # Cycle 1: Item 1 active -> 1 auction in API
+    res1 = run_continuous_publisher(str(cand_file), str(ledger), str(key_file), str(snap_file),
+                                   interval=0.01, max_runs=1, enabled=True, collector_dir=cache)
+    assert res1 == "completed"
+    resp1 = client.get("/api/auctions")
+    assert resp1.status_code == 200
+    assert len(resp1.json()["auctions"]) == 1
+    assert resp1.json()["auctions"][0]["auction_id"] == p1["auctionId"]
+
+    # Cycle 2: Item 2 discovered
+    p2 = payload()
+    p2["auctionId"] = "CSE001-UA-20261124-00002"
+    p2["dateModified"] = t0.isoformat()
+    p2["tenderPeriod"] = {"startDate": (t0 - timedelta(days=1)).isoformat(),
+                         "endDate": (t0 + timedelta(days=2)).isoformat()}
+    apply_page(cache, [p1, p2], observed_at=t0, now=t0)
+    export_handoff(cache, cand_file, now=t0)
+    cands2 = json.loads(cand_file.read_text(encoding="utf-8"))
+    for r in cands2:
+        decide(ledger, r, now=t0, valid_until=t0 + timedelta(hours=2), reviewed=True)
+
+    res2 = run_continuous_publisher(str(cand_file), str(ledger), str(key_file), str(snap_file),
+                                   interval=0.01, max_runs=1, enabled=True, collector_dir=cache)
+    assert res2 == "completed"
+    resp2 = client.get("/api/auctions")
+    assert resp2.status_code == 200
+    assert len(resp2.json()["auctions"]) == 2
+
+    # Cycle 3: Item 1 is withdrawn/ended -> cache only contains item 2
+    # Re-apply page with ONLY item 2
+    from scripts.prozorro_review_cache import _connect
+    with _connect(cache) as conn:
+        conn.execute("DELETE FROM auction_review WHERE auction_id = ?", (p1["auctionId"],))
+    apply_page(cache, [p2], observed_at=t0, now=t0)
+    export_handoff(cache, cand_file, now=t0)
+
+    res3 = run_continuous_publisher(str(cand_file), str(ledger), str(key_file), str(snap_file),
+                                   interval=0.01, max_runs=1, enabled=True, collector_dir=cache)
+    assert res3 == "completed"
+    resp3 = client.get("/api/auctions")
+    assert resp3.status_code == 200
+    assert len(resp3.json()["auctions"]) == 1
+    assert resp3.json()["auctions"][0]["auction_id"] == p2["auctionId"]
+
+    # Cycle 4 (T0 + 2 hours without refresh): Stale observations (>1 hour old) expire and disappear
+    t120 = t0 + timedelta(hours=2)
+    with monkeypatch.context() as m:
+        from server import auction_snapshot
+        real_load = auction_snapshot.load
+        m.setattr(auction_snapshot, "load", lambda s, k, now: real_load(s, k, now=t120))
+        resp4 = client.get("/api/auctions")
+        assert resp4.status_code == 503
+        assert resp4.json()["available"] is False
+
 
 
