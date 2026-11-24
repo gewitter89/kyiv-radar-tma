@@ -120,7 +120,17 @@ def isolated_app():
         kyiv_radar_api.APP_ENV = "test"
 
         kyiv_radar_api.init_db()
-
+        # Baseline sample listings must have corresponding live published
+        # submissions in the isolated DB for the canonical status gate.
+        with sqlite3.connect(test_db_path) as conn:
+            conn.executemany(
+                "INSERT INTO landlord_submissions "
+                "(id,address,price,rooms,phone,status) VALUES (?,?,?,?,?,?)",
+                [
+                    (1, "вул. Хрещатик, 15", "20000", 1, "+380501112233", "published"),
+                    (2, "вул. Спаська, 10", "25000", 2, "+380674445566", "published"),
+                ],
+            )
         client = TestClient(kyiv_radar_api.app)
 
         yield {
