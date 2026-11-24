@@ -20,6 +20,8 @@ def publish(candidates_path, decisions_path, key_path, output_path, *, now=None,
     out = Path(output_path)
     if os.path.islink(out):
         raise ValueError("Output path cannot be a symlink")
+    if out.resolve() != out:
+        raise ValueError("Output path must be canonical without symlink ancestors")
 
     try:
         if out.is_relative_to(ROOT):
@@ -33,7 +35,7 @@ def publish(candidates_path, decisions_path, key_path, output_path, *, now=None,
         raise ValueError("Target directory must exist and cannot be a symlink")
 
     parent_stat = parent.stat()
-    if (parent_stat.st_mode & 0o022) or (parent_stat.st_mode & 0o007):
+    if parent_stat.st_uid != os.geteuid() or (parent_stat.st_mode & 0o022) or (parent_stat.st_mode & 0o007):
         raise ValueError("Unsafe target directory permissions")
 
     if out.exists():
@@ -45,18 +47,25 @@ def publish(candidates_path, decisions_path, key_path, output_path, *, now=None,
         if existing_stat.st_nlink > 1:
             raise ValueError("Existing target cannot have hard links")
 
-    now = now or datetime.now(timezone.utc)
-    candidates = read_candidates(candidates_path)
-    key = read_file(key_path, 32)
-    rows = approved_rows(Path(decisions_path), candidates, now=now, enabled=enabled)
-    sealed = seal(rows, key, now=now)
+    explicit_now = now is not None
 
     # Acquire serialization lock on target directory
     lock_path = parent / ".publisher.lock"
-    lock_fd = os.open(lock_path, os.O_RDWR | os.O_CREAT, 0o600)
+    lock_fd = os.open(lock_path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK, 0o600)
     tmp_path_str = None
     try:
+        info = os.fstat(lock_fd)
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or info.st_uid != os.geteuid() or info.st_mode & 0o077:
+            raise ValueError("Unsafe publisher lock")
         fcntl.flock(lock_fd, fcntl.LOCK_EX)
+        if os.path.lexists(parent / ".kill_switch"):
+            raise ValueError("Auction release disabled")
+        # Generate under lock so an older concurrent snapshot cannot overwrite a newer one.
+        now = now if explicit_now else datetime.now(timezone.utc)
+        candidates = read_candidates(candidates_path)
+        key = read_file(key_path, 32)
+        rows = approved_rows(Path(decisions_path), candidates, now=now, enabled=enabled)
+        sealed = seal(rows, key, now=now)
         # Create unique temp file in the same directory using mkstemp
         fd, tmp_path_str = tempfile.mkstemp(dir=parent, prefix=".snapshot-", suffix=".tmp")
         try:
@@ -64,16 +73,15 @@ def publish(candidates_path, decisions_path, key_path, output_path, *, now=None,
             os.fchmod(fd, 0o640)
             reader_gid = os.getenv("KYIV_RADAR_READER_GID")
             if reader_gid:
-                try:
-                    os.fchown(fd, -1, int(reader_gid))
-                except (OSError, ValueError):
-                    pass
+                os.fchown(fd, -1, int(reader_gid))
             with os.fdopen(fd, "wb") as f:
                 f.write(sealed)
                 f.flush()
                 os.fsync(f.fileno())
 
-            # Atomic replace
+            # Atomic replace; the API separately checks the same kill marker.
+            if os.path.lexists(parent / ".kill_switch"):
+                raise ValueError("Auction release disabled")
             os.replace(tmp_path_str, out)
             tmp_path_str = None
 
