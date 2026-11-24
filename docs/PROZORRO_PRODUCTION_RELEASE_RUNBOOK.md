@@ -75,15 +75,15 @@ KYIV_RADAR_AUCTIONS_RELEASE=1
 # Transport snapshot paths
 KYIV_RADAR_AUCTION_SNAPSHOT=/var/lib/kyiv-radar-transport/auction_snapshot.bin
 KYIV_RADAR_AUCTION_KEY=/var/lib/kyiv-radar-transport/auction.key
-KYIV_RADAR_READER_GID=1000  # GID of kyivradar group
-KYIV_RADAR_PUBLISHER_UID=1004  # UID of kyiv-radar-reviewer
+KYIV_RADAR_READER_GID=<actual numeric reader group GID>
+KYIV_RADAR_PUBLISHER_UID=<actual numeric reviewer UID>
 
 # CORS Whitelist (server/kyiv_radar_api.py)
 # Allowed origin: https://gewitter89.github.io
 ```
 
 - **Default-Deny:** `APP_ENV=production` returns HTTP 404 unless `KYIV_RADAR_AUCTIONS_RELEASE=1`.
-- Unknown `APP_ENV` values strictly default to `production` (fail-safe).
+- Unknown `APP_ENV` values return 404 even if release is set.
 - Staging preview flags (`KYIV_RADAR_AUCTIONS_PREVIEW`) have NO effect in production.
 - Client uses **authoritative availability discovery**: starts default-off without DOM injection; mounts `#krAuctionsNav` only when `/api/auctions` returns 200 OK with `available: true`. Query toggles (`?staging=1`, `?preview=1`) are strictly ignored.
 
@@ -93,11 +93,11 @@ KYIV_RADAR_PUBLISHER_UID=1004  # UID of kyiv-radar-reviewer
 
 ### Automated Candidate Handoff Pipeline
 1. **Collector Cadence (every 20 min via `kyiv-radar-auction-pilot.timer`):**
-   - Runs `scripts.prozorro_targeted_refresh --export-handoff /var/lib/kyiv-radar-handoff/candidates.json`.
+   - Requires an authorized, separately staged collector code update and unit drop-in allowing writes to the isolated handoff directory under ProtectSystem=strict; the currently deployed pilot has neither. Runs `scripts.prozorro_targeted_refresh --live-private-review --private-dir /var/lib/kyiv-radar-auction-pilot --export-handoff /var/lib/kyiv-radar-handoff/candidates.json`. Do not replace the existing ExecStart with an incomplete command.
    - Atomically updates `/var/lib/kyiv-radar-auction-pilot/auction-review.sqlite` and writes sanitized export (`mode 0640`, group `kyiv-radar-reviewer`).
    - Zero privilege widening: collector has zero write access to decisions ledger or transport dir.
 2. **Reviewer / Publisher Cadence (every 30 sec via `scripts.prozorro_continuous_publisher`):**
-   - Reads `/var/lib/kyiv-radar-handoff/candidates.json` and evaluates approvals against `auction-decisions.sqlite`.
+   - Reads `/var/lib/kyiv-radar-handoff/candidates.json` and evaluates approvals against `auction-decisions.sqlite`. Set `KYIV_RADAR_COLLECTOR_UID` to the actual collector UID in reviewer environment only. The reviewer must not access collector SQLite. The collector-owned handoff directory is 0750 with reviewer-only group; collector must be able to assign that group (`KYIV_RADAR_REVIEWER_GID`). API must not join the reviewer-only group.
    - Generates HMAC-SHA256 snapshot with 60-second TTL stamp.
    - **Zero Poll Rule:** Never queries Prozorro CDB API each minute; reuses verified local observations.
 3. **Automatic Expiry & Item Disappearance:**
@@ -111,7 +111,7 @@ KYIV_RADAR_PUBLISHER_UID=1004  # UID of kyiv-radar-reviewer
    ```
    *Result:*
    - The API checks `os.path.lexists(marker)` on every request: immediately fails closed (HTTP 503) without waiting for publisher.
-   - The publisher daemon detects `.kill_switch`, immediately stops regeneration, unlinks `auction_snapshot.bin`, and exits with `"kill_switch_triggered"`.
+   - The publisher daemon detects `.kill_switch` at its next check (up to its cadence), stops regeneration, unlinks `auction_snapshot.bin`, and exits with `"kill_switch_triggered"`.
    - The client hides auction tab and displays graceful offline state.
 
 2. **Configuration Route Kill-Switch:**
@@ -168,3 +168,6 @@ systemctl daemon-reload
 - [ ] PR #91 merged into `main` on GitHub.
 - [ ] Operator authorizes deployment and executes production environment release.
 - [ ] Post-release manual check on physical mobile device (iOS/Android Telegram Mini App).
+
+## Final operational evidence still required
+The UID/GID branch test mocks Python identity/access functions; it is not proof of kernel-enforced distinct accounts. Run the exact CLI and real distinct unprivileged accounts in an authorized isolated rehearsal, demonstrate reviewer reads sanitized handoff but cannot read collector DB, API reads signed snapshot but cannot read handoff/ledger or write transport, and collector writes only its own cache and handoff. Demonstrate two successive actual scheduled handoffs and active snapshot refresh, including service hardening and rollback. Do not enable the release flag until actual rights grant and independent item approval, exact-head green CI, and operational approval. No synthetic approvals in production.
