@@ -122,6 +122,13 @@ def test_review_registry_only_reads_schema_and_never_falls_back_to_untrusted_dat
 
 
 def test_api_hides_withdrawn_and_does_not_export_moderator_evidence(monkeypatch, tmp_path):
+    # Separate operator review evidence from canonical submission status.
+    import sqlite3
+    owner_db = tmp_path / "owner.sqlite"
+    with sqlite3.connect(owner_db) as conn:
+        conn.execute("CREATE TABLE landlord_submissions (id INTEGER PRIMARY KEY, status TEXT NOT NULL)")
+        conn.execute("INSERT INTO landlord_submissions VALUES (8, 'published')")
+    monkeypatch.setattr(api, "DB_PATH", str(owner_db))
     doc = tmp_path / "reviews.json"
     doc.write_text(json.dumps({
         "schema_version": 1,
