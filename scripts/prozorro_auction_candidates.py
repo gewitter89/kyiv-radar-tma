@@ -38,6 +38,11 @@ def candidate(procedure, *, observed_at, now):
     if not timedelta(0) <= now - observed_at <= MAX_FRESHNESS:
         return None
     try:
+        # Never process protected or test procedures, even if some fields remain visible.
+        if procedure.get("_protected", False) is not False or procedure.get("_protect_level"):
+            return None
+        if procedure.get("mode", "real") != "real":
+            return None
         method = procedure["sellingMethod"]
         prefix = METHODS.get(method)
         auction_id = procedure["auctionId"]
