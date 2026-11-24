@@ -57,6 +57,42 @@ def test_actual_index_wires_tab_but_never_enables_flag():
     text=(ROOT/"index.html").read_text(encoding="utf-8")
     assert "./auction-tab.js?v=1" in text
     assert "KR_AUCTIONS_STAGING=true" not in text
+    assert "KR_AUCTIONS_ENABLED=true" not in text
+
+
+@pytest.mark.asyncio
+async def test_github_pages_origin_mapping():
+    async with async_playwright() as p:
+        browser=await p.chromium.launch()
+        page=await browser.new_page()
+        api_called = []
+        async def route(r):
+            if "contaboserver.net/api/auctions" in r.request.url:
+                api_called.append(r.request.url)
+                await r.fulfill(status=200, content_type="application/json; charset=utf-8",
+                                body=json.dumps(response(), ensure_ascii=False))
+            elif r.request.url.endswith("/auction-tab.js"):
+                await r.fulfill(content_type="text/javascript; charset=utf-8",
+                                body=(ROOT/"auction-tab.js").read_text(encoding="utf-8"))
+            elif r.request.url.endswith("/auction-tab.css"):
+                await r.fulfill(content_type="text/css; charset=utf-8",
+                                body=(ROOT/"auction-tab.css").read_text(encoding="utf-8"))
+            else:
+                await r.fulfill(content_type="text/html; charset=utf-8", body=HTML)
+        await page.route("**/*", route)
+        await page.add_init_script("""
+            window.KR_AUCTIONS_ENABLED = true;
+            Object.defineProperty(window.location, 'origin', {
+                value: 'https://gewitter89.github.io',
+                configurable: true
+            });
+        """)
+        await page.goto("https://gewitter89.github.io/")
+        await page.locator("#krAuctionsNav").click()
+        await page.locator("#krAuctionList article").nth(0).wait_for(timeout=8000)
+        assert len(api_called) == 1
+        assert "https://vmi3445944.contaboserver.net/api/auctions" in api_called[0]
+        await browser.close()
 
 
 @pytest.mark.asyncio

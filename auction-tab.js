@@ -1,7 +1,7 @@
-/* Isolated staging tab. No requests or navigation when flag is off. */
+/* Isolated staging & production tab. No requests or navigation when flag is off. */
 (() => {
   'use strict';
-  if (window.KR_AUCTIONS_STAGING !== true) return;
+  if (window.KR_AUCTIONS_STAGING !== true && window.KR_AUCTIONS_ENABLED !== true) return;
   const ID = /^(?:ALE001|CSE001)-UA-\d{8}-\d{5}$/;
   const KEY = 'kr_auction_favs_v1';
   const fmt = new Intl.NumberFormat('uk-UA', {style:'currency',currency:'UAH',maximumFractionDigits:2});
@@ -24,7 +24,7 @@
   const close = el('button','Закрити',{type:'button','aria-label':'Закрити аукціони'});
   const header = el('div',undefined,{class:'kr-auction-header'});
   header.append(title,close);
-  const note = el('p','Prozorro.Продажі · Стартова ціна не є кінцевою вартістю. Вибірка неповна.');
+  const note = el('p','Prozorro.Продажі · Офіційні відкриті дані. Стартова ціна не є остаточною вартістю продажу. Можуть нараховуватись додаткові збори та ПДВ. Обов’язково перевіряйте оригінал лота за посиланням. Вибірка неповна, не відображає весь ринок.');
   const filters = el('div',undefined,{class:'kr-auction-filters'});
   const max = el('input',undefined,{type:'number',min:'0',step:'1',placeholder:'Без обмежень',id:'krAuctionMax'});
   const maxLabel = el('label','Макс. стартова ціна, грн',{for:'krAuctionMax'});
@@ -39,6 +39,10 @@
   const host = document.querySelector('body > header');
   if (!host || typeof panel.showModal !== 'function') return;
   host.append(nav); document.body.append(panel);
+
+  const API_ENDPOINT = (window.location.origin === 'https://gewitter89.github.io')
+    ? 'https://vmi3445944.contaboserver.net/api/auctions'
+    : '/api/auctions';
 
   function normalize(r) {
     if (!r || typeof r.auction_id!=='string' || !ID.test(r.auction_id) ||
@@ -77,8 +81,10 @@
           try{tg.openLink(r.url);event.preventDefault();}catch(_){}
         }
       });
+      const vatText = r.vat ? 'з ПДВ' : 'без ПДВ (ПДВ нараховується додатково)';
       card.append(el('p','Київ · Квартира'),el('h3',fmt.format(r.price)),
-        el('p','Стартова ціна · '+(r.vat?'з ПДВ':'без ПДВ')),
+        el('p','Стартова ціна · '+vatText),
+        el('p','Додаткові збори сплачуються окремо'),
         el('p','Заявки до: '+date.format(r.end)),el('p','Перевірено: '+date.format(r.seen)),
         el('p',r.id),heart,link);
       list.append(card);
@@ -92,7 +98,7 @@
     const controller = new AbortController();
     const timeout = setTimeout(()=>controller.abort(),5000);
     try{
-      const response=await fetch('/api/auctions',{cache:'no-store',credentials:'same-origin',signal:controller.signal,redirect:'error'});
+      const response=await fetch(API_ENDPOINT,{cache:'no-store',signal:controller.signal,redirect:'error'});
       if(!response.ok) throw Error();
       const body=await response.json();
       if(body.available!==true || body.coverage_complete!==false || !Array.isArray(body.auctions)||body.auctions.length>2000) throw Error();

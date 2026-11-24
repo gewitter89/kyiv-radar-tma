@@ -110,3 +110,71 @@ def test_staging_api_disabled_and_no_store(tmp_path,monkeypatch):
     response=client.get("/api/auctions")
     assert response.status_code==503 and response.json()["auctions"]==[]
     assert str(snap) not in response.text
+
+
+def test_production_release_gate(tmp_path, monkeypatch):
+    now = datetime.now(timezone.utc)
+    ledger, rows = fixture(tmp_path, now)
+    grant(ledger, now)
+    approve(ledger, rows, now)
+    private = tmp_path / "transport"
+    private.mkdir(mode=0o700)
+    snap = private / "snapshot"
+    secret = private / "key"
+    snap.write_bytes(build(rows, ledger, KEY, now=now, enabled=True))
+    secret.write_bytes(KEY)
+    snap.chmod(0o600)
+    secret.chmod(0o600)
+
+    monkeypatch.setenv("KYIV_RADAR_AUCTION_SNAPSHOT", str(snap))
+    monkeypatch.setenv("KYIV_RADAR_AUCTION_KEY", str(secret))
+    monkeypatch.setattr(api, "APP_ENV", "production")
+
+    client = TestClient(api.app)
+
+    # 1. In production, default is 404 (disabled)
+    assert client.get("/api/auctions").status_code == 404
+
+    # 2. Preview flag must NOT enable production route
+    monkeypatch.setenv("KYIV_RADAR_AUCTIONS_PREVIEW", "1")
+    assert client.get("/api/auctions").status_code == 404
+
+    # 3. Explicit production release flag enables the route
+    monkeypatch.setenv("KYIV_RADAR_AUCTIONS_RELEASE", "1")
+    resp = client.get("/api/auctions")
+    assert resp.status_code == 200
+    assert resp.headers["cache-control"] == "no-store"
+    assert resp.json()["available"] is True
+    assert len(resp.json()["auctions"]) == 1
+
+    # 4. OPTIONS preflight
+    resp_options = client.options("/api/auctions")
+    assert resp_options.status_code == 204
+
+
+def test_atomic_publish(tmp_path):
+    now = datetime.now(timezone.utc)
+    ledger, rows = fixture(tmp_path, now)
+    grant(ledger, now)
+    approve(ledger, rows, now)
+    candidates_file = tmp_path / "candidates.json"
+    candidates_file.write_text(json.dumps(rows))
+    candidates_file.chmod(0o600)
+
+    key_file = tmp_path / "secret.key"
+    key_file.write_bytes(KEY)
+    key_file.chmod(0o600)
+
+    out_file = tmp_path / "published" / "snapshot.bin"
+
+    from scripts.prozorro_atomic_publish import publish
+    count, size = publish(str(candidates_file), str(ledger), str(key_file), str(out_file), now=now)
+    assert count == 1
+    assert size > 0
+    assert out_file.exists()
+
+    from server.auction_snapshot import load
+    unsealed = load(str(out_file), str(key_file), now=now)
+    assert len(unsealed) == 1
+    assert unsealed[0]["auction_id"] == rows[0]["auction_id"]
+
