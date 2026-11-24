@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Read-only public health monitor; no production writes, secrets or contacts."""
+"""Read-only production monitor. Truthful empty catalog is NOT a failure.
+
+No production writes, accounts, paid-provider calls or private credentials.
+The served HTML/JSON and public API must ALL pass; a green API HTTP status
+is not by itself evidence of source rights or up-to-date inventory.
+"""
+from __future__ import annotations
+
 import json
 import re
 import urllib.request
@@ -9,6 +16,12 @@ API = "https://vmi3445944.contaboserver.net"
 PAGES = "https://gewitter89.github.io/kyiv-radar-tma/"
 TIMEOUT = 12
 MAX_JSON_BYTES = 12 * 1024 * 1024
+INLINE = re.compile(r"const KYIV_DEALS_INIT\s*=\s*(\[[^\n]*\]);")
+VERSION = re.compile(r"\d+\.\d+\.\d+")
+PRIVATE_KEYS = {
+    "ownerName", "phoneRaw", "reporter_info", "private_note", "evidence_ref",
+    "reviewer", "initData", "adminNotes", "ownerTg",
+}
 
 
 class TitleParser(HTMLParser):
@@ -31,13 +44,13 @@ class TitleParser(HTMLParser):
 
 
 def fetch(url: str, limit: int = MAX_JSON_BYTES) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": "KyivRadarPublicHealth/1.8"})
+    req = urllib.request.Request(url, headers={"User-Agent": "KyivRadarPublicHealth/1.41"})
     with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
         if resp.status != 200:
-            raise RuntimeError(f"Unexpected HTTP {resp.status}")
+            raise RuntimeError("Public resource HTTP status is not 200")
         body = resp.read(limit + 1)
         if len(body) > limit:
-            raise RuntimeError("Response exceeds maximum expected audit size")
+            raise RuntimeError("Public audit response exceeds safe bound")
         return body
 
 
@@ -46,47 +59,75 @@ def verify_pages_html(page_html: str) -> None:
     parser.feed(page_html)
     title = " ".join(parser.title.split())
     if not (title == "Київ Радар" or title.startswith("Київ Радар —")):
-        raise AssertionError("The published page is missing the expected Kyiv Radar title")
+        raise AssertionError("Expected published page title missing")
     if "<html" not in page_html.lower():
-        raise AssertionError("Published page is not recognizable HTML")
+        raise AssertionError("Published response is not recognizable HTML")
+    embedded = INLINE.findall(page_html)
+    if len(embedded) != 1 or embedded[0] != "[]":
+        raise AssertionError("Public page embeds outdated or unapproved listings")
+    if "ireland.apollo.olxcdn.com" in page_html:
+        raise AssertionError("Historical third-party image fingerprints remain in HTML")
+    if "function approvedHostedListing(item)" not in page_html:
+        raise AssertionError("Frontend source-trust gate missing")
 
 
-def verify_public_api(health: dict, catalog: dict) -> int:
+def verify_public_static_catalog(rows: object) -> None:
+    if rows != []:
+        raise AssertionError("Public static listing feed still contains unreviewed inventory")
+
+
+def verify_public_api(health: object, catalog: object) -> int:
     if not isinstance(health, dict) or health.get("status") != "healthy":
         raise AssertionError("Public API is not healthy")
-    version = str(health.get("version") or "")
-    if not re.fullmatch(r"\d+\.\d+\.\d+", version):
-        raise AssertionError("Public API has an invalid version response")
-
+    if VERSION.fullmatch(str(health.get("version") or "")) is None:
+        raise AssertionError("Public API version malformed")
     if not isinstance(catalog, dict) or catalog.get("success") is not True:
-        raise AssertionError("Catalog API returned an unsuccessful response")
-    listings = catalog.get("deals")
-    if not isinstance(listings, list) or not listings:
-        raise AssertionError("Public catalog has no visible listings")
+        raise AssertionError("Public API catalog is unsuccessful")
+    deals = catalog.get("deals")
+    if not isinstance(deals, list):
+        raise AssertionError("Public catalog must be an array, including when empty")
+
     ids = set()
-    for row in listings:
-        if not isinstance(row, dict) or type(row.get("id")) is not int:
-            raise AssertionError("Public listing has invalid data")
-        if row["id"] in ids:
-            raise AssertionError("Public listing IDs are duplicated")
-        ids.add(row["id"])
-        if row.get("phone") is not None or "ownerName" in row:
-            raise AssertionError("Public catalog exposes a landlord contact or owner identity")
-        if any(key in row for key in ("reporter_info", "private_note", "evidence_ref",
-                                     "reviewer", "initData")):
-            raise AssertionError("Public catalog exposes private moderation data")
-    return len(listings)
+    for item in deals:
+        if not isinstance(item, dict) or type(item.get("id")) is not int:
+            raise AssertionError("Public listing identity malformed")
+        if item["id"] <= 0 or item["id"] in ids:
+            raise AssertionError("Public listing has duplicate/invalid ID")
+        ids.add(item["id"])
+        source = str(item.get("source") or "").strip().casefold()
+        first_party = source == "київ радар (пряма заявка)"
+        authorized_partner = source.startswith("partner:") and bool(source[8:])
+        if not (first_party or authorized_partner):
+            raise AssertionError("Unlicensed/archived source exposed by public API")
+        if item.get("fixtureOnly") is True:
+            raise AssertionError("Synthetic test row leaked through public API")
+        if item.get("phone") is not None or any(key in item for key in PRIVATE_KEYS):
+            raise AssertionError("Sensitive contact/review fields exposed in public API")
+        if authorized_partner and not str(item.get("url") or "").startswith("https://"):
+            raise AssertionError("Partner listing missing HTTPS original permalink")
+
+    if type(health.get("deals_count")) is not int or health["deals_count"] != len(deals):
+        raise AssertionError("Public API health and catalog disagree")
+    return len(deals)
 
 
 def main() -> int:
-    health = json.loads(fetch(API + "/api/health"))
-    catalog = json.loads(fetch(API + "/api/deals"))
-    count = verify_public_api(health, catalog)
-    page = fetch(PAGES, limit=6 * 1024 * 1024).decode("utf-8", errors="replace")
-    verify_pages_html(page)
-    print("PASS: public API, private fields, published HTML; listings =", count,
-          "; api_version =", health["version"])
-    # The health endpoint doesn't certify freshness, origin or contact delivery.
+    try:
+        page_html = fetch(PAGES, limit=6 * 1024 * 1024).decode("utf-8", errors="strict")
+        verify_pages_html(page_html)
+        static = json.loads(fetch(PAGES + "data/deals.json"))
+        verify_public_static_catalog(static)
+        health = json.loads(fetch(API + "/api/health"))
+        catalog = json.loads(fetch(API + "/api/deals"))
+        count = verify_public_api(health, catalog)
+    except (AssertionError, OSError, RuntimeError, ValueError, UnicodeError, TypeError) as exc:
+        # Do not leak URLs, contact values, response bodies, credentials in CI.
+        print("FAIL: release verification incomplete; issue_type =", type(exc).__name__)
+        return 2
+    print("PASS: actual public HTML/JSON and API source/privacy checks; eligible_count =", count)
+    if count == 0:
+        print("NOTE: empty verified catalog is a valid state, not an outage")
+    print("LIMIT: this monitor cannot independently verify partner contracts or landlords")
     return 0
 
 
