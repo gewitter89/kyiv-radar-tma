@@ -5,16 +5,15 @@ networking, raw payload persistence or integration with ordinary listings.
 """
 import json
 import os
-import re
 import sqlite3
 import stat
 from datetime import timedelta
 from pathlib import Path
 
-from .prozorro_auction_candidates import candidate, _aware, _utc, MAX_FRESHNESS
+from .prozorro_auction_candidates import candidate, _aware, _utc, MAX_FRESHNESS, AUCTION_ID
 
 ROOT = Path(__file__).resolve().parents[1]
-ID = re.compile(r"CSE001-UA-[0-9]{8}-[0-9]{5}")
+ID = AUCTION_ID
 MAX_ROWS = 30
 MAX_CACHE_ROWS = 2000
 MAX_DB_BYTES = 16 * 1024 * 1024
