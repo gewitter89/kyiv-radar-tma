@@ -5,6 +5,7 @@ on:
     paths:
       - scripts/prozorro_probe.py
       - scripts/prozorro_target_probe.py
+      - scripts/prozorro_targeted_refresh.py
       - scripts/prozorro_incremental_scan.py
       - scripts/prozorro_review_cache.py
       - scripts/prozorro_review_sync.py
@@ -40,3 +41,12 @@ jobs:
 
       - name: Targeted public apartment schema check (one GET, no raw logs)
         run: python3 -m scripts.prozorro_target_probe --live-read-only --procedure-id 6b05418490b317f67c94dd0f --auction-id ALE001-UA-20261124-04958
+
+      - name: Targeted discovery and private review refresh
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir="$(mktemp -d)"
+          trap 'rm -rf -- "$dir"' EXIT
+          chmod 700 "$dir"
+          python3 -m scripts.prozorro_targeted_refresh --live-private-review --private-dir "$dir"
