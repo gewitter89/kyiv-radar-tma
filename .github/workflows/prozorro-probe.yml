@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - scripts/prozorro_probe.py
+      - scripts/prozorro_incremental_scan.py
       - scripts/prozorro_auction_candidates.py
       - .github/workflows/prozorro-probe.yml
 permissions:
@@ -21,3 +22,6 @@ jobs:
           persist-credentials: false
       - name: One bounded public GET; print aggregate counts only
         run: python3 scripts/prozorro_probe.py --live-read-only --limit 3
+
+      - name: Bounded three-page incremental diagnostic
+        run: python3 scripts/prozorro_incremental_scan.py --live-read-only
