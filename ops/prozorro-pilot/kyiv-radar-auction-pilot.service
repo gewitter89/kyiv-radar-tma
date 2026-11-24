@@ -6,7 +6,8 @@ ConditionPathExists=/opt/kyiv-radar-auction-pilot/scripts/prozorro_targeted_refr
 
 [Service]
 Type=oneshot
-DynamicUser=yes
+User=kyiv-radar-auction
+Group=kyiv-radar-auction
 StateDirectory=kyiv-radar-auction-pilot
 StateDirectoryMode=0700
 WorkingDirectory=/opt/kyiv-radar-auction-pilot
