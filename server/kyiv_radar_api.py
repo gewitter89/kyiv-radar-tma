@@ -86,7 +86,9 @@ def _load_env_file(filepath: str = "/opt/agent-bot/.env"):
 
 _load_env_file()
 
-APP_ENV = os.getenv("APP_ENV", "production")
+VALID_ENVS = {"production", "staging", "test"}
+raw_app_env = os.getenv("APP_ENV", "production")
+APP_ENV = raw_app_env if raw_app_env in VALID_ENVS else "production"
 DB_PATH = os.getenv("KYIV_RADAR_DB_PATH", "/opt/resell-radar-ukraine/data/rent_deals.db")
 DEALS_JSON_PATH = os.getenv("KYIV_RADAR_DEALS_PATH", "/opt/kyiv-radar-tma/data/deals.json")
 # Private staging source rights: never a public file or client-controlled path.
@@ -250,7 +252,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "HEAD", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -678,11 +680,31 @@ async def get_live_deals(response: Response):
         "timestamp": int(time.time())
     }
 
-@app.get("/api/auctions")
-async def staged_auctions():
-    # Separate read-only staging route. No public enablement in this release.
-    if APP_ENV not in ("staging", "test") or os.getenv("KYIV_RADAR_AUCTIONS_PREVIEW") != "1":
-        raise HTTPException(status_code=404, detail="Not found", headers={"Cache-Control":"no-store"})
+@app.api_route("/api/auctions", methods=["GET", "HEAD", "OPTIONS"])
+async def staged_auctions(request: Request):
+    # Production release gate: strictly gated by KYIV_RADAR_AUCTIONS_RELEASE.
+    # Staging/test allows KYIV_RADAR_AUCTIONS_PREVIEW or KYIV_RADAR_AUCTIONS_RELEASE.
+    # Default deny: 404 if gate is not explicitly enabled.
+    valid_envs = ("production", "staging", "test")
+    if APP_ENV not in valid_envs:
+        raise HTTPException(status_code=404, detail="Not found", headers={"Cache-Control": "no-store"})
+    is_prod = (APP_ENV == "production")
+    release_enabled = (os.getenv("KYIV_RADAR_AUCTIONS_RELEASE") == "1")
+    preview_enabled = (os.getenv("KYIV_RADAR_AUCTIONS_PREVIEW") == "1")
+
+    if is_prod:
+        if not release_enabled:
+            raise HTTPException(status_code=404, detail="Not found", headers={"Cache-Control": "no-store"})
+    else:
+        if not (preview_enabled or release_enabled):
+            raise HTTPException(status_code=404, detail="Not found", headers={"Cache-Control": "no-store"})
+
+    if request.method == "OPTIONS":
+        return Response(status_code=204, headers={
+            "Allow": "GET, HEAD, OPTIONS",
+            "Cache-Control": "no-store"
+        })
+
     from datetime import datetime, timezone
     from fastapi.responses import JSONResponse
     try:
@@ -690,14 +712,26 @@ async def staged_auctions():
             from .auction_snapshot import load
         except ImportError:
             from auction_snapshot import load
-        rows = load(os.getenv("KYIV_RADAR_AUCTION_SNAPSHOT"),
-                    os.getenv("KYIV_RADAR_AUCTION_KEY"), now=datetime.now(timezone.utc))
+        from pathlib import Path
+        snapshot = os.getenv("KYIV_RADAR_AUCTION_SNAPSHOT")
+        if not snapshot or not Path(snapshot).is_absolute():
+            raise ValueError("Missing snapshot")
+        marker = Path(snapshot).parent / ".kill_switch"
+        # lstat semantics: even a broken marker symlink disables publication.
+        if os.path.lexists(marker):
+            raise ValueError("Auction release disabled")
+        rows = load(snapshot, os.getenv("KYIV_RADAR_AUCTION_KEY"),
+                    now=datetime.now(timezone.utc))
+        if os.path.lexists(marker):
+            raise ValueError("Auction release disabled")
     except Exception:
         # Do not leak filesystem paths, signatures or private state.
-        return JSONResponse({"available":False,"auctions":[]},status_code=503,
-                            headers={"Cache-Control":"no-store"})
-    return JSONResponse({"available":True,"auctions":rows,"coverage_complete":False},
-                        headers={"Cache-Control":"no-store"})
+        return JSONResponse({"available": False, "auctions": []}, status_code=503,
+                            headers={"Cache-Control": "no-store"})
+    if request.method == "HEAD":
+        return Response(status_code=200, headers={"Cache-Control": "no-store"})
+    return JSONResponse({"available": True, "auctions": rows, "coverage_complete": False},
+                        headers={"Cache-Control": "no-store"})
 
 
 @app.post("/api/reports")

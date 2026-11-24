@@ -2,6 +2,7 @@
 import argparse
 import json
 from datetime import datetime, timezone
+from pathlib import Path
 
 from .prozorro_auction_candidates import AUCTION_ID, METHODS, _aware, _utc
 from .prozorro_probe import read_page, MAX_BYTES
@@ -54,7 +55,7 @@ def recheck(auction_id, *, now, request_fn=read_page):
     return row
 
 
-def refresh(directory, *, now, request_fn=read_page):
+def refresh(directory, *, now, request_fn=read_page, export_path=None):
     """Atomic bounded private refresh; no claim of full discovery or coverage."""
     now = _aware(now)
     with exclusive_sync(directory) as directory:
@@ -63,9 +64,14 @@ def refresh(directory, *, now, request_fn=read_page):
         rows = discover(now=now, request_fn=request_fn)
         rows.extend(recheck(key, now=now, request_fn=request_fn) for key in ids)
         apply_page(directory, rows, observed_at=now, now=now)
+        exported = 0
+        if export_path:
+            from .prozorro_candidate_handoff import export_handoff
+            exported, _ = export_handoff(directory, export_path, now=now)
         return {"discovery_requests": len(METHODS), "recheck_requests": len(ids),
                 "procedures_seen": len(rows),
                 "private_review_count": len(review_candidates(directory, now=now)),
+                "exported_candidates": exported,
                 "coverage_complete": False, "publications": 0}
 
 
@@ -73,11 +79,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--private-dir", required=True)
     parser.add_argument("--live-private-review", action="store_true")
+    parser.add_argument("--export-handoff", type=Path, default=None, help="Atomically export sanitized candidates to destination file")
     args = parser.parse_args()
     if not args.live_private_review:
         parser.error("Explicit opt-in required")
     try:
-        print(json.dumps(refresh(private_directory(args.private_dir), now=datetime.now(timezone.utc))))
+        print(json.dumps(refresh(private_directory(args.private_dir), now=datetime.now(timezone.utc), export_path=args.export_handoff)))
     except Exception:
         parser.exit(1, "Targeted refresh failed; no public output.\n")
 

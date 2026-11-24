@@ -91,23 +91,42 @@ def unseal(raw,key,*,now):
             for row in clean(body["rows"],now)]
 
 
-def read_file(value, limit):
+def _trusted_publisher_uids():
+    uids = {0, os.geteuid()}
+    env_uid = os.getenv("KYIV_RADAR_PUBLISHER_UID")
+    if env_uid:
+        try:
+            uids.add(int(env_uid))
+        except ValueError:
+            pass
+    return uids
+
+
+def read_file(value, limit, *, owner_uid=None):
     if not value:
         raise ValueError("Private path required")
     path = Path(value)
     if not path.is_absolute() or path.resolve()!=path or path.is_relative_to(ROOT):
         raise ValueError("Unsafe path")
-    # Require a dedicated root/owner-controlled directory, not writable by group/world.
+    trusted_uids = _trusted_publisher_uids() if owner_uid is None else {owner_uid}
     parent = path.parent.stat()
-    if parent.st_mode & 0o022 or parent.st_uid not in (0,os.geteuid()):
+    if (parent.st_mode & 0o022) or (parent.st_mode & 0o007) or parent.st_uid not in trusted_uids:
         raise ValueError("Unsafe directory")
     fd = os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
     try:
         info = os.fstat(fd)
         if (not stat.S_ISREG(info.st_mode) or info.st_nlink!=1
-                or info.st_mode & 0o027 or info.st_uid not in (0,os.geteuid())
+                or (info.st_mode & 0o027) or info.st_uid not in trusted_uids
                 or info.st_size>limit):
             raise ValueError("Unsafe input")
+        if info.st_uid != os.geteuid() and info.st_uid != 0:
+            if not (info.st_mode & 0o040):
+                raise ValueError("Group read required for distinct publisher")
+            allowed_gids = {os.getegid()} | set(os.getgroups())
+            if info.st_gid not in allowed_gids:
+                raise ValueError("Reader group access required")
+            if os.access(path, os.W_OK):
+                raise ValueError("API process must have strictly read-only access")
         with os.fdopen(fd,"rb",closefd=False) as file:
             data = file.read(limit+1)
         if len(data)>limit:
