@@ -3,6 +3,7 @@
 import json
 import os
 import re
+import sqlite3
 import sys
 from pathlib import Path
 
@@ -34,7 +35,13 @@ def test_json_and_embedded_catalogue_have_zero_fabricated_template_claims():
                 assert claim not in str(deal.get("desc", ""))
 
 
-def test_api_blocks_old_import_and_scrubs_first_party_template_claims(monkeypatch):
+def test_api_blocks_old_import_and_scrubs_first_party_template_claims(monkeypatch, tmp_path):
+    # Synthetic direct owner is backed by the original published submission.
+    db = tmp_path / "owners.sqlite"
+    with sqlite3.connect(db) as conn:
+        conn.execute("CREATE TABLE landlord_submissions (id INTEGER PRIMARY KEY, status TEXT)")
+        conn.execute("INSERT INTO landlord_submissions VALUES (8, 'published')")
+    monkeypatch.setattr(api, "DB_PATH", str(db))
     unsupported = (
         "Здається реальна квартира від власника без посередників. "
         "Оригінальна назва. "

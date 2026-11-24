@@ -65,12 +65,16 @@ def test_submission_stores_private_consent_receipt_atomically(privacy_test_env):
         "rightsConfirmed": True,
         "initData": auth,
     }
+    # The shared synthetic fixture already includes one approved owner.
+    # Invalid consent must not create any ADDITIONAL submission.
+    with sqlite3.connect(privacy_test_env["db_path"]) as conn:
+        baseline = conn.execute("SELECT count(*) FROM landlord_submissions").fetchone()[0]
     for bad in ({}, {"consentVersion": "not-supported"}):
         res = client.post("/api/landlords/submit", json={**payload, **bad})
         assert res.status_code == 400
         assert "форм" in res.json()["detail"]
     with sqlite3.connect(privacy_test_env["db_path"]) as conn:
-        assert conn.execute("SELECT count(*) FROM landlord_submissions").fetchone()[0] == 0
+        assert conn.execute("SELECT count(*) FROM landlord_submissions").fetchone()[0] == baseline
         assert conn.execute("SELECT count(*) FROM landlord_consent_receipts").fetchone()[0] == 0
 
     with patch("server.kyiv_radar_api.send_telegram_alert", new_callable=AsyncMock) as alert:

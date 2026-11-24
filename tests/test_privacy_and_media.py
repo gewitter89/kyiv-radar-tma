@@ -94,6 +94,15 @@ def privacy_test_env():
         kyiv_radar_api.APP_ENV = "test"
 
         kyiv_radar_api.init_db()
+        # The baseline synthetic owner card represents an actually published
+        # private submission, not just an arbitrary flag in deals.json.
+        import sqlite3
+        with sqlite3.connect(test_db) as conn:
+            conn.execute(
+                "INSERT INTO landlord_submissions (id,address,price,rooms,phone,status) "
+                "VALUES (?,?,?,?,?,?)",
+                (990001, "вул. Хрещатик, 1", "15000", 1, "+380671112233", "published"),
+            )
         client = TestClient(kyiv_radar_api.app)
 
         yield {
