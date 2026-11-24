@@ -7,7 +7,7 @@ from playwright.async_api import async_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
 ORIGIN="http://127.0.0.1:8765"
-HTML='<!doctype html><html lang="uk"><head><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/auction-tab.css"></head><body><header>КИЇВ РАДАР</header><script src="/auction-tab.js"></script></body></html>'
+HTML='<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/auction-tab.css"></head><body><header>КИЇВ РАДАР</header><script src="/auction-tab.js"></script></body></html>'
 
 
 def response(now=None):
@@ -30,14 +30,14 @@ async def configure(page, *, enabled=True):
     async def route(r):
         path=r.request.url.removeprefix(ORIGIN)
         if path=="/":
-            await r.fulfill(content_type="text/html",body=HTML)
+            await r.fulfill(content_type="text/html; charset=utf-8",body=HTML)
         elif path in ("/auction-tab.js","/auction-tab.css"):
-            await r.fulfill(content_type="text/javascript" if path.endswith(".js") else "text/css",
+            await r.fulfill(content_type="text/javascript; charset=utf-8" if path.endswith(".js") else "text/css; charset=utf-8",
                             body=(ROOT/path[1:]).read_text(encoding="utf-8"))
         elif path=="/api/auctions":
             calls.append(path)
             if state["available"]:
-                await r.fulfill(status=200,content_type="application/json",body=json.dumps(response(),ensure_ascii=False))
+                await r.fulfill(status=200,content_type="application/json; charset=utf-8",body=json.dumps(response(),ensure_ascii=False))
             else:
                 await r.fulfill(status=503,content_type="application/json",body=json.dumps({"available":False,"auctions":[]}))
         else:
@@ -47,6 +47,9 @@ async def configure(page, *, enabled=True):
         await page.add_init_script("""window.KR_AUCTIONS_STAGING=true;
           window.__links=[];window.Telegram={WebApp:{openLink(url){window.__links.push(url)}}};""")
     await page.goto(ORIGIN+"/")
+    assert await page.evaluate("document.characterSet") == "UTF-8"
+    if enabled:
+        assert await page.locator("#krAuctionsNav").inner_text() == "Аукціони"
     return calls,state
 
 
