@@ -686,8 +686,9 @@ async def staged_auctions(request: Request):
     # Staging/test allows KYIV_RADAR_AUCTIONS_PREVIEW or KYIV_RADAR_AUCTIONS_RELEASE.
     # Default deny: 404 if gate is not explicitly enabled.
     valid_envs = ("production", "staging", "test")
-    effective_env = APP_ENV if APP_ENV in valid_envs else "production"
-    is_prod = (effective_env == "production")
+    if APP_ENV not in valid_envs:
+        raise HTTPException(status_code=404, detail="Not found", headers={"Cache-Control": "no-store"})
+    is_prod = (APP_ENV == "production")
     release_enabled = (os.getenv("KYIV_RADAR_AUCTIONS_RELEASE") == "1")
     preview_enabled = (os.getenv("KYIV_RADAR_AUCTIONS_PREVIEW") == "1")
 
@@ -711,8 +712,18 @@ async def staged_auctions(request: Request):
             from .auction_snapshot import load
         except ImportError:
             from auction_snapshot import load
-        rows = load(os.getenv("KYIV_RADAR_AUCTION_SNAPSHOT"),
-                    os.getenv("KYIV_RADAR_AUCTION_KEY"), now=datetime.now(timezone.utc))
+        from pathlib import Path
+        snapshot = os.getenv("KYIV_RADAR_AUCTION_SNAPSHOT")
+        if not snapshot or not Path(snapshot).is_absolute():
+            raise ValueError("Missing snapshot")
+        marker = Path(snapshot).parent / ".kill_switch"
+        # lstat semantics: even a broken marker symlink disables publication.
+        if os.path.lexists(marker):
+            raise ValueError("Auction release disabled")
+        rows = load(snapshot, os.getenv("KYIV_RADAR_AUCTION_KEY"),
+                    now=datetime.now(timezone.utc))
+        if os.path.lexists(marker):
+            raise ValueError("Auction release disabled")
     except Exception:
         # Do not leak filesystem paths, signatures or private state.
         return JSONResponse({"available": False, "auctions": []}, status_code=503,
