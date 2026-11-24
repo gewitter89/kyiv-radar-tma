@@ -23,3 +23,18 @@ def test_daily_and_manual_readonly_paths_preserved():
     assert "workflow_dispatch:" in raw
     assert "schedule:" in raw
     assert "17 06 * * *" in raw
+
+
+def test_scoped_main_push_keeps_live_audit_when_pages_is_dynamic():
+    # The Pages workflow is recorded with a dynamic GitHub event, which may
+    # not yield the expected downstream workflow_run event for this repo.
+    raw = WORKFLOW.read_text(encoding="utf-8")
+    assert "push:" in raw
+    assert "branches: [main]" in raw
+    for path in ("index.html", "*.js", "*.css", "data/deals.json",
+                 "scripts/monitor_public_health.py",
+                 ".github/workflows/public-health.yml"):
+        assert f'"{path}"' in raw
+    # A push-triggered check is allowed to race with CDN propagation, so
+    # neither the test nor workflow can claim to attest a particular build.
+    assert "schedule:" in raw

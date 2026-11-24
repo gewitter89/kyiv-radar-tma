@@ -1,5 +1,19 @@
 name: Read-only public production health
 on:
+  # GitHub's generated Pages workflow is emitted as a dynamic event and did
+  # not produce a workflow_run follow-up in our first observed release.
+  # A scoped main push ensures the *live* site/API is checked at least once
+  # for actual website/monitor code changes. It is not an atomic deploy gate:
+  # daily checks and optional workflow_run remain independent safeguards.
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "*.js"
+      - "*.css"
+      - "data/deals.json"
+      - "scripts/monitor_public_health.py"
+      - ".github/workflows/public-health.yml"
   workflow_dispatch:
   schedule:
     - cron: '17 06 * * *'
