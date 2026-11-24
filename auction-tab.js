@@ -36,7 +36,7 @@
   const status = el('p','',{role:'status','aria-live':'polite'});
   const list = el('div',undefined,{id:'krAuctionList'});
   panel.append(header,note,filters,status,list);
-  const host = document.querySelector('header');
+  const host = document.querySelector('body > header');
   if (!host || typeof panel.showModal !== 'function') return;
   host.append(nav); document.body.append(panel);
 
@@ -89,20 +89,24 @@
   async function refresh(){
     const n=++seq;
     rows=[]; list.replaceChildren(); status.textContent='Оновлення…';
+    const controller = new AbortController();
+    const timeout = setTimeout(()=>controller.abort(),5000);
     try{
-      const response=await fetch('/api/auctions',{cache:'no-store',credentials:'omit',signal:AbortSignal.timeout(5000)});
+      const response=await fetch('/api/auctions',{cache:'no-store',credentials:'same-origin',signal:controller.signal,redirect:'error'});
       if(!response.ok) throw Error();
       const body=await response.json();
       if(body.available!==true || body.coverage_complete!==false || !Array.isArray(body.auctions)||body.auctions.length>2000) throw Error();
       const normalized=body.auctions.map(normalize);
       if(normalized.some(x=>!x)||new Set(normalized.map(x=>x.id)).size!==normalized.length) throw Error();
-      if(n!==seq||!panel.open||document.hidden)return;
+      if(n!==seq||!panel.open)return;
+      if(document.hidden){status.textContent='Оновлення після повернення';return;}
       rows=normalized;render();
     }catch(_){if(n===seq&&panel.open){rows=[];list.replaceChildren();status.textContent='Дані тимчасово недоступні.';}}
+    finally{clearTimeout(timeout);}
   }
-  nav.addEventListener('click',()=>{panel.showModal();refresh();refreshTimer=setInterval(refresh,20000);});
+  nav.addEventListener('click',()=>{clearInterval(refreshTimer);clearTimeout(expiryTimer);panel.showModal();refresh();refreshTimer=setInterval(()=>{if(!document.hidden)refresh();},20000);});
   close.addEventListener('click',()=>panel.close());
-  panel.addEventListener('close',()=>{seq++;clearInterval(refreshTimer);clearTimeout(expiryTimer);rows=[];list.replaceChildren();nav.focus();});
+  panel.addEventListener('close',()=>{if(panel.open)return;seq++;clearInterval(refreshTimer);clearTimeout(expiryTimer);rows=[];list.replaceChildren();nav.focus();});
   for(const input of [max,sort,only])input.addEventListener('input',render);
   document.addEventListener('visibilitychange',()=>{if(!panel.open)return;seq++;rows=[];list.replaceChildren();if(!document.hidden)refresh();});
 })();
