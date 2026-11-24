@@ -2260,63 +2260,109 @@
             if (!currentModalDeal) return;
             const photos = Array.isArray(currentModalDeal.images)
                 ? currentModalDeal.images.map(safePhotoUrl).filter(Boolean) : [];
-            const hasPhotos = photos.length > 0;
             const imgEl = document.getElementById('modalImage');
             const prevBtn = document.getElementById('modalPhotoPrev');
             const nextBtn = document.getElementById('modalPhotoNext');
             const dotsContainer = document.getElementById('modalPhotoDots');
             const indexBadge = document.getElementById('modalPhotoIndex');
+            const container = document.getElementById('modalPhotoContainer');
+            if (!imgEl || !container) return;
 
+            // Always allocate a readable, deterministic fallback surface. Broken
+            // <img> glyphs/text must never appear even if an approved photo's URL
+            // becomes unavailable, expired or revoked between catalog and view.
             let placeholder = document.getElementById('modalPhotoPlaceholder');
-
-            if (!hasPhotos) {
-                imgEl.src = '';
+            if (!placeholder) {
+                placeholder = document.createElement('div');
+                placeholder.id = 'modalPhotoPlaceholder';
+                placeholder.className = 'kr-modal-photo-placeholder hidden';
+                placeholder.setAttribute('role', 'status');
+                placeholder.setAttribute('aria-live', 'polite');
+                Object.assign(placeholder.style, {
+                    position: 'absolute', inset: '0', zIndex: '1',
+                    flexDirection: 'column', alignItems: 'center',
+                    justifyContent: 'center', textAlign: 'center',
+                    background: '#1d2937', color: '#f5f8fd',
+                    pointerEvents: 'none', padding: '16px'
+                });
+                placeholder.innerHTML = `
+                    <svg aria-hidden="true" width="38" height="38" viewBox="0 0 24 24" fill="none"
+                         stroke="#afbdd1" stroke-width="1.4"><rect x="3" y="3" width="18"
+                         height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                         <path d="M21 15l-5-5L5 21"/></svg>
+                    <p class="kr-modal-photo-message" style="color:#f5f8fd;font-size:13px;
+                       font-weight:600;margin-top:12px">Фото тимчасово недоступне</p>
+                    <p style="color:#a7b7c9;font-size:11px;margin-top:5px">
+                       Спробуйте інше фото або перевірте джерело</p>`;
+                container.appendChild(placeholder);
+            }
+            const showFallback = (message) => {
                 imgEl.classList.add('hidden');
-                if (!placeholder) {
-                    placeholder = document.createElement('div');
-                    placeholder.id = 'modalPhotoPlaceholder';
-                    placeholder.className = 'w-full h-full flex flex-col items-center justify-center bg-[#242426] text-[#8e8e93] p-4 text-center select-none';
-                    placeholder.innerHTML = `
-                        <svg class="w-12 h-12 mb-2 opacity-30 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                        <p class="text-xs font-medium text-white/80">Фотографії очікуються</p>
-                        <p class="text-[10px] text-white/50 mt-0.5">Фото до цього оголошення поки немає</p>
-                    `;
-                    document.getElementById('modalPhotoContainer').appendChild(placeholder);
-                } else {
-                    placeholder.classList.remove('hidden');
+                placeholder.querySelector('.kr-modal-photo-message').textContent = message;
+                placeholder.classList.remove('hidden');
+                placeholder.style.display = 'flex';
+            };
+            const hideFallback = () => {
+                placeholder.classList.add('hidden');
+                placeholder.style.display = 'none';
+                imgEl.classList.remove('hidden');
+            };
+
+            // Cancel stale handlers when changing listing/photo; never treat a
+            // failure from the previous image as a failure of the current one.
+            imgEl.onload = null;
+            imgEl.onerror = null;
+            if (!photos.length) {
+                imgEl.removeAttribute('src');
+                showFallback('Фотографій поки немає');
+                for (const control of [prevBtn, nextBtn, dotsContainer, indexBadge]) {
+                    if (control) control.classList.add('hidden');
                 }
-                if (prevBtn) prevBtn.classList.add('hidden');
-                if (nextBtn) nextBtn.classList.add('hidden');
-                if (dotsContainer) dotsContainer.classList.add('hidden');
-                if (indexBadge) indexBadge.classList.add('hidden');
                 return;
             }
 
-            if (placeholder) placeholder.classList.add('hidden');
-            imgEl.classList.remove('hidden');
-            imgEl.referrerPolicy = 'no-referrer';
-            imgEl.src = photos[currentModalPhotoIdx];
-            imgEl.alt = `Фото квартири ${currentModalPhotoIdx + 1} з ${photos.length}`;
-
             if (photos.length <= 1) {
-                if (prevBtn) prevBtn.classList.add('hidden');
-                if (nextBtn) nextBtn.classList.add('hidden');
-                if (dotsContainer) dotsContainer.classList.add('hidden');
-                if (indexBadge) indexBadge.classList.add('hidden');
+                for (const control of [prevBtn, nextBtn, dotsContainer, indexBadge]) {
+                    if (control) control.classList.add('hidden');
+                }
             } else {
-                if (prevBtn) prevBtn.classList.remove('hidden');
-                if (nextBtn) nextBtn.classList.remove('hidden');
-                if (indexBadge) {
-                    indexBadge.classList.remove('hidden');
-                    indexBadge.innerText = `${currentModalPhotoIdx + 1}/${photos.length}`;
+                for (const control of [prevBtn, nextBtn, dotsContainer, indexBadge]) {
+                    if (control) control.classList.remove('hidden');
                 }
+                if (indexBadge) indexBadge.textContent =
+                    `${currentModalPhotoIdx + 1}/${photos.length}`;
                 if (dotsContainer) {
-                    dotsContainer.classList.remove('hidden');
-                    dotsContainer.innerHTML = photos.map((_, i) => {
-                        const isActive = i === currentModalPhotoIdx;
-                        return `<span class="${isActive ? 'w-3.5 h-1 bg-white' : 'w-1 h-1 bg-white/40'} rounded-full transition-all duration-300"></span>`;
-                    }).join('');
+                    dotsContainer.innerHTML = photos.map((_, i) =>
+                        `<span class="${i === currentModalPhotoIdx
+                            ? 'w-3.5 h-1 bg-white' : 'w-1 h-1 bg-white/40'
+                        } rounded-full transition-all duration-300"></span>`
+                    ).join('');
                 }
+            }
+
+            const expectedDeal = currentModalDeal;
+            const expectedIndex = currentModalPhotoIdx;
+            const expectedUrl = photos[expectedIndex];
+            const stillCurrent = () =>
+                currentModalDeal === expectedDeal &&
+                currentModalPhotoIdx === expectedIndex &&
+                imgEl.getAttribute('src') === expectedUrl;
+            showFallback('Завантажуємо фото…');
+            imgEl.referrerPolicy = 'no-referrer';
+            imgEl.alt = `Фото квартири ${expectedIndex + 1} з ${photos.length}`;
+            imgEl.onload = () => {
+                if (!stillCurrent()) return;
+                if (imgEl.naturalWidth > 0) hideFallback();
+                else showFallback('Фото тимчасово недоступне');
+            };
+            imgEl.onerror = () => {
+                if (stillCurrent()) showFallback('Фото тимчасово недоступне');
+            };
+            imgEl.src = expectedUrl;
+            // Already-cached images can be complete before the load listener
+            // fires. Avoid an indefinite loading placeholder in that case.
+            if (imgEl.complete && imgEl.naturalWidth > 0 && stillCurrent()) {
+                hideFallback();
             }
         }
 
