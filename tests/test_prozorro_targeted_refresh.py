@@ -65,3 +65,26 @@ def test_wrong_selling_method_and_oversized_page():
         discover(now=NOW, request_fn=lambda _: json.dumps([row()]*11).encode())
     with pytest.raises(ValueError, match="selling method"):
         discover(now=NOW, request_fn=lambda _: json.dumps([row(sellingMethod="alienation-english")]).encode())
+
+
+def test_stale_retained_object_revalidated_after_outage(tmp_path):
+    tmp_path.chmod(0o700)
+    apply_page(tmp_path, [row()], observed_at=NOW, now=NOW)
+    later = NOW + timedelta(hours=2)
+    assert review_candidates(tmp_path, now=later) == []
+    def fetch(url):
+        return json.dumps(row()).encode() if "byAuctionId" in url else b"[]"
+    result = refresh(tmp_path, now=later, request_fn=fetch)
+    assert result["recheck_requests"] == 1
+    assert result["private_review_count"] == 1
+
+
+def test_recheck_budget_is_bounded(tmp_path):
+    tmp_path.chmod(0o700)
+    items = [row(auctionId=f"CSE001-UA-20261124-{i:05d}") for i in range(8)]
+    apply_page(tmp_path, items, observed_at=NOW, now=NOW)
+    def fetch(url):
+        if "byAuctionId/" in url:
+            return json.dumps(row(auctionId=url.rsplit("/", 1)[1])).encode()
+        return b"[]"
+    assert refresh(tmp_path, now=NOW+timedelta(minutes=1), request_fn=fetch)["recheck_requests"] == 5
