@@ -4,7 +4,7 @@ import json
 import re
 from datetime import datetime, timezone
 from .prozorro_probe import read_page, MAX_BYTES
-from .prozorro_auction_candidates import candidate
+from .prozorro_auction_candidates import candidate, address_label, KYIV, UKRAINE, KYIV_REGION
 
 BASE = "https://procedure.prozorro.sale/api/procedures/"
 ID = re.compile(r"[0-9a-f]{24}")
@@ -38,8 +38,9 @@ def inspect(*, procedure_id, auction_id, request_fn=read_page, now=None):
         "active_tendering": row.get("status") == "active_tendering",
         "single_item": single,
         "cav_apartment": isinstance(classification, dict) and classification.get("scheme") == "CAV" and classification.get("id") == "04111000-9",
-        "kyiv_locality": isinstance(address, dict) and address.get("locality") in ("Київ", "м. Київ"),
-        "ukrainian_country": isinstance(address, dict) and address.get("countryName") in ("Україна", "Ukraine"),
+        "kyiv_locality": isinstance(address, dict) and address_label(address.get("locality")) in KYIV,
+        "ukrainian_country": isinstance(address, dict) and address_label(address.get("countryName")) in UKRAINE,
+        "kyiv_region": isinstance(address, dict) and address_label(address.get("region")) in KYIV_REGION,
         "uah": isinstance(value, dict) and value.get("currency") == "UAH",
         "vat_boolean": isinstance(value, dict) and type(value.get("valueAddedTaxIncluded")) is bool,
         "tender_window_present": isinstance(period, dict) and all(isinstance(period.get(k), str) for k in ("startDate", "endDate")),
