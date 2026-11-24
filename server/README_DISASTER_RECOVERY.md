@@ -1,5 +1,45 @@
 # Kyiv Radar — Production Architecture & Disaster Recovery Runbook
 
+> **CRITICAL / 24 Nov 2026 — HISTORICAL BOOTSTRAP, NOT A LIVE DEPLOY SCRIPT.**
+> The section titled "Fresh VPS Recovery from Scratch" is an archived
+> starting point for a **brand-new empty host only**, not a valid upgrade,
+> rollback, or restoration plan for the running Kyiv Radar VPS.
+> **Never execute the commands in that section on an existing server.**
+> It does not protect a WAL-mode SQLite database, approved owner photos,
+> private contact vault, other shared service writers, or the verified
+> listing catalogue. The repository's `data/deals.json` intentionally
+> contains **[]** after P0 safety purge and MUST NOT overwrite live data.
+>
+> For any operational change use [the coordinated release runbook](../docs/COORDINATED_RELEASE_RUNBOOK.md),
+> [the private backup-only preflight](../scripts/prepare_vps_release.py),
+> and the current [source/rights release gates](../docs/DIM_RIA_20261124_SAFE_PILOT.md).
+> **GitHub Pages success does not mean production VPS code is updated.**
+> A new installation must independently review and adapt every path,
+> service, package, database schema, security permission and token reference.
+
+## Mandatory P0 safeguards for existing production
+
+1. Read actual `systemctl cat` and process identities for **both**
+   `kyiv-radar-api.service` and `agent-bot.service` plus any other SQLite
+   writers; determine the real import paths, owner, database and catalog paths.
+2. Capture private preflight backup with SQLite Online Backup API,
+   WAL-consistent verification, catalogue, uploads, contacts, bot module,
+   deployment configuration, permissions and exact deployed SHA. Keep private.
+3. Never copy the repo's empty `data/deals.json` onto a live catalog,
+   execute `schema.sql` against an existing database, or overwrite/restore a
+   SQLite file while services/writers are active.
+4. Test migration on a **disposable copy**. Change API and Telegram bot
+   modules together only after explicit maintenance approval; avoid touching
+   unrelated workloads.
+5. Confirm current source permissions, stale/withdrawn property exclusion,
+   media takedown (old URLs return 404 and no-store), user consent, no raw
+   contacts in public API, and browser/API real-device E2E.
+6. Stop/revert on any failed gate. A former release's rollback recipe may
+   re-enable unsafe historical records: preserve private state, prefer a
+   compatible code-only rollback and never blindly restore old catalog bytes.
+
+
+
 ## 1. System Architecture Overview
 
 ```
@@ -62,7 +102,7 @@ curl -s https://vmi3445944.contaboserver.net/api/health | jq .
 
 ---
 
-## 3. Fresh VPS Recovery from Scratch
+## 3. Historical fresh-install sketch — NOT FOR EXISTING HOSTS
 
 ### Step 1: Install Base Packages & Caddy
 ```bash
@@ -87,23 +127,29 @@ python3 -m venv /opt/agent-bot/venv
 ### Step 3: Deploy Application Code & Set File Permissions
 ```bash
 # Copy files into place
-cp server/kyiv_radar_api.py /opt/agent-bot/kyiv_radar_api.py
+# This single-file copy is historical and insufficient for current modular imports.
+# Deploy the full pinned compatible package/API+bot as verified by the release runbook.
+# cp server/kyiv_radar_api.py /opt/agent-bot/kyiv_radar_api.py
 cp server/schema.sql /opt/resell-radar-ukraine/data/
 sqlite3 /opt/resell-radar-ukraine/data/rent_deals.db < server/schema.sql
-cp data/deals.json /opt/kyiv-radar-tma/data/deals.json
+# DO NOT copy the repo's deliberately empty data/deals.json over live data.
+# For a new empty host only, initialize its own empty catalogue explicitly.
+printf '[]\\n' > /opt/kyiv-radar-tma/data/deals.json
 
 # Secure permissions
 chown -R kyivradar:kyivradar /opt/resell-radar-ukraine/data
-chmod 775 /opt/resell-radar-ukraine/data
-chmod 664 /opt/resell-radar-ukraine/data/rent_deals.db
+chmod 700 /opt/resell-radar-ukraine/data
+chmod 600 /opt/resell-radar-ukraine/data/rent_deals.db
 chown kyivradar:kyivradar /opt/kyiv-radar-tma/data/deals.json
-chmod 664 /opt/kyiv-radar-tma/data/deals.json
-chown kyivradar:kyivradar /opt/agent-bot/kyiv_radar_api.py
+chmod 600 /opt/kyiv-radar-tma/data/deals.json
+# Only set ownership AFTER installing the full, compatible API/bot package:
+# chown kyivradar:kyivradar /opt/agent-bot/kyiv_radar_api.py
 ```
 
 ### Step 4: Configure Secrets & Systemd
 ```bash
 # Create .env with mode 600
+# NEVER paste actual tokens into shared terminal logs.
 cat << 'EOF' > /opt/agent-bot/.env
 APP_ENV=production
 BOT_TOKEN=YOUR_BOTFATHER_TOKEN
