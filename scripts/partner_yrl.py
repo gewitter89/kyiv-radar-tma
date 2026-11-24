@@ -33,6 +33,8 @@ FIELDS = {
     ("price", "period"): "_period",
     ("price", "unit"): "_price_unit",
     ("rooms",): "rooms",
+    ("title",): "title",
+    ("description",): "description",
     ("area", "value"): "_area",
     ("area", "unit"): "_area_unit",
 }
@@ -126,6 +128,10 @@ def _canonical_row(data: dict) -> dict:
         "district": data.get("district"),
         "price_uah": raw_price,
     }
+    # Only a transient validation input; never copied into inventory.
+    for transient in ("title", "description"):
+        if transient in data:
+            row[transient] = data[transient]
     rooms = data.get("rooms")
     if rooms is not None:
         row["rooms"] = rooms
