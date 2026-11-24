@@ -764,26 +764,65 @@ def cleanup_abandoned_uploads(max_age_hours: int = 48) -> None:
 
 @app.get("/api/media/{photo_id}")
 async def get_approved_photo(photo_id: str):
-    """Serve a photo only after the corresponding listing has been approved."""
+    """Only serve photos that still belong to an explicitly published owner ad.
+
+    A once-approved upload must become inaccessible as soon as its submission
+    or public listing is withdrawn. Approved bytes may remain in private backup
+    storage, but a public photo URL is not a permanent publication permission.
+    """
     if not PHOTO_ID_PATTERN.fullmatch(photo_id):
         raise HTTPException(status_code=404, detail="Фото не знайдено")
-    conn = sqlite3.connect(DB_PATH, timeout=5.0)
+
+    # Both states are necessary: file approval is NOT a permanent license to
+    # publish, and a catalog URL alone cannot make an unowned upload public.
     try:
-        row = conn.execute(
-            "SELECT status FROM landlord_uploads WHERE photo_id = ?",
-            (photo_id,)
-        ).fetchone()
-    finally:
-        conn.close()
-    if not row or row[0] != "approved":
+        with sqlite3.connect(DB_PATH, timeout=5.0) as conn:
+            row = conn.execute(
+                "SELECT u.submission_id, s.status, s.photos "
+                "FROM landlord_uploads AS u "
+                "JOIN landlord_submissions AS s ON s.id = u.submission_id "
+                "WHERE u.photo_id = ? AND u.status = 'approved'",
+                (photo_id,),
+            ).fetchone()
+    except sqlite3.Error:
+        # A temporarily unavailable database must never disclose a private image.
+        raise HTTPException(status_code=404, detail="Фото не знайдено") from None
+
+    if not row or type(row[0]) is not int or row[0] <= 0 or row[1] != "published":
+        raise HTTPException(status_code=404, detail="Фото не знайдено")
+    try:
+        submitted_photos = json.loads(row[2])
+    except (TypeError, ValueError, json.JSONDecodeError):
+        submitted_photos = None
+    if not isinstance(submitted_photos, list) or photo_id not in submitted_photos:
+        raise HTTPException(status_code=404, detail="Фото не знайдено")
+
+    # The same live rights/reviewer/status gate used by /api/deals must also
+    # govern photo bytes. Do not allow old bookmarked URLs to bypass takedowns.
+    expected_url = f"{PUBLIC_API_BASE}/api/media/{photo_id}"
+    try:
+        current_catalog = load_effective_deals()
+    except (OSError, ValueError, sqlite3.Error, TypeError):
+        raise HTTPException(status_code=404, detail="Фото не знайдено") from None
+    eligible = any(
+        isinstance(deal, dict)
+        and deal.get("source") == "Київ Радар (Пряма заявка)"
+        and type(deal.get("submission_id")) is int
+        and deal["submission_id"] == row[0]
+        and isinstance(deal.get("images"), list)
+        and expected_url in deal["images"]
+        for deal in current_catalog
+    )
+    if not eligible:
         raise HTTPException(status_code=404, detail="Фото не знайдено")
     path = os.path.join(UPLOADS_BASE_DIR, photo_id + ".webp")
     if not os.path.isfile(path):
         raise HTTPException(status_code=404, detail="Фото не знайдено")
-    return FileResponse(path, media_type="image/webp",
-                        headers={"Cache-Control": "public, max-age=86400",
-                                 "X-Content-Type-Options": "nosniff"})
-
+    return FileResponse(
+        path, media_type="image/webp",
+        headers={"Cache-Control": "private, no-store, max-age=0",
+                 "X-Content-Type-Options": "nosniff"},
+    )
 
 async def send_landlord_photo_previews(photo_ids: List[str], submission_id: int) -> bool:
     """Deliver pending photos privately to the moderator; never publish a preview URL."""
