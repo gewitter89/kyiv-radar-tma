@@ -327,7 +327,7 @@ def test_real_os_separation_permissions(tmp_path, monkeypatch):
         read_file(str(test_file), 64)
     transport_dir.chmod(0o750)
 
-    # 5. ACTUAL DISTINCT UIDs test (publisher UID != API reader euid)
+    # 5. Simulated UID/GID validation (real OS permission acceptance is separate)
     real_uid = os.geteuid()
     api_reader_uid = 988  # e.g. kyivradar
     reader_gid = os.getegid()
@@ -452,7 +452,7 @@ def test_repeated_handoffs_across_collector_cycles_and_disappearance(tmp_path, m
 
     # Cycle 1: Item 1 active -> 1 auction in API
     res1 = run_continuous_publisher(str(cand_file), str(ledger), str(key_file), str(snap_file),
-                                   interval=0.01, max_runs=1, enabled=True, collector_dir=cache)
+                                   interval=0.01, max_runs=1, enabled=True)
     assert res1 == "completed"
     resp1 = client.get("/api/auctions")
     assert resp1.status_code == 200
@@ -472,7 +472,7 @@ def test_repeated_handoffs_across_collector_cycles_and_disappearance(tmp_path, m
         decide(ledger, r, now=t0, valid_until=t0 + timedelta(hours=2), reviewed=True)
 
     res2 = run_continuous_publisher(str(cand_file), str(ledger), str(key_file), str(snap_file),
-                                   interval=0.01, max_runs=1, enabled=True, collector_dir=cache)
+                                   interval=0.01, max_runs=1, enabled=True)
     assert res2 == "completed"
     resp2 = client.get("/api/auctions")
     assert resp2.status_code == 200
@@ -487,7 +487,7 @@ def test_repeated_handoffs_across_collector_cycles_and_disappearance(tmp_path, m
     export_handoff(cache, cand_file, now=t0)
 
     res3 = run_continuous_publisher(str(cand_file), str(ledger), str(key_file), str(snap_file),
-                                   interval=0.01, max_runs=1, enabled=True, collector_dir=cache)
+                                   interval=0.01, max_runs=1, enabled=True)
     assert res3 == "completed"
     resp3 = client.get("/api/auctions")
     assert resp3.status_code == 200
