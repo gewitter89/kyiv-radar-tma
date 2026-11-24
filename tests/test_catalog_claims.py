@@ -34,16 +34,27 @@ def test_json_and_embedded_catalogue_have_zero_fabricated_template_claims():
                 assert claim not in str(deal.get("desc", ""))
 
 
-def test_api_removes_historic_template_claims_when_disk_catalog_is_stale(monkeypatch):
-    monkeypatch.setattr(api, "load_trusted_deals", lambda: [{
-        "id": 7, "source": "OLX", "isOwnerVerified": False,
-        "desc": "Здається реальна квартира від власника без посередників. "
-                "Оригінальна назва. "
-                "Повний комплект меблів та техніки, інтернет працює стабільно.",
+def test_api_blocks_old_import_and_scrubs_first_party_template_claims(monkeypatch):
+    unsupported = (
+        "Здається реальна квартира від власника без посередників. "
+        "Оригінальна назва. "
+        "Повний комплект меблів та техніки, інтернет працює стабільно."
+    )
+    old_import = {
+        "id": 7, "source": "OLX", "desc": unsupported,
         "phone": "+380631234567", "ownerName": "private person",
-    }])
+    }
+    synthetic_direct = {
+        "id": 8, "source": "Київ Радар (Пряма заявка)",
+        "submission_id": 8, "moderationStatus": "approved",
+        "isOwnerVerified": False, "desc": unsupported,
+        "phone": "+380631234567", "ownerName": "private person",
+    }
+    monkeypatch.setattr(api, "load_trusted_deals",
+                        lambda: [old_import, synthetic_direct])
     resp = TestClient(api.app).get("/api/deals")
     assert resp.status_code == 200
+    assert [row["id"] for row in resp.json()["deals"]] == [8]
     deal = resp.json()["deals"][0]
     assert deal["desc"] == "Оригінальна назва."
     assert deal["phone"] is None
