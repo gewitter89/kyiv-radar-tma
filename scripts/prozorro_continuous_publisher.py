@@ -1,24 +1,35 @@
 """Continuous, bounded publisher daemon staging verified auction snapshot handoffs."""
 import argparse
 import os
+import math
 import time
-from datetime import datetime, timezone
 from pathlib import Path
 
 from scripts.prozorro_atomic_publish import publish
 
 
 def run_continuous_publisher(candidates_path, decisions_path, key_path, output_path,
-                             *, interval=30.0, kill_switch_path=None, max_runs=None, enabled=True):
+                             *, interval=30.0, kill_switch_path=None, max_runs=None, enabled=False):
     """Periodically publish sealed snapshot while reusing verified candidates."""
     out = Path(output_path)
+    if enabled is not True:
+        raise ValueError("Explicit release required")
+    if not math.isfinite(interval) or not 0 < interval <= 30:
+        raise ValueError("Invalid publisher interval")
+    if max_runs is None and interval < 10:
+        raise ValueError("Unattended loop must be resource bounded")
+    if max_runs is not None and (type(max_runs) is not int or not 1 <= max_runs <= 10000):
+        raise ValueError("Invalid iteration budget")
+    marker = out.parent / ".kill_switch"
+    if kill_switch_path is not None and Path(kill_switch_path) != marker:
+        raise ValueError("Kill marker must be the transport directory marker")
     runs = 0
 
     while max_runs is None or runs < max_runs:
         runs += 1
 
         # Check kill switch: stop regeneration and invalidate snapshot immediately
-        if kill_switch_path and os.path.exists(kill_switch_path):
+        if os.path.lexists(marker):
             if out.exists():
                 try:
                     out.unlink()
@@ -26,10 +37,9 @@ def run_continuous_publisher(candidates_path, decisions_path, key_path, output_p
                     pass
             return "kill_switch_triggered"
 
-        now = datetime.now(timezone.utc)
         try:
             count, size = publish(candidates_path, decisions_path, key_path, output_path,
-                                  now=now, enabled=enabled)
+                                  enabled=enabled)
             if count == 0:
                 # No approved active items: invalidate snapshot to prevent serving empty active state
                 if out.exists():
