@@ -142,13 +142,15 @@ chmod 700 /opt/resell-radar-ukraine/data
 chmod 600 /opt/resell-radar-ukraine/data/rent_deals.db
 chown kyivradar:kyivradar /opt/kyiv-radar-tma/data/deals.json
 chmod 600 /opt/kyiv-radar-tma/data/deals.json
-chown kyivradar:kyivradar /opt/agent-bot/kyiv_radar_api.py
+# Only set ownership AFTER installing the full, compatible API/bot package:
+# chown kyivradar:kyivradar /opt/agent-bot/kyiv_radar_api.py
 ```
 
 ### Step 4: Configure Secrets & Systemd
 ```bash
 # Create .env with mode 600
-cat << 'EOF' > /opt/agent-bot/.env  # NEVER fill tokens into a shared terminal log
+# NEVER paste actual tokens into shared terminal logs.
+cat << 'EOF' > /opt/agent-bot/.env
 APP_ENV=production
 BOT_TOKEN=YOUR_BOTFATHER_TOKEN
 ADMIN_CHAT_ID=8531839081
