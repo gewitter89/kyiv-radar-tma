@@ -64,7 +64,7 @@ def apply_page(directory, procedures, *, observed_at, now):
     if not isinstance(procedures, list) or len(procedures) > MAX_ROWS:
         raise ValueError("Bounded page required")
     # Validate before touching disk. Only canonical IDs enter the cache.
-    updates = []
+    updates = {}
     for row in procedures:
         if not isinstance(row, dict):
             raise ValueError("Unexpected procedure")
@@ -77,12 +77,17 @@ def apply_page(directory, procedures, *, observed_at, now):
         result = candidate(row, observed_at=observed, now=now)
         if result:
             result.pop("observed_at", None)
-        updates.append((key, _stamp(modified), result))
+        stamp = _stamp(modified)
+        previous = updates.get(key)
+        if previous is None or stamp > previous[0]:
+            updates[key] = (stamp, result)
+        elif stamp == previous[0] and previous[1] != result:
+            updates[key] = (stamp, None)
     conn = _connect(directory)
     try:
         with conn:
             conn.execute("BEGIN IMMEDIATE")
-            for key, modified, result in updates:
+            for key, (modified, result) in updates.items():
                 existing = conn.execute(
                     "SELECT modified, observed, payload FROM auction_review WHERE auction_id=?",
                     (key,)).fetchone()
