@@ -147,8 +147,9 @@ def test_production_release_gate(tmp_path, monkeypatch):
     assert client.get("/api/auctions").status_code == 404
 
     # 4. Explicit production release flag enables the route
-    monkeypatch.setattr(api, "APP_ENV", "production")
     monkeypatch.setenv("KYIV_RADAR_AUCTIONS_RELEASE", "1")
+    assert client.get("/api/auctions").status_code == 404
+    monkeypatch.setattr(api, "APP_ENV", "production")
     resp = client.get("/api/auctions")
     assert resp.status_code == 200
     assert resp.headers["cache-control"] == "no-store"
@@ -279,8 +280,11 @@ def test_continuous_publisher_and_kill_switch(tmp_path, monkeypatch):
     client = TestClient(api.app)
     assert client.get("/api/auctions").status_code == 200
 
-    # 3. Trigger kill switch: publisher stops immediately and removes snapshot
+    # 3. The API itself blocks immediately, even before the publisher wakes.
     kill_switch_file.touch()
+    assert out_file.exists()
+    assert client.get("/api/auctions").status_code == 503
+    assert client.head("/api/auctions").status_code == 503
     res_kill = run_continuous_publisher(
         str(candidates_file), str(ledger), str(key_file), str(out_file),
         interval=0.01, kill_switch_path=str(kill_switch_file), max_runs=2, enabled=True
