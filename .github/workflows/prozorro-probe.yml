@@ -1,0 +1,23 @@
+name: Open-data read-only probe
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/prozorro_probe.py
+      - scripts/prozorro_auction_candidates.py
+      - .github/workflows/prozorro-probe.yml
+permissions:
+  contents: read
+concurrency:
+  group: prozorro-probe-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  public-endpoint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: One bounded public GET; print aggregate counts only
+        run: python3 scripts/prozorro_probe.py --live-read-only --limit 3
