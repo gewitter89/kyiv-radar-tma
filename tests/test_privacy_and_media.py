@@ -53,6 +53,9 @@ def privacy_test_env():
         deals_data = [
             {
                 "id": 1,
+                "source": "Київ Радар (Пряма заявка)",
+                "submission_id": 1,
+                "moderationStatus": "approved",
                 "title": "Квартира #1",
                 "address": "вул. Хрещатик, 1",
                 "price": 15000,
