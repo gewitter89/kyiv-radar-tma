@@ -5,6 +5,8 @@ on:
     paths:
       - scripts/prozorro_probe.py
       - scripts/prozorro_incremental_scan.py
+      - scripts/prozorro_review_cache.py
+      - scripts/prozorro_review_sync.py
       - scripts/prozorro_auction_candidates.py
       - .github/workflows/prozorro-probe.yml
 permissions:
@@ -25,3 +27,12 @@ jobs:
 
       - name: Bounded three-page incremental diagnostic
         run: python3 scripts/prozorro_incremental_scan.py --live-read-only
+
+      - name: Live feed to disposable private SQLite (aggregate only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir="$(mktemp -d)"
+          trap 'rm -rf -- "$dir"' EXIT
+          chmod 700 "$dir"
+          python3 -m scripts.prozorro_review_sync --live-private-review --private-dir "$dir"
