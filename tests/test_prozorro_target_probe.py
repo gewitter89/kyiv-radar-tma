@@ -9,7 +9,7 @@ AID = "ALE001-UA-20261124-00000"
 
 def test_schema_flags_without_private_fields():
     p = payload()
-    p.update(auctionId=AID, sellingMethod="alienation-english")
+    p.update(auctionId=AID, sellingMethod="alienation-english", dateModified=NOW.isoformat())
     def request(url):
         assert url == BASE+PID
         return json.dumps(p).encode()
@@ -17,6 +17,7 @@ def test_schema_flags_without_private_fields():
     assert result["identity_confirmed"] and result["ale_method"]
     assert result["cav_apartment"] and result["kyiv_locality"]
     assert result["current_adapter_accepts"]
+    assert result["private_cache_verified"]
     assert result["publications"] == 0
     assert "PRIVATE" not in repr(result)
 
