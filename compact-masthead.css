@@ -152,13 +152,13 @@ html.kr-compact.kr-simple header.kr-compact-masthead #searchInput::placeholder {
   opacity:1;
 }
 html.kr-compact.kr-simple header.kr-compact-masthead .kr-compact-search-row > button[onclick="openLandlordModal()"] {
-  display:grid !important;
-  place-items:center;
-  flex:0 0 41px;
-  width:41px !important;
+  display:flex !important;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
   height:44px !important;
   min-height:44px !important;
-  padding:0 !important;
+  padding-inline:9px !important;
   border-radius:13px;
   background:rgba(111,164,232,.08) !important;
   border:1px solid rgba(173,198,228,.16) !important;
