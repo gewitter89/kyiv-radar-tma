@@ -141,7 +141,7 @@ async def test_empty_catalog_favorites_return_restores_search_and_map():
         await search.fill("Позняки")
         await page.locator("#viewModeMapBtn").tap()
         await page.locator("#krFavoritesShortcut").tap()
-        assert await page.get_by_text("Обраних квартир поки немає").is_visible()
+        assert await page.locator("#listViewContainer").get_by_text("Обраних квартир поки немає", exact=True).is_visible()
         await page.get_by_role("button", name="Повернутися до пошуку", exact=True).tap()
         assert await search.input_value() == "Позняки"
         assert await page.evaluate("CURRENT_VIEW_MODE") == "map"
