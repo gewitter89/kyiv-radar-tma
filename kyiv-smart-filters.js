@@ -55,6 +55,7 @@
   if(!favoritesAreOpen){
    previousBrowse={
     filters:{...ACTIVE_FILTERS},
+    view:CURRENT_VIEW_MODE,
     query:typeof searchQuery==="string"?searchQuery:""
    };
    Object.assign(ACTIVE_FILTERS,{
@@ -70,6 +71,7 @@
     Object.assign(ACTIVE_FILTERS,previousBrowse.filters,{favs:false});
     if(typeof searchQuery!=="undefined")searchQuery=previousBrowse.query;
     if(input)input.value=previousBrowse.query;
+    if(typeof setViewMode==="function")setViewMode(previousBrowse.view);
    }else ACTIVE_FILTERS.favs=false;
    previousBrowse=null;
   }
@@ -103,7 +105,7 @@
  }
  function createSheet(){
   const modal=document.createElement("div");modal.id="krFiltersSheet";modal.className="kr-filters-sheet";modal.hidden=true;
-  modal.innerHTML="<button type=\"button\" id=\"krFiltersScrim\" class=\"kr-filters-scrim\" aria-label=\"Закрити фільтри\"></button><section class=\"kr-filters-panel\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"krFiltersTitle\"><header class=\"kr-filters-head\"><div><h2 id=\"krFiltersTitle\">Фільтри квартир</h2><p>Обирайте лише потрібне</p></div><button type=\"button\" id=\"krFiltersClose\" aria-label=\"Закрити фільтри\">×</button></header><div class=\"kr-filters-scroll\" id=\"krFiltersScroll\"><section id=\"krRoomsSection\" class=\"kr-filters-section\"><h3>Кількість кімнат</h3><div id=\"krRoomsOptions\" class=\"kr-room-options\" role=\"group\" aria-label=\"Вибір кількості кімнат\"></div><p id=\"krRoomNotice\" class=\"kr-filter-note\"></p></section><section id=\"krPriceSection\" class=\"kr-filters-section\"><h3>Максимальна ціна</h3><label for=\"krMaxPriceInput\">Оренда за місяць, ₴</label><input id=\"krMaxPriceInput\" type=\"number\" inputmode=\"numeric\" min=\"0\" max=\"1000000\" step=\"500\" placeholder=\"Без обмежень\"><div id=\"krPriceOptions\" class=\"kr-price-options\" role=\"group\" aria-label=\"Швидкий вибір ціни\"></div></section><section id=\"krConditionsSection\" class=\"kr-filters-section\"><h3>Умови проживання</h3><div id=\"krConditionOptions\" class=\"kr-condition-options\"></div><p class=\"kr-filter-note\">Відомості заявлені в оголошеннях. Ми не підтверджували умови незалежно.</p></section><section class=\"kr-filters-section\"><button type=\"button\" id=\"krFiltersSort\" class=\"kr-filters-sort\">Сортування <span aria-hidden=\"true\">›</span></button></section></div><footer class=\"kr-filters-footer\"><button type=\"button\" id=\"krFiltersReset\">Скинути</button><button type=\"button\" id=\"krFiltersApply\">Показати квартири</button></footer></section>";
+  modal.innerHTML="<button type=\"button\" id=\"krFiltersScrim\" class=\"kr-filters-scrim\" aria-label=\"Закрити фільтри\"></button><section class=\"kr-filters-panel\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"krFiltersTitle\"><header class=\"kr-filters-head\"><div><h2 id=\"krFiltersTitle\">Фільтри квартир</h2></div><button type=\"button\" id=\"krFiltersClose\" aria-label=\"Закрити фільтри\">×</button></header><div class=\"kr-filters-scroll\" id=\"krFiltersScroll\"><section id=\"krRoomsSection\" class=\"kr-filters-section\"><h3>Кількість кімнат</h3><div id=\"krRoomsOptions\" class=\"kr-room-options\" role=\"group\" aria-label=\"Вибір кількості кімнат\"></div><p id=\"krRoomNotice\" class=\"kr-filter-note\"></p></section><section id=\"krPriceSection\" class=\"kr-filters-section\"><h3>Максимальна ціна</h3><label for=\"krMaxPriceInput\">Оренда за місяць, ₴</label><input id=\"krMaxPriceInput\" type=\"number\" inputmode=\"numeric\" min=\"0\" max=\"1000000\" step=\"500\" placeholder=\"Без обмежень\"><div id=\"krPriceOptions\" class=\"kr-price-options\" role=\"group\" aria-label=\"Швидкий вибір ціни\"></div></section><section id=\"krConditionsSection\" class=\"kr-filters-section\"><h3>Умови проживання</h3><div id=\"krConditionOptions\" class=\"kr-condition-options\"></div><p class=\"kr-filter-note\">Відомості заявлені в оголошеннях. Ми не підтверджували умови незалежно.</p></section><section class=\"kr-filters-section\"><button type=\"button\" id=\"krFiltersSort\" class=\"kr-filters-sort\">Сортування <span aria-hidden=\"true\">›</span></button></section></div><footer class=\"kr-filters-footer\"><button type=\"button\" id=\"krFiltersReset\">Скинути</button><button type=\"button\" id=\"krFiltersApply\">Показати квартири</button></footer></section>";
   document.body.append(modal);
   for(const [v,label] of [[null,"Усі"],[1,"1"],[2,"2"],[3,"3"],[4,"4"],[5,"5+"]]){
    const b=btn(label,null,"kr-filter-option");b.dataset.room=v==null?"any":String(v);b.setAttribute("aria-pressed","false");
