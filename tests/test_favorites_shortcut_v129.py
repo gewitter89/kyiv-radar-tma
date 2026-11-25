@@ -123,3 +123,31 @@ async def test_favorites_button_keyboard_and_filter_sheet_remain_in_sync():
         await button.press("Space")
         assert await button.get_attribute("aria-pressed")=="false"
         await browser.close()
+
+
+@pytest.mark.asyncio
+async def test_empty_catalog_favorites_return_restores_search_and_map():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 390, "height": 844},
+                                      is_mobile=True, has_touch=True)
+        await page.route("**/api/deals?*", lambda route: route.fulfill(
+            json={"success": True, "deals": []},
+            headers={"access-control-allow-origin": "*"},
+        ))
+        await page.goto(URL, wait_until="domcontentloaded")
+        await page.wait_for_function("window.KR_CATALOG_MODE === 'live' && LISTINGS.length === 0")
+        search = page.locator("#searchInput")
+        await search.fill("Позняки")
+        await page.locator("#viewModeMapBtn").tap()
+        await page.locator("#krFavoritesShortcut").tap()
+        assert await page.get_by_text("Обраних квартир поки немає").is_visible()
+        await page.get_by_role("button", name="Повернутися до пошуку", exact=True).tap()
+        assert await search.input_value() == "Позняки"
+        assert await page.evaluate("CURRENT_VIEW_MODE") == "map"
+
+        owner = page.get_by_role("button", name="Подати оголошення про квартиру")
+        assert await owner.get_by_text("Подати", exact=True).is_visible()
+        await owner.tap()
+        assert await page.get_by_role("link", name="Відкрити бота").is_visible()
+        await browser.close()
