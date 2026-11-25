@@ -366,7 +366,7 @@
         <!-- Landlord Post Button -->
         <button onclick="openLandlordModal()" class="shrink-0 h-8 px-2.5 rounded-full bg-[#1c1c1e] hover:bg-[#30d158] hover:text-black border border-white/[0.08] text-white text-xs font-medium flex items-center gap-1.5 transition-all active:scale-95" title="Опублікувати квартиру (Для власників)">
             <svg class="w-3.5 h-3.5 text-[#30d158]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-            <span class="hidden sm:inline">Здати</span>
+            <span class="hidden sm:inline">Подати</span>
         </button>
     </header>
 
@@ -1504,14 +1504,34 @@
             if (items.length === 0) {
                 const emptyCatalog = LISTINGS.length === 0;
                 const catalogUnavailable = emptyCatalog && window.KR_CATALOG_MODE === 'unavailable';
-                const noSaved = !emptyCatalog && ACTIVE_FILTERS.favs && FAVORITES.size === 0;
-                const savedMissing = !emptyCatalog && ACTIVE_FILTERS.favs &&
-                    FAVORITES.size > 0 && !LISTINGS.some(item => FAVORITES.has(Number(item.id)));
+                let title = 'Нічого не знайдено';
+                let message = 'Змініть район, бюджет або інші умови.';
+                let action = `<button type="button" onclick="document.getElementById('krReset').click()" class="kr-reset mt-4">Скинути фільтри</button>`;
+
+                const backToSearch = `<button type="button" onclick="document.getElementById('krFavoritesShortcut').click()" class="kr-reset mt-4">Повернутися до пошуку</button>`;
+                if (ACTIVE_FILTERS.favs && FAVORITES.size === 0) {
+                    title = 'Обраних квартир поки немає';
+                    message = 'Торкніться сердечка на оголошенні, щоб зберегти квартиру.';
+                    action = backToSearch;
+                } else if (catalogUnavailable) {
+                    title = 'Каталог тимчасово недоступний';
+                    message = 'Не вдалося завантажити актуальні оголошення.';
+                    action = '<button type="button" onclick="loadDeals()" class="kr-reset mt-4">Спробувати ще раз</button>';
+                } else if (ACTIVE_FILTERS.favs && !LISTINGS.some(item => FAVORITES.has(Number(item.id)))) {
+                    title = 'Збережені оголошення зараз недоступні';
+                    message = 'У поточному каталозі немає збережених вами квартир.';
+                    action = backToSearch;
+                } else if (emptyCatalog) {
+                    title = 'Зараз немає доступних оголошень';
+                    message = 'Нові пропозиції з’являться тут після публікації.';
+                    action = '';
+                }
+
                 listEl.innerHTML = `
-                    <div class="kr-empty-state">
-                        <div class="text-white font-semibold text-base">${catalogUnavailable ? 'Каталог тимчасово недоступний' : emptyCatalog ? 'Зараз немає доступних оголошень' : noSaved ? 'Обраних квартир поки немає' : savedMissing ? 'Збережені оголошення зараз недоступні' : 'Нічого не знайдено'}</div>
-                        <p class="mt-2 text-sm text-[#aebdd0]">${catalogUnavailable ? 'Не вдалося отримати актуальні дані. Старі оголошення приховано, щоб не показувати зняті квартири як доступні.' : emptyCatalog ? 'Опубліковані пропозиції тимчасово відсутні. Не показуємо зняті оголошення.' : noSaved ? 'Натисніть сердечко на квартирі, щоб зберегти її тут. Обрані залишаються лише у цьому браузері.' : savedMissing ? 'Ці квартири наразі відсутні в доступному каталозі. Ми не показуємо зняті або недоступні оголошення як активні.' : 'Змініть район, бюджет або інші умови.'}</p>
-                        ${catalogUnavailable ? '<button type="button" onclick="loadDeals()" class="kr-reset mt-4">Спробувати ще раз</button>' : emptyCatalog ? '' : '<button type="button" onclick="setFilter(\'all\')" class="kr-reset mt-4">Скинути фільтри</button>'}
+                    <div class="kr-empty-state" role="status">
+                        <div class="text-white font-semibold text-base">${title}</div>
+                        <p class="mt-2 text-sm text-[#aebdd0]">${message}</p>
+                        ${action}
                     </div>
                 `;
                 return;
@@ -2787,7 +2807,7 @@
     <script src="./compact-masthead.js?v=1.10.0"></script>
     <script src="./unified-toolbar.js?v=1.12.0"></script>
     <script src="./kyiv-signal-theme.js?v=1.38.0"></script>
-    <script src="./kyiv-smart-filters.js?v=1.29.1"></script>
+    <script src="./kyiv-smart-filters.js?v=1.29.2"></script>
     <!-- Auction preview is disabled unless backend authorizes release or staging explicitly sets KR_AUCTIONS_STAGING. -->
     <link rel="stylesheet" href="./auction-tab.css?v=1.49.0">
     <script src="./auction-tab.js?v=1.49.0"></script>
